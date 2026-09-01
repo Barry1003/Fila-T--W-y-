@@ -5,8 +5,13 @@ build
 dist
 *.tsbuildinfo
 next-env.d.ts
+.env
 .env*.local
+!.env.example
 .DS_Store
 npm-debug.log*
 yarn-error.log*
 .claude
+
+# Prisma client is generated, not source
+src/generated
