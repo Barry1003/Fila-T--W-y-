@@ -397,7 +397,7 @@ export default function ConsoleAnalytics() {
   const maxRegionOrders = Math.max(...REGIONS.map((r) => r.orders));
 
   return (
-    <div style={{ padding: "1.75rem", fontFamily: UI, display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+    <div className="console-page" style={{ padding: "1.75rem", fontFamily: UI, display: "flex", flexDirection: "column", gap: "1.25rem" }}>
 
       {/* ── Page header row ──────────────────────────────── */}
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
@@ -441,7 +441,7 @@ export default function ConsoleAnalytics() {
       </div>
 
       {/* ── Top stat cards ────────────────────────────────── */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "1rem" }}>
+      <div className="rg-4" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "1rem" }}>
         <StatCard
           label="Total Revenue"
           primary={fmtGBP(stats.revenue)}
@@ -495,7 +495,7 @@ export default function ConsoleAnalytics() {
       </Card>
 
       {/* ── Two-column: Products + Categories ─────────────── */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 360px", gap: "1rem" }}>
+      <div className="rg-split" style={{ display: "grid", gridTemplateColumns: "1fr 360px", gap: "1rem" }}>
 
         {/* Top Products */}
         <Card>
@@ -586,7 +586,7 @@ export default function ConsoleAnalytics() {
         <div style={{ fontSize: "0.7rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(43,35,32,0.38)", fontWeight: 500, marginBottom: "0.75rem" }}>
           Traffic & Customers
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "0.875rem" }}>
+        <div className="rg-4" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "0.875rem" }}>
           <InsightCard
             label="New Customers"
             value={String(stats.newCustomers)}

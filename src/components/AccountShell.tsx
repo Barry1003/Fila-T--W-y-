@@ -110,9 +110,45 @@ const ITEMS: SidebarItem[] = [
   },
 ];
 
+const SIGN_OUT_ICON = (
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+    <polyline points="16 17 21 12 16 7" />
+    <line x1="21" y1="12" x2="9" y2="12" />
+  </svg>
+);
+
 export default function AccountShell({ children }: { children: React.ReactNode }) {
   return (
     <div style={{ backgroundColor: C.cream, minHeight: 'calc(100vh - 70px)', fontFamily: UI }}>
+
+      {/* ── Mobile nav — a scrolling tab strip replaces the sidebar ─────── */}
+      <div className="account-mobile-nav">
+        <div className="account-mobile-id">
+          <div className="account-mobile-avatar">
+            <span style={{ fontFamily: DISPLAY, fontSize: '0.95rem', color: C.cream, fontWeight: 500, lineHeight: 1 }}>A</span>
+          </div>
+          <div style={{ minWidth: 0 }}>
+            <div className="account-mobile-name">Adunola Okonkwo</div>
+            <div className="account-mobile-email">adunola@example.com</div>
+          </div>
+        </div>
+
+        <nav className="account-mobile-tabs" aria-label="Account sections">
+          {ITEMS.map(item => (
+            <NavLink
+              key={item.key}
+              to={item.to}
+              end={item.to === '/account'}
+              className={({ isActive }) => `account-tab${isActive ? ' active' : ''}`}
+            >
+              {item.icon}
+              {item.label}
+            </NavLink>
+          ))}
+        </nav>
+      </div>
+
       <div className="account-layout" style={{ maxWidth: '1440px', margin: '0 auto', padding: '3rem 2.5rem', display: 'grid', gridTemplateColumns: '240px 1fr', gap: '3rem', alignItems: 'start' }}>
 
         {/* ── Sidebar ────────────────────────────────────── */}
@@ -180,13 +216,7 @@ export default function AccountShell({ children }: { children: React.ReactNode }
               onMouseEnter={e => (e.currentTarget.style.color = C.maroon)}
               onMouseLeave={e => (e.currentTarget.style.color = 'rgba(43,35,32,0.45)')}
             >
-              <span style={{ lineHeight: 0 }}>
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-                  <polyline points="16 17 21 12 16 7" />
-                  <line x1="21" y1="12" x2="9" y2="12" />
-                </svg>
-              </span>
+              <span style={{ lineHeight: 0 }}>{SIGN_OUT_ICON}</span>
               Sign Out
             </button>
           </nav>

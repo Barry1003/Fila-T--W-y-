@@ -221,7 +221,7 @@ export default function ConsoleProducts() {
   const hasBulk = selected.size > 0;
 
   return (
-    <div style={{ padding: "1.75rem", fontFamily: UI, minHeight: "100%" }}>
+    <div className="console-page" style={{ padding: "1.75rem", fontFamily: UI, minHeight: "100%" }}>
 
       {/* ── Top action row ────────────────────────────────── */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "1.25rem" }}>
@@ -365,136 +365,138 @@ export default function ConsoleProducts() {
           <EmptyState />
         ) : (
           <>
-            <table style={{ width: "100%", borderCollapse: "collapse" }}>
-              <thead>
-                <tr style={{ borderBottom: "1px solid rgba(43,35,32,0.07)" }}>
-                  <th style={thStyle}>
-                    <input
-                      type="checkbox"
-                      checked={allOnPageSelected}
-                      onChange={toggleAll}
-                      style={{ accentColor: C.maroon, cursor: "pointer" }}
-                    />
-                  </th>
-                  {["Product", "Category", "Price", "Stock", "Status", "Actions"].map(h => (
-                    <th key={h} style={thStyle}>{h}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {paginated.map((p, i) => {
-                  const isSelected = selected.has(p.id);
-                  return (
-                    <tr
-                      key={p.id}
-                      style={{
-                        backgroundColor: isSelected
-                          ? "rgba(212,169,78,0.06)"
-                          : i % 2 === 0 ? "transparent" : "rgba(43,35,32,0.015)",
-                        transition: "background-color 0.1s",
-                      }}
-                      onMouseEnter={e => {
-                        if (!isSelected) (e.currentTarget as HTMLTableRowElement).style.backgroundColor = "rgba(212,169,78,0.04)";
-                      }}
-                      onMouseLeave={e => {
-                        if (!isSelected) (e.currentTarget as HTMLTableRowElement).style.backgroundColor = i % 2 === 0 ? "transparent" : "rgba(43,35,32,0.015)";
-                      }}
-                    >
-                      {/* Checkbox */}
-                      <td style={tdCentered}>
-                        <input
-                          type="checkbox"
-                          checked={isSelected}
-                          onChange={() => toggleOne(p.id)}
-                          style={{ accentColor: C.maroon, cursor: "pointer" }}
-                        />
-                      </td>
-
-                      {/* Product */}
-                      <td style={td}>
-                        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-                          <ProductThumb
-                            color={p.color}
-                            initials={p.name.split(" ").slice(0, 2).map(w => w[0]).join("").toUpperCase()}
+            <div className="table-scroll">
+              <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 640 }}>
+                <thead>
+                  <tr style={{ borderBottom: "1px solid rgba(43,35,32,0.07)" }}>
+                    <th style={thStyle}>
+                      <input
+                        type="checkbox"
+                        checked={allOnPageSelected}
+                        onChange={toggleAll}
+                        style={{ accentColor: C.maroon, cursor: "pointer" }}
+                      />
+                    </th>
+                    {["Product", "Category", "Price", "Stock", "Status", "Actions"].map(h => (
+                      <th key={h} style={thStyle}>{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {paginated.map((p, i) => {
+                    const isSelected = selected.has(p.id);
+                    return (
+                      <tr
+                        key={p.id}
+                        style={{
+                          backgroundColor: isSelected
+                            ? "rgba(212,169,78,0.06)"
+                            : i % 2 === 0 ? "transparent" : "rgba(43,35,32,0.015)",
+                          transition: "background-color 0.1s",
+                        }}
+                        onMouseEnter={e => {
+                          if (!isSelected) (e.currentTarget as HTMLTableRowElement).style.backgroundColor = "rgba(212,169,78,0.04)";
+                        }}
+                        onMouseLeave={e => {
+                          if (!isSelected) (e.currentTarget as HTMLTableRowElement).style.backgroundColor = i % 2 === 0 ? "transparent" : "rgba(43,35,32,0.015)";
+                        }}
+                      >
+                        {/* Checkbox */}
+                        <td style={tdCentered}>
+                          <input
+                            type="checkbox"
+                            checked={isSelected}
+                            onChange={() => toggleOne(p.id)}
+                            style={{ accentColor: C.maroon, cursor: "pointer" }}
                           />
-                          <div>
-                            <div style={{ fontSize: "0.8rem", fontWeight: 600, color: C.charcoal, lineHeight: 1.2 }}>
-                              {p.name}
-                            </div>
-                            <div style={{ fontSize: "0.68rem", color: "rgba(43,35,32,0.4)", marginTop: "2px" }}>
-                              #{p.id.toUpperCase()}
+                        </td>
+
+                        {/* Product */}
+                        <td style={td}>
+                          <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+                            <ProductThumb
+                              color={p.color}
+                              initials={p.name.split(" ").slice(0, 2).map(w => w[0]).join("").toUpperCase()}
+                            />
+                            <div>
+                              <div style={{ fontSize: "0.8rem", fontWeight: 600, color: C.charcoal, lineHeight: 1.2 }}>
+                                {p.name}
+                              </div>
+                              <div style={{ fontSize: "0.68rem", color: "rgba(43,35,32,0.4)", marginTop: "2px" }}>
+                                #{p.id.toUpperCase()}
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      </td>
+                        </td>
 
-                      {/* Category */}
-                      <td style={td}>
-                        <span style={{ fontSize: "0.77rem", color: "rgba(43,35,32,0.65)" }}>{p.category}</span>
-                      </td>
+                        {/* Category */}
+                        <td style={td}>
+                          <span style={{ fontSize: "0.77rem", color: "rgba(43,35,32,0.65)" }}>{p.category}</span>
+                        </td>
 
-                      {/* Price */}
-                      <td style={td}>
-                        <div style={{ fontSize: "0.8rem", fontWeight: 600, color: C.charcoal }}>£{p.priceGBP.toLocaleString()}</div>
-                        <div style={{ fontSize: "0.67rem", color: "rgba(43,35,32,0.38)", marginTop: "1px" }}>
-                          ₦{p.priceNGN.toLocaleString()}
-                        </div>
-                      </td>
+                        {/* Price */}
+                        <td style={td}>
+                          <div style={{ fontSize: "0.8rem", fontWeight: 600, color: C.charcoal }}>£{p.priceGBP.toLocaleString()}</div>
+                          <div style={{ fontSize: "0.67rem", color: "rgba(43,35,32,0.38)", marginTop: "1px" }}>
+                            ₦{p.priceNGN.toLocaleString()}
+                          </div>
+                        </td>
 
-                      {/* Stock */}
-                      <td style={td}>
-                        <span style={{
-                          fontSize: "0.8rem",
-                          fontWeight: p.stock === 0 ? 600 : 400,
-                          color: p.stock === 0 ? C.maroon : p.stock <= 3 ? "#8A6818" : C.charcoal,
-                        }}>
-                          {p.stock === 0 ? "—" : p.stock}
-                        </span>
-                        {p.stock > 0 && p.stock <= 3 && (
-                          <span style={{ marginLeft: 5, fontSize: "0.63rem", color: "#8A6818", fontWeight: 500 }}>low</span>
-                        )}
-                      </td>
+                        {/* Stock */}
+                        <td style={td}>
+                          <span style={{
+                            fontSize: "0.8rem",
+                            fontWeight: p.stock === 0 ? 600 : 400,
+                            color: p.stock === 0 ? C.maroon : p.stock <= 3 ? "#8A6818" : C.charcoal,
+                          }}>
+                            {p.stock === 0 ? "—" : p.stock}
+                          </span>
+                          {p.stock > 0 && p.stock <= 3 && (
+                            <span style={{ marginLeft: 5, fontSize: "0.63rem", color: "#8A6818", fontWeight: 500 }}>low</span>
+                          )}
+                        </td>
 
-                      {/* Status */}
-                      <td style={td}>
-                        <StatusBadge status={p.status} />
-                      </td>
+                        {/* Status */}
+                        <td style={td}>
+                          <StatusBadge status={p.status} />
+                        </td>
 
-                      {/* Actions */}
-                      <td style={tdCentered}>
-                        <div style={{ display: "flex", gap: "0.375rem", alignItems: "center" }}>
-                          <Link
-                            to={`/console/products/${p.id}/edit`}
-                            title="Edit"
-                            style={{ color: "rgba(43,35,32,0.45)", lineHeight: 0, display: "flex", textDecorationLine: "none" }}
-                            onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = C.charcoal}
-                            onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = "rgba(43,35,32,0.45)"}
-                          >
-                            <PenIcon size={14} />
-                          </Link>
-                          <button
-                            title="Duplicate"
-                            style={actionBtn}
-                            onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = C.charcoal}
-                            onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = "rgba(43,35,32,0.45)"}
-                          >
-                            <DuplicateIcon size={14} />
-                          </button>
-                          <button
-                            title="Delete"
-                            style={{ ...actionBtn }}
-                            onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = C.maroon}
-                            onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = "rgba(43,35,32,0.45)"}
-                          >
-                            <TrashIcon size={14} />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+                        {/* Actions */}
+                        <td style={tdCentered}>
+                          <div style={{ display: "flex", gap: "0.375rem", alignItems: "center" }}>
+                            <Link
+                              to={`/console/products/${p.id}/edit`}
+                              title="Edit"
+                              style={{ color: "rgba(43,35,32,0.45)", lineHeight: 0, display: "flex", textDecorationLine: "none" }}
+                              onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = C.charcoal}
+                              onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = "rgba(43,35,32,0.45)"}
+                            >
+                              <PenIcon size={14} />
+                            </Link>
+                            <button
+                              title="Duplicate"
+                              style={actionBtn}
+                              onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = C.charcoal}
+                              onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = "rgba(43,35,32,0.45)"}
+                            >
+                              <DuplicateIcon size={14} />
+                            </button>
+                            <button
+                              title="Delete"
+                              style={{ ...actionBtn }}
+                              onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = C.maroon}
+                              onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = "rgba(43,35,32,0.45)"}
+                            >
+                              <TrashIcon size={14} />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
 
             {/* Pagination */}
             <div style={{

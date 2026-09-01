@@ -207,113 +207,115 @@ function DiscountTable({
         overflow: "hidden",
       }}
     >
-      <table style={{ width: "100%", borderCollapse: "collapse" }}>
-        <thead>
-          <tr>
-            {["Code", "Type", "Value", "Usage", "Status", "Expiry", ""].map((h) => (
-              <th
-                key={h}
-                style={{
-                  padding: "0.625rem 1.25rem",
-                  textAlign: "left",
-                  fontSize: "0.62rem",
-                  letterSpacing: "0.09em",
-                  textTransform: "uppercase",
-                  color: "rgba(43,35,32,0.38)",
-                  fontWeight: 500,
-                  borderBottom: "1px solid rgba(43,35,32,0.06)",
-                  whiteSpace: "nowrap",
-                  fontFamily: UI,
-                }}
-              >
-                {h}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {codes.map((c, i) => (
-            <tr key={c.id} style={{ backgroundColor: i % 2 === 0 ? "transparent" : "rgba(43,35,32,0.018)" }}>
-              <td style={{ padding: "0.75rem 1.25rem" }}>
-                <span
+      <div className="table-scroll">
+        <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 680 }}>
+          <thead>
+            <tr>
+              {["Code", "Type", "Value", "Usage", "Status", "Expiry", ""].map((h) => (
+                <th
+                  key={h}
                   style={{
+                    padding: "0.625rem 1.25rem",
+                    textAlign: "left",
+                    fontSize: "0.62rem",
+                    letterSpacing: "0.09em",
+                    textTransform: "uppercase",
+                    color: "rgba(43,35,32,0.38)",
+                    fontWeight: 500,
+                    borderBottom: "1px solid rgba(43,35,32,0.06)",
+                    whiteSpace: "nowrap",
                     fontFamily: UI,
-                    fontSize: "0.8rem",
-                    fontWeight: 600,
-                    color: C.charcoal,
-                    backgroundColor: "rgba(43,35,32,0.05)",
-                    padding: "2px 8px",
-                    borderRadius: 4,
-                    letterSpacing: "0.06em",
                   }}
                 >
-                  {c.code}
-                </span>
-              </td>
-              <td style={{ padding: "0.75rem 1.25rem", fontSize: "0.77rem", color: "rgba(43,35,32,0.6)" }}>
-                {c.type}
-              </td>
-              <td style={{ padding: "0.75rem 1.25rem", fontSize: "0.82rem", fontWeight: 600, color: C.charcoal }}>
-                {c.value}
-              </td>
-              <td style={{ padding: "0.75rem 1.25rem" }}>
-                <UsageBar used={c.usedCount} limit={c.limitCount} />
-              </td>
-              <td style={{ padding: "0.75rem 1.25rem" }}>
-                <Toggle
-                  active={c.active && !c.expired}
-                  onChange={() => { if (!c.expired) onToggle(c.id); }}
-                />
-              </td>
-              <td
-                style={{
-                  padding: "0.75rem 1.25rem",
-                  fontSize: "0.77rem",
-                  color: c.expired ? C.maroon : "rgba(43,35,32,0.55)",
-                  whiteSpace: "nowrap",
-                }}
-              >
-                {c.expiry}
-              </td>
-              <td style={{ padding: "0.75rem 1.25rem" }}>
-                <div style={{ display: "flex", gap: "0.5rem" }}>
-                  <button
-                    style={{
-                      background: "none",
-                      border: "1px solid rgba(43,35,32,0.14)",
-                      borderRadius: 4,
-                      padding: "3px 10px",
-                      fontSize: "0.7rem",
-                      color: "rgba(43,35,32,0.6)",
-                      cursor: "pointer",
-                      fontFamily: UI,
-                      whiteSpace: "nowrap",
-                    }}
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => onDelete(c.id)}
-                    style={{
-                      background: "none",
-                      border: "1px solid rgba(122,46,56,0.2)",
-                      borderRadius: 4,
-                      padding: "3px 10px",
-                      fontSize: "0.7rem",
-                      color: C.maroon,
-                      cursor: "pointer",
-                      fontFamily: UI,
-                      whiteSpace: "nowrap",
-                    }}
-                  >
-                    Delete
-                  </button>
-                </div>
-              </td>
+                  {h}
+                </th>
+              ))}
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {codes.map((c, i) => (
+              <tr key={c.id} style={{ backgroundColor: i % 2 === 0 ? "transparent" : "rgba(43,35,32,0.018)" }}>
+                <td style={{ padding: "0.75rem 1.25rem" }}>
+                  <span
+                    style={{
+                      fontFamily: UI,
+                      fontSize: "0.8rem",
+                      fontWeight: 600,
+                      color: C.charcoal,
+                      backgroundColor: "rgba(43,35,32,0.05)",
+                      padding: "2px 8px",
+                      borderRadius: 4,
+                      letterSpacing: "0.06em",
+                    }}
+                  >
+                    {c.code}
+                  </span>
+                </td>
+                <td style={{ padding: "0.75rem 1.25rem", fontSize: "0.77rem", color: "rgba(43,35,32,0.6)" }}>
+                  {c.type}
+                </td>
+                <td style={{ padding: "0.75rem 1.25rem", fontSize: "0.82rem", fontWeight: 600, color: C.charcoal }}>
+                  {c.value}
+                </td>
+                <td style={{ padding: "0.75rem 1.25rem" }}>
+                  <UsageBar used={c.usedCount} limit={c.limitCount} />
+                </td>
+                <td style={{ padding: "0.75rem 1.25rem" }}>
+                  <Toggle
+                    active={c.active && !c.expired}
+                    onChange={() => { if (!c.expired) onToggle(c.id); }}
+                  />
+                </td>
+                <td
+                  style={{
+                    padding: "0.75rem 1.25rem",
+                    fontSize: "0.77rem",
+                    color: c.expired ? C.maroon : "rgba(43,35,32,0.55)",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {c.expiry}
+                </td>
+                <td style={{ padding: "0.75rem 1.25rem" }}>
+                  <div style={{ display: "flex", gap: "0.5rem" }}>
+                    <button
+                      style={{
+                        background: "none",
+                        border: "1px solid rgba(43,35,32,0.14)",
+                        borderRadius: 4,
+                        padding: "3px 10px",
+                        fontSize: "0.7rem",
+                        color: "rgba(43,35,32,0.6)",
+                        cursor: "pointer",
+                        fontFamily: UI,
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => onDelete(c.id)}
+                      style={{
+                        background: "none",
+                        border: "1px solid rgba(122,46,56,0.2)",
+                        borderRadius: 4,
+                        padding: "3px 10px",
+                        fontSize: "0.7rem",
+                        color: C.maroon,
+                        cursor: "pointer",
+                        fontFamily: UI,
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
@@ -604,7 +606,7 @@ function CreateCodePanel({ onClose }: { onClose: () => void }) {
             <div style={{ fontSize: "0.62rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(43,35,32,0.38)", fontWeight: 500 }}>
               Value & Limits
             </div>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem" }}>
+            <div className="rg-2" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem" }}>
               <div>
                 <label style={{ display: "block", fontSize: "0.78rem", fontWeight: 500, color: C.charcoal, marginBottom: "0.375rem" }}>
                   {discountType === "Percentage" ? "Percentage (%)" : "Amount (£)"}
@@ -696,7 +698,7 @@ function CreateCodePanel({ onClose }: { onClose: () => void }) {
               )}
             </div>
 
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem" }}>
+            <div className="rg-2" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem" }}>
               <div>
                 <label style={{ display: "block", fontSize: "0.78rem", fontWeight: 500, color: C.charcoal, marginBottom: "0.375rem" }}>Start Date</label>
                 <input type="date" style={{ width: "100%", padding: "0.5rem 0.75rem", border: "1px solid rgba(43,35,32,0.18)", borderRadius: 6, fontSize: "0.82rem", fontFamily: UI, color: C.charcoal, outline: "none", boxSizing: "border-box", backgroundColor: "#fff" }} />
@@ -824,7 +826,7 @@ function CreateBannerPanel({ onClose }: { onClose: () => void }) {
             />
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem" }}>
+          <div className="rg-2" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem" }}>
             <div>
               <label style={{ display: "block", fontSize: "0.78rem", fontWeight: 500, color: C.charcoal, marginBottom: "0.375rem" }}>Start Date</label>
               <input type="date" style={{ width: "100%", padding: "0.5rem 0.75rem", border: "1px solid rgba(43,35,32,0.18)", borderRadius: 6, fontSize: "0.82rem", fontFamily: UI, color: C.charcoal, outline: "none", boxSizing: "border-box", backgroundColor: "#fff" }} />
@@ -957,7 +959,7 @@ export default function ConsolePromotions() {
   const TAB_LABELS: Record<Tab, string> = { codes: "Discount Codes", banners: "Homepage Banners" };
 
   return (
-    <div style={{ padding: "1.75rem", fontFamily: UI }}>
+    <div className="console-page" style={{ padding: "1.75rem", fontFamily: UI }}>
       {/* Page header */}
       <div
         style={{

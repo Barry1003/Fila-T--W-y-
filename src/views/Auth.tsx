@@ -308,7 +308,7 @@ function RegisterForm({ switchTab }: { switchTab: () => void }) {
       {/* Phone */}
       <div>
         <label style={{ ...label, fontSize: '0.65rem', color: C.charcoal, display: 'block', marginBottom: '0.4rem' }}>Phone Number</label>
-        <div style={{ display: 'grid', gridTemplateColumns: '130px 1fr', gap: '0.5rem' }}>
+        <div className="rg-split" style={{ display: 'grid', gridTemplateColumns: '130px 1fr', gap: '0.5rem' }}>
           <FocusSelect value={phoneCode} onChange={e => setPhoneCode(e.target.value)}>
             {PHONE_CODES.map(p => (
               <option key={p.code} value={p.code}>{p.label}</option>

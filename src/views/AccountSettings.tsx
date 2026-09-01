@@ -391,7 +391,7 @@ export default function AccountSettings() {
           <SectionLabel>Profile</SectionLabel>
           <AvatarBlock />
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 1rem' }}>
+          <div className="rg-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 1rem' }}>
             <FInput label="Full Name" value={fullName} onChange={setFullName} />
             <div style={{ marginBottom: '1.1rem' }}>
               <label style={{
@@ -443,7 +443,7 @@ export default function AccountSettings() {
           <SectionLabel>Password</SectionLabel>
           <div style={{ maxWidth: '480px' }}>
             <FInput label="Current Password" type="password" value={currentPw} onChange={setCurrentPw} placeholder="••••••••••" />
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 1rem' }}>
+            <div className="rg-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 1rem' }}>
               <FInput label="New Password" type="password" value={newPw} onChange={setNewPw} placeholder="••••••••••" />
               <FInput label="Confirm New Password" type="password" value={confirmPw} onChange={setConfirmPw} placeholder="••••••••••" />
             </div>
@@ -495,7 +495,7 @@ export default function AccountSettings() {
         {/* ── 4. Language & Region ─────────────────────────────────── */}
         <SectionCard>
           <SectionLabel>Language &amp; Region</SectionLabel>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 1rem', maxWidth: '560px' }}>
+          <div className="rg-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 1rem', maxWidth: '560px' }}>
             <FSelect
               label="Language"
               value={language}

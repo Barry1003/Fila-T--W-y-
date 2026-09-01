@@ -134,7 +134,7 @@ export default function Account() {
         </div>
 
         {/* ── Stat tiles ──────────────────────────────────── */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem' }}>
+        <div className="rg-3" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem' }}>
           {STATS.map(s => (
             <div
               key={s.label}

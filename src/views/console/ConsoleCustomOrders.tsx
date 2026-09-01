@@ -543,7 +543,7 @@ function RequestDetailPanel({
           {/* ── Customer info */}
           <section>
             <SectionLabel>Customer</SectionLabel>
-            <div
+            <div className="rg-2"
               style={{
                 backgroundColor: "rgba(43,35,32,0.025)",
                 border: "1px solid rgba(43,35,32,0.07)",
@@ -564,7 +564,7 @@ function RequestDetailPanel({
           {/* ── Order context */}
           <section>
             <SectionLabel>Order Context</SectionLabel>
-            <div
+            <div className="rg-2"
               style={{
                 display: "grid",
                 gridTemplateColumns: "1fr 1fr",
@@ -604,7 +604,7 @@ function RequestDetailPanel({
           {/* ── Measurements */}
           <section>
             <SectionLabel>Measurements</SectionLabel>
-            <div
+            <div className="rg-3"
               style={{
                 display: "grid",
                 gridTemplateColumns: "repeat(3, 1fr)",
@@ -673,7 +673,7 @@ function RequestDetailPanel({
               }}
             >
               <SectionLabel color="#8A6818">Quote</SectionLabel>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem", marginBottom: "0.875rem" }}>
+              <div className="rg-2" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem", marginBottom: "0.875rem" }}>
                 <div>
                   <label style={{ display: "block", fontSize: "0.78rem", fontWeight: 500, color: C.charcoal, marginBottom: "0.375rem" }}>
                     Price (£)
@@ -1018,7 +1018,7 @@ export default function ConsoleCustomOrders() {
   }
 
   return (
-    <div style={{ padding: "1.75rem", fontFamily: UI }}>
+    <div className="console-page" style={{ padding: "1.75rem", fontFamily: UI }}>
       {/* Page header */}
       <div style={{ marginBottom: "1.5rem" }}>
         <h1

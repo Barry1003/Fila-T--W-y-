@@ -766,7 +766,7 @@ export default function ConsoleReviews() {
   }
 
   return (
-    <div style={{ padding: "1.75rem", fontFamily: UI }}>
+    <div className="console-page" style={{ padding: "1.75rem", fontFamily: UI }}>
 
       {/* ── Controls row ──────────────────────────────────── */}
       <div

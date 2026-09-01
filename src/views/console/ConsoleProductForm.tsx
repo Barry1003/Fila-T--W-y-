@@ -273,7 +273,7 @@ export default function ConsoleProductForm() {
   }
 
   return (
-    <div style={{ padding: "1.75rem", fontFamily: UI, minHeight: "100%" }}>
+    <div className="console-page" style={{ padding: "1.75rem", fontFamily: UI, minHeight: "100%" }}>
 
       {/* Breadcrumb */}
       <div style={{ display: "flex", alignItems: "center", gap: "0.4rem", marginBottom: "1.25rem" }}>
@@ -294,7 +294,7 @@ export default function ConsoleProductForm() {
       </h1>
 
       {/* Two-column layout */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 300px", gap: "1.25rem", alignItems: "start" }}>
+      <div className="rg-split" style={{ display: "grid", gridTemplateColumns: "1fr 300px", gap: "1.25rem", alignItems: "start" }}>
 
         {/* ── LEFT ─────────────────────────────────────── */}
         <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
@@ -351,7 +351,7 @@ export default function ConsoleProductForm() {
 
           {/* Pricing */}
           <FormCard title="Pricing">
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+            <div className="rg-2" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
               <div>
                 <FieldLabel>Price (GBP)</FieldLabel>
                 <div style={{ position: "relative" }}>
@@ -511,7 +511,7 @@ export default function ConsoleProductForm() {
 
           {/* Images */}
           <FormCard title="Images">
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.5rem", marginBottom: "0.75rem" }}>
+            <div className="rg-2" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.5rem", marginBottom: "0.75rem" }}>
               {images.map((img, i) => (
                 <ImageSlot key={img.id} img={img} isMain={i === 0} onRemove={() => removeImage(img.id)} />
               ))}

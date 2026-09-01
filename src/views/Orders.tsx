@@ -355,7 +355,7 @@ function OrderCard({ order }: { order: Order }) {
       {/* ── Expanded detail ───────────────────────────── */}
       {expanded && (
         <div style={{ borderTop: `1px solid rgba(43,35,32,0.08)`, backgroundColor: 'rgba(250,246,240,0.55)' }}>
-          <div style={{ padding: '1.75rem 1.5rem', display: 'grid', gridTemplateColumns: '1fr 300px', gap: '2.5rem' }}>
+          <div className="rg-split" style={{ padding: '1.75rem 1.5rem', display: 'grid', gridTemplateColumns: '1fr 300px', gap: '2.5rem' }}>
 
             {/* LEFT — items + timeline */}
             <div>

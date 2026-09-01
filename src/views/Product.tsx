@@ -582,24 +582,26 @@ export default function Product() {
                     ? 'Measure the length of your foot from heel to longest toe. Our lasts run true to EU sizing — if between sizes, size up.'
                     : 'For garments, measure your chest at its fullest point and your natural waist. All garments include a 2 cm seam allowance. For custom measurements, use the Request Custom Size link above.'}
                 </p>
-                <table style={{ width: '100%', borderCollapse: 'collapse', fontFamily: UI, fontSize: '0.875rem' }}>
-                  <thead>
-                    <tr style={{ borderBottom: `2px solid ${C.gold}` }}>
-                      {sizingHeaders.map(h => (
-                        <th key={h} style={{ textAlign: 'left', padding: '0.75rem 1rem 0.75rem 0', color: C.charcoal, ...label, fontSize: '0.565rem', fontWeight: 600 }}>{h}</th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {sizingRows.map((row, i) => (
-                      <tr key={i} style={{ borderBottom: '1px solid rgba(43,35,32,0.07)', backgroundColor: i % 2 === 1 ? 'rgba(43,35,32,0.02)' : 'transparent' }}>
-                        {row.map((cell, j) => (
-                          <td key={j} style={{ padding: '0.75rem 1rem 0.75rem 0', color: j === 0 ? C.charcoal : 'rgba(43,35,32,0.65)', fontWeight: j === 0 ? 600 : 400 }}>{cell}</td>
+                <div className="table-scroll">
+                  <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 420, fontFamily: UI, fontSize: '0.875rem' }}>
+                    <thead>
+                      <tr style={{ borderBottom: `2px solid ${C.gold}` }}>
+                        {sizingHeaders.map(h => (
+                          <th key={h} style={{ textAlign: 'left', padding: '0.75rem 1rem 0.75rem 0', color: C.charcoal, ...label, fontSize: '0.565rem', fontWeight: 600 }}>{h}</th>
                         ))}
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {sizingRows.map((row, i) => (
+                        <tr key={i} style={{ borderBottom: '1px solid rgba(43,35,32,0.07)', backgroundColor: i % 2 === 1 ? 'rgba(43,35,32,0.02)' : 'transparent' }}>
+                          {row.map((cell, j) => (
+                            <td key={j} style={{ padding: '0.75rem 1rem 0.75rem 0', color: j === 0 ? C.charcoal : 'rgba(43,35,32,0.65)', fontWeight: j === 0 ? 600 : 400 }}>{cell}</td>
+                          ))}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             )}
 

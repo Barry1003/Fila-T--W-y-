@@ -297,7 +297,7 @@ function TabStoreProfile() {
         >
           Brand Images
         </div>
-        <div
+        <div className="rg-split"
           style={{
             display: "grid",
             gridTemplateColumns: "160px 1fr",
@@ -330,7 +330,7 @@ function TabStoreProfile() {
           Store Identity
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-          <div
+          <div className="rg-2"
             style={{
               display: "grid",
               gridTemplateColumns: "1fr 1fr",
@@ -366,7 +366,7 @@ function TabStoreProfile() {
           Contact Details
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-          <div
+          <div className="rg-2"
             style={{
               display: "grid",
               gridTemplateColumns: "1fr 1fr",
@@ -727,70 +727,72 @@ function TabShipping() {
         </div>
 
         <div style={{ overflowX: "auto" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse" }}>
-            <thead>
-              <tr>
-                {colHead("Region")}
-                {colHead("Standard Delivery")}
-                {colHead("Express Delivery")}
-                {colHead("Cost (GBP)")}
-                {colHead("Cost (NGN)")}
-                <th style={{ width: 32 }} />
-              </tr>
-            </thead>
-            <tbody>
-              {regions.map((r, i) => (
-                <tr
-                  key={r.id}
-                  style={{
-                    backgroundColor:
-                      i % 2 === 0 ? "transparent" : "rgba(43,35,32,0.018)",
-                  }}
-                >
-                  {(
-                    [
-                      ["name", r.name, "Region name"],
-                      ["standard", r.standard, "e.g. 3–5 days"],
-                      ["express", r.express, "Optional"],
-                      ["costGBP", r.costGBP, "£0.00"],
-                      ["costNGN", r.costNGN, "₦0"],
-                    ] as [keyof Region, string, string][]
-                  ).map(([field, val, ph]) => (
-                    <td key={field} style={{ padding: "0.5rem 0.75rem" }}>
-                      <input
-                        value={val}
-                        onChange={(e) => update(r.id, field, e.target.value)}
-                        placeholder={ph}
-                        style={{
-                          ...inputStyle,
-                          fontSize: "0.77rem",
-                          padding: "0.4rem 0.6rem",
-                          minWidth: field === "name" ? 160 : 100,
-                        }}
-                      />
-                    </td>
-                  ))}
-                  <td style={{ padding: "0.5rem 0.5rem" }}>
-                    <button
-                      onClick={() => remove(r.id)}
-                      style={{
-                        background: "none",
-                        border: "none",
-                        cursor: "pointer",
-                        color: "rgba(43,35,32,0.3)",
-                        fontSize: "1rem",
-                        lineHeight: 1,
-                        padding: "2px 4px",
-                      }}
-                      aria-label="Remove region"
-                    >
-                      ×
-                    </button>
-                  </td>
+          <div className="table-scroll">
+            <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 560 }}>
+              <thead>
+                <tr>
+                  {colHead("Region")}
+                  {colHead("Standard Delivery")}
+                  {colHead("Express Delivery")}
+                  {colHead("Cost (GBP)")}
+                  {colHead("Cost (NGN)")}
+                  <th style={{ width: 32 }} />
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {regions.map((r, i) => (
+                  <tr
+                    key={r.id}
+                    style={{
+                      backgroundColor:
+                        i % 2 === 0 ? "transparent" : "rgba(43,35,32,0.018)",
+                    }}
+                  >
+                    {(
+                      [
+                        ["name", r.name, "Region name"],
+                        ["standard", r.standard, "e.g. 3–5 days"],
+                        ["express", r.express, "Optional"],
+                        ["costGBP", r.costGBP, "£0.00"],
+                        ["costNGN", r.costNGN, "₦0"],
+                      ] as [keyof Region, string, string][]
+                    ).map(([field, val, ph]) => (
+                      <td key={field} style={{ padding: "0.5rem 0.75rem" }}>
+                        <input
+                          value={val}
+                          onChange={(e) => update(r.id, field, e.target.value)}
+                          placeholder={ph}
+                          style={{
+                            ...inputStyle,
+                            fontSize: "0.77rem",
+                            padding: "0.4rem 0.6rem",
+                            minWidth: field === "name" ? 160 : 100,
+                          }}
+                        />
+                      </td>
+                    ))}
+                    <td style={{ padding: "0.5rem 0.5rem" }}>
+                      <button
+                        onClick={() => remove(r.id)}
+                        style={{
+                          background: "none",
+                          border: "none",
+                          cursor: "pointer",
+                          color: "rgba(43,35,32,0.3)",
+                          fontSize: "1rem",
+                          lineHeight: 1,
+                          padding: "2px 4px",
+                        }}
+                        aria-label="Remove region"
+                      >
+                        ×
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
 
         <div style={{ padding: "1rem 1.25rem" }}>
@@ -995,7 +997,7 @@ function TabPayments() {
           <div
             style={{ display: "flex", flexDirection: "column", gap: "0.875rem" }}
           >
-            <div
+            <div className="rg-2"
               style={{
                 display: "grid",
                 gridTemplateColumns: "1fr 1fr",
@@ -1035,7 +1037,7 @@ function TabPayments() {
             </div>
           </div>
         ) : (
-          <div
+          <div className="rg-3"
             style={{
               display: "grid",
               gridTemplateColumns: "repeat(3, 1fr)",

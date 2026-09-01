@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import type { ReactNode } from "react";
+import { useOverlay } from "@/lib/useOverlay";
 import { NavLink, Link, useLocation } from '@/lib/router';
 import { C, DISPLAY, UI } from "../tokens";
 import {
@@ -160,6 +161,9 @@ function SidebarContent({ onNavClick }: { onNavClick?: () => void }) {
 export default function ConsoleShell({ children }: { children: ReactNode }) {
   const title = usePageTitle();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const closeSidebar = useCallback(() => setSidebarOpen(false), []);
+
+  useOverlay(sidebarOpen, closeSidebar);
 
   return (
     <div
@@ -171,12 +175,10 @@ export default function ConsoleShell({ children }: { children: ReactNode }) {
         backgroundColor: "#EDE9E3",
       }}
     >
-      {/* Mobile sidebar overlay */}
-      <div
-        className="console-sidebar-overlay"
-        onClick={() => setSidebarOpen(false)}
-        aria-hidden="true"
-      />
+      {/* Mobile sidebar overlay — only while the sidebar is actually open */}
+      {sidebarOpen && (
+        <div className="console-sidebar-overlay" onClick={closeSidebar} aria-hidden="true" />
+      )}
 
       {/* ── Sidebar ─────────────────────────────────────────── */}
       <aside
@@ -190,7 +192,7 @@ export default function ConsoleShell({ children }: { children: ReactNode }) {
           overflow: "hidden",
         }}
       >
-        <SidebarContent onNavClick={() => setSidebarOpen(false)} />
+        <SidebarContent onNavClick={closeSidebar} />
       </aside>
 
       {/* ── Main column ─────────────────────────────────────── */}

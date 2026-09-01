@@ -246,7 +246,7 @@ function StatusBadge({ status, type }: { status: string; type: string }) {
 
 export default function ConsoleDashboard() {
   return (
-    <div style={{ padding: "1.75rem", fontFamily: UI }}>
+    <div className="console-page" style={{ padding: "1.75rem", fontFamily: UI }}>
       {/* Greeting */}
       <div style={{ marginBottom: "1.75rem" }}>
         <p
@@ -280,8 +280,7 @@ export default function ConsoleDashboard() {
       </div>
 
       {/* ── Stat cards ─────────────────────────────────────── */}
-      <div
-        className="console-stat-grid"
+      <div className="console-stat-grid"
         style={{
           display: "grid",
           gridTemplateColumns: "repeat(4, 1fr)",
@@ -359,8 +358,7 @@ export default function ConsoleDashboard() {
       </div>
 
       {/* ── Lower grid: Orders + Activity ──────────────────── */}
-      <div
-        className="console-lower-grid"
+      <div className="console-lower-grid"
         style={{
           display: "grid",
           gridTemplateColumns: "1fr 340px",
@@ -413,102 +411,104 @@ export default function ConsoleDashboard() {
             </span>
           </div>
 
-          <table style={{ width: "100%", borderCollapse: "collapse" }}>
-            <thead>
-              <tr>
-                {["Order", "Buyer", "Item", "Total", "Status", ""].map((h) => (
-                  <th
-                    key={h}
-                    style={{
-                      padding: "0.5rem 1.25rem",
-                      textAlign: "left",
-                      fontSize: "0.62rem",
-                      letterSpacing: "0.09em",
-                      textTransform: "uppercase",
-                      color: "rgba(43,35,32,0.38)",
-                      fontWeight: 500,
-                      borderBottom: "1px solid rgba(43,35,32,0.06)",
-                    }}
-                  >
-                    {h}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {ORDERS.map((o, i) => (
-                <tr
-                  key={o.id}
-                  style={{
-                    backgroundColor: i % 2 === 0 ? "transparent" : "rgba(43,35,32,0.018)",
-                  }}
-                >
-                  <td
-                    style={{
-                      padding: "0.7rem 1.25rem",
-                      fontSize: "0.77rem",
-                      fontWeight: 600,
-                      color: C.charcoal,
-                      whiteSpace: "nowrap",
-                    }}
-                  >
-                    {o.id}
-                  </td>
-                  <td
-                    style={{
-                      padding: "0.7rem 1.25rem",
-                      fontSize: "0.77rem",
-                      color: C.charcoal,
-                      whiteSpace: "nowrap",
-                    }}
-                  >
-                    {o.buyer}
-                  </td>
-                  <td
-                    style={{
-                      padding: "0.7rem 1.25rem",
-                      fontSize: "0.75rem",
-                      color: "rgba(43,35,32,0.6)",
-                    }}
-                  >
-                    {o.item}
-                  </td>
-                  <td
-                    style={{
-                      padding: "0.7rem 1.25rem",
-                      fontSize: "0.77rem",
-                      fontWeight: 600,
-                      color: C.charcoal,
-                      whiteSpace: "nowrap",
-                    }}
-                  >
-                    {o.total}
-                  </td>
-                  <td style={{ padding: "0.7rem 1.25rem" }}>
-                    <StatusBadge status={o.status} type={o.statusType} />
-                  </td>
-                  <td style={{ padding: "0.7rem 1.25rem" }}>
-                    <button
+          <div className="table-scroll">
+            <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 540 }}>
+              <thead>
+                <tr>
+                  {["Order", "Buyer", "Item", "Total", "Status", ""].map((h) => (
+                    <th
+                      key={h}
                       style={{
-                        backgroundColor: C.gold,
-                        color: C.charcoal,
-                        border: "none",
-                        borderRadius: 4,
-                        padding: "4px 12px",
-                        fontSize: "0.68rem",
-                        fontWeight: 600,
-                        cursor: "pointer",
-                        whiteSpace: "nowrap",
-                        letterSpacing: "0.02em",
+                        padding: "0.5rem 1.25rem",
+                        textAlign: "left",
+                        fontSize: "0.62rem",
+                        letterSpacing: "0.09em",
+                        textTransform: "uppercase",
+                        color: "rgba(43,35,32,0.38)",
+                        fontWeight: 500,
+                        borderBottom: "1px solid rgba(43,35,32,0.06)",
                       }}
                     >
-                      Fulfil
-                    </button>
-                  </td>
+                      {h}
+                    </th>
+                  ))}
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {ORDERS.map((o, i) => (
+                  <tr
+                    key={o.id}
+                    style={{
+                      backgroundColor: i % 2 === 0 ? "transparent" : "rgba(43,35,32,0.018)",
+                    }}
+                  >
+                    <td
+                      style={{
+                        padding: "0.7rem 1.25rem",
+                        fontSize: "0.77rem",
+                        fontWeight: 600,
+                        color: C.charcoal,
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      {o.id}
+                    </td>
+                    <td
+                      style={{
+                        padding: "0.7rem 1.25rem",
+                        fontSize: "0.77rem",
+                        color: C.charcoal,
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      {o.buyer}
+                    </td>
+                    <td
+                      style={{
+                        padding: "0.7rem 1.25rem",
+                        fontSize: "0.75rem",
+                        color: "rgba(43,35,32,0.6)",
+                      }}
+                    >
+                      {o.item}
+                    </td>
+                    <td
+                      style={{
+                        padding: "0.7rem 1.25rem",
+                        fontSize: "0.77rem",
+                        fontWeight: 600,
+                        color: C.charcoal,
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      {o.total}
+                    </td>
+                    <td style={{ padding: "0.7rem 1.25rem" }}>
+                      <StatusBadge status={o.status} type={o.statusType} />
+                    </td>
+                    <td style={{ padding: "0.7rem 1.25rem" }}>
+                      <button
+                        style={{
+                          backgroundColor: C.gold,
+                          color: C.charcoal,
+                          border: "none",
+                          borderRadius: 4,
+                          padding: "4px 12px",
+                          fontSize: "0.68rem",
+                          fontWeight: 600,
+                          cursor: "pointer",
+                          whiteSpace: "nowrap",
+                          letterSpacing: "0.02em",
+                        }}
+                      >
+                        Fulfil
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
 
         {/* Activity feed */}

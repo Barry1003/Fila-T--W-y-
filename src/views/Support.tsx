@@ -231,7 +231,7 @@ export default function Support() {
 
       ) : (
         /* ── Two-panel layout ─────────────────────────────── */
-        <div style={{
+        <div className="rg-split" style={{
           display: 'grid',
           gridTemplateColumns: '300px 1fr',
           border: `1px solid rgba(43,35,32,0.09)`,

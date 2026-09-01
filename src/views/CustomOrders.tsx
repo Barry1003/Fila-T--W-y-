@@ -373,7 +373,7 @@ function ExpandedDetail({
   const showDeclineBlock = req.status === "declined" && req.declineReason;
 
   return (
-    <div
+    <div className="rg-split"
       style={{
         borderTop: "1px solid rgba(43,35,32,0.08)",
         backgroundColor: "rgba(250,246,240,0.55)",
@@ -408,7 +408,7 @@ function ExpandedDetail({
               gap: "1rem",
             }}
           >
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.875rem" }}>
+            <div className="rg-2" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.875rem" }}>
               <Field lbl="Occasion" val={req.occasion} />
               <Field lbl="Needed By" val={req.neededBy} />
               <Field lbl="Fabric Preference" val={req.fabricPreference} />
@@ -451,7 +451,7 @@ function ExpandedDetail({
         {/* Measurements */}
         <div>
           <SectionLabel>Your Measurements</SectionLabel>
-          <div
+          <div className="rg-3"
             style={{
               backgroundColor: "#fff",
               border: "1px solid rgba(43,35,32,0.09)",

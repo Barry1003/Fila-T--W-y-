@@ -1,11 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { Link, NavLink } from '@/lib/router';
+import { useOverlay } from '@/lib/useOverlay';
 import { C, DISPLAY, label, UI } from '../tokens';
 import { SearchIcon, HeartIcon, UserIcon, CartIcon, GridIcon } from '../icons';
 
 const IS_OWNER = true;
+const CART_COUNT = 3;
 
 const NAV_LINKS = [
   { label: 'Shop', to: '/shop' },
@@ -14,43 +16,51 @@ const NAV_LINKS = [
   { label: 'About', to: '/about' },
 ];
 
+const ACCOUNT_LINKS = [
+  { label: 'My Account', to: '/account', icon: <UserIcon /> },
+  { label: 'Wishlist', to: '/account/wishlist', icon: <HeartIcon /> },
+  { label: 'Search', to: '/shop', icon: <SearchIcon /> },
+];
+
+function CartBadge({ count }: { count: number }) {
+  return (
+    <span className="nav-cart-badge" aria-hidden="true">
+      {count}
+    </span>
+  );
+}
+
 export default function Nav() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const close = useCallback(() => setMenuOpen(false), []);
 
-  const close = () => setMenuOpen(false);
+  useOverlay(menuOpen, close);
 
   return (
     <>
-      <nav role="navigation" style={{
-        backgroundColor: C.maroon,
-        position: 'sticky',
-        top: 0,
-        zIndex: 50,
-        borderBottom: '1px solid rgba(212,169,78,0.18)',
-      }}>
-        <div style={{
-          maxWidth: '1440px',
-          margin: '0 auto',
-          padding: '0 2rem',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          height: '70px',
-          gap: '1rem',
-        }}>
-
+      <nav
+        role="navigation"
+        style={{
+          backgroundColor: C.maroon,
+          position: 'sticky',
+          top: 0,
+          zIndex: 50,
+          borderBottom: '1px solid rgba(212,169,78,0.18)',
+        }}
+      >
+        <div className="nav-bar">
           {/* Wordmark */}
           <Link to="/" onClick={close} style={{ textDecorationLine: 'none', flexShrink: 0 }}>
-            <div style={{ fontFamily: DISPLAY, fontSize: '1.4rem', color: C.cream, fontWeight: 500, lineHeight: 1.05, letterSpacing: '-0.01em' }}>
+            <div className="nav-wordmark" style={{ fontFamily: DISPLAY, color: C.cream, fontWeight: 500, lineHeight: 1.05, letterSpacing: '-0.01em' }}>
               Fila Tó Wúyì
             </div>
-            <div style={{ ...label, color: C.gold, fontSize: '0.575rem', marginTop: '2px', letterSpacing: '0.16em' }}>
+            <div className="nav-wordmark-sub" style={{ ...label, color: C.gold, letterSpacing: '0.16em' }}>
               by AdeClassics
             </div>
           </Link>
 
           {/* Desktop nav links */}
-          <div className="nav-center" style={{ display: 'flex', gap: '2.25rem' }}>
+          <div className="nav-center">
             {NAV_LINKS.map(({ label: lbl, to }) => (
               <NavLink
                 key={lbl}
@@ -74,150 +84,103 @@ export default function Nav() {
           {/* Desktop icons */}
           <div className="nav-icons-desktop">
             {IS_OWNER && (
-              <Link
-                to="/console"
-                style={{
-                  display: 'inline-flex', alignItems: 'center', gap: '5px',
-                  padding: '4px 11px',
-                  border: `1px solid ${C.gold}`,
-                  borderRadius: 100,
-                  color: C.gold,
-                  textDecorationLine: 'none',
-                  fontSize: '0.62rem',
-                  fontFamily: UI,
-                  fontWeight: 500,
-                  letterSpacing: '0.06em',
-                  whiteSpace: 'nowrap',
-                  transition: 'background-color 0.15s, color 0.15s',
-                }}
-                onMouseEnter={e => {
-                  (e.currentTarget as HTMLAnchorElement).style.backgroundColor = C.gold;
-                  (e.currentTarget as HTMLAnchorElement).style.color = C.charcoal;
-                }}
-                onMouseLeave={e => {
-                  (e.currentTarget as HTMLAnchorElement).style.backgroundColor = 'transparent';
-                  (e.currentTarget as HTMLAnchorElement).style.color = C.gold;
-                }}
-              >
+              <Link to="/console" className="nav-dashboard-pill">
                 <GridIcon />
                 Store Dashboard
               </Link>
             )}
             {([
-              { icon: <SearchIcon />, to: '/shop' },
-              { icon: <HeartIcon />, to: '/account/wishlist' },
-              { icon: <UserIcon />, to: '/account' },
-            ] as const).map(({ icon, to }) => (
-              <Link key={to} to={to} style={{ color: C.cream, display: 'flex', opacity: 0.8, lineHeight: 0, textDecorationLine: 'none' }}>
+              { icon: <SearchIcon />, to: '/shop', label: 'Search' },
+              { icon: <HeartIcon />, to: '/account/wishlist', label: 'Wishlist' },
+              { icon: <UserIcon />, to: '/account', label: 'Account' },
+            ] as const).map(({ icon, to, label: lbl }) => (
+              <Link key={lbl} to={to} className="nav-icon-btn" aria-label={lbl}>
                 {icon}
               </Link>
             ))}
-            <Link to="/cart" style={{ textDecorationLine: 'none', color: 'inherit', lineHeight: 0, position: 'relative', display: 'flex', opacity: 0.8 }}>
+            <Link to="/cart" className="nav-icon-btn" aria-label={`Cart, ${CART_COUNT} items`}>
               <CartIcon />
-              <span style={{
-                position: 'absolute', top: '1px', right: '1px',
-                backgroundColor: C.gold, color: C.charcoal,
-                borderRadius: '50%', width: '15px', height: '15px',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: '0.55rem', fontWeight: 700, lineHeight: 1,
-              }}>3</span>
+              <CartBadge count={CART_COUNT} />
             </Link>
           </div>
 
-          {/* Hamburger — mobile only */}
-          <button
-            className="nav-hamburger"
-            onClick={() => setMenuOpen(v => !v)}
-            aria-label={menuOpen ? 'Close menu' : 'Open menu'}
-            aria-expanded={menuOpen}
-          >
-            {menuOpen ? (
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+          {/* Mobile actions — cart stays reachable without opening the menu */}
+          <div className="nav-actions-mobile">
+            <Link to="/cart" className="nav-icon-btn" aria-label={`Cart, ${CART_COUNT} items`}>
+              <CartIcon />
+              <CartBadge count={CART_COUNT} />
+            </Link>
+            <button
+              className="nav-icon-btn"
+              onClick={() => setMenuOpen(v => !v)}
+              aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+              aria-expanded={menuOpen}
+              aria-controls="nav-mobile-panel"
+            >
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round">
+                <line x1="3" y1="6" x2="21" y2="6" />
+                <line x1="3" y1="12" x2="21" y2="12" />
+                <line x1="3" y1="18" x2="21" y2="18" />
               </svg>
-            ) : (
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                <line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="18" x2="21" y2="18" />
-              </svg>
-            )}
-          </button>
+            </button>
+          </div>
         </div>
       </nav>
 
       {/* Mobile drawer */}
-      <div className={`nav-mobile-drawer${menuOpen ? ' open' : ''}`} aria-hidden={!menuOpen}>
-        <div className="nav-mobile-overlay" onClick={close} />
-        <div className="nav-mobile-panel">
-          {/* Panel header */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '2rem', paddingBottom: '1.25rem', borderBottom: '1px solid rgba(250,246,240,0.1)' }}>
+      <div className={`nav-drawer${menuOpen ? ' open' : ''}`}>
+        <div className="nav-drawer-overlay" onClick={close} />
+
+        <div className="nav-drawer-panel" id="nav-mobile-panel" role="dialog" aria-modal="true" aria-label="Menu" inert={!menuOpen}>
+          <div className="nav-drawer-head">
             <div>
-              <div style={{ fontFamily: DISPLAY, fontSize: '1.25rem', color: C.cream, fontWeight: 500 }}>Fila Tó Wúyì</div>
-              <div style={{ ...label, color: C.gold, fontSize: '0.55rem', letterSpacing: '0.15em', marginTop: '2px' }}>by AdeClassics</div>
+              <div style={{ fontFamily: DISPLAY, fontSize: '1.2rem', color: C.cream, fontWeight: 500, lineHeight: 1.1 }}>
+                Fila Tó Wúyì
+              </div>
+              <div style={{ ...label, color: C.gold, fontSize: '0.53rem', letterSpacing: '0.15em', marginTop: '3px' }}>
+                by AdeClassics
+              </div>
             </div>
-            <button onClick={close} style={{ background: 'none', border: 'none', color: 'rgba(250,246,240,0.6)', cursor: 'pointer', padding: '4px', lineHeight: 0 }}>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+            <button onClick={close} className="nav-drawer-close" aria-label="Close menu">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round">
                 <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
               </svg>
             </button>
           </div>
 
-          {/* Links */}
-          <nav style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', flex: 1 }}>
-            {NAV_LINKS.map(({ label: lbl, to }) => (
-              <NavLink
-                key={lbl}
-                to={to}
-                onClick={close}
-                style={({ isActive }) => ({
-                  fontFamily: UI,
-                  fontSize: '1rem',
-                  fontWeight: isActive ? 600 : 400,
-                  color: isActive ? C.gold : 'rgba(250,246,240,0.85)',
-                  textDecorationLine: 'none',
-                  padding: '0.75rem 0.5rem',
-                  borderBottom: '1px solid rgba(250,246,240,0.07)',
-                  display: 'block',
-                  letterSpacing: '0.01em',
-                })}
-              >
-                {lbl}
-              </NavLink>
-            ))}
+          <div className="nav-drawer-body">
+            <nav aria-label="Main">
+              {NAV_LINKS.map(({ label: lbl, to }) => (
+                <NavLink key={lbl} to={to} onClick={close} className={({ isActive }) => `nav-drawer-link${isActive ? ' active' : ''}`}>
+                  {lbl}
+                </NavLink>
+              ))}
+            </nav>
 
-            <div style={{ marginTop: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-              <Link to="/account" onClick={close} style={{ fontFamily: UI, fontSize: '0.875rem', color: 'rgba(250,246,240,0.7)', textDecorationLine: 'none', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <UserIcon /> My Account
-              </Link>
-              <Link to="/account/wishlist" onClick={close} style={{ fontFamily: UI, fontSize: '0.875rem', color: 'rgba(250,246,240,0.7)', textDecorationLine: 'none', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <HeartIcon /> Wishlist
-              </Link>
-              <Link to="/cart" onClick={close} style={{ fontFamily: UI, fontSize: '0.875rem', color: 'rgba(250,246,240,0.7)', textDecorationLine: 'none', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <CartIcon /> Cart <span style={{ backgroundColor: C.gold, color: C.charcoal, borderRadius: '50%', width: 18, height: 18, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.6rem', fontWeight: 700 }}>3</span>
-              </Link>
-            </div>
+            <div className="nav-drawer-section-label">My Account</div>
 
-            {IS_OWNER && (
-              <Link
-                to="/console"
-                onClick={close}
-                style={{
-                  marginTop: '1.5rem',
-                  display: 'inline-flex', alignItems: 'center', gap: '6px',
-                  padding: '0.65rem 1rem',
-                  border: `1px solid ${C.gold}`,
-                  borderRadius: 6,
-                  color: C.gold,
-                  fontFamily: UI,
-                  fontSize: '0.78rem',
-                  fontWeight: 500,
-                  letterSpacing: '0.06em',
-                  textDecorationLine: 'none',
-                }}
-              >
+            <nav aria-label="Account">
+              {ACCOUNT_LINKS.map(({ label: lbl, to, icon }) => (
+                <Link key={lbl} to={to} onClick={close} className="nav-drawer-sublink">
+                  <span className="nav-drawer-sublink-icon">{icon}</span>
+                  {lbl}
+                </Link>
+              ))}
+              <Link to="/cart" onClick={close} className="nav-drawer-sublink">
+                <span className="nav-drawer-sublink-icon"><CartIcon /></span>
+                Cart
+                <span className="nav-drawer-count">{CART_COUNT}</span>
+              </Link>
+            </nav>
+          </div>
+
+          {IS_OWNER && (
+            <div className="nav-drawer-foot">
+              <Link to="/console" onClick={close} className="nav-drawer-dashboard">
                 <GridIcon /> Store Dashboard
               </Link>
-            )}
-          </nav>
+            </div>
+          )}
         </div>
       </div>
     </>

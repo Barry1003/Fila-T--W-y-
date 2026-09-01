@@ -310,7 +310,7 @@ export default function ConsoleMessages() {
   const panelHeight = "calc(100vh - 200px)";
 
   return (
-    <div style={{ padding: "1.75rem", fontFamily: UI, display: "flex", flexDirection: "column", gap: "1rem" }}>
+    <div className="console-page" style={{ padding: "1.75rem", fontFamily: UI, display: "flex", flexDirection: "column", gap: "1rem" }}>
 
       {/* ── Header row ────────────────────────────────── */}
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
@@ -357,7 +357,7 @@ export default function ConsoleMessages() {
       </div>
 
       {/* ── Two-panel layout ─────────────────────────── */}
-      <div
+      <div className="rg-split console-messages"
         style={{
           display: "grid",
           gridTemplateColumns: "288px 1fr",

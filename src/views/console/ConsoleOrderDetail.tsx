@@ -154,7 +154,7 @@ export default function ConsoleOrderDetail() {
   }
 
   return (
-    <div style={{ padding: "1.75rem", fontFamily: UI, minHeight: "100%" }}>
+    <div className="console-page" style={{ padding: "1.75rem", fontFamily: UI, minHeight: "100%" }}>
 
       {/* ── Breadcrumb ────────────────────────────────────── */}
       <div style={{ display: "flex", alignItems: "center", gap: "0.4rem", marginBottom: "1.25rem" }}>
@@ -209,7 +209,7 @@ export default function ConsoleOrderDetail() {
       </div>
 
       {/* ── Two-column grid ───────────────────────────────── */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 320px", gap: "1.25rem", alignItems: "start" }}>
+      <div className="rg-split" style={{ display: "grid", gridTemplateColumns: "1fr 320px", gap: "1.25rem", alignItems: "start" }}>
 
         {/* ── LEFT ─────────────────────────────────────── */}
         <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
@@ -240,47 +240,49 @@ export default function ConsoleOrderDetail() {
 
           {/* Order items */}
           <SectionCard title="Items">
-            <table style={{ width: "100%", borderCollapse: "collapse" }}>
-              <thead>
-                <tr>
-                  {["Product", "Variant", "Qty", "Unit Price", "Line Total"].map(h => (
-                    <th key={h} style={{
-                      padding: "0 0 0.625rem",
-                      textAlign: h === "Qty" || h === "Unit Price" || h === "Line Total" ? "right" : "left",
-                      fontSize: "0.63rem", letterSpacing: "0.09em", textTransform: "uppercase",
-                      color: "rgba(43,35,32,0.38)", fontWeight: 500, fontFamily: UI,
-                    }}>{h}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {order.items.map((item, i) => {
-                  const lineGBP = item.unitGBP * item.qty;
-                  return (
-                    <tr key={i} style={{ borderTop: "1px solid rgba(43,35,32,0.06)" }}>
-                      <td style={{ padding: "0.75rem 0" }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: "0.625rem" }}>
-                          <div style={{
-                            width: 36, height: 36, borderRadius: 5, flexShrink: 0,
-                            backgroundColor: C.maroon, opacity: 0.75,
-                            display: "flex", alignItems: "center", justifyContent: "center",
-                          }}>
-                            <span style={{ color: "#fff", fontSize: "0.55rem", fontWeight: 700 }}>IMG</span>
+            <div className="table-scroll">
+              <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 520 }}>
+                <thead>
+                  <tr>
+                    {["Product", "Variant", "Qty", "Unit Price", "Line Total"].map(h => (
+                      <th key={h} style={{
+                        padding: "0 0 0.625rem",
+                        textAlign: h === "Qty" || h === "Unit Price" || h === "Line Total" ? "right" : "left",
+                        fontSize: "0.63rem", letterSpacing: "0.09em", textTransform: "uppercase",
+                        color: "rgba(43,35,32,0.38)", fontWeight: 500, fontFamily: UI,
+                      }}>{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {order.items.map((item, i) => {
+                    const lineGBP = item.unitGBP * item.qty;
+                    return (
+                      <tr key={i} style={{ borderTop: "1px solid rgba(43,35,32,0.06)" }}>
+                        <td style={{ padding: "0.75rem 0" }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: "0.625rem" }}>
+                            <div style={{
+                              width: 36, height: 36, borderRadius: 5, flexShrink: 0,
+                              backgroundColor: C.maroon, opacity: 0.75,
+                              display: "flex", alignItems: "center", justifyContent: "center",
+                            }}>
+                              <span style={{ color: "#fff", fontSize: "0.55rem", fontWeight: 700 }}>IMG</span>
+                            </div>
+                            <span style={{ fontSize: "0.8rem", fontWeight: 600, color: C.charcoal }}>{item.name}</span>
                           </div>
-                          <span style={{ fontSize: "0.8rem", fontWeight: 600, color: C.charcoal }}>{item.name}</span>
-                        </div>
-                      </td>
-                      <td style={{ padding: "0.75rem 0.5rem", fontSize: "0.75rem", color: "rgba(43,35,32,0.55)" }}>
-                        {item.variant}
-                      </td>
-                      <td style={{ padding: "0.75rem 0", textAlign: "right", fontSize: "0.8rem", color: C.charcoal }}>{item.qty}</td>
-                      <td style={{ padding: "0.75rem 0", textAlign: "right", fontSize: "0.8rem", color: C.charcoal }}>£{item.unitGBP}</td>
-                      <td style={{ padding: "0.75rem 0", textAlign: "right", fontSize: "0.8rem", fontWeight: 600, color: C.charcoal }}>£{lineGBP}</td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+                        </td>
+                        <td style={{ padding: "0.75rem 0.5rem", fontSize: "0.75rem", color: "rgba(43,35,32,0.55)" }}>
+                          {item.variant}
+                        </td>
+                        <td style={{ padding: "0.75rem 0", textAlign: "right", fontSize: "0.8rem", color: C.charcoal }}>{item.qty}</td>
+                        <td style={{ padding: "0.75rem 0", textAlign: "right", fontSize: "0.8rem", color: C.charcoal }}>£{item.unitGBP}</td>
+                        <td style={{ padding: "0.75rem 0", textAlign: "right", fontSize: "0.8rem", fontWeight: 600, color: C.charcoal }}>£{lineGBP}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
           </SectionCard>
 
           {/* Internal notes */}

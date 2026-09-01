@@ -291,7 +291,7 @@ export default function Help() {
                 </div>
               ) : (
                 <form onSubmit={e => { e.preventDefault(); if (name && email && message) setSent(true); }} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                  <div className="rg-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                     <div>
                       <label style={{ ...label, display: 'block', fontSize: '0.64rem', color: 'rgba(43,35,32,0.5)', marginBottom: '0.4rem' }}>Name</label>
                       <input

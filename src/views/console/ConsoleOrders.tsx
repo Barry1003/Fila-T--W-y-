@@ -204,7 +204,7 @@ export default function ConsoleOrders() {
   }
 
   return (
-    <div style={{ padding: "1.75rem", fontFamily: UI, minHeight: "100%" }}>
+    <div className="console-page" style={{ padding: "1.75rem", fontFamily: UI, minHeight: "100%" }}>
 
       {/* ── Top row ──────────────────────────────────────── */}
       <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: "1.5rem" }}>
@@ -329,20 +329,22 @@ export default function ConsoleOrders() {
           <EmptyState tab={activeTab} />
         ) : (
           <>
-            <table style={{ width: "100%", borderCollapse: "collapse" }}>
-              <thead>
-                <tr style={{ borderBottom: "1px solid rgba(43,35,32,0.07)" }}>
-                  {["Order #", "Date", "Customer", "Items", "Total", "Payment", "Status", "Actions"].map(h => (
-                    <th key={h} style={thStyle}>{h}</th>
+            <div className="table-scroll">
+              <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 760 }}>
+                <thead>
+                  <tr style={{ borderBottom: "1px solid rgba(43,35,32,0.07)" }}>
+                    {["Order #", "Date", "Customer", "Items", "Total", "Payment", "Status", "Actions"].map(h => (
+                      <th key={h} style={thStyle}>{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {paginated.map((o, i) => (
+                    <OrderRow key={o.id} order={o} alt={i % 2 !== 0} />
                   ))}
-                </tr>
-              </thead>
-              <tbody>
-                {paginated.map((o, i) => (
-                  <OrderRow key={o.id} order={o} alt={i % 2 !== 0} />
-                ))}
-              </tbody>
-            </table>
+                </tbody>
+              </table>
+            </div>
 
             {/* Pagination */}
             <div style={{

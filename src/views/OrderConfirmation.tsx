@@ -42,14 +42,14 @@ const STEPS = ['Cart', 'Shipping', 'Payment', 'Confirmation'];
 function ProgressBar() {
   const current = 3; // "Confirmation" step
   return (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+    <div className="checkout-steps" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       {STEPS.map((s, i) => {
         const done = i < current;
         const active = i === current;
         return (
           <div key={s} style={{ display: 'flex', alignItems: 'center' }}>
             {i > 0 && (
-              <div style={{ width: '2.5rem', height: '1px', backgroundColor: done || active ? C.maroon : 'rgba(43,35,32,0.2)' }} />
+              <div className="checkout-step-line" style={{ width: '2.5rem', height: '1px', backgroundColor: done || active ? C.maroon : 'rgba(43,35,32,0.2)' }} />
             )}
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
               <div style={{
@@ -65,7 +65,7 @@ function ProgressBar() {
                   <span style={{ fontFamily: UI, fontSize: '0.6rem', fontWeight: 700, color: 'rgba(43,35,32,0.4)' }}>{i + 1}</span>
                 )}
               </div>
-              <span style={{ ...label, fontSize: '0.575rem', color: active ? C.gold : done ? C.maroon : 'rgba(43,35,32,0.4)', letterSpacing: '0.1em' }}>
+              <span className="checkout-step-label" style={{ ...label, fontSize: '0.575rem', color: active ? C.gold : done ? C.maroon : 'rgba(43,35,32,0.4)', letterSpacing: '0.1em' }}>
                 {s}
               </span>
             </div>
@@ -221,7 +221,7 @@ export default function OrderConfirmation() {
           </div>
 
           {/* Two-column: Shipping address + Delivery estimate */}
-          <div style={{
+          <div className="rg-2" style={{
             display: 'grid', gridTemplateColumns: '1fr 1fr',
             borderTop: `1px solid rgba(43,35,32,0.1)`,
           }}>

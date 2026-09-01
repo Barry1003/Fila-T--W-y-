@@ -150,14 +150,14 @@ function FocusTextarea(props: React.TextareaHTMLAttributes<HTMLTextAreaElement> 
 const STEPS = ['Cart', 'Shipping', 'Payment', 'Confirmation'];
 function ProgressBar({ current }: { current: number }) {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0 }}>
+    <div className="checkout-steps" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0 }}>
       {STEPS.map((s, i) => {
         const done = i < current;
         const active = i === current;
         return (
           <div key={s} style={{ display: 'flex', alignItems: 'center' }}>
             {i > 0 && (
-              <div style={{ width: '2.5rem', height: '1px', backgroundColor: done ? C.maroon : 'rgba(43,35,32,0.2)' }} />
+              <div className="checkout-step-line" style={{ width: '2.5rem', height: '1px', backgroundColor: done ? C.maroon : 'rgba(43,35,32,0.2)' }} />
             )}
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
               <div style={{
@@ -176,7 +176,7 @@ function ProgressBar({ current }: { current: number }) {
                   </span>
                 )}
               </div>
-              <span style={{ ...label, fontSize: '0.575rem', color: active ? C.gold : done ? C.maroon : 'rgba(43,35,32,0.4)', letterSpacing: '0.1em' }}>
+              <span className="checkout-step-label" style={{ ...label, fontSize: '0.575rem', color: active ? C.gold : done ? C.maroon : 'rgba(43,35,32,0.4)', letterSpacing: '0.1em' }}>
                 {s}
               </span>
             </div>
@@ -283,6 +283,7 @@ export default function Checkout() {
     <div style={{ backgroundColor: C.cream, minHeight: '100vh', fontFamily: UI, color: C.charcoal }}>
       <style>{`
         .checkout-grid { display: grid; grid-template-columns: 1fr 380px; gap: 3rem; align-items: start; }
+        .checkout-grid > * { min-width: 0; }
         .checkout-sticky { position: sticky; top: 2rem; }
         .shimmer-place-order { position: relative; overflow: hidden; }
         .shimmer-place-order::after {
@@ -296,6 +297,12 @@ export default function Checkout() {
           .checkout-sticky { position: static; }
           .checkout-summary-top { order: -1; }
         }
+        @media (max-width: 640px) {
+          .checkout-head { padding: 0 1rem !important; }
+          .checkout-progress { padding: 0.7rem 1rem !important; }
+          .checkout-body { padding: 2rem 1rem 3.5rem !important; }
+          .checkout-grid { gap: 2rem; }
+        }
         input[type="radio"] { accent-color: ${C.gold}; }
         input[type="checkbox"] { accent-color: ${C.gold}; }
         *:focus-visible { outline: none; }
@@ -303,7 +310,7 @@ export default function Checkout() {
 
       {/* ── Checkout Header ─────────────────────────────────── */}
       <header style={{ backgroundColor: C.maroon, borderBottom: `1px solid rgba(212,169,78,0.22)` }}>
-        <div style={{ maxWidth: '1240px', margin: '0 auto', padding: '0 2rem', height: '64px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div className="checkout-head" style={{ maxWidth: '1240px', margin: '0 auto', padding: '0 2rem', height: '64px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <Link to="/" style={{ textDecorationLine: 'none' }}>
             <div style={{ fontFamily: DISPLAY, fontSize: '1.25rem', color: C.cream, fontWeight: 500, letterSpacing: '-0.01em', lineHeight: 1.05 }}>
               Fila Tó Wúyì
@@ -323,13 +330,13 @@ export default function Checkout() {
           </div>
         </div>
         {/* Progress bar */}
-        <div style={{ backgroundColor: 'rgba(0,0,0,0.12)', padding: '0.7rem 2rem' }}>
+        <div className="checkout-progress" style={{ backgroundColor: 'rgba(0,0,0,0.12)', padding: '0.7rem 2rem' }}>
           <ProgressBar current={1} />
         </div>
       </header>
 
       {/* ── Page body ─────────────────────────────────────────── */}
-      <div style={{ maxWidth: '1240px', margin: '0 auto', padding: '3rem 2rem 5rem' }}>
+      <div className="checkout-body" style={{ maxWidth: '1240px', margin: '0 auto', padding: '3rem 2rem 5rem' }}>
         <form onSubmit={handleSubmit} noValidate>
           <div className="checkout-grid">
 
@@ -437,7 +444,7 @@ export default function Checkout() {
                     onChange={e => setAddress2(e.target.value)}
                     autoComplete="address-line2"
                   />
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.75rem' }}>
+                  <div className="rg-3" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.75rem' }}>
                     <div style={{ gridColumn: '1 / 2' }}>
                       <label style={{ ...label, fontSize: '0.65rem', color: C.charcoal, display: 'block', marginBottom: '0.4rem' }}>
                         City <span style={{ color: '#b94a48' }}>*</span>
@@ -568,7 +575,7 @@ export default function Checkout() {
                     </div>
                     {showErr('cardNum') && <FieldError msg={errors.cardNum} />}
                   </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+                  <div className="rg-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
                     <div>
                       <label style={{ ...label, fontSize: '0.65rem', color: C.charcoal, display: 'block', marginBottom: '0.4rem' }}>
                         Expiry <span style={{ color: '#b94a48' }}>*</span>

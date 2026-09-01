@@ -283,11 +283,11 @@ function AddressSlideOver({ initial, isEdit, onSave, onClose }: {
       <FInput label="Full Name" value={form.name} onChange={set('name')} required />
       <FInput label="Address Line 1" value={form.line1} onChange={set('line1')} required />
       <FInput label="Address Line 2" placeholder="Apartment, suite, etc. (optional)" value={form.line2} onChange={set('line2')} />
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 0.75rem' }}>
+      <div className="rg-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 0.75rem' }}>
         <FInput label="City" value={form.city} onChange={set('city')} required />
         <FInput label="State / Province" value={form.state} onChange={set('state')} required />
       </div>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 0.75rem' }}>
+      <div className="rg-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 0.75rem' }}>
         <FInput label="Postal / ZIP" value={form.postal} onChange={set('postal')} required />
         <FSelect label="Country" value={form.country} onChange={set('country')} options={COUNTRIES} />
       </div>
@@ -314,7 +314,7 @@ function PaymentSlideOver({ onSave, onClose }: { onSave: () => void; onClose: ()
       saveLabel="Save Card"
     >
       <FInput label="Card Number" placeholder="1234 5678 9012 3456" value={form.cardNumber} onChange={set('cardNumber')} required />
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 0.75rem' }}>
+      <div className="rg-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 0.75rem' }}>
         <FInput label="Expiry (MM / YY)" placeholder="09/27" value={form.expiry} onChange={set('expiry')} required />
         <FInput label="CVC" type="password" placeholder="•••" value={form.cvc} onChange={set('cvc')} required />
       </div>
