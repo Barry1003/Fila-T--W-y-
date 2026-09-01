@@ -1,0 +1,508 @@
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import 'tailwindcss';
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background-color: #faf6f0;
+  color: #2b2320;
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+/* Gold foil shimmer on primary CTAs */
+@keyframes foil-shimmer {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+.shimmer-cta {
+  transition: all 0.25s ease;
+}
+
+.shimmer-cta:hover {
+  background: linear-gradient(
+    90deg,
+    #b8913a 0%,
+    #d4a94e 25%,
+    #f5d98a 48%,
+    #d4a94e 72%,
+    #b8913a 100%
+  ) !important;
+  background-size: 200% auto !important;
+  animation: foil-shimmer 1.4s linear infinite;
+  color: #2b2320 !important;
+  border-color: transparent !important;
+}
+
+/* Product image scale */
+.product-card:hover .product-img {
+  transform: scale(1.06);
+}
+
+.product-img {
+  transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* Product hover overlay */
+.product-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(43,35,32,0.88) 0%, rgba(43,35,32,0.18) 55%, rgba(43,35,32,0) 100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 1.125rem;
+  opacity: 0;
+  transition: opacity 0.32s ease;
+  pointer-events: none;
+}
+
+.product-card:hover .product-overlay {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.product-overlay-btns {
+  display: flex;
+  gap: 0.5rem;
+  transform: translateY(10px);
+  transition: transform 0.38s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.product-card:hover .product-overlay-btns {
+  transform: translateY(0);
+}
+
+/* Category card — 3D flip */
+.flip-card {
+  perspective: 900px;
+}
+
+.flip-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 0.65s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.flip-card:hover .flip-card-inner {
+  transform: rotateY(180deg);
+}
+
+.flip-card-front,
+.flip-card-back {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.flip-card-back {
+  transform: rotateY(180deg);
+}
+
+/* Maker card hover */
+.maker-card {
+  transition: box-shadow 0.25s ease;
+}
+
+.maker-card:hover {
+  box-shadow: 0 4px 24px rgba(43, 35, 32, 0.1);
+}
+
+/* Nav link hover */
+.nav-link {
+  transition: opacity 0.15s ease;
+}
+
+.nav-link:hover {
+  opacity: 1 !important;
+}
+
+/* Hide scrollbars while still allowing scroll */
+* {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+*::-webkit-scrollbar {
+  display: none;
+}
+
+/* PDP main image fade on thumbnail switch */
+@keyframes pdp-img-in {
+  from { opacity: 0; transform: scale(1.015); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+.pdp-main-img {
+  animation: pdp-img-in 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* Responsive */
+@media (max-width: 1000px) {
+  .pdp-grid {
+    grid-template-columns: 1fr !important;
+    gap: 2.5rem !important;
+  }
+
+  .pdp-reviews-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .pdp-related-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+@media (max-width: 1000px) {
+  .nav-center {
+    display: none !important;
+  }
+
+  .new-in-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  .story-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .footer-cols {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  /* Shop page */
+  .shop-sidebar {
+    display: none !important;
+  }
+
+  .shop-mobile-filter {
+    display: block !important;
+  }
+
+  .shop-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  .shop-topbar-controls {
+    display: none !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .trust-row {
+    grid-template-columns: 1fr !important;
+    gap: 1.5rem !important;
+  }
+
+  .cat-grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+
+  .footer-cols {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ── Scroll reveal ──────────────────────────────────────────────────────────── */
+
+.reveal {
+  opacity: 0;
+  transform: translateY(26px);
+  transition:
+    opacity 0.72s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.72s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: none;
+}
+
+.reveal[data-delay="1"] { transition-delay: 0.08s; }
+.reveal[data-delay="2"] { transition-delay: 0.18s; }
+.reveal[data-delay="3"] { transition-delay: 0.28s; }
+.reveal[data-delay="4"] { transition-delay: 0.38s; }
+.reveal[data-delay="5"] { transition-delay: 0.48s; }
+
+.reveal-left {
+  opacity: 0;
+  transform: translateX(-28px);
+  transition:
+    opacity 0.72s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.72s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.reveal-left.visible {
+  opacity: 1;
+  transform: none;
+}
+
+.reveal-right {
+  opacity: 0;
+  transform: translateX(28px);
+  transition:
+    opacity 0.72s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.72s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.reveal-right.visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* ── Mobile Nav ─────────────────────────────────────────────────────────────── */
+
+.nav-hamburger {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #FAF6F0;
+  padding: 6px;
+  line-height: 0;
+  flex-shrink: 0;
+}
+
+.nav-icons-desktop {
+  display: flex;
+  gap: 0.875rem;
+  align-items: center;
+}
+
+@media (max-width: 900px) {
+  .nav-hamburger { display: flex; align-items: center; }
+  .nav-icons-desktop { display: none !important; }
+}
+
+.nav-mobile-drawer {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  pointer-events: none;
+}
+
+.nav-mobile-drawer.open {
+  pointer-events: auto;
+}
+
+.nav-mobile-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(43, 35, 32, 0.52);
+  opacity: 0;
+  transition: opacity 0.28s ease;
+}
+
+.nav-mobile-drawer.open .nav-mobile-overlay {
+  opacity: 1;
+}
+
+.nav-mobile-panel {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 280px;
+  background: #7A2E38;
+  transform: translateX(-100%);
+  transition: transform 0.36s cubic-bezier(0.22, 1, 0.36, 1);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.nav-mobile-drawer.open .nav-mobile-panel {
+  transform: translateX(0);
+}
+
+/* ── Mobile Console Shell ───────────────────────────────────────────────────── */
+
+.console-hamburger {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #2B2320;
+  padding: 5px;
+  line-height: 0;
+  flex-shrink: 0;
+}
+
+@media (max-width: 900px) {
+  .console-hamburger {
+    display: flex;
+    align-items: center;
+  }
+
+  .console-sidebar {
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 150;
+    transform: translateX(-100%);
+    transition: transform 0.33s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .console-sidebar.sidebar-open {
+    transform: translateX(0);
+    box-shadow: 6px 0 28px rgba(43, 35, 32, 0.22);
+  }
+
+  .console-sidebar-overlay {
+    display: block !important;
+  }
+
+  /* stat grid: 2 col on tablet */
+  .console-stat-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  /* lower panels: stack */
+  .console-lower-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* settings homepage-content preview col */
+  .settings-preview-col {
+    display: none !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .console-stat-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+.console-sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 149;
+  background: rgba(43, 35, 32, 0.4);
+}
+
+/* ── Mobile Account Shell ───────────────────────────────────────────────────── */
+
+@media (max-width: 860px) {
+  .account-layout {
+    grid-template-columns: 1fr !important;
+    padding: 2rem 1.5rem !important;
+    gap: 1.5rem !important;
+  }
+
+  .account-sidebar-col {
+    display: none !important;
+  }
+}
+
+/* ── Home page mobile ───────────────────────────────────────────────────────── */
+
+@media (max-width: 900px) {
+  .hero-content {
+    padding: 0 1.75rem !important;
+    max-width: 100% !important;
+  }
+
+  .craftsmanship-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .story-grid {
+    gap: 3rem !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .hero-content {
+    padding: 0 1.25rem !important;
+  }
+
+  .new-in-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.875rem !important;
+  }
+
+  .story-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .section-pad {
+    padding-left: 1.25rem !important;
+    padding-right: 1.25rem !important;
+  }
+}
+
+/* ── Custom Order page mobile ───────────────────────────────────────────────── */
+
+@media (max-width: 860px) {
+  .custom-order-detail-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ── Reviews summary mobile ─────────────────────────────────────────────────── */
+
+@media (max-width: 768px) {
+  .reviews-summary-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1.25rem !important;
+  }
+
+  .reviews-summary-divider-left,
+  .reviews-summary-divider-right {
+    border: none !important;
+    padding: 0 !important;
+  }
+}
+
+/* ── Settings homepage grid ─────────────────────────────────────────────────── */
+
+@media (max-width: 900px) {
+  .settings-homepage-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ── Orders page detail grid ────────────────────────────────────────────────── */
+
+@media (max-width: 860px) {
+  .order-detail-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ── Overflow guard ─────────────────────────────────────────────────────────── */
+
+html {
+  overflow-x: hidden;
+}
+
+/* Ensure tables scroll horizontally instead of overflowing */
+.table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ── Footer mobile ──────────────────────────────────────────────────────────── */
+
+@media (max-width: 768px) {
+  .footer-brand-row {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 1rem !important;
+  }
+}
