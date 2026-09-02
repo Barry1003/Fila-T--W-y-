@@ -9,7 +9,7 @@
  */
 
 import NextLink from 'next/link';
-import { useParams as useNextParams, usePathname, useRouter } from 'next/navigation';
+import { useParams as useNextParams, usePathname, useRouter, useSearchParams } from 'next/navigation';
 import type { ComponentProps, CSSProperties, ReactNode } from 'react';
 
 type AnchorProps = Omit<ComponentProps<typeof NextLink>, 'href' | 'children' | 'className' | 'style'>;
@@ -68,6 +68,8 @@ export function useLocation() {
   const pathname = usePathname() ?? '/';
   return { pathname };
 }
+
+export { useSearchParams };
 
 /**
  * Route params flattened to plain strings — Next hands catch-all segments back

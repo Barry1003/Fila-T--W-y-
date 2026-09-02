@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useMemo } from 'react';
-import { Link } from '@/lib/router';
+import { Suspense, useState, useMemo } from 'react';
+import { Link, useSearchParams } from '@/lib/router';
 import { C, DISPLAY, UI, label } from '../tokens';
 import { SlidersIcon, GridIcon, ListIcon, XIcon } from '../icons';
 import { ALL_PRODUCTS, ALL_CATEGORIES, ALL_COLORS, COLOR_HEX, type Product } from '../data/products';
@@ -51,7 +51,7 @@ const PROMOS: Promo[] = PROMO_SOURCES.flatMap(src => {
     subtext: src.subtext,
     ctaLabel: src.ctaLabel,
     ctaHref: `/product/${product.id}`,
-    imageUrl: `https://images.unsplash.com/${product.img}?w=900&h=900&fit=crop&auto=format`,
+    imageUrl: `https://images.unsplash.com/${product.img}?w=1200&h=900&fit=crop&auto=format`,
     productTitle: product.title,
     productPriceCad: product.cadNum,
   }];
@@ -206,7 +206,7 @@ function ProductCard({ p, view }: { p: Product; view: 'grid' | 'list' }) {
 
 // ── Shop page ─────────────────────────────────────────────────────────────────
 
-export default function Shop() {
+function ShopContent() {
   const [selectedCats, setSelectedCats]   = useState<string[]>([]);
   const [priceMax, setPriceMax]           = useState(350);
   const [selectedColors, setSelectedColors] = useState<string[]>([]);
@@ -215,6 +215,9 @@ export default function Shop() {
   const [viewMode, setViewMode]           = useState<'grid' | 'list'>('grid');
   const [filterOpen, setFilterOpen]       = useState(false);
   const [visibleCount, setVisibleCount]   = useState(12);
+
+  // Set by the search field in the nav bar.
+  const query = (useSearchParams()?.get('q') ?? '').trim().toLowerCase();
 
   const toggleArr = <T,>(arr: T[], item: T) =>
     arr.includes(item) ? arr.filter(x => x !== item) : [...arr, item];
@@ -225,6 +228,13 @@ export default function Shop() {
 
   const filtered = useMemo(() => {
     let r = [...ALL_PRODUCTS];
+    if (query) {
+      // Match on title, category or colour so "gele", "indigo" and "kaftan"
+      // all find something.
+      r = r.filter(p =>
+        `${p.title} ${p.category} ${p.color}`.toLowerCase().includes(query)
+      );
+    }
     if (selectedCats.length)   r = r.filter(p => selectedCats.includes(p.category));
     r = r.filter(p => p.cadNum <= priceMax);
     if (selectedColors.length) r = r.filter(p => selectedColors.includes(p.color));
@@ -235,7 +245,7 @@ export default function Shop() {
     if (sortBy === 'price-asc')  r.sort((a, b) => a.cadNum - b.cadNum);
     if (sortBy === 'price-desc') r.sort((a, b) => b.cadNum - a.cadNum);
     return r;
-  }, [selectedCats, priceMax, selectedColors, availability, sortBy]);
+  }, [query, selectedCats, priceMax, selectedColors, availability, sortBy]);
 
   const visible = filtered.slice(0, visibleCount);
   const hasMore = visibleCount < filtered.length;
@@ -265,7 +275,7 @@ export default function Shop() {
         <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
           <div>
             <h1 style={{ fontFamily: DISPLAY, fontSize: 'clamp(2rem, 4vw, 3.25rem)', fontWeight: 400, letterSpacing: '-0.022em', color: C.charcoal, margin: 0, lineHeight: 1.05 }}>
-              {selectedCats.length === 1 ? selectedCats[0] : 'Shop All'}
+              {query ? `“${query}”` : selectedCats.length === 1 ? selectedCats[0] : 'Shop All'}
             </h1>
             <p style={{ fontFamily: UI, fontSize: '0.8rem', color: 'rgba(43,35,32,0.45)', margin: '0.4rem 0 0' }}>
               {filtered.length} {filtered.length === 1 ? 'product' : 'products'}
@@ -382,5 +392,13 @@ export default function Shop() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function Shop() {
+  return (
+    <Suspense fallback={<div style={{ minHeight: '100vh', backgroundColor: C.cream }} />}>
+      <ShopContent />
+    </Suspense>
   );
 }

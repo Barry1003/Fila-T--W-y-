@@ -375,6 +375,69 @@ body {
   .nav-wordmark-sub { font-size: 0.5rem; letter-spacing: 0.13em !important; }
 }
 
+/* ── Nav search ─────────────────────────────────────────────────────────────── */
+
+.nav-search {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 0 1 260px;
+  min-width: 0;
+}
+
+.nav-search-icon {
+  position: absolute;
+  left: 0.7rem;
+  display: flex;
+  line-height: 0;
+  color: rgba(250, 246, 240, 0.55);
+  pointer-events: none;
+}
+
+.nav-search input {
+  width: 100%;
+  height: 36px;
+  padding: 0 0.75rem 0 2.15rem;
+  border: 1px solid rgba(250, 246, 240, 0.22);
+  border-radius: 100px;
+  background: rgba(250, 246, 240, 0.08);
+  color: #FAF6F0;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 0.78rem;
+  outline: none;
+  transition: border-color 0.15s, background-color 0.15s;
+}
+
+.nav-search input::placeholder {
+  color: rgba(250, 246, 240, 0.45);
+}
+
+.nav-search input:focus {
+  border-color: #D4A94E;
+  background: rgba(250, 246, 240, 0.13);
+}
+
+/* Chrome and Safari draw their own clear button on type="search". */
+.nav-search input::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.nav-search-drawer {
+  flex: 1 1 auto;
+  margin: 0 0.9rem 1.25rem;
+}
+
+.nav-search-drawer input {
+  height: 42px;
+  font-size: 0.85rem;
+}
+
+/* The inline field belongs to the desktop bar; the drawer carries its own. */
+@media (max-width: 1000px) {
+  .nav-search:not(.nav-search-drawer) { display: none; }
+}
+
 /* ── Mobile drawer ──────────────────────────────────────────────────────────── */
 
 .nav-drawer {
@@ -859,15 +922,19 @@ body {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  /* Product photos put the piece in the upper half, so bias the crop upward
+     rather than centring and cutting off heads and headwraps. */
+  object-position: center 22%;
   display: block;
 }
 
-/* Fades the image into the maroon panel so the join is not a hard edge. */
+/* Softens the join with the maroon panel. Kept narrow and mostly transparent —
+   a heavier gradient hides the product, which is the point of the slide. */
 .promo-media::after {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(90deg, rgba(122, 46, 56, 0) 55%, rgba(122, 46, 56, 0.95) 100%);
+  background: linear-gradient(90deg, rgba(122, 46, 56, 0) 82%, rgba(122, 46, 56, 0.55) 100%);
 }
 
 .promo-badge {
@@ -922,32 +989,6 @@ body {
   transform: translateY(-1px);
 }
 
-.promo-arrow {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 2;
-  width: 38px;
-  height: 38px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid rgba(250, 246, 240, 0.3);
-  border-radius: 50%;
-  background: rgba(43, 35, 32, 0.4);
-  color: #FAF6F0;
-  cursor: pointer;
-  transition: background-color 0.15s, border-color 0.15s;
-}
-
-.promo-arrow:hover {
-  background: rgba(43, 35, 32, 0.75);
-  border-color: #D4A94E;
-}
-
-.promo-arrow-prev { left: 0.875rem; }
-.promo-arrow-next { right: 0.875rem; }
-
 .promo-dots {
   display: flex;
   justify-content: center;
@@ -977,18 +1018,17 @@ body {
 
   /* Image on top, copy beneath — the side gradient would cut the image in half. */
   .promo-slide { grid-template-columns: 1fr; min-height: 0; }
-  .promo-media { height: 260px; }
+  .promo-media { height: 340px; }
   .promo-media::after {
-    background: linear-gradient(180deg, rgba(122, 46, 56, 0) 55%, rgba(122, 46, 56, 0.95) 100%);
+    background: linear-gradient(180deg, rgba(122, 46, 56, 0) 84%, rgba(122, 46, 56, 0.5) 100%);
   }
   .promo-body { padding: 1.5rem 1.5rem 2rem; }
-  .promo-arrow { top: auto; bottom: 1rem; transform: none; }
 }
 
 @media (max-width: 560px) {
   .promo-carousel { padding: 1rem 1rem 0; }
   .promo-body { padding: 1.25rem 1.15rem 1.75rem; }
-  .promo-media { height: 200px; }
+  .promo-media { height: 260px; }
 }
 
 /* ── Responsive grid utilities ──────────────────────────────────────────────── */

@@ -71,6 +71,13 @@ after editing it run `pnpm db:migrate` and the client regenerates.
 - App and seed talk to Neon over HTTPS (port 443) through
   `@prisma/adapter-neon`. Only `prisma migrate` needs port 5432.
 
+## Landing page
+
+`src/middleware.ts` sends returning visitors from `/` straight to `/shop`,
+keyed on the `ac_seen_landing` cookie. It runs on the server so the landing
+page never flashes before the redirect. Clear that cookie to see the landing
+page again.
+
 ## Conventions
 
 - Every component under `src/views` and `src/components` is a client component

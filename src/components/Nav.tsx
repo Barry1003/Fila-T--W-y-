@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useState } from 'react';
-import { Link, NavLink } from '@/lib/router';
+import { Link, NavLink, useNavigate } from '@/lib/router';
 import { useOverlay } from '@/lib/useOverlay';
 import { C, DISPLAY, label, UI } from '../tokens';
 import { SearchIcon, HeartIcon, UserIcon, CartIcon, GridIcon } from '../icons';
@@ -19,7 +19,6 @@ const NAV_LINKS = [
 const ACCOUNT_LINKS = [
   { label: 'My Account', to: '/account', icon: <UserIcon /> },
   { label: 'Wishlist', to: '/account/wishlist', icon: <HeartIcon /> },
-  { label: 'Search', to: '/shop', icon: <SearchIcon /> },
 ];
 
 function CartBadge({ count }: { count: number }) {
@@ -27,6 +26,33 @@ function CartBadge({ count }: { count: number }) {
     <span className="nav-cart-badge" aria-hidden="true">
       {count}
     </span>
+  );
+}
+
+function SearchField({ className, onSubmitted }: { className: string; onSubmitted?: () => void }) {
+  const navigate = useNavigate();
+  const [query, setQuery] = useState('');
+
+  return (
+    <form
+      className={className}
+      role="search"
+      onSubmit={e => {
+        e.preventDefault();
+        const q = query.trim();
+        navigate(q ? `/shop?q=${encodeURIComponent(q)}` : '/shop');
+        onSubmitted?.();
+      }}
+    >
+      <span className="nav-search-icon" aria-hidden="true"><SearchIcon /></span>
+      <input
+        type="search"
+        value={query}
+        onChange={e => setQuery(e.target.value)}
+        placeholder="Search caps, gele, kaftans…"
+        aria-label="Search products"
+      />
+    </form>
   );
 }
 
@@ -81,6 +107,9 @@ export default function Nav() {
             ))}
           </div>
 
+          {/* Desktop search */}
+          <SearchField className="nav-search" />
+
           {/* Desktop icons */}
           <div className="nav-icons-desktop">
             {IS_OWNER && (
@@ -90,7 +119,6 @@ export default function Nav() {
               </Link>
             )}
             {([
-              { icon: <SearchIcon />, to: '/shop', label: 'Search' },
               { icon: <HeartIcon />, to: '/account/wishlist', label: 'Wishlist' },
               { icon: <UserIcon />, to: '/account', label: 'Account' },
             ] as const).map(({ icon, to, label: lbl }) => (
@@ -149,6 +177,8 @@ export default function Nav() {
           </div>
 
           <div className="nav-drawer-body">
+            <SearchField className="nav-search nav-search-drawer" onSubmitted={close} />
+
             <nav aria-label="Main">
               {NAV_LINKS.map(({ label: lbl, to }) => (
                 <NavLink key={lbl} to={to} onClick={close} className={({ isActive }) => `nav-drawer-link${isActive ? ' active' : ''}`}>
