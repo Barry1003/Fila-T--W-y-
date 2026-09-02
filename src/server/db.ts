@@ -14,13 +14,20 @@ function isTransient(error: unknown): boolean {
   return (error as { type?: string } | null)?.type === 'error';
 }
 
-export async function withDbRetry<T>(operation: string, fn: () => Promise<T>, attempts = 4): Promise<T> {
+/**
+ * Neon suspends idle computes, and waking one takes upwards of two seconds —
+ * longer than a tight retry budget, so the first request after a quiet spell
+ * would fail even though the database is healthy. The schedule below spans
+ * roughly nine seconds, which covers a cold start without leaving a genuinely
+ * broken page hanging.
+ */
+export async function withDbRetry<T>(operation: string, fn: () => Promise<T>, attempts = 6): Promise<T> {
   for (let attempt = 1; ; attempt++) {
     try {
       return await fn();
     } catch (error) {
       if (!isTransient(error) || attempt >= attempts) throw error;
-      const wait = 2 ** attempt * 150;
+      const wait = Math.min(2 ** attempt * 250, 3000);
       console.warn(`[db] ${operation} hit a transient error (${attempt}/${attempts}), retrying in ${wait}ms`);
       await new Promise(resolve => setTimeout(resolve, wait));
     }

@@ -107,6 +107,25 @@ than in columns — adding a field is a schema-and-form change, not a migration.
 - Pages currently editable: `home` (hero slides, story, promo strip) and
   `about`. Each gets a tab in Store Settings.
 
+## Reading the catalogue
+
+`src/server/catalogue.ts` is the only place that queries products. It maps
+Prisma rows to a flat `CatalogueProduct` — Decimal becomes a number, the first
+image becomes a URL, variants become a list of sizes — so views never handle
+Prisma types.
+
+- Shop and the product page are database-backed and take props; their route
+  files fetch and pass down.
+- Products are addressed by `slug`, not id. `slugify` in `src/lib/slug.ts` is
+  shared with the seed, so a slug is derivable from a title without a lookup —
+  which is how the views still on fixtures link to database-backed pages.
+- Fetch sequentially rather than in `Promise.all`. Neon opens a socket per
+  query and firing several at a sleeping compute makes a cold start fail.
+  Derive what you can in memory instead (see `colorsOf`).
+- `withDbRetry` spans about nine seconds, which covers a Neon cold start. A
+  failure past that hits `src/app/(site)/error.tsx`, which keeps the nav and
+  footer and offers a retry.
+
 ## Landing page
 
 `src/middleware.ts` sends returning visitors from `/` straight to `/shop`,

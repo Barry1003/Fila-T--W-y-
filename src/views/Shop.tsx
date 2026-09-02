@@ -4,62 +4,67 @@ import { Suspense, useState, useMemo } from 'react';
 import { Link, useSearchParams } from '@/lib/router';
 import { C, DISPLAY, UI, label } from '../tokens';
 import { SlidersIcon, GridIcon, ListIcon, XIcon } from '../icons';
-import { ALL_PRODUCTS, COLLECTIONS, ALL_COLORS, COLOR_HEX, type Product } from '../data/products';
+import { COLOR_HEX } from '../data/products';
+import type { CatalogueProduct, CatalogueCollection } from '@/server/catalogue';
 import PromoCarousel, { type Promo } from '../components/PromoCarousel';
 
 const fmt = (num: number, prefix: string) => `${prefix}${num.toLocaleString()}`;
 
 // ── Live promotions ───────────────────────────────────────────────────────────
-// Shaped like the Banner rows in prisma/schema.prisma, so swapping this for a
-// query later is a change of source rather than a change of markup. Each promo
-// borrows its image, title and price from the product it advertises.
+// Shaped like the Banner rows in prisma/schema.prisma. Each promo borrows its
+// image, title and price from the product it advertises, so a slide can never
+// show a price the product page contradicts.
 
-const PROMO_SOURCES: { productId: number; badge: string; text: string; subtext: string; ctaLabel: string }[] = [
+const PROMO_SOURCES: { slug: string; badge: string; text: string; subtext: string; ctaLabel: string }[] = [
   {
-    productId: 4, badge: '20% off',
+    slug: 'aso-oke-gele-ivory-gold-set', badge: '20% off',
     text: 'Aso-oke, woven to be worn again',
     subtext: 'Our hand-woven Gele sets are 20% off through the end of the month with code ASOKEVIP.',
     ctaLabel: 'Shop Gele',
   },
   {
-    productId: 1, badge: '10% off first order',
+    slug: 'gobi-fila-cap-burgundy-velvet', badge: '10% off first order',
     text: 'Your first cap, on us — almost',
     subtext: 'New here? Code WELCOME10 takes 10% off anything in the collection.',
     ctaLabel: 'Shop Filà',
   },
   {
-    productId: 8, badge: 'Free shipping',
+    slug: 'embroidered-agbada-kaftan', badge: 'Free shipping',
     text: 'Made to order, delivered free',
-    subtext: 'Orders over CAD $150 ship free worldwide with code FREESHIP25.',
+    subtext: 'Orders over CAD $258 ship free worldwide with code FREESHIP25.',
     ctaLabel: 'Shop Kaftans',
   },
   {
-    productId: 5, badge: '15% off',
+    slug: 'damask-gele-teal-coral', badge: '15% off',
     text: 'Damask Gele, in every colour',
     subtext: 'Fifteen percent off the full Gele range with code GELE15 while stock lasts.',
     ctaLabel: 'Shop the offer',
   },
 ];
 
-const PROMOS: Promo[] = PROMO_SOURCES.flatMap(src => {
-  const product = ALL_PRODUCTS.find(p => p.id === src.productId);
-  if (!product) return [];
-  return [{
-    id: `promo-${src.productId}`,
-    badge: src.badge,
-    text: src.text,
-    subtext: src.subtext,
-    ctaLabel: src.ctaLabel,
-    ctaHref: `/product/${product.id}`,
-    imageUrl: `https://images.unsplash.com/${product.img}?w=1200&h=900&fit=crop&auto=format`,
-    productTitle: product.title,
-    productPriceCad: product.cadNum,
-  }];
-});
+function buildPromos(products: CatalogueProduct[]): Promo[] {
+  return PROMO_SOURCES.flatMap(src => {
+    const product = products.find(p => p.slug === src.slug);
+    if (!product) return [];
+    return [{
+      id: `promo-${product.id}`,
+      badge: src.badge,
+      text: src.text,
+      subtext: src.subtext,
+      ctaLabel: src.ctaLabel,
+      ctaHref: `/product/${product.slug}`,
+      imageUrl: product.imageUrl,
+      productTitle: product.title,
+      productPriceCad: product.priceCad,
+    }];
+  });
+}
 
 // ── Filter sidebar ────────────────────────────────────────────────────────────
 
 interface SidebarProps {
+  collections: CatalogueCollection[];
+  colors: string[];
   selectedCats: string[];
   onCat: (c: string) => void;
   priceMax: number;
@@ -72,7 +77,7 @@ interface SidebarProps {
   onClose?: () => void;
 }
 
-function Sidebar({ selectedCats, onCat, priceMax, onPriceMax, selectedColors, onColor, availability, onAvail, onClear, onClose }: SidebarProps) {
+function Sidebar({ collections, colors, selectedCats, onCat, priceMax, onPriceMax, selectedColors, onColor, availability, onAvail, onClear, onClose }: SidebarProps) {
   const sectionHead: React.CSSProperties = {
     ...label, fontSize: '0.595rem', color: C.charcoal, marginBottom: '0.875rem',
     letterSpacing: '0.14em', paddingBottom: '0.5rem', borderBottom: '1px solid rgba(43,35,32,0.08)',
@@ -105,7 +110,7 @@ function Sidebar({ selectedCats, onCat, priceMax, onPriceMax, selectedColors, on
       </div>
 
       {/* Category, grouped by the collection each one belongs to */}
-      {COLLECTIONS.map(collection => (
+      {collections.map(collection => (
         <div key={collection.slug}>
           <div style={sectionHead}>{collection.name}</div>
           {collection.categories.map(c => checkRow(selectedCats.includes(c), c, () => onCat(c)))}
@@ -136,7 +141,7 @@ function Sidebar({ selectedCats, onCat, priceMax, onPriceMax, selectedColors, on
       <div>
         <div style={sectionHead}>Colour</div>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
-          {ALL_COLORS.map(col => {
+          {colors.map(col => {
             const active = selectedColors.includes(col);
             const bg = COLOR_HEX[col];
             return (
@@ -163,29 +168,29 @@ function Sidebar({ selectedCats, onCat, priceMax, onPriceMax, selectedColors, on
 
 // ── Product card ──────────────────────────────────────────────────────────────
 
-function ProductCard({ p, view }: { p: Product; view: 'grid' | 'list' }) {
+function ProductCard({ p, view }: { p: CatalogueProduct; view: 'grid' | 'list' }) {
   const [hovered, setHovered] = useState(false);
 
   if (view === 'list') {
     return (
-      <Link to={`/product/${p.id}`} style={{ display: 'flex', gap: '1.5rem', textDecorationLine: 'none', color: C.charcoal, padding: '1.25rem 0', borderBottom: '1px solid rgba(43,35,32,0.07)' }}
+      <Link to={`/product/${p.slug}`} style={{ display: 'flex', gap: '1.5rem', textDecorationLine: 'none', color: C.charcoal, padding: '1.25rem 0', borderBottom: '1px solid rgba(43,35,32,0.07)' }}
         onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}>
         <div style={{ width: '120px', flexShrink: 0, aspectRatio: '3/4', backgroundColor: '#ddd5c8', overflow: 'hidden', position: 'relative' }}>
-          <img src={`https://images.unsplash.com/${p.img}?w=300&h=400&fit=crop&auto=format`} alt={p.title} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', transform: hovered ? 'scale(1.05)' : 'scale(1)', transition: 'transform 0.4s ease' }} />
+          <img src={p.imageUrl} alt={p.title} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', transform: hovered ? 'scale(1.05)' : 'scale(1)', transition: 'transform 0.4s ease' }} />
           <span style={{ position: 'absolute', top: '0.5rem', left: '0.5rem', backgroundColor: p.tag === 'NEW' ? C.maroon : C.charcoal, color: C.cream, ...label, fontSize: '0.52rem', padding: '2px 6px' }}>{p.tag}</span>
         </div>
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
           <div style={{ fontFamily: UI, fontSize: '0.9375rem', marginBottom: '0.4rem', color: C.charcoal }}>{p.title}</div>
-          <div style={{ fontFamily: UI, fontSize: '1rem', fontWeight: 600, color: C.charcoal }}>{fmt(p.cadNum, 'CAD $')}</div>
+          <div style={{ fontFamily: UI, fontSize: '1rem', fontWeight: 600, color: C.charcoal }}>{fmt(p.priceCad, 'CAD $')}</div>
         </div>
       </Link>
     );
   }
 
   return (
-    <Link to={`/product/${p.id}`} className="product-card" style={{ textDecorationLine: 'none', color: C.charcoal, display: 'block' }}>
+    <Link to={`/product/${p.slug}`} className="product-card" style={{ textDecorationLine: 'none', color: C.charcoal, display: 'block' }}>
       <div style={{ position: 'relative', marginBottom: '1rem', backgroundColor: '#ddd5c8', overflow: 'hidden', aspectRatio: '3/4' }}>
-        <img className="product-img" src={`https://images.unsplash.com/${p.img}?w=600&h=800&fit=crop&auto=format`} alt={p.title} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+        <img className="product-img" src={p.imageUrl} alt={p.title} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
         <span style={{ position: 'absolute', top: '0.75rem', left: '0.75rem', backgroundColor: p.tag === 'NEW' ? C.maroon : C.charcoal, color: C.cream, ...label, fontSize: '0.56rem', padding: '3px 8px', letterSpacing: '0.12em' }}>
           {p.tag}
         </span>
@@ -201,14 +206,14 @@ function ProductCard({ p, view }: { p: Product; view: 'grid' | 'list' }) {
         </div>
       </div>
       <div style={{ fontFamily: UI, fontSize: '0.875rem', fontWeight: 400, marginBottom: '0.5rem', lineHeight: 1.4, color: C.charcoal }}>{p.title}</div>
-      <div style={{ fontFamily: UI, fontSize: '1rem', fontWeight: 600, color: C.charcoal, lineHeight: 1 }}>{fmt(p.cadNum, 'CAD $')}</div>
+      <div style={{ fontFamily: UI, fontSize: '1rem', fontWeight: 600, color: C.charcoal, lineHeight: 1 }}>{fmt(p.priceCad, 'CAD $')}</div>
     </Link>
   );
 }
 
 // ── Shop page ─────────────────────────────────────────────────────────────────
 
-function ShopContent() {
+function ShopContent({ products, collections, colors }: ShopProps) {
   const [selectedCats, setSelectedCats]   = useState<string[]>([]);
   const [priceMax, setPriceMax]           = useState(350);
   const [selectedColors, setSelectedColors] = useState<string[]>([]);
@@ -229,7 +234,7 @@ function ShopContent() {
   };
 
   const filtered = useMemo(() => {
-    let r = [...ALL_PRODUCTS];
+    let r = [...products];
     if (query) {
       // Match on title, category or colour so "gele", "indigo" and "kaftan"
       // all find something.
@@ -238,22 +243,23 @@ function ShopContent() {
       );
     }
     if (selectedCats.length)   r = r.filter(p => selectedCats.includes(p.category));
-    r = r.filter(p => p.cadNum <= priceMax);
+    r = r.filter(p => p.priceCad <= priceMax);
     if (selectedColors.length) r = r.filter(p => selectedColors.includes(p.color));
     if (availability.includes('In Stock') && !availability.includes('Made to Order'))
       r = r.filter(p => p.inStock && p.tag !== 'MADE TO ORDER');
     if (availability.includes('Made to Order') && !availability.includes('In Stock'))
       r = r.filter(p => p.tag === 'MADE TO ORDER');
-    if (sortBy === 'price-asc')  r.sort((a, b) => a.cadNum - b.cadNum);
-    if (sortBy === 'price-desc') r.sort((a, b) => b.cadNum - a.cadNum);
+    if (sortBy === 'price-asc')  r.sort((a, b) => a.priceCad - b.priceCad);
+    if (sortBy === 'price-desc') r.sort((a, b) => b.priceCad - a.priceCad);
     return r;
-  }, [query, selectedCats, priceMax, selectedColors, availability, sortBy]);
+  }, [products, query, selectedCats, priceMax, selectedColors, availability, sortBy]);
 
   const visible = filtered.slice(0, visibleCount);
   const hasMore = visibleCount < filtered.length;
   const hasFilters = selectedCats.length > 0 || selectedColors.length > 0 || availability.length > 0 || priceMax < 350;
 
   const sidebarProps: SidebarProps = {
+    collections, colors,
     selectedCats, onCat: c => setSelectedCats(prev => toggleArr(prev, c)),
     priceMax, onPriceMax: setPriceMax,
     selectedColors, onColor: c => setSelectedColors(prev => toggleArr(prev, c)),
@@ -265,7 +271,7 @@ function ShopContent() {
     <div style={{ backgroundColor: C.cream, minHeight: '100vh' }}>
 
       {/* ── Running promotions ── */}
-      <PromoCarousel promos={PROMOS} />
+      <PromoCarousel promos={buildPromos(products)} />
 
       {/* ── Page header ── */}
       <div style={{ borderBottom: '1px solid rgba(43,35,32,0.08)', padding: '3rem 2.5rem 2.5rem', maxWidth: '1440px', margin: '0 auto' }}>
@@ -397,10 +403,16 @@ function ShopContent() {
   );
 }
 
-export default function Shop() {
+export type ShopProps = {
+  products: CatalogueProduct[];
+  collections: CatalogueCollection[];
+  colors: string[];
+};
+
+export default function Shop(props: ShopProps) {
   return (
     <Suspense fallback={<div style={{ minHeight: '100vh', backgroundColor: C.cream }} />}>
-      <ShopContent />
+      <ShopContent {...props} />
     </Suspense>
   );
 }

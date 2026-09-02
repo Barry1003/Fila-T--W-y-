@@ -42,6 +42,8 @@ export default function AuthReset() {
     });
   }
 
+  const [show, setShow] = useState(false);
+
   const field: React.CSSProperties = {
     width: '100%', padding: '0.8rem 0.9rem', fontFamily: UI, fontSize: '0.9rem',
     border: '1px solid rgba(43,35,32,0.18)', borderRadius: 5, outline: 'none', color: C.charcoal,
@@ -74,12 +76,52 @@ export default function AuthReset() {
 
             <div>
               <label htmlFor="pw" style={{ ...label, fontSize: '0.65rem', color: C.charcoal, display: 'block', marginBottom: '0.4rem' }}>New password</label>
-              <input id="pw" type="password" value={password} onChange={e => setPassword(e.target.value)} autoComplete="new-password" placeholder="Min. 8 characters" style={field} />
+              <div style={{ position: 'relative' }}>
+                <input
+                  id="pw"
+                  type={show ? 'text' : 'password'}
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                  autoComplete="new-password"
+                  placeholder="Min. 8 characters"
+                  style={{ ...field, paddingRight: '2.75rem' }}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShow(v => !v)}
+                  aria-label={show ? 'Hide password' : 'Show password'}
+                  style={{
+                    position: 'absolute', right: '0.6rem', top: '50%', transform: 'translateY(-50%)',
+                    background: 'none', border: 'none', cursor: 'pointer', padding: '4px',
+                    color: 'rgba(43,35,32,0.45)', lineHeight: 0,
+                  }}
+                >
+                  {show ? (
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
+                      <line x1="1" y1="1" x2="23" y2="23" />
+                    </svg>
+                  ) : (
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                      <circle cx="12" cy="12" r="3" />
+                    </svg>
+                  )}
+                </button>
+              </div>
             </div>
 
             <div>
               <label htmlFor="pw2" style={{ ...label, fontSize: '0.65rem', color: C.charcoal, display: 'block', marginBottom: '0.4rem' }}>Confirm password</label>
-              <input id="pw2" type="password" value={confirm} onChange={e => setConfirm(e.target.value)} autoComplete="new-password" placeholder="Re-enter password" style={field} />
+              <input
+                id="pw2"
+                type={show ? 'text' : 'password'}
+                value={confirm}
+                onChange={e => setConfirm(e.target.value)}
+                autoComplete="new-password"
+                placeholder="Re-enter password"
+                style={field}
+              />
             </div>
 
             <button

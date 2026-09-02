@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Link } from '@/lib/router';
 import AccountShell from '../components/AccountShell';
 import { C, DISPLAY, UI, label } from '../tokens';
+import { slugify } from '@/lib/slug';
 
 /* ─── Seed data ───────────────────────────────────────────── */
 type WishItem = {
@@ -51,7 +52,7 @@ function WishCard({ item, onRemove, onAddToCart }: { item: WishItem; onRemove: (
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
       >
-        <Link to={`/product/${item.id}`}>
+        <Link to={`/product/${slugify(item.title)}`}>
           <img
             src={`https://images.unsplash.com/${item.img}?w=600&h=800&fit=crop&auto=format`}
             alt={item.title}
@@ -105,7 +106,7 @@ function WishCard({ item, onRemove, onAddToCart }: { item: WishItem; onRemove: (
       </div>
 
       {/* Text */}
-      <Link to={`/product/${item.id}`} style={{ textDecorationLine: 'none', color: C.charcoal }}>
+      <Link to={`/product/${slugify(item.title)}`} style={{ textDecorationLine: 'none', color: C.charcoal }}>
         <div style={{ fontFamily: UI, fontSize: '0.875rem', lineHeight: 1.4, marginBottom: '0.45rem', color: C.charcoal }}>
           {item.title}
         </div>

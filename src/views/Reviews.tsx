@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Link } from '@/lib/router';
 import AccountShell from '../components/AccountShell';
 import { C, DISPLAY, UI, label } from '../tokens';
+import { slugify } from '@/lib/slug';
 
 /* ─── Mock data ─────────────────────────────────────────────── */
 
@@ -137,12 +138,12 @@ function ReviewCard({ review }: { review: Review }) {
     }}>
       {/* Product row */}
       <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.875rem' }}>
-        <Link to={`/product/${review.productId}`} style={{ flexShrink: 0 }}>
+        <Link to={`/product/${slugify(review.product)}`} style={{ flexShrink: 0 }}>
           <img src={review.thumbnail} alt={review.product} width={52} height={52}
             style={{ borderRadius: '6px', objectFit: 'cover', display: 'block' }} />
         </Link>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <Link to={`/product/${review.productId}`}
+          <Link to={`/product/${slugify(review.product)}`}
             style={{ fontFamily: UI, fontSize: '0.875rem', fontWeight: 600, color: C.charcoal, textDecorationLine: 'none', display: 'block', marginBottom: '0.3rem' }}>
             {review.product}
           </Link>
@@ -222,12 +223,12 @@ function PendingCard({ item }: { item: Pending }) {
       padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: writing ? '1.125rem' : '0',
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.875rem', flexWrap: 'wrap' }}>
-        <Link to={`/product/${item.productId}`} style={{ flexShrink: 0 }}>
+        <Link to={`/product/${slugify(item.product)}`} style={{ flexShrink: 0 }}>
           <img src={item.thumbnail} alt={item.product} width={52} height={52}
             style={{ borderRadius: '6px', objectFit: 'cover', display: 'block' }} />
         </Link>
         <div style={{ flex: 1, minWidth: '140px' }}>
-          <Link to={`/product/${item.productId}`}
+          <Link to={`/product/${slugify(item.product)}`}
             style={{ fontFamily: UI, fontSize: '0.875rem', fontWeight: 600, color: C.charcoal, textDecorationLine: 'none', display: 'block', marginBottom: '0.25rem' }}>
             {item.product}
           </Link>

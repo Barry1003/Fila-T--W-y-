@@ -4,6 +4,7 @@ import { PrismaNeon } from '@prisma/adapter-neon';
 import ws from 'ws';
 import { PrismaClient } from '../src/generated/prisma/index.js';
 import { ALL_PRODUCTS, COLLECTIONS } from '../src/data/products.js';
+import { slugify } from '../src/lib/slug.js';
 import {
   BANNERS, CONVERSATIONS, CUSTOMERS, CUSTOM_REQUESTS, DISCOUNT_CODES,
   ORDERS, OWNER, OWNER_ADDRESSES, OWNER_CARDS, PRODUCT_ALIASES, REVIEWS, WISHLIST_TITLES,
@@ -53,15 +54,6 @@ async function withRetries<T>(label: string, fn: () => Promise<T>, attempts = 10
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
-/** Slug that survives the diacritics in names like "Ọjọ Ipele" and "Filà". */
-function slugify(input: string): string {
-  return input
-    .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '')
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '');
-}
 
 const date = (iso: string) => new Date(`${iso}T12:00:00Z`);
 const daysAgo = (n: number) => new Date(Date.now() - n * 86_400_000);

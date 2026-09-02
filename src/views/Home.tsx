@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Link } from '@/lib/router';
 import { C, DISPLAY, UI, label } from '../tokens';
+import { slugify } from '@/lib/slug';
 import type { HomeContent } from '@/server/content-schema';
 import HeroCarousel from '../components/HeroCarousel';
 import { ShieldIcon, BadgeIcon, GlobeIcon } from '../icons';
@@ -109,7 +110,7 @@ export default function Home({ content }: { content: HomeContent }) {
         </div>
         <div className="new-in-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1.5rem' }}>
           {products.map(p => (
-            <Link key={p.id} to={`/product/${p.id}`} className="product-card" style={{ textDecorationLine: 'none', color: C.charcoal, display: 'block' }}>
+            <Link key={p.id} to={`/product/${slugify(p.title)}`} className="product-card" style={{ textDecorationLine: 'none', color: C.charcoal, display: 'block' }}>
               <div style={{ position: 'relative', marginBottom: '1rem', backgroundColor: '#ddd5c8', overflow: 'hidden', aspectRatio: '3/4' }}>
                 <img className="product-img" src={`https://images.unsplash.com/${p.img}?w=600&h=800&fit=crop&auto=format`} alt={p.title} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                 <span style={{ position: 'absolute', top: '0.75rem', left: '0.75rem', backgroundColor: p.tag === 'NEW' ? C.maroon : C.charcoal, color: C.cream, ...label, fontSize: '0.56rem', padding: '3px 8px', letterSpacing: '0.12em' }}>

@@ -3,11 +3,12 @@
 import { useMemo } from 'react';
 import { Link, useParams } from '@/lib/router';
 import { C, DISPLAY, UI, label } from '../tokens';
+import { slugify } from '@/lib/slug';
 import { ALL_PRODUCTS, COLLECTIONS, type Product } from '../data/products';
 
 function ProductCard({ p }: { p: Product }) {
   return (
-    <Link to={`/product/${p.id}`} style={{ textDecorationLine: 'none', color: 'inherit', display: 'block' }}>
+    <Link to={`/product/${slugify(p.title)}`} style={{ textDecorationLine: 'none', color: 'inherit', display: 'block' }}>
       <div style={{ position: 'relative', aspectRatio: '3 / 4', overflow: 'hidden', backgroundColor: 'rgba(43,35,32,0.05)', marginBottom: '0.75rem' }}>
         <img
           src={`https://images.unsplash.com/${p.img}?w=600&h=800&fit=crop&auto=format`}

@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { useParams, Link } from '@/lib/router';
+import { Link } from '@/lib/router';
 import { C, DISPLAY, UI, label } from '../tokens';
-import { ALL_PRODUCTS, collectionOf } from '../data/products';
+import type { CatalogueProduct } from '@/server/catalogue';
 
 const U = 'https://images.unsplash.com/';
 
@@ -39,13 +39,13 @@ function ShareModal({
   imgSrc,
   onClose,
 }: {
-  product: typeof ALL_PRODUCTS[number];
+  product: CatalogueProduct;
   imgSrc: string;
   onClose: () => void;
 }) {
   const [copied, setCopied] = useState(false);
-  const productUrl = `https://adeclassics.com/product/${product.id}`;
-  const shareText = `Check out ${product.title} on AdeClassics — CAD $${product.cadNum.toLocaleString()}`;
+  const productUrl = `https://adeclassics.com/product/${product.slug}`;
+  const shareText = `Check out ${product.title} on AdeClassics — CAD $${product.priceCad.toLocaleString()}`;
 
   function handleCopy() {
     navigator.clipboard.writeText(productUrl).then(() => {
@@ -160,7 +160,7 @@ function ShareModal({
                 {product.title}
               </div>
               <div style={{ fontFamily: UI, fontSize: '0.8rem', color: 'rgba(43,35,32,0.5)', display: 'flex', gap: '0.375rem', alignItems: 'baseline', flexWrap: 'wrap' }}>
-                <span style={{ fontWeight: 700, color: C.charcoal }}>CAD ${product.cadNum.toLocaleString()}</span>
+                <span style={{ fontWeight: 700, color: C.charcoal }}>CAD ${product.priceCad.toLocaleString()}</span>
               </div>
             </div>
           </div>
@@ -256,9 +256,12 @@ function Stars({ rating, size = 13 }: { rating: number; size?: number }) {
   );
 }
 
-export default function Product() {
-  const { id } = useParams();
-  const product = ALL_PRODUCTS.find(p => p.id === Number(id)) ?? ALL_PRODUCTS[0];
+export type ProductProps = {
+  product: CatalogueProduct;
+  related: CatalogueProduct[];
+};
+
+export default function Product({ product, related }: ProductProps) {
 
   const [mainIdx, setMainIdx] = useState(0);
   const [selectedSize, setSelectedSize] = useState(product.sizes[0] ?? '');
@@ -266,17 +269,19 @@ export default function Product() {
   const [activeTab, setActiveTab] = useState<'description' | 'sizing' | 'shipping'>('description');
   const [shareOpen, setShareOpen] = useState(false);
 
-  const crops = ['entropy', 'top', 'bottom', 'left', 'right'];
-  const gallery = crops.map(crop => ({
-    main: `${U}${product.img}?w=900&h=1125&fit=crop&crop=${crop}&auto=format`,
-    thumb: `${U}${product.img}?w=200&h=200&fit=crop&crop=${crop}&auto=format`,
-  }));
-
-  const related = useMemo(() => {
-    const same = ALL_PRODUCTS.filter(p => p.category === product.category && p.id !== product.id);
-    const others = ALL_PRODUCTS.filter(p => p.category !== product.category);
-    return [...same, ...others].slice(0, 4);
-  }, [product]);
+  // One stored image, shown at several crops until products carry a real
+  // gallery. Unsplash-hosted URLs accept crop hints; anything else falls back
+  // to the image as stored.
+  const gallery = ['entropy', 'top', 'bottom', 'left', 'right'].map(crop => {
+    const unsplash = product.imageUrl.includes('images.unsplash.com');
+    const base = product.imageUrl.split('?')[0];
+    return unsplash
+      ? {
+          main: `${base}?w=900&h=1125&fit=crop&crop=${crop}&auto=format`,
+          thumb: `${base}?w=200&h=200&fit=crop&crop=${crop}&auto=format`,
+        }
+      : { main: product.imageUrl, thumb: product.imageUrl };
+  });
 
   const isHeadwear = ['Fila Gobi', 'Abetiaja', 'Shisha', 'Fila Senator', 'Gele', 'Ipele'].includes(product.category);
   const isFootwear = ['Shoes', 'Pam Slippers'].includes(product.category);
@@ -327,7 +332,7 @@ export default function Product() {
           <Link to="/shop" style={{ color: 'inherit', textDecorationLine: 'none' }}>Shop</Link>
           <span>/</span>
           <Link
-            to={collectionOf(product.category) ? `/collections/${collectionOf(product.category)!.slug}` : '/shop'}
+            to={product.collectionSlug ? `/collections/${product.collectionSlug}` : '/shop'}
             style={{ color: 'inherit', textDecorationLine: 'none' }}
           >
             {product.category}
@@ -395,7 +400,7 @@ export default function Product() {
             {/* Price block */}
             <div style={{ marginBottom: '2rem', paddingBottom: '2rem', borderBottom: '1px solid rgba(43,35,32,0.08)' }}>
               <div style={{ fontFamily: UI, fontSize: '2rem', fontWeight: 700, color: C.charcoal, lineHeight: 1, letterSpacing: '-0.025em' }}>
-                CAD ${product.cadNum.toLocaleString()}
+                CAD ${product.priceCad.toLocaleString()}
               </div>
             </div>
 
@@ -697,9 +702,9 @@ export default function Product() {
           </div>
           <div className="pdp-related-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1.5rem' }}>
             {related.map(p => (
-              <Link key={p.id} to={`/product/${p.id}`} className="product-card" style={{ textDecorationLine: 'none', color: C.charcoal, display: 'block' }}>
+              <Link key={p.id} to={`/product/${p.slug}`} className="product-card" style={{ textDecorationLine: 'none', color: C.charcoal, display: 'block' }}>
                 <div style={{ position: 'relative', marginBottom: '1rem', backgroundColor: '#ddd5c8', overflow: 'hidden', aspectRatio: '3/4' }}>
-                  <img className="product-img" src={`${U}${p.img}?w=600&h=800&fit=crop&auto=format`} alt={p.title} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                  <img className="product-img" src={p.imageUrl} alt={p.title} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                   <span style={{ position: 'absolute', top: '0.75rem', left: '0.75rem', backgroundColor: p.tag === 'NEW' ? C.maroon : C.charcoal, color: C.cream, ...label, fontSize: '0.56rem', padding: '3px 8px', letterSpacing: '0.12em' }}>
                     {p.tag}
                   </span>
@@ -715,7 +720,7 @@ export default function Product() {
                   </div>
                 </div>
                 <div style={{ fontFamily: UI, fontSize: '0.875rem', fontWeight: 400, marginBottom: '0.5rem', lineHeight: 1.4 }}>{p.title}</div>
-                <div style={{ fontFamily: UI, fontSize: '1rem', fontWeight: 600 }}>CAD ${p.cadNum.toLocaleString()}</div>
+                <div style={{ fontFamily: UI, fontSize: '1rem', fontWeight: 600 }}>CAD ${p.priceCad.toLocaleString()}</div>
               </Link>
             ))}
           </div>
