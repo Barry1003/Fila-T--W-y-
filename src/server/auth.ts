@@ -12,6 +12,18 @@ import { getAppwriteAccount } from './appwrite-server';
  * to another.
  */
 
+/**
+ * Whether an address owns the store.
+ *
+ * Set OWNER_EMAIL in .env and that account gets console access on sign-in.
+ * Without it there would be no way to reach the console at all: the seeded
+ * owner row has no Appwrite account behind it.
+ */
+function isOwnerEmail(email: string): boolean {
+  const owner = process.env.OWNER_EMAIL?.trim().toLowerCase();
+  return !!owner && owner === email.trim().toLowerCase();
+}
+
 export type CurrentUser = {
   id: string;
   appwriteId: string;
@@ -38,7 +50,13 @@ export async function getCurrentUser(): Promise<CurrentUser | null> {
     if (byEmail) {
       return prisma.user.update({
         where: { id: byEmail.id },
-        data: { appwriteId: account.$id, name: byEmail.name || account.name },
+        data: {
+          appwriteId: account.$id,
+          name: byEmail.name || account.name,
+          // Promote, never demote: a role set by hand in the database is not
+          // undone just because OWNER_EMAIL changed.
+          ...(isOwnerEmail(account.email) ? { role: 'OWNER' as const } : {}),
+        },
       });
     }
 
@@ -47,6 +65,7 @@ export async function getCurrentUser(): Promise<CurrentUser | null> {
         appwriteId: account.$id,
         email: account.email,
         name: account.name || account.email.split('@')[0],
+        role: isOwnerEmail(account.email) ? 'OWNER' : 'CUSTOMER',
       },
     });
   });

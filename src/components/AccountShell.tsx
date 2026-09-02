@@ -1,6 +1,7 @@
 'use client';
 
 import { NavLink } from '@/lib/router';
+import { signOut } from '@/server/auth-actions';
 import { C, DISPLAY, UI, label } from '../tokens';
 
 type SidebarItem = {
@@ -204,7 +205,7 @@ export default function AccountShell({ children }: { children: React.ReactNode }
             ))}
 
             {/* Sign out */}
-            <button
+            <form action={signOut}><button
               style={{
                 display: 'flex', alignItems: 'center', gap: '0.75rem',
                 padding: '0.65rem 0.875rem', marginTop: '0.75rem',
@@ -218,7 +219,7 @@ export default function AccountShell({ children }: { children: React.ReactNode }
             >
               <span style={{ lineHeight: 0 }}>{SIGN_OUT_ICON}</span>
               Sign Out
-            </button>
+            </button></form>
           </nav>
         </aside>
 

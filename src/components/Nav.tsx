@@ -3,10 +3,11 @@
 import { useCallback, useState } from 'react';
 import { Link, NavLink, useNavigate } from '@/lib/router';
 import { useOverlay } from '@/lib/useOverlay';
+import { signOut } from '@/server/auth-actions';
+import type { CurrentUser } from '@/server/auth';
 import { C, DISPLAY, label, UI } from '../tokens';
 import { SearchIcon, HeartIcon, UserIcon, CartIcon, GridIcon } from '../icons';
 
-const IS_OWNER = true;
 const CART_COUNT = 3;
 
 /** The collections sit under Shop rather than beside it — they are ways into
@@ -64,9 +65,10 @@ function SearchField({ className, onSubmitted }: { className: string; onSubmitte
   );
 }
 
-export default function Nav() {
+export default function Nav({ user }: { user: CurrentUser | null }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const close = useCallback(() => setMenuOpen(false), []);
+  const isOwner = user?.role === 'OWNER';
 
   useOverlay(menuOpen, close);
 
@@ -139,7 +141,7 @@ export default function Nav() {
 
           {/* Desktop icons */}
           <div className="nav-icons-desktop">
-            {IS_OWNER && (
+            {isOwner && (
               <Link to="/console" className="nav-dashboard-pill">
                 <GridIcon />
                 Store Dashboard
@@ -147,7 +149,7 @@ export default function Nav() {
             )}
             {([
               { icon: <HeartIcon />, to: '/account/wishlist', label: 'Wishlist' },
-              { icon: <UserIcon />, to: '/account', label: 'Account' },
+              { icon: <UserIcon />, to: user ? '/account' : '/auth', label: user ? 'Account' : 'Sign in' },
             ] as const).map(({ icon, to, label: lbl }) => (
               <Link key={lbl} to={to} className="nav-icon-btn" aria-label={lbl}>
                 {icon}
@@ -227,7 +229,7 @@ export default function Nav() {
             <div className="nav-drawer-section-label">My Account</div>
 
             <nav aria-label="Account">
-              {ACCOUNT_LINKS.map(({ label: lbl, to, icon }) => (
+              {(user ? ACCOUNT_LINKS : []).map(({ label: lbl, to, icon }) => (
                 <Link key={lbl} to={to} onClick={close} className="nav-drawer-sublink">
                   <span className="nav-drawer-sublink-icon">{icon}</span>
                   {lbl}
@@ -238,10 +240,30 @@ export default function Nav() {
                 Cart
                 <span className="nav-drawer-count">{CART_COUNT}</span>
               </Link>
+
+              {user ? (
+                <form action={signOut}>
+                  <button type="submit" className="nav-drawer-sublink" style={{ width: '100%', background: 'none', border: 'none', cursor: 'pointer', font: 'inherit', textAlign: 'left' }}>
+                    <span className="nav-drawer-sublink-icon">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                        <polyline points="16 17 21 12 16 7" />
+                        <line x1="21" y1="12" x2="9" y2="12" />
+                      </svg>
+                    </span>
+                    Sign out
+                  </button>
+                </form>
+              ) : (
+                <Link to="/auth" onClick={close} className="nav-drawer-sublink">
+                  <span className="nav-drawer-sublink-icon"><UserIcon /></span>
+                  Sign in
+                </Link>
+              )}
             </nav>
           </div>
 
-          {IS_OWNER && (
+          {isOwner && (
             <div className="nav-drawer-foot">
               <Link to="/console" onClick={close} className="nav-drawer-dashboard">
                 <GridIcon /> Store Dashboard

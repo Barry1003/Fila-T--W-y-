@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import type { ReactNode } from 'react';
+import type { CurrentUser } from '@/server/auth';
 import { useLocation } from '@/lib/router';
 import { C, UI } from '../tokens';
 import Nav from './Nav';
@@ -44,12 +45,12 @@ function useScrollReveal() {
   }, [pathname]);
 }
 
-export default function Root({ children }: { children: ReactNode }) {
+export default function Root({ children, user }: { children: ReactNode; user: CurrentUser | null }) {
   useScrollReveal();
 
   return (
     <div style={{ backgroundColor: C.cream, color: C.charcoal, fontFamily: UI, overflowX: 'hidden', minHeight: '100vh' }}>
-      <Nav />
+      <Nav user={user} />
       <main>
         {children}
       </main>
