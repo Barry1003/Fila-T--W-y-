@@ -24,7 +24,7 @@ type CustomRequest = {
   colorPreference: string;
   notes: string;
   refImages: { bg: string; label: string }[];
-  quotedPriceGBP?: number;
+  quotedPriceCad?: number;
   quotedPriceNGN?: number;
   estimatedCompletion?: string;
   storeNotes?: string;
@@ -82,7 +82,7 @@ const MY_REQUESTS: CustomRequest[] = [
       { bg: "#2E4A9E", label: "Style ref 1" },
       { bg: "#8A6818", label: "Embroidery ref" },
     ],
-    quotedPriceGBP: 850,
+    quotedPriceCad: 1462,
     quotedPriceNGN: 1258905,
     estimatedCompletion: "Dec 8, 2026",
     storeNotes: "We have the royal blue Aso-Oke in stock. Embroidery on collar and chest is confirmed. We'll share a fabric swatch photo before cutting. Please approve so we can begin sourcing.",
@@ -113,7 +113,7 @@ const MY_REQUESTS: CustomRequest[] = [
       { bg: "#2B2320", label: "Style ref" },
       { bg: "#888", label: "Fabric swatch" },
     ],
-    quotedPriceGBP: 520,
+    quotedPriceCad: 894,
     quotedPriceNGN: 769676,
     estimatedCompletion: "Nov 20, 2026",
     storeNotes: "Linen sourced. Pattern cut confirmed. We will send you progress photos by Nov 10.",
@@ -138,7 +138,7 @@ const MY_REQUESTS: CustomRequest[] = [
     refImages: [
       { bg: "#E87050", label: "Colour ref" },
     ],
-    quotedPriceGBP: 440,
+    quotedPriceCad: 757,
     quotedPriceNGN: 651772,
     estimatedCompletion: "Jun 28, 2026",
   },
@@ -167,8 +167,8 @@ const MY_REQUESTS: CustomRequest[] = [
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-function fmtGBP(n: number) {
-  return `£${n.toLocaleString("en-GB")}`;
+function fmtCad(n: number) {
+  return `CAD $${n.toLocaleString("en-CA")}`;
 }
 // ── Ref swatch (color placeholder for uploaded reference images) ───────────────
 
@@ -508,7 +508,7 @@ function ExpandedDetail({
       <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
 
         {/* Quote card */}
-        {showQuoteCard && req.quotedPriceGBP && (
+        {showQuoteCard && req.quotedPriceCad && (
           <div
             style={{
               backgroundColor: "#fff",
@@ -543,7 +543,7 @@ function ExpandedDetail({
                   Total Price
                 </div>
                 <div style={{ fontFamily: UI, fontSize: "1.5rem", fontWeight: 700, color: C.charcoal, letterSpacing: "-0.03em", lineHeight: 1 }}>
-                  {fmtGBP(req.quotedPriceGBP)}
+                  {fmtCad(req.quotedPriceCad)}
                 </div>
                 <div style={{ fontFamily: UI, fontSize: "0.72rem", color: "rgba(43,35,32,0.42)", marginTop: 3 }}>
                 </div>
@@ -626,7 +626,7 @@ function ExpandedDetail({
         )}
 
         {/* In production — summary tile */}
-        {(req.status === "in-production" || req.status === "approved") && req.quotedPriceGBP && (
+        {(req.status === "in-production" || req.status === "approved") && req.quotedPriceCad && (
           <div
             style={{
               backgroundColor: "#fff",
@@ -639,7 +639,7 @@ function ExpandedDetail({
             }}
           >
             <div style={{ fontFamily: UI, fontSize: "0.6rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(43,35,32,0.38)", fontWeight: 500 }}>Agreed Price</div>
-            <div style={{ fontFamily: UI, fontSize: "1.15rem", fontWeight: 700, color: C.charcoal, letterSpacing: "-0.02em" }}>{fmtGBP(req.quotedPriceGBP)}</div>
+            <div style={{ fontFamily: UI, fontSize: "1.15rem", fontWeight: 700, color: C.charcoal, letterSpacing: "-0.02em" }}>{fmtCad(req.quotedPriceCad)}</div>
             {req.estimatedCompletion && (
               <>
                 <div style={{ fontFamily: UI, fontSize: "0.6rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(43,35,32,0.38)", fontWeight: 500, marginTop: 2 }}>Est. Completion</div>
@@ -656,7 +656,7 @@ function ExpandedDetail({
         )}
 
         {/* Completed tile */}
-        {req.status === "completed" && req.quotedPriceGBP && (
+        {req.status === "completed" && req.quotedPriceCad && (
           <div
             style={{
               backgroundColor: "rgba(40,120,60,0.05)",
@@ -670,7 +670,7 @@ function ExpandedDetail({
           >
             <div style={{ fontFamily: UI, fontSize: "0.7rem", fontWeight: 600, color: "#2A6E38" }}>Order complete ✓</div>
             <div style={{ fontFamily: UI, fontSize: "0.78rem", color: "rgba(43,35,32,0.6)", lineHeight: 1.5 }}>
-              Total paid: {fmtGBP(req.quotedPriceGBP)}
+              Total paid: {fmtCad(req.quotedPriceCad)}
             </div>
           </div>
         )}
@@ -817,7 +817,7 @@ function RequestCard({
           }}
         >
           <div style={{ fontFamily: UI, fontSize: "0.78rem", color: "#8A6818" }}>
-            <strong>Quote received:</strong> {req.quotedPriceGBP ? fmtGBP(req.quotedPriceGBP) : ""} — your approval is needed to begin production.
+            <strong>Quote received:</strong> {req.quotedPriceCad ? fmtCad(req.quotedPriceCad) : ""} — your approval is needed to begin production.
           </div>
           <button
             onClick={() => setExpanded(true)}

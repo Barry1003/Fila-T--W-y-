@@ -404,7 +404,7 @@ function TabHomepageContent() {
     "Where African Heritage\nMeets Global Style"
   );
   const [promo, setPromo] = useState(
-    "Free shipping on orders over £150 · Use code FILAWELCOME for 10% off your first order"
+    "Free shipping on orders over CAD $258 · Use code FILAWELCOME for 10% off your first order"
   );
   const [story, setStory] = useState(
     "Born from a love of Yoruba craftsmanship, AdeClassics brings centuries-old weaving and embroidery traditions to discerning wardrobes worldwide. Every piece is handmade by master artisans in Lagos."
@@ -649,15 +649,15 @@ type Region = {
   name: string;
   standard: string;
   express: string;
-  costGBP: string;
+  costCad: string;
 };
 
 const DEFAULT_REGIONS: Region[] = [
-  { id: 1, name: "United Kingdom", standard: "3–5 business days", express: "Next day", costGBP: "£6.99" },
-  { id: 2, name: "Canada", standard: "7–10 business days", express: "3–5 days", costGBP: "£12.00" },
-  { id: 3, name: "United States", standard: "7–10 business days", express: "3–5 days", costGBP: "£10.00" },
-  { id: 4, name: "Nigeria", standard: "2–4 business days", express: "Same day (Lagos)", costGBP: "£0" },
-  { id: 5, name: "Other / Rest of World", standard: "10–21 business days", express: "", costGBP: "£18.00" },
+  { id: 1, name: "United Kingdom", standard: "3–5 business days", express: "Next day", costCad: "CAD $12.02" },
+  { id: 2, name: "Canada", standard: "7–10 business days", express: "3–5 days", costCad: "CAD $20.64" },
+  { id: 3, name: "United States", standard: "7–10 business days", express: "3–5 days", costCad: "CAD $17.20" },
+  { id: 4, name: "Nigeria", standard: "2–4 business days", express: "Same day (Lagos)", costCad: "CAD $0.00" },
+  { id: 5, name: "Other / Rest of World", standard: "10–21 business days", express: "", costCad: "CAD $30.96" },
 ];
 
 function TabShipping() {
@@ -673,7 +673,7 @@ function TabShipping() {
   const addRegion = () => {
     setRegions((prev) => [
       ...prev,
-      { id: nextId, name: "", standard: "", express: "", costGBP: "" },
+      { id: nextId, name: "", standard: "", express: "", costCad: "" },
     ]);
     setNextId((n) => n + 1);
   };
@@ -733,7 +733,7 @@ function TabShipping() {
                   {colHead("Region")}
                   {colHead("Standard Delivery")}
                   {colHead("Express Delivery")}
-                  {colHead("Cost (GBP)")}
+                  {colHead("Cost (CAD)")}
                   {colHead("Cost (NGN)")}
                   <th style={{ width: 32 }} />
                 </tr>
@@ -752,7 +752,7 @@ function TabShipping() {
                         ["name", r.name, "Region name"],
                         ["standard", r.standard, "e.g. 3–5 days"],
                         ["express", r.express, "Optional"],
-                        ["costGBP", r.costGBP, "£0.00"],
+                        ["costCad", r.costCad, "CAD $0.00"],
                       ] as [keyof Region, string, string][]
                     ).map(([field, val, ph]) => (
                       <td key={field} style={{ padding: "0.5rem 0.75rem" }}>
@@ -1120,7 +1120,7 @@ const POLICY_DEFAULTS: Record<string, string> = {
   "Shipping Policy":
     "All orders are dispatched from Lagos, Nigeria within 2 business days. International orders are shipped via DHL or FedEx. Estimated delivery times vary by region — see our Shipping & Delivery table for details. We are not responsible for customs duties or import taxes.",
   "Terms of Service":
-    "By placing an order with AdeClassics you agree to these terms. All prices are displayed in GBP (£). Payment is processed securely via Paystack or Flutterwave. We reserve the right to cancel any order at our discretion with a full refund.",
+    "By placing an order with AdeClassics you agree to these terms. All prices are displayed in Canadian dollars (CAD). Payment is processed securely via Paystack or Flutterwave. We reserve the right to cancel any order at our discretion with a full refund.",
   "Privacy Policy":
     "We collect your name, email, shipping address, and payment details solely to fulfil your orders. We do not sell your data to third parties. Your data is stored securely and you may request deletion at any time by emailing privacy@adeclassics.com.",
 };

@@ -218,7 +218,7 @@ export default function ConsoleProductForm() {
   const [name, setName] = useState(isEdit ? "Yoruba Filà (Custom)" : "");
   const [description, setDescription] = useState(isEdit ? "Handcrafted Yoruba Filà made to order in your choice of colour and embroidery pattern. Each cap takes 5–7 working days to complete." : "");
   const [category, setCategory] = useState(isEdit ? "Filà" : "");
-  const [priceGBP, setPriceGBP] = useState(isEdit ? "285" : "");
+  const [priceCad, setPriceCad] = useState(isEdit ? "285" : "");
   const [productionDays, setProductionDays] = useState(isEdit ? "5–7" : "");
   const [selectedTags, setSelectedTags] = useState<Set<string>>(isEdit ? new Set(["Made to Order"]) : new Set());
   const [publishStatus, setPublishStatus] = useState<"published" | "draft">(isEdit ? "published" : "draft");
@@ -349,16 +349,16 @@ export default function ConsoleProductForm() {
           <FormCard title="Pricing">
             <div className="rg-2" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
               <div>
-                <FieldLabel>Price (GBP)</FieldLabel>
+                <FieldLabel>Price (CAD)</FieldLabel>
                 <div style={{ position: "relative" }}>
-                  <span style={{ position: "absolute", left: "0.7rem", top: "50%", transform: "translateY(-50%)", fontSize: "0.82rem", color: "rgba(43,35,32,0.4)", fontWeight: 600 }}>£</span>
+                  <span style={{ position: "absolute", left: "0.7rem", top: "50%", transform: "translateY(-50%)", fontSize: "0.82rem", color: "rgba(43,35,32,0.4)", fontWeight: 600 }}>CAD $</span>
                   <input
                     type="number"
                     min="0"
                     step="0.01"
                     placeholder="0.00"
-                    value={priceGBP}
-                    onChange={e => setPriceGBP(e.target.value)}
+                    value={priceCad}
+                    onChange={e => setPriceCad(e.target.value)}
                     style={{ ...inputBase, paddingLeft: "1.6rem", width: "100%" }}
                   />
                 </div>

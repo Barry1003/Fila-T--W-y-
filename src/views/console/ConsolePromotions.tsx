@@ -31,14 +31,14 @@ interface Banner {
 
 const INIT_CODES: DiscountCode[] = [
   { id: "1", code: "WELCOME10", type: "Percentage", value: "10%", usedCount: 42, limitCount: 200, active: true, expiry: "31 Dec 2026", expired: false },
-  { id: "2", code: "FREESHIP25", type: "Fixed Amount", value: "£25", usedCount: 18, limitCount: 100, active: true, expiry: "15 Oct 2026", expired: false },
+  { id: "2", code: "FREESHIP25", type: "Fixed Amount", value: "CAD $43", usedCount: 18, limitCount: 100, active: true, expiry: "15 Oct 2026", expired: false },
   { id: "3", code: "GELE15", type: "Percentage", value: "15%", usedCount: 7, limitCount: 50, active: false, expiry: "30 Sep 2026", expired: false },
   { id: "4", code: "ASOKEVIP", type: "Percentage", value: "20%", usedCount: 89, limitCount: 150, active: true, expiry: "01 Jan 2027", expired: false },
-  { id: "5", code: "NEWCUSTOMER", type: "Fixed Amount", value: "£15", usedCount: 203, limitCount: null, active: false, expiry: "Expired", expired: true },
+  { id: "5", code: "NEWCUSTOMER", type: "Fixed Amount", value: "CAD $26", usedCount: 203, limitCount: null, active: false, expiry: "Expired", expired: true },
 ];
 
 const INIT_BANNERS: Banner[] = [
-  { id: "1", text: "Free UK shipping on all orders over £150 — use code FREESHIP25", cta: "Shop Now", dateRange: "01 Sep 2026 – 30 Sep 2026", status: "Live" },
+  { id: "1", text: "Free shipping on all orders over CAD $258 — use code FREESHIP25", cta: "Shop Now", dateRange: "01 Sep 2026 – 30 Sep 2026", status: "Live" },
   { id: "2", text: "New Aso-Oke collection dropping 15 Oct — early access for newsletter subscribers", cta: "Sign up", dateRange: "10 Oct 2026 – 30 Oct 2026", status: "Scheduled" },
   { id: "3", text: "Summer sale: 15% off everything with SUMMER15", cta: "", dateRange: "01 Jun 2026 – 31 Aug 2026", status: "Expired" },
 ];
@@ -609,7 +609,7 @@ function CreateCodePanel({ onClose }: { onClose: () => void }) {
             <div className="rg-2" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem" }}>
               <div>
                 <label style={{ display: "block", fontSize: "0.78rem", fontWeight: 500, color: C.charcoal, marginBottom: "0.375rem" }}>
-                  {discountType === "Percentage" ? "Percentage (%)" : "Amount (£)"}
+                  {discountType === "Percentage" ? "Percentage (%)" : "Amount (CAD $)"}
                 </label>
                 <input
                   type="number"
@@ -623,7 +623,7 @@ function CreateCodePanel({ onClose }: { onClose: () => void }) {
                 </label>
                 <input
                   type="number"
-                  placeholder="£0.00"
+                  placeholder="0.00"
                   style={{ width: "100%", padding: "0.5rem 0.75rem", border: "1px solid rgba(43,35,32,0.18)", borderRadius: 6, fontSize: "0.82rem", fontFamily: UI, color: C.charcoal, outline: "none", boxSizing: "border-box", backgroundColor: "#fff" }}
                 />
               </div>
@@ -796,7 +796,7 @@ function CreateBannerPanel({ onClose }: { onClose: () => void }) {
               rows={3}
               value={bannerText}
               onChange={(e) => setBannerText(e.target.value)}
-              placeholder="e.g. Free UK shipping on all orders over £150 · Use code FREESHIP25"
+              placeholder="e.g. Free shipping on all orders over CAD $258 · Use code FREESHIP25"
               style={{
                 width: "100%",
                 padding: "0.5rem 0.75rem",

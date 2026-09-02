@@ -70,7 +70,7 @@ const MOCK_ORDERS: Record<string, {
   num: string; date: string; customer: string; email: string; phone: string;
   address: string; status: FulfilStatus; payment: "paid" | "pending";
   method: string; tracking: string; carrier: string;
-  items: { name: string; variant: string; qty: number; unitGBP: number }[];
+  items: { name: string; variant: string; qty: number; unitCad: number }[];
   shipping: number; discount: number;
 }> = {
   o1: {
@@ -80,9 +80,9 @@ const MOCK_ORDERS: Record<string, {
     status: "new", payment: "paid", method: "Stripe (Visa ·· 4242)",
     tracking: "", carrier: "Royal Mail",
     items: [
-      { name: "Aso-Oke Gele Set", variant: "Size M · Ivory", qty: 2, unitGBP: 340 },
+      { name: "Aso-Oke Gele Set", variant: "Size M · Ivory", qty: 2, unitCad: 585 },
     ],
-    shipping: 12, discount: 0,
+    shipping: 21, discount: 0,
   },
   o2: {
     num: "#FTW-2887", date: "31 Aug 2026", customer: "David Mensah",
@@ -91,9 +91,9 @@ const MOCK_ORDERS: Record<string, {
     status: "processing", payment: "paid", method: "Stripe (Mastercard ·· 5555)",
     tracking: "", carrier: "DHL",
     items: [
-      { name: "Yoruba Filà (Custom)", variant: "Size L · Burgundy", qty: 1, unitGBP: 285 },
+      { name: "Yoruba Filà (Custom)", variant: "Size L · Burgundy", qty: 1, unitCad: 490 },
     ],
-    shipping: 8, discount: 0,
+    shipping: 14, discount: 0,
   },
   o3: {
     num: "#FTW-2882", date: "30 Aug 2026", customer: "Bola Adeyemi",
@@ -102,9 +102,9 @@ const MOCK_ORDERS: Record<string, {
     status: "shipped", payment: "paid", method: "PayPal",
     tracking: "JD000940012345678901", carrier: "Royal Mail",
     items: [
-      { name: "Adire Wrapper Set", variant: "Standard · Indigo", qty: 1, unitGBP: 195 },
+      { name: "Adire Wrapper Set", variant: "Standard · Indigo", qty: 1, unitCad: 335 },
     ],
-    shipping: 10, discount: 20,
+    shipping: 17, discount: 34,
   },
 };
 
@@ -141,7 +141,7 @@ export default function ConsoleOrderDetail() {
   const fulfil = FULFIL_STYLE[status];
   const nextStatus = NEXT_STATUS[status];
 
-  const subtotal = order.items.reduce((s, i) => s + i.unitGBP * i.qty, 0);
+  const subtotal = order.items.reduce((s, i) => s + i.unitCad * i.qty, 0);
   const total = subtotal + order.shipping - order.discount;
 
   function advanceStatus() {
@@ -256,7 +256,7 @@ export default function ConsoleOrderDetail() {
                 </thead>
                 <tbody>
                   {order.items.map((item, i) => {
-                    const lineGBP = item.unitGBP * item.qty;
+                    const lineCad = item.unitCad * item.qty;
                     return (
                       <tr key={i} style={{ borderTop: "1px solid rgba(43,35,32,0.06)" }}>
                         <td style={{ padding: "0.75rem 0" }}>
@@ -275,8 +275,8 @@ export default function ConsoleOrderDetail() {
                           {item.variant}
                         </td>
                         <td style={{ padding: "0.75rem 0", textAlign: "right", fontSize: "0.8rem", color: C.charcoal }}>{item.qty}</td>
-                        <td style={{ padding: "0.75rem 0", textAlign: "right", fontSize: "0.8rem", color: C.charcoal }}>£{item.unitGBP}</td>
-                        <td style={{ padding: "0.75rem 0", textAlign: "right", fontSize: "0.8rem", fontWeight: 600, color: C.charcoal }}>£{lineGBP}</td>
+                        <td style={{ padding: "0.75rem 0", textAlign: "right", fontSize: "0.8rem", color: C.charcoal }}>CAD ${item.unitCad}</td>
+                        <td style={{ padding: "0.75rem 0", textAlign: "right", fontSize: "0.8rem", fontWeight: 600, color: C.charcoal }}>CAD ${lineCad}</td>
                       </tr>
                     );
                   })}
@@ -328,13 +328,13 @@ export default function ConsoleOrderDetail() {
           {/* Payment summary */}
           <SectionCard title="Payment">
             <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-              <SummaryRow label="Subtotal" value={`£${subtotal}`} />
-              <SummaryRow label="Shipping" value={`£${order.shipping}`} />
+              <SummaryRow label="Subtotal" value={`CAD $${subtotal}`} />
+              <SummaryRow label="Shipping" value={`CAD $${order.shipping}`} />
               {order.discount > 0 && (
-                <SummaryRow label="Discount" value={`−£${order.discount}`} valueColor={C.teal} />
+                <SummaryRow label="Discount" value={`−CAD $${order.discount}`} valueColor={C.teal} />
               )}
               <div style={{ borderTop: "1px solid rgba(43,35,32,0.1)", paddingTop: "0.5rem", marginTop: "0.125rem" }}>
-                <SummaryRow label="Total" value={`£${total}`} bold />
+                <SummaryRow label="Total" value={`CAD $${total}`} bold />
               </div>
             </div>
             <div style={{

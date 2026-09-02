@@ -62,7 +62,7 @@ type Product = {
   id: string;
   name: string;
   category: string;
-  priceGBP: number;
+  priceCad: number;
   priceNGN: number;
   stock: number;
   status: Status;
@@ -70,18 +70,18 @@ type Product = {
 };
 
 const PRODUCTS: Product[] = [
-  { id: "p1", name: "Aso-Oke Gele Set", category: "Gele", priceGBP: 340, priceNGN: 504000, stock: 8, status: "published", color: "#7A2E38" },
-  { id: "p2", name: "Yoruba Filà (Custom)", category: "Filà", priceGBP: 285, priceNGN: 422200, stock: 12, status: "published", color: "#D4A94E" },
-  { id: "p3", name: "Adire Wrapper Set", category: "Ipele", priceGBP: 195, priceNGN: 288900, stock: 5, status: "published", color: "#2E4A9E" },
-  { id: "p4", name: "Embroidered Kaftan (Men)", category: "Kaftan", priceGBP: 420, priceNGN: 622000, stock: 0, status: "outofstock", color: "#3B8A93" },
-  { id: "p5", name: "Aso-Oke Cap — Classic", category: "Filà", priceGBP: 140, priceNGN: 207200, stock: 22, status: "published", color: "#7A2E38" },
-  { id: "p6", name: "Beaded Pam Slippers", category: "Pam Slippers", priceGBP: 88, priceNGN: 130200, stock: 3, status: "draft", color: "#D4A94E" },
-  { id: "p7", name: "Ankara Roundneck Shirt", category: "Roundneck Shirts", priceGBP: 115, priceNGN: 170200, stock: 14, status: "published", color: "#2E4A9E" },
-  { id: "p8", name: "Bead & Cowrie Necklace Set", category: "Accessories", priceGBP: 68, priceNGN: 100600, stock: 19, status: "published", color: "#3B8A93" },
-  { id: "p9", name: "Agbada 3-Piece Set", category: "Kaftan", priceGBP: 680, priceNGN: 1006400, stock: 2, status: "draft", color: "#7A2E38" },
-  { id: "p10", name: "Aso-Oke Trousers", category: "Trousers", priceGBP: 160, priceNGN: 236800, stock: 0, status: "outofstock", color: "#D4A94E" },
-  { id: "p11", name: "Leather Yoruba Shoes", category: "Shoes", priceGBP: 220, priceNGN: 325600, stock: 6, status: "published", color: "#2E4A9E" },
-  { id: "p12", name: "Ipele Wrap (Silk Blend)", category: "Ipele", priceGBP: 245, priceNGN: 362600, stock: 9, status: "published", color: "#3B8A93" },
+  { id: "p1", name: "Aso-Oke Gele Set", category: "Gele", priceCad: 585, priceNGN: 504000, stock: 8, status: "published", color: "#7A2E38" },
+  { id: "p2", name: "Yoruba Filà (Custom)", category: "Filà", priceCad: 490, priceNGN: 422200, stock: 12, status: "published", color: "#D4A94E" },
+  { id: "p3", name: "Adire Wrapper Set", category: "Ipele", priceCad: 335, priceNGN: 288900, stock: 5, status: "published", color: "#2E4A9E" },
+  { id: "p4", name: "Embroidered Kaftan (Men)", category: "Kaftan", priceCad: 722, priceNGN: 622000, stock: 0, status: "outofstock", color: "#3B8A93" },
+  { id: "p5", name: "Aso-Oke Cap — Classic", category: "Filà", priceCad: 241, priceNGN: 207200, stock: 22, status: "published", color: "#7A2E38" },
+  { id: "p6", name: "Beaded Pam Slippers", category: "Pam Slippers", priceCad: 151, priceNGN: 130200, stock: 3, status: "draft", color: "#D4A94E" },
+  { id: "p7", name: "Ankara Roundneck Shirt", category: "Roundneck Shirts", priceCad: 198, priceNGN: 170200, stock: 14, status: "published", color: "#2E4A9E" },
+  { id: "p8", name: "Bead & Cowrie Necklace Set", category: "Accessories", priceCad: 117, priceNGN: 100600, stock: 19, status: "published", color: "#3B8A93" },
+  { id: "p9", name: "Agbada 3-Piece Set", category: "Kaftan", priceCad: 1170, priceNGN: 1006400, stock: 2, status: "draft", color: "#7A2E38" },
+  { id: "p10", name: "Aso-Oke Trousers", category: "Trousers", priceCad: 275, priceNGN: 236800, stock: 0, status: "outofstock", color: "#D4A94E" },
+  { id: "p11", name: "Leather Yoruba Shoes", category: "Shoes", priceCad: 378, priceNGN: 325600, stock: 6, status: "published", color: "#2E4A9E" },
+  { id: "p12", name: "Ipele Wrap (Silk Blend)", category: "Ipele", priceCad: 421, priceNGN: 362600, stock: 9, status: "published", color: "#3B8A93" },
 ];
 
 const CATEGORIES = ["All Categories", "Filà", "Gele", "Ipele", "Kaftan", "Trousers", "Roundneck Shirts", "Shoes", "Pam Slippers", "Accessories"];
@@ -190,7 +190,7 @@ export default function ConsoleProducts() {
     return matchSearch && matchCat && matchStatus;
   }).sort((a, b) => {
     if (sort === "Name A–Z") return a.name.localeCompare(b.name);
-    if (sort === "Price ↑") return a.priceGBP - b.priceGBP;
+    if (sort === "Price ↑") return a.priceCad - b.priceCad;
     if (sort === "Stock Level") return a.stock - b.stock;
     return 0;
   });
@@ -436,7 +436,7 @@ export default function ConsoleProducts() {
 
                         {/* Price */}
                         <td style={td}>
-                          <div style={{ fontSize: "0.8rem", fontWeight: 600, color: C.charcoal }}>£{p.priceGBP.toLocaleString()}</div>
+                          <div style={{ fontSize: "0.8rem", fontWeight: 600, color: C.charcoal }}>CAD ${p.priceCad.toLocaleString()}</div>
                         </td>
 
                         {/* Stock */}

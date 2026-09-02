@@ -382,7 +382,7 @@ function RequestCard({ req, onOpen }: { req: CustomRequest; onOpen: () => void }
         >
           <div>
             <div style={{ fontSize: "0.6rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(43,35,32,0.38)", fontWeight: 500 }}>Quoted</div>
-            <div style={{ fontSize: "1rem", fontWeight: 700, color: C.charcoal, letterSpacing: "-0.02em" }}>£{req.quotedPrice.toLocaleString()}</div>
+            <div style={{ fontSize: "1rem", fontWeight: 700, color: C.charcoal, letterSpacing: "-0.02em" }}>CAD ${req.quotedPrice.toLocaleString()}</div>
           </div>
           {req.estimatedCompletion && (
             <div>
@@ -676,11 +676,11 @@ function RequestDetailPanel({
               <div className="rg-2" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem", marginBottom: "0.875rem" }}>
                 <div>
                   <label style={{ display: "block", fontSize: "0.78rem", fontWeight: 500, color: C.charcoal, marginBottom: "0.375rem" }}>
-                    Price (£)
+                    Price (CAD $)
                   </label>
                   <div style={{ position: "relative" }}>
                     <span style={{ position: "absolute", left: "0.625rem", top: "50%", transform: "translateY(-50%)", fontSize: "0.82rem", color: "rgba(43,35,32,0.4)", pointerEvents: "none" }}>
-                      £
+                      CAD $
                     </span>
                     <input
                       type="number"

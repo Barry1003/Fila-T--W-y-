@@ -31,10 +31,10 @@ export const OWNER_CARDS = [
 
 export const DISCOUNT_CODES = [
   { code: 'WELCOME10',   type: 'PERCENTAGE' as const,   value: 10, usedCount: 42,  usageLimit: 200,  active: true,  expiresAt: '2026-12-31' },
-  { code: 'FREESHIP25',  type: 'FIXED_AMOUNT' as const, value: 25, usedCount: 18,  usageLimit: 100,  active: true,  expiresAt: '2026-10-15' },
+  { code: 'FREESHIP25',  type: 'FIXED_AMOUNT' as const, value: 43, usedCount: 18,  usageLimit: 100,  active: true,  expiresAt: '2026-10-15' },
   { code: 'GELE15',      type: 'PERCENTAGE' as const,   value: 15, usedCount: 7,   usageLimit: 50,   active: false, expiresAt: '2026-09-30' },
   { code: 'ASOKEVIP',    type: 'PERCENTAGE' as const,   value: 20, usedCount: 89,  usageLimit: 150,  active: true,  expiresAt: '2027-01-01' },
-  { code: 'NEWCUSTOMER', type: 'FIXED_AMOUNT' as const, value: 15, usedCount: 203, usageLimit: null, active: false, expiresAt: '2026-07-31' },
+  { code: 'NEWCUSTOMER', type: 'FIXED_AMOUNT' as const, value: 26, usedCount: 203, usageLimit: null, active: false, expiresAt: '2026-07-31' },
 ];
 
 /**
@@ -59,7 +59,7 @@ export const BANNERS = [
   },
   {
     text: 'Made to order, delivered free',
-    subtext: 'Orders over CAD $150 ship free worldwide with code FREESHIP25.',
+    subtext: 'Orders over CAD $258 ship free worldwide with code FREESHIP25.',
     badge: 'Free shipping', ctaLabel: 'Shop Kaftans', status: 'LIVE' as const,
     productTitle: 'Embroidered Agbada Kaftan',
     startsAt: '2026-09-01', endsAt: '2026-10-15', position: 2,
@@ -119,43 +119,43 @@ export const ORDERS: SeedOrder[] = [
     number: '#FTW-2891', date: '2026-09-01', email: 'chiamaka@email.com',
     status: 'NEW', paymentStatus: 'PAID', paymentMethod: 'Stripe (Visa ·· 4242)', carrier: 'Royal Mail',
     address: UK('14 Brixton Hill', 'London', 'SW2 1RJ'),
-    items: [{ name: 'Aso-Oke Gele Set', variant: 'Size M · Ivory', qty: 2, unit: 340 }],
-    shipping: 12, discount: 0, totalNgn: 1006480,
+    items: [{ name: 'Aso-Oke Gele Set', variant: 'Size M · Ivory', qty: 2, unit: 585 }],
+    shipping: 21, discount: 0, totalNgn: 1006480,
   },
   {
     number: '#FTW-2887', date: '2026-08-31', email: 'david@email.com',
     status: 'PROCESSING', paymentStatus: 'PAID', paymentMethod: 'Stripe (Mastercard ·· 5555)', carrier: 'DHL',
     address: UK('77 Cowley Road', 'Oxford', 'OX4 1HY'),
-    items: [{ name: 'Yoruba Filà (Custom)', variant: 'Size L · Burgundy', qty: 1, unit: 285 }],
-    shipping: 8, discount: 0, totalNgn: 422085,
+    items: [{ name: 'Yoruba Filà (Custom)', variant: 'Size L · Burgundy', qty: 1, unit: 490 }],
+    shipping: 14, discount: 0, totalNgn: 422085,
   },
   {
     number: '#FTW-2882', date: '2026-08-30', email: 'bola@email.com',
     status: 'SHIPPED', paymentStatus: 'PAID', paymentMethod: 'PayPal',
     carrier: 'Royal Mail', tracking: 'JD000940012345678901',
     address: UK('33 Canal Street', 'Manchester', 'M1 3WB'),
-    items: [{ name: 'Adire Wrapper Set', variant: 'Standard · Indigo', qty: 1, unit: 195 }],
-    shipping: 10, discount: 20, totalNgn: 288795,
+    items: [{ name: 'Adire Wrapper Set', variant: 'Standard · Indigo', qty: 1, unit: 335 }],
+    shipping: 17, discount: 34, totalNgn: 288795,
   },
   {
     number: '#FTW-2871', date: '2026-08-29', email: 'ngozi@email.com',
     status: 'DELIVERED', paymentStatus: 'PAID',
     address: UK('8 Park Row', 'Leeds', 'LS1 5HD'),
-    items: [{ name: 'Embroidered Cap (Large)', variant: 'Size L', qty: 1, unit: 120 }],
+    items: [{ name: 'Embroidered Cap (Large)', variant: 'Size L', qty: 1, unit: 206 }],
     shipping: 0, discount: 0, totalNgn: 177720,
   },
   {
     number: '#FTW-2869', date: '2026-08-29', email: 'kwame@email.com',
     status: 'NEW', paymentStatus: 'PAID',
     address: UK('2 Wellington Place', 'Leeds', 'LS1 4AP'),
-    items: [{ name: 'Aso-Oke Cap', variant: 'Size M · Navy', qty: 3, unit: 140 }],
+    items: [{ name: 'Aso-Oke Cap', variant: 'Size M · Navy', qty: 3, unit: 241 }],
     shipping: 0, discount: 0, totalNgn: 621620,
   },
   {
     number: '#FTW-2860', date: '2026-08-27', email: 'temi@email.com',
     status: 'CANCELLED', paymentStatus: 'PENDING',
     address: UK('19 Park Street', 'Bristol', 'BS1 5NF'),
-    items: [{ name: 'Beaded Pam Slippers', variant: 'Size 41 · Tan', qty: 1, unit: 88 }],
+    items: [{ name: 'Beaded Pam Slippers', variant: 'Size 41 · Tan', qty: 1, unit: 151 }],
     shipping: 0, discount: 0, totalNgn: 130328,
   },
   {
@@ -163,8 +163,8 @@ export const ORDERS: SeedOrder[] = [
     status: 'PROCESSING', paymentStatus: 'PAID',
     address: UK('5 Deansgate', 'Manchester', 'M3 2FF'),
     items: [
-      { name: 'Ankara Roundneck Shirt', variant: 'Size L · Rust', qty: 1, unit: 125 },
-      { name: 'Bead Necklace Set', variant: 'One Size', qty: 1, unit: 58 },
+      { name: 'Ankara Roundneck Shirt', variant: 'Size L · Rust', qty: 1, unit: 215 },
+      { name: 'Bead Necklace Set', variant: 'One Size', qty: 1, unit: 100 },
     ],
     shipping: 0, discount: 0, totalNgn: 271023,
   },
@@ -172,14 +172,14 @@ export const ORDERS: SeedOrder[] = [
     number: '#FTW-2848', date: '2026-08-23', email: 'samuel@email.com',
     status: 'SHIPPED', paymentStatus: 'PAID', carrier: 'DHL',
     address: UK('44 Old Kent Road', 'London', 'SE1 5TY'),
-    items: [{ name: 'Agbada 3-Piece Set', variant: 'Size XL · Gold', qty: 1, unit: 680 }],
+    items: [{ name: 'Agbada 3-Piece Set', variant: 'Size XL · Gold', qty: 1, unit: 1170 }],
     shipping: 0, discount: 0, totalNgn: 1006480,
   },
   {
     number: '#FTW-2841', date: '2026-08-20', email: 'ayo@email.com',
     status: 'DELIVERED', paymentStatus: 'PAID',
     address: UK('12 Broad Street', 'Birmingham', 'B1 2HF'),
-    items: [{ name: 'Ipele Wrap (Silk Blend)', variant: 'One Size · Crimson', qty: 1, unit: 245 }],
+    items: [{ name: 'Ipele Wrap (Silk Blend)', variant: 'One Size · Crimson', qty: 1, unit: 421 }],
     shipping: 0, discount: 0, totalNgn: 362945,
   },
   {
@@ -187,8 +187,8 @@ export const ORDERS: SeedOrder[] = [
     status: 'DELIVERED', paymentStatus: 'PAID',
     address: UK('7 Queen Street', 'Glasgow', 'G1 3DX'),
     items: [
-      { name: 'Leather Yoruba Shoes', variant: 'Size 43 · Maroon', qty: 1, unit: 220 },
-      { name: 'Adire Wrapper Set', variant: 'Standard · Indigo', qty: 1, unit: 195 },
+      { name: 'Leather Yoruba Shoes', variant: 'Size 43 · Maroon', qty: 1, unit: 378 },
+      { name: 'Adire Wrapper Set', variant: 'Standard · Indigo', qty: 1, unit: 335 },
     ],
     shipping: 0, discount: 0, totalNgn: 614615,
   },
@@ -196,14 +196,14 @@ export const ORDERS: SeedOrder[] = [
     number: '#FTW-2830', date: '2026-08-15', email: 'emma@email.com',
     status: 'NEW', paymentStatus: 'PENDING',
     address: UK('90 High Street', 'Cardiff', 'CF10 1PU'),
-    items: [{ name: 'Aso-Oke Trousers', variant: 'Size 32 · Charcoal', qty: 1, unit: 160 }],
+    items: [{ name: 'Aso-Oke Trousers', variant: 'Size 32 · Charcoal', qty: 1, unit: 275 }],
     shipping: 0, discount: 0, totalNgn: 236960,
   },
   {
     number: '#FTW-2822', date: '2026-08-12', email: 'chioma@email.com',
     status: 'DELIVERED', paymentStatus: 'PAID',
     address: UK('21 Fargate', 'Sheffield', 'S1 2HE'),
-    items: [{ name: 'Embroidered Kaftan (Men)', variant: 'Size L · Gold', qty: 1, unit: 420 }],
+    items: [{ name: 'Embroidered Kaftan (Men)', variant: 'Size L · Gold', qty: 1, unit: 722 }],
     shipping: 0, discount: 0, totalNgn: 621620,
   },
 ];
@@ -278,7 +278,7 @@ export const CUSTOM_REQUESTS = [
     fabricPreference: 'Hand-woven Aso-oke', colorPreference: 'Ivory and gold',
     notes: 'Seven yards for the gele, please — I prefer sculptured folds.',
     measurements: [['Bust', '38"'], ['Waist', '32"'], ['Hip', '42"'], ['Gele yards', '7']],
-    quotedPrice: 680, estimatedCompletion: '2026-12-15', declineReason: null,
+    quotedPrice: 1170, estimatedCompletion: '2026-12-15', declineReason: null,
   },
   {
     reference: 'CR-2026-003', email: 'f.adeyemi@business.com',
@@ -287,7 +287,7 @@ export const CUSTOM_REQUESTS = [
     fabricPreference: 'Cashmere blend', colorPreference: 'Charcoal',
     notes: 'Minimal embroidery — keep it understated.',
     measurements: [['Chest', '42"'], ['Waist', '36"'], ['Sleeve', '26"'], ['Trouser', '32"']],
-    quotedPrice: 520, estimatedCompletion: '2026-11-10', declineReason: null,
+    quotedPrice: 894, estimatedCompletion: '2026-11-10', declineReason: null,
   },
   {
     reference: 'CR-2026-004', email: 'chidi.n@email.com',
@@ -296,7 +296,7 @@ export const CUSTOM_REQUESTS = [
     fabricPreference: 'Guinea brocade', colorPreference: 'Emerald green',
     notes: 'Full chest and sleeve embroidery.',
     measurements: [['Chest', '46"'], ['Waist', '40"'], ['Sleeve', '28"'], ['Length', '60"']],
-    quotedPrice: 890, estimatedCompletion: '2026-12-05', declineReason: null,
+    quotedPrice: 1531, estimatedCompletion: '2026-12-05', declineReason: null,
   },
   {
     reference: 'CR-2026-005', email: 'nnenna.okeke@gmail.com',
@@ -305,7 +305,7 @@ export const CUSTOM_REQUESTS = [
     fabricPreference: 'Damask', colorPreference: 'Teal and coral',
     notes: 'Delivered ahead of schedule.',
     measurements: [['Bust', '36"'], ['Waist', '30"'], ['Hip', '40"'], ['Gele yards', '5']],
-    quotedPrice: 440, estimatedCompletion: '2026-08-20', declineReason: null,
+    quotedPrice: 757, estimatedCompletion: '2026-08-20', declineReason: null,
   },
   {
     reference: 'CR-2026-006', email: 'tunde.b@email.com',

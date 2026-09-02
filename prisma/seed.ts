@@ -67,9 +67,6 @@ const date = (iso: string) => new Date(`${iso}T12:00:00Z`);
 const daysAgo = (n: number) => new Date(Date.now() - n * 86_400_000);
 const imageUrl = (id: string) => `https://images.unsplash.com/${id}?w=900&h=1200&fit=crop&auto=format`;
 
-/** Console figures are quoted in GBP; the catalogue prices are CAD. */
-const NGN_PER_GBP = 1480;
-
 // ── Reset ────────────────────────────────────────────────────────────────────
 
 /**

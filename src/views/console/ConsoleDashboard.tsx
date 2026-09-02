@@ -16,7 +16,7 @@ import {
 const STATS = [
   {
     label: "Today's Sales",
-    value: "£2,840",
+    value: "CAD $4,885",
     sub: null,
     trend: "+14%",
     trendUp: true,
@@ -43,7 +43,7 @@ const STATS = [
   },
   {
     label: "Month Revenue",
-    value: "£18,450",
+    value: "CAD $31,734",
     sub: null,
     trend: "+8%",
     trendUp: true,
@@ -57,7 +57,7 @@ const ORDERS = [
     id: "#FTW-2891",
     buyer: "Chiamaka Eze",
     item: "Aso-Oke Gele Set ×2",
-    total: "£340",
+    total: "CAD $585",
     status: "Payment Received",
     statusType: "received",
   },
@@ -65,7 +65,7 @@ const ORDERS = [
     id: "#FTW-2887",
     buyer: "David Mensah",
     item: "Yoruba Filà (Custom)",
-    total: "£285",
+    total: "CAD $490",
     status: "Awaiting Fabric",
     statusType: "waiting",
   },
@@ -73,7 +73,7 @@ const ORDERS = [
     id: "#FTW-2882",
     buyer: "Bola Adeyemi",
     item: "Adire Wrapper Set",
-    total: "£195",
+    total: "CAD $335",
     status: "Ready to Ship",
     statusType: "ready",
   },
@@ -81,7 +81,7 @@ const ORDERS = [
     id: "#FTW-2871",
     buyer: "Ngozi Obi",
     item: "Embroidered Cap (Large)",
-    total: "£120",
+    total: "CAD $206",
     status: "Payment Received",
     statusType: "received",
   },
@@ -89,7 +89,7 @@ const ORDERS = [
     id: "#FTW-2869",
     buyer: "Kwame Asante",
     item: "Aso-Oke Cap ×3",
-    total: "£420",
+    total: "CAD $722",
     status: "In Production",
     statusType: "production",
   },
@@ -100,7 +100,7 @@ const ACTIVITY = [
     icon: <ShoppingBagIcon size={13} />,
     iconBg: C.teal,
     text: "New order from Temi Adeyemi",
-    sub: "Aso-Oke Gele Set · £340",
+    sub: "Aso-Oke Gele Set · CAD $585",
     time: "2 min ago",
   },
   {
@@ -659,7 +659,7 @@ export default function ConsoleDashboard() {
                 letterSpacing: "-0.03em",
               }}
             >
-              £28,890
+              CAD $49,691
             </span>
             <span
               style={{

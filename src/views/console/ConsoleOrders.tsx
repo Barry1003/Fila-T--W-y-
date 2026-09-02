@@ -83,25 +83,25 @@ type Order = {
   email: string;
   itemCount: number;
   items: string[];
-  totalGBP: number;
+  totalCad: number;
   totalNGN: number;
   payment: PayStatus;
   status: FulfilStatus;
 };
 
 const ORDERS: Order[] = [
-  { id: "o1", num: "#FTW-2891", date: "1 Sep 2026", customer: "Chiamaka Eze", email: "chiamaka@email.com", itemCount: 2, items: ["Aso-Oke Gele Set ×2"], totalGBP: 680, totalNGN: 1006480, payment: "paid", status: "new" },
-  { id: "o2", num: "#FTW-2887", date: "31 Aug 2026", customer: "David Mensah", email: "david@email.com", itemCount: 1, items: ["Yoruba Filà (Custom)"], totalGBP: 285, totalNGN: 422085, payment: "paid", status: "processing" },
-  { id: "o3", num: "#FTW-2882", date: "30 Aug 2026", customer: "Bola Adeyemi", email: "bola@email.com", itemCount: 1, items: ["Adire Wrapper Set"], totalGBP: 195, totalNGN: 288795, payment: "paid", status: "shipped" },
-  { id: "o4", num: "#FTW-2871", date: "29 Aug 2026", customer: "Ngozi Obi", email: "ngozi@email.com", itemCount: 1, items: ["Embroidered Cap (Large)"], totalGBP: 120, totalNGN: 177720, payment: "paid", status: "delivered" },
-  { id: "o5", num: "#FTW-2869", date: "29 Aug 2026", customer: "Kwame Asante", email: "kwame@email.com", itemCount: 3, items: ["Aso-Oke Cap ×3"], totalGBP: 420, totalNGN: 621620, payment: "paid", status: "new" },
-  { id: "o6", num: "#FTW-2860", date: "27 Aug 2026", customer: "Temi Fadare", email: "temi@email.com", itemCount: 1, items: ["Beaded Pam Slippers"], totalGBP: 88, totalNGN: 130328, payment: "pending", status: "cancelled" },
-  { id: "o7", num: "#FTW-2856", date: "25 Aug 2026", customer: "Fatima Al-Amin", email: "fatima@email.com", itemCount: 2, items: ["Ankara Roundneck Shirt", "Bead Necklace Set"], totalGBP: 183, totalNGN: 271023, payment: "paid", status: "processing" },
-  { id: "o8", num: "#FTW-2848", date: "23 Aug 2026", customer: "Samuel Okonkwo", email: "samuel@email.com", itemCount: 1, items: ["Agbada 3-Piece Set"], totalGBP: 680, totalNGN: 1006480, payment: "paid", status: "shipped" },
-  { id: "o9", num: "#FTW-2841", date: "20 Aug 2026", customer: "Ayo Babatunde", email: "ayo@email.com", itemCount: 1, items: ["Ipele Wrap (Silk Blend)"], totalGBP: 245, totalNGN: 362945, payment: "paid", status: "delivered" },
-  { id: "o10", num: "#FTW-2838", date: "18 Aug 2026", customer: "Zainab Musa", email: "zainab@email.com", itemCount: 2, items: ["Leather Yoruba Shoes", "Adire Wrapper Set"], totalGBP: 415, totalNGN: 614615, payment: "paid", status: "delivered" },
-  { id: "o11", num: "#FTW-2830", date: "15 Aug 2026", customer: "Emmanuel Diop", email: "emma@email.com", itemCount: 1, items: ["Aso-Oke Trousers"], totalGBP: 160, totalNGN: 236960, payment: "pending", status: "new" },
-  { id: "o12", num: "#FTW-2822", date: "12 Aug 2026", customer: "Chioma Ibe", email: "chioma@email.com", itemCount: 1, items: ["Embroidered Kaftan (Men)"], totalGBP: 420, totalNGN: 621620, payment: "paid", status: "delivered" },
+  { id: "o1", num: "#FTW-2891", date: "1 Sep 2026", customer: "Chiamaka Eze", email: "chiamaka@email.com", itemCount: 2, items: ["Aso-Oke Gele Set ×2"], totalCad: 1170, totalNGN: 1006480, payment: "paid", status: "new" },
+  { id: "o2", num: "#FTW-2887", date: "31 Aug 2026", customer: "David Mensah", email: "david@email.com", itemCount: 1, items: ["Yoruba Filà (Custom)"], totalCad: 490, totalNGN: 422085, payment: "paid", status: "processing" },
+  { id: "o3", num: "#FTW-2882", date: "30 Aug 2026", customer: "Bola Adeyemi", email: "bola@email.com", itemCount: 1, items: ["Adire Wrapper Set"], totalCad: 335, totalNGN: 288795, payment: "paid", status: "shipped" },
+  { id: "o4", num: "#FTW-2871", date: "29 Aug 2026", customer: "Ngozi Obi", email: "ngozi@email.com", itemCount: 1, items: ["Embroidered Cap (Large)"], totalCad: 206, totalNGN: 177720, payment: "paid", status: "delivered" },
+  { id: "o5", num: "#FTW-2869", date: "29 Aug 2026", customer: "Kwame Asante", email: "kwame@email.com", itemCount: 3, items: ["Aso-Oke Cap ×3"], totalCad: 722, totalNGN: 621620, payment: "paid", status: "new" },
+  { id: "o6", num: "#FTW-2860", date: "27 Aug 2026", customer: "Temi Fadare", email: "temi@email.com", itemCount: 1, items: ["Beaded Pam Slippers"], totalCad: 151, totalNGN: 130328, payment: "pending", status: "cancelled" },
+  { id: "o7", num: "#FTW-2856", date: "25 Aug 2026", customer: "Fatima Al-Amin", email: "fatima@email.com", itemCount: 2, items: ["Ankara Roundneck Shirt", "Bead Necklace Set"], totalCad: 315, totalNGN: 271023, payment: "paid", status: "processing" },
+  { id: "o8", num: "#FTW-2848", date: "23 Aug 2026", customer: "Samuel Okonkwo", email: "samuel@email.com", itemCount: 1, items: ["Agbada 3-Piece Set"], totalCad: 1170, totalNGN: 1006480, payment: "paid", status: "shipped" },
+  { id: "o9", num: "#FTW-2841", date: "20 Aug 2026", customer: "Ayo Babatunde", email: "ayo@email.com", itemCount: 1, items: ["Ipele Wrap (Silk Blend)"], totalCad: 421, totalNGN: 362945, payment: "paid", status: "delivered" },
+  { id: "o10", num: "#FTW-2838", date: "18 Aug 2026", customer: "Zainab Musa", email: "zainab@email.com", itemCount: 2, items: ["Leather Yoruba Shoes", "Adire Wrapper Set"], totalCad: 714, totalNGN: 614615, payment: "paid", status: "delivered" },
+  { id: "o11", num: "#FTW-2830", date: "15 Aug 2026", customer: "Emmanuel Diop", email: "emma@email.com", itemCount: 1, items: ["Aso-Oke Trousers"], totalCad: 275, totalNGN: 236960, payment: "pending", status: "new" },
+  { id: "o12", num: "#FTW-2822", date: "12 Aug 2026", customer: "Chioma Ibe", email: "chioma@email.com", itemCount: 1, items: ["Embroidered Kaftan (Men)"], totalCad: 722, totalNGN: 621620, payment: "paid", status: "delivered" },
 ];
 
 // ── Status config ─────────────────────────────────────────────────────────────
@@ -190,7 +190,7 @@ export default function ConsoleOrders() {
     return matchTab && matchSearch;
   }).sort((a, b) => {
     if (sort === "Oldest") return a.num.localeCompare(b.num);
-    if (sort === "Highest Total") return b.totalGBP - a.totalGBP;
+    if (sort === "Highest Total") return b.totalCad - a.totalCad;
     return b.num.localeCompare(a.num);
   });
 
@@ -424,7 +424,7 @@ function OrderRow({ order: o, alt }: { order: Order; alt: boolean }) {
 
       {/* Total */}
       <td style={td}>
-        <div style={{ fontSize: "0.8rem", fontWeight: 600, color: C.charcoal }}>£{o.totalGBP.toLocaleString()}</div>
+        <div style={{ fontSize: "0.8rem", fontWeight: 600, color: C.charcoal }}>CAD ${o.totalCad.toLocaleString()}</div>
       </td>
 
       {/* Payment */}

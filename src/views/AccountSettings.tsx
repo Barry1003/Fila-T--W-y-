@@ -516,7 +516,6 @@ export default function AccountSettings() {
                 { value: 'cad', label: 'CAD — Canadian Dollar' },
                 { value: 'ngn', label: 'NGN — Nigerian Naira' },
                 { value: 'usd', label: 'USD — US Dollar' },
-                { value: 'gbp', label: 'GBP — British Pound' },
               ]}
             />
           </div>

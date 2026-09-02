@@ -9,10 +9,8 @@ type DateRange = "7d" | "30d" | "90d";
 
 interface StatSet {
   revenue: number;
-  revenueNGN: number;
   orders: number;
   aov: number;
-  aovNGN: number;
   convRate: number;
   revTrend: number;
   orderTrend: number;
@@ -31,20 +29,20 @@ interface ChartPoint { label: string; value: number }
 
 const STATS: Record<DateRange, StatSet> = {
   "7d": {
-    revenue: 18450, revenueNGN: 27324330, orders: 47,
-    aov: 392, aovNGN: 580696, convRate: 3.2,
+    revenue: 31734, orders: 47,
+    aov: 674, convRate: 3.2,
     revTrend: 11.4, orderTrend: 8.7, aovTrend: 2.1, convTrend: -0.4,
     newCustomers: 34, returningCustomers: 13, returningPct: 28, abandonRate: 67, topSource: "Instagram",
   },
   "30d": {
-    revenue: 68200, revenueNGN: 101020460, orders: 174,
-    aov: 392, aovNGN: 580696, convRate: 3.8,
+    revenue: 117304, orders: 174,
+    aov: 674, convRate: 3.8,
     revTrend: 19.2, orderTrend: 22.1, aovTrend: -3.5, convTrend: 0.9,
     newCustomers: 118, returningCustomers: 56, returningPct: 32, abandonRate: 64, topSource: "Instagram",
   },
   "90d": {
-    revenue: 198750, revenueNGN: 294530750, orders: 512,
-    aov: 388, aovNGN: 574844, convRate: 4.1,
+    revenue: 341850, orders: 512,
+    aov: 667, convRate: 4.1,
     revTrend: 28.7, orderTrend: 31.0, aovTrend: 1.4, convTrend: 1.2,
     newCustomers: 348, returningCustomers: 164, returningPct: 32, abandonRate: 61, topSource: "Instagram",
   },
@@ -52,32 +50,32 @@ const STATS: Record<DateRange, StatSet> = {
 
 const CHART_DATA: Record<DateRange, ChartPoint[]> = {
   "7d": [
-    { label: "Mon", value: 3200 }, { label: "Tue", value: 4100 },
-    { label: "Wed", value: 2800 }, { label: "Thu", value: 5200 },
-    { label: "Fri", value: 4800 }, { label: "Sat", value: 6100 },
-    { label: "Sun", value: 2840 },
+    { label: "Mon", value: 5504 }, { label: "Tue", value: 7052 },
+    { label: "Wed", value: 4816 }, { label: "Thu", value: 8944 },
+    { label: "Fri", value: 8256 }, { label: "Sat", value: 10492 },
+    { label: "Sun", value: 4885 },
   ],
   "30d": [2800,3400,2200,4100,3600,5200,2800,3900,4400,2600,3100,4800,
           3200,2900,5600,4200,3800,2500,4600,5100,3400,2900,4800,5500,
           3200,4100,2800,5800,4400,2840].map((v, i) => ({ label: String(i + 1), value: v })),
   "90d": [
-    { label: "Wk 1", value: 14200 }, { label: "Wk 2", value: 18500 },
-    { label: "Wk 3", value: 16800 }, { label: "Wk 4", value: 22100 },
-    { label: "Wk 5", value: 19400 }, { label: "Wk 6", value: 24600 },
-    { label: "Wk 7", value: 21000 }, { label: "Wk 8", value: 17800 },
-    { label: "Wk 9", value: 25200 }, { label: "Wk 10", value: 22400 },
-    { label: "Wk 11", value: 28100 }, { label: "Wk 12", value: 24800 },
-    { label: "Wk 13", value: 26550 },
+    { label: "Wk 1", value: 24424 }, { label: "Wk 2", value: 31820 },
+    { label: "Wk 3", value: 28896 }, { label: "Wk 4", value: 38012 },
+    { label: "Wk 5", value: 33368 }, { label: "Wk 6", value: 42312 },
+    { label: "Wk 7", value: 36120 }, { label: "Wk 8", value: 30616 },
+    { label: "Wk 9", value: 43344 }, { label: "Wk 10", value: 38528 },
+    { label: "Wk 11", value: 48332 }, { label: "Wk 12", value: 42656 },
+    { label: "Wk 13", value: 45666 },
   ],
 };
 
 const TOP_PRODUCTS = [
-  { name: "3-Piece Agbada Set", category: "Agbada", units: 24, revenue: 16320 },
-  { name: "Aso-Oke Gele Set", category: "Gele", units: 38, revenue: 13490 },
-  { name: "Yoruba Filà (Custom)", category: "Filà", units: 31, revenue: 8835 },
-  { name: "Embroidered Cap", category: "Caps", units: 42, revenue: 5040 },
-  { name: "Adire Wrapper Set", category: "Wrapper", units: 19, revenue: 3705 },
-  { name: "Ipele Wrap (Silk)", category: "Ipele", units: 12, revenue: 2940 },
+  { name: "3-Piece Agbada Set", category: "Agbada", units: 24, revenue: 28070 },
+  { name: "Aso-Oke Gele Set", category: "Gele", units: 38, revenue: 23203 },
+  { name: "Yoruba Filà (Custom)", category: "Filà", units: 31, revenue: 15196 },
+  { name: "Embroidered Cap", category: "Caps", units: 42, revenue: 8669 },
+  { name: "Adire Wrapper Set", category: "Wrapper", units: 19, revenue: 6373 },
+  { name: "Ipele Wrap (Silk)", category: "Ipele", units: 12, revenue: 5057 },
 ];
 
 const CATEGORIES = [
@@ -89,11 +87,11 @@ const CATEGORIES = [
 ];
 
 const REGIONS = [
-  { name: "United Kingdom", flag: "🇬🇧", orders: 28, revenue: 11200 },
-  { name: "Nigeria", flag: "🇳🇬", orders: 9, revenue: 3600 },
-  { name: "United States", flag: "🇺🇸", orders: 5, revenue: 2100 },
-  { name: "Canada", flag: "🇨🇦", orders: 3, revenue: 1200 },
-  { name: "Other", flag: "🌍", orders: 2, revenue: 350 },
+  { name: "United Kingdom", flag: "🇬🇧", orders: 28, revenue: 19264 },
+  { name: "Nigeria", flag: "🇳🇬", orders: 9, revenue: 6192 },
+  { name: "United States", flag: "🇺🇸", orders: 5, revenue: 3612 },
+  { name: "Canada", flag: "🇨🇦", orders: 3, revenue: 2064 },
+  { name: "Other", flag: "🌍", orders: 2, revenue: 602 },
 ];
 
 const RANGE_LABELS: Record<DateRange, string> = {
@@ -102,10 +100,10 @@ const RANGE_LABELS: Record<DateRange, string> = {
 
 // ── Utilities ─────────────────────────────────────────────────────────────────
 
-function fmtGBP(n: number): string {
-  if (n >= 1_000_000) return `£${(n / 1_000_000).toFixed(2)}M`;
-  if (n >= 1_000) return `£${(n / 1_000).toFixed(0)}k`;
-  return `£${n.toLocaleString()}`;
+function fmtCad(n: number): string {
+  if (n >= 1_000_000) return `CAD $${(n / 1_000_000).toFixed(2)}M`;
+  if (n >= 1_000) return `CAD $${(n / 1_000).toFixed(0)}k`;
+  return `CAD $${n.toLocaleString()}`;
 }
 
 function smoothPath(pts: { x: number; y: number }[]): string {
@@ -227,7 +225,7 @@ function RevenueChart({ data, range }: { data: ChartPoint[]; range: DateRange })
           <g key={frac}>
             <line x1={PL} y1={y} x2={W - PR} y2={y} stroke="rgba(43,35,32,0.06)" strokeWidth="1" />
             <text x={PL - 6} y={y + 3.5} textAnchor="end" fontSize="9" fill="rgba(43,35,32,0.35)" fontFamily={UI}>
-              {val >= 1000 ? `£${(val / 1000).toFixed(0)}k` : `£${val}`}
+              {val >= 1000 ? `$${(val / 1000).toFixed(0)}k` : `$${val}`}
             </text>
           </g>
         );
@@ -273,7 +271,7 @@ function RevenueChart({ data, range }: { data: ChartPoint[]; range: DateRange })
       {hoveredIdx !== null && (() => {
         const p = pts[hoveredIdx];
         const d = data[hoveredIdx];
-        const valStr = d.value >= 1000 ? `£${(d.value / 1000).toFixed(1)}k` : `£${d.value}`;
+        const valStr = d.value >= 1000 ? `$${(d.value / 1000).toFixed(1)}k` : `$${d.value}`;
         const tipW = 62, tipH = 22;
         const tipX = Math.min(Math.max(p.x - tipW / 2, PL), W - PR - tipW);
         const tipY = p.y - tipH - 8;
@@ -439,7 +437,7 @@ export default function ConsoleAnalytics() {
       <div className="rg-4" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "1rem" }}>
         <StatCard
           label="Total Revenue"
-          primary={fmtGBP(stats.revenue)}
+          primary={fmtCad(stats.revenue)}
           trend={stats.revTrend}
           accentColor={C.gold}
         />
@@ -451,7 +449,7 @@ export default function ConsoleAnalytics() {
         />
         <StatCard
           label="Avg. Order Value"
-          primary={`£${stats.aov}`}
+          primary={`CAD $${stats.aov}`}
           trend={stats.aovTrend}
           accentColor={C.maroon}
         />
@@ -478,7 +476,7 @@ export default function ConsoleAnalytics() {
             </div>
             <div style={{ display: "flex", alignItems: "baseline", gap: "8px" }}>
               <span style={{ fontSize: "1.5rem", fontWeight: 700, color: C.charcoal, letterSpacing: "-0.03em" }}>
-                {fmtGBP(stats.revenue)}
+                {fmtCad(stats.revenue)}
               </span>
               <Trend value={stats.revTrend} />
             </div>
@@ -537,7 +535,7 @@ export default function ConsoleAnalytics() {
                     {/* Revenue */}
                     <div style={{ width: 64, textAlign: "right", flexShrink: 0 }}>
                       <div style={{ fontSize: "0.82rem", fontWeight: 600, color: C.charcoal }}>
-                        {fmtGBP(p.revenue)}
+                        {fmtCad(p.revenue)}
                       </div>
                     </div>
                   </div>
@@ -647,7 +645,7 @@ export default function ConsoleAnalytics() {
                   {/* Revenue */}
                   <div style={{ width: 72, textAlign: "right", flexShrink: 0 }}>
                     <span style={{ fontSize: "0.82rem", fontWeight: 600, color: C.charcoal }}>
-                      {fmtGBP(reg.revenue)}
+                      {fmtCad(reg.revenue)}
                     </span>
                   </div>
                 </div>
