@@ -1,5 +1,19 @@
-import { PrismaPg } from '@prisma/adapter-pg';
+import { neonConfig } from '@neondatabase/serverless';
+import { PrismaNeon } from '@prisma/adapter-neon';
+import ws from 'ws';
 import { PrismaClient } from '@/generated/prisma';
+
+/**
+ * Neon's driver reaches the database over HTTPS/WebSocket on 443 rather than
+ * the Postgres wire protocol on 5432. That is what Neon recommends for
+ * serverless deployments, and it also works from networks that block 5432.
+ *
+ * Node has no global WebSocket before v22, and some runtimes still omit it, so
+ * fall back to the `ws` package when it is missing.
+ */
+if (typeof globalThis.WebSocket === 'undefined') {
+  neonConfig.webSocketConstructor = ws;
+}
 
 /**
  * A single PrismaClient for the process.
@@ -20,7 +34,7 @@ function createClient() {
   }
 
   return new PrismaClient({
-    adapter: new PrismaPg({ connectionString }),
+    adapter: new PrismaNeon({ connectionString }),
     log: process.env.NODE_ENV === 'development' ? ['warn', 'error'] : ['error'],
   });
 }

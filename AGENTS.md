@@ -54,6 +54,23 @@ for scroll locking and Escape-to-close.
 Some views also carry a local `<style>` block for layout that only they use;
 check there before assuming a class is undefined.
 
+## Database
+
+Prisma against Neon Postgres. `prisma/schema.prisma` is the source of truth;
+after editing it run `pnpm db:migrate` and the client regenerates.
+
+- `src/lib/prisma.ts` — the shared client. Import `prisma` from here; never
+  construct a `PrismaClient` anywhere else.
+- The generated client lands in `src/generated/prisma` (gitignored). `.npmrc`
+  hoists `@prisma/*` so that generated code can resolve its runtime under pnpm.
+- Connection URLs live in `.env`, not in the schema — Prisma 7 reads them from
+  `prisma.config.ts` for migrations, and the client gets them via the adapter.
+- `pnpm db:seed` wipes and reloads sample data. `prisma/seed.ts` imports the
+  catalogue from `src/data/products.ts` so it stays in step; the console
+  fixtures are transcribed in `prisma/seed-data.ts`.
+- App and seed talk to Neon over HTTPS (port 443) through
+  `@prisma/adapter-neon`. Only `prisma migrate` needs port 5432.
+
 ## Conventions
 
 - Every component under `src/views` and `src/components` is a client component
