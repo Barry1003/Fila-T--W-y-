@@ -1,6 +1,8 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useTransition } from 'react';
+import { useRouter } from 'next/navigation';
+import { signInWithEmail, signUpWithEmail, requestPasswordReset } from '@/server/auth-actions';
 import { Link } from '@/lib/router';
 import { C, DISPLAY, UI, label } from '../tokens';
 
@@ -129,17 +131,19 @@ const PHONE_CODES = [
 ];
 
 /* ─── GoldButton ────────────────────────────────────────────── */
-function GoldButton({ children, onClick }: { children: React.ReactNode; onClick?: () => void }) {
+function GoldButton({ children, onClick, disabled }: { children: React.ReactNode; onClick?: () => void; disabled?: boolean }) {
   return (
     <button
-      type="submit" onClick={onClick}
+      type="submit" onClick={onClick} disabled={disabled}
       className="auth-gold-btn"
       style={{
         width: '100%', padding: '1rem 2rem',
         backgroundColor: C.gold, color: C.charcoal,
         fontFamily: UI, fontWeight: 700, fontSize: '0.82rem',
         letterSpacing: '0.14em', textTransform: 'uppercase',
-        border: 'none', borderRadius: '5px', cursor: 'pointer',
+        border: 'none', borderRadius: '5px',
+        cursor: disabled ? 'wait' : 'pointer',
+        opacity: disabled ? 0.7 : 1,
         boxShadow: `0 2px 14px rgba(212,169,78,0.35)`,
         transition: 'box-shadow 0.2s, transform 0.15s',
         position: 'relative', overflow: 'hidden',
@@ -180,6 +184,25 @@ function GoogleButton({ label: lbl }: { label: string }) {
   );
 }
 
+/* ─── Form banner ─────────────────────────────────────────── */
+function FormBanner({ tone, children }: { tone: 'error' | 'info'; children: React.ReactNode }) {
+  const error = tone === 'error';
+  return (
+    <div
+      role={error ? 'alert' : 'status'}
+      style={{
+        fontFamily: UI, fontSize: '0.8rem', lineHeight: 1.5,
+        padding: '0.7rem 0.85rem', borderRadius: 6,
+        color: error ? C.maroon : C.charcoal,
+        backgroundColor: error ? 'rgba(122,46,56,0.07)' : 'rgba(59,138,147,0.09)',
+        border: `1px solid ${error ? 'rgba(122,46,56,0.25)' : 'rgba(59,138,147,0.3)'}`,
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
 /* ─── Divider ───────────────────────────────────────────────── */
 function OrDivider() {
   return (
@@ -193,9 +216,13 @@ function OrDivider() {
 
 /* ─── Sign In form ──────────────────────────────────────────── */
 function SignInForm({ switchTab }: { switchTab: () => void }) {
+  const router = useRouter();
+  const [pending, startTransition] = useTransition();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [submitted, setSubmitted] = useState(false);
+  const [serverError, setServerError] = useState<string | null>(null);
+  const [resetSent, setResetSent] = useState(false);
 
   const errors: Record<string, string> = {};
   if (submitted && !email.trim()) errors.email = 'Email is required.';
@@ -205,10 +232,41 @@ function SignInForm({ switchTab }: { switchTab: () => void }) {
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSubmitted(true);
+    setServerError(null);
+    if (Object.keys(errors).length) return;
+
+    const data = new FormData();
+    data.set('email', email);
+    data.set('password', password);
+
+    startTransition(async () => {
+      const result = await signInWithEmail(data);
+      if (result.ok) router.push('/account');
+      else setServerError(result.message);
+    });
+  }
+
+  async function handleForgotPassword() {
+    if (!email.trim()) {
+      setSubmitted(true);
+      setServerError('Enter your email address first, then choose "Forgot password?".');
+      return;
+    }
+    const data = new FormData();
+    data.set('email', email);
+    await requestPasswordReset(data);
+    setResetSent(true);
   }
 
   return (
     <form onSubmit={handleSubmit} noValidate style={{ display: 'flex', flexDirection: 'column', gap: '1.1rem' }}>
+      {serverError && <FormBanner tone="error">{serverError}</FormBanner>}
+      {resetSent && (
+        <FormBanner tone="info">
+          If an account exists for that address, a reset link is on its way.
+        </FormBanner>
+      )}
+
       {/* Email */}
       <div>
         <label style={{ ...label, fontSize: '0.65rem', color: C.charcoal, display: 'block', marginBottom: '0.4rem' }}>
@@ -226,9 +284,13 @@ function SignInForm({ switchTab }: { switchTab: () => void }) {
       <div>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '0.4rem' }}>
           <label style={{ ...label, fontSize: '0.65rem', color: C.charcoal }}>Password</label>
-          <a href="#" style={{ fontFamily: UI, fontSize: '0.72rem', color: C.indigo, textDecorationLine: 'none', letterSpacing: '0.01em' }}>
+          <button
+            type="button"
+            onClick={handleForgotPassword}
+            style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', fontFamily: UI, fontSize: '0.72rem', color: C.indigo, letterSpacing: '0.01em' }}
+          >
             Forgot password?
-          </a>
+          </button>
         </div>
         <PasswordInput
           value={password} onChange={e => setPassword(e.target.value)}
@@ -238,7 +300,7 @@ function SignInForm({ switchTab }: { switchTab: () => void }) {
       </div>
 
       <div style={{ marginTop: '0.4rem' }}>
-        <GoldButton>Sign In</GoldButton>
+        <GoldButton disabled={pending}>{pending ? 'Signing in…' : 'Sign In'}</GoldButton>
       </div>
 
       <OrDivider />
@@ -257,6 +319,9 @@ function SignInForm({ switchTab }: { switchTab: () => void }) {
 
 /* ─── Register form ─────────────────────────────────────────── */
 function RegisterForm({ switchTab }: { switchTab: () => void }) {
+  const router = useRouter();
+  const [pending, startTransition] = useTransition();
+  const [serverError, setServerError] = useState<string | null>(null);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phoneCode, setPhoneCode] = useState('+1');
@@ -279,10 +344,27 @@ function RegisterForm({ switchTab }: { switchTab: () => void }) {
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSubmitted(true);
+    setServerError(null);
+    if (Object.keys(errors).length) return;
+
+    const data = new FormData();
+    data.set('name', name);
+    data.set('email', email);
+    data.set('password', password);
+
+    startTransition(async () => {
+      const result = await signUpWithEmail(data);
+      // Phone is collected for delivery contact; sign-in by phone needs an SMS
+      // provider, so it is not part of the account yet.
+      if (result.ok) router.push('/account?welcome=1');
+      else setServerError(result.message);
+    });
   }
 
   return (
     <form onSubmit={handleSubmit} noValidate style={{ display: 'flex', flexDirection: 'column', gap: '1.1rem' }}>
+      {serverError && <FormBanner tone="error">{serverError}</FormBanner>}
+
       {/* Full Name */}
       <div>
         <label style={{ ...label, fontSize: '0.65rem', color: C.charcoal, display: 'block', marginBottom: '0.4rem' }}>Full Name</label>
@@ -363,7 +445,7 @@ function RegisterForm({ switchTab }: { switchTab: () => void }) {
       </div>
 
       <div style={{ marginTop: '0.2rem' }}>
-        <GoldButton>Create Account</GoldButton>
+        <GoldButton disabled={pending}>{pending ? 'Creating account…' : 'Create Account'}</GoldButton>
       </div>
 
       <OrDivider />

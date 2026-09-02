@@ -83,9 +83,16 @@ enum MessageSender {
 // ── People ───────────────────────────────────────────────────────────────────
 
 model User {
-  id        String   @id @default(cuid())
+  id String @id @default(cuid())
+
+  /// The Appwrite account this row belongs to. Appwrite owns identity; this
+  /// table owns everything the shop knows about the person. Null for rows
+  /// seeded before anyone signed in.
+  appwriteId String? @unique
+
   email     String   @unique
   name      String
+  avatarUrl String?
   phone     String?
   location  String?
   role      Role     @default(CUSTOMER)
@@ -101,6 +108,7 @@ model User {
   conversations  Conversation[]
 
   @@index([role])
+  @@index([appwriteId])
 }
 
 model Address {
