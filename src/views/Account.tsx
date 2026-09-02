@@ -2,6 +2,7 @@
 
 import { Link } from '@/lib/router';
 import AccountShell from '../components/AccountShell';
+import type { CurrentUser } from '@/server/auth';
 import { C, DISPLAY, UI, label } from '../tokens';
 
 /* ─── Stat tiles ────────────────────────────────────────────── */
@@ -118,7 +119,7 @@ function SectionHead({ title, linkTo, linkLabel }: { title: string; linkTo: stri
 }
 
 /* ─── Main ──────────────────────────────────────────────────── */
-export default function Account() {
+export default function Account({ user }: { user: CurrentUser | null }) {
   return (
     <AccountShell>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '2.5rem' }}>
@@ -126,7 +127,7 @@ export default function Account() {
         {/* ── Greeting ─────────────────────────────────────── */}
         <div>
           <h1 style={{ fontFamily: DISPLAY, fontSize: '2.1rem', fontWeight: 500, color: C.charcoal, letterSpacing: '-0.015em', lineHeight: 1.1, marginBottom: '0.4rem' }}>
-            Welcome back, Adunola
+            {user ? `Welcome back, ${user.name.split(' ')[0]}` : 'Welcome back'}
           </h1>
           <p style={{ fontFamily: UI, fontSize: '0.875rem', color: 'rgba(43,35,32,0.48)', lineHeight: 1.6 }}>
             Here's an overview of your orders and saved items.

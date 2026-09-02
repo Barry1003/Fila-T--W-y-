@@ -33,6 +33,15 @@ async function storeSession(secret: string, expire: string) {
 function readableError(error: unknown, context: 'signin' | 'signup' | 'reset'): string {
   const type = error instanceof AppwriteException ? error.type : '';
 
+  // The customer sees a friendly line; the real cause belongs in the logs,
+  // otherwise a misconfiguration is indistinguishable from a typo'd password.
+  console.error(
+    `[auth] ${context} failed:`,
+    error instanceof AppwriteException
+      ? { type: error.type, code: error.code, message: error.message }
+      : error
+  );
+
   switch (type) {
     case 'user_already_exists':
       return 'An account with that email already exists. Try signing in instead.';
@@ -73,14 +82,21 @@ export async function signUpWithEmail(formData: FormData): Promise<AuthResult> {
     return { ok: false, message: readableError(error, 'signup') };
   }
 
-  // Sign the new account straight in, then send the verification email.
+  // Sign the new account straight in. If this fails the account still exists,
+  // so say so — otherwise the customer retries and is told their email is
+  // already taken, with no way forward.
   try {
     const session = await account.createEmailPasswordSession(email, password);
     await storeSession(session.secret, session.expire);
   } catch (error) {
-    return { ok: false, message: readableError(error, 'signin') };
+    readableError(error, 'signin');
+    return {
+      ok: false,
+      message: 'Your account was created, but we could not sign you in just now. Try signing in with those details.',
+    };
   }
 
+  // Best effort: a failed verification email must not fail the sign-up.
   await sendVerificationEmail();
   return { ok: true };
 }
