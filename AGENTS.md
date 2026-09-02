@@ -85,6 +85,26 @@ a collection.
 - Shisha and Fila Senator are deliberately empty — part of the line, no stock
   yet. Collection pages render an empty state rather than hiding them.
 
+## Editable content
+
+Owner-editable page copy lives in the `PageContent` table, one row per page,
+with the shape defined and validated in `src/server/content-schema.ts` rather
+than in columns — adding a field is a schema-and-form change, not a migration.
+
+- Defaults live in code (`HOME_DEFAULTS`). A missing row, unreachable database
+  or row that fails validation all fall back to them, so a bad edit or an
+  outage cannot take a page down.
+- `src/server/content.ts` reads and writes; `content-actions.ts` is the server
+  action, which calls `revalidatePath` so a static page picks the edit up.
+- All database work goes through `withDbRetry` in `src/server/db.ts`. Neon's
+  WebSocket drops as an `ErrorEvent` with no error code, which would otherwise
+  fail a save silently.
+- Content-driven routes fetch and pass a prop, so they are not the usual
+  one-line re-export. Console editor routes are `force-dynamic` so they always
+  open on live values.
+- `pnpm db:seed` does not touch `PageContent` — it is configuration the owner
+  wrote, not sample data.
+
 ## Landing page
 
 `src/middleware.ts` sends returning visitors from `/` straight to `/shop`,

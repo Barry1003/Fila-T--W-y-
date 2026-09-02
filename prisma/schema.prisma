@@ -491,3 +491,15 @@ model Message {
 
   @@index([conversationId])
 }
+
+/// Owner-editable page copy, one row per page.
+///
+/// The shape of `content` is defined and validated in src/server/content-schema.ts
+/// rather than in columns, so adding an editable field is a schema-and-form
+/// change instead of a migration. Code holds the defaults, so a missing or
+/// invalid row still renders the page.
+model PageContent {
+  slug      String   @id
+  content   Json
+  updatedAt DateTime @updatedAt
+}

@@ -2,6 +2,8 @@
 
 import { useState, useCallback } from "react";
 import { C, UI, DISPLAY, label } from "../../tokens";
+import { updatePageContent } from "@/server/content-actions";
+import type { HomeContent } from "@/server/content-schema";
 
 // ── Shared primitives ────────────────────────────────────────────────────────
 
@@ -398,17 +400,39 @@ function TabStoreProfile() {
 
 // ── Homepage Content tab ──────────────────────────────────────────────────────
 
-function TabHomepageContent() {
-  const [eyebrow, setEyebrow] = useState("New Collection · Summer 2026");
-  const [headline, setHeadline] = useState(
-    "Where African Heritage\nMeets Global Style"
-  );
-  const [promo, setPromo] = useState(
-    "Free shipping on orders over CAD $258 · Use code FILAWELCOME for 10% off your first order"
-  );
-  const [story, setStory] = useState(
-    "Born from a love of Yoruba craftsmanship, AdeClassics brings centuries-old weaving and embroidery traditions to discerning wardrobes worldwide. Every piece is handmade by master artisans in Lagos."
-  );
+function TabHomepageContent({ initial }: { initial: HomeContent }) {
+  const [eyebrow, setEyebrow] = useState(initial.hero.eyebrow);
+  const [headline, setHeadline] = useState(initial.hero.headline);
+  const [ctaLabel, setCtaLabel] = useState(initial.hero.ctaLabel);
+  const [heroImage, setHeroImage] = useState(initial.hero.imageUrl);
+  const [promoEnabled, setPromoEnabled] = useState(initial.promo.enabled);
+  const [promo, setPromo] = useState(initial.promo.text);
+  const [storyHeading, setStoryHeading] = useState(initial.story.heading);
+  const [story, setStory] = useState(initial.story.body);
+  const [storyImage, setStoryImage] = useState(initial.story.imageUrl);
+
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function save() {
+    setSaving(true);
+    setError(null);
+    const result = await updatePageContent('home', {
+      hero: { eyebrow, headline, ctaLabel, ctaHref: initial.hero.ctaHref, imageUrl: heroImage },
+      story: { heading: storyHeading, body: story, imageUrl: storyImage },
+      promo: { enabled: promoEnabled, text: promo },
+    });
+    setSaving(false);
+    if (result.ok) {
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2600);
+    } else if ('unreachable' in result && result.unreachable) {
+      setError('Could not reach the database — nothing was saved. Try again in a moment.');
+    } else {
+      setError('Some fields could not be saved — check the image URLs are complete web addresses.');
+    }
+  }
 
   return (
     <div style={{ display: "grid", gridTemplateColumns: "1fr 340px", gap: "1.25rem" }} className="settings-homepage-grid">
@@ -444,6 +468,17 @@ function TabHomepageContent() {
                 rows={3}
                 placeholder="Main hero headline"
               />
+              <p style={{ fontSize: "0.63rem", color: "rgba(43,35,32,0.4)", marginTop: "4px" }}>
+                Each new line becomes its own line on the hero.
+              </p>
+            </div>
+            <div>
+              <FieldLabel>Button Label</FieldLabel>
+              <Input value={ctaLabel} onChange={setCtaLabel} placeholder="e.g. Shop the collection" />
+            </div>
+            <div>
+              <FieldLabel>Hero Image URL</FieldLabel>
+              <Input value={heroImage} onChange={setHeroImage} placeholder="https://…" />
             </div>
           </div>
         </SectionCard>
@@ -459,13 +494,24 @@ function TabHomepageContent() {
           >
             Promo Strip
           </div>
-          <div>
-            <FieldLabel>Promo Strip Message</FieldLabel>
-            <Input
-              value={promo}
-              onChange={setPromo}
-              placeholder="Scrolling promo bar text"
-            />
+          <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+            <label style={{ display: "flex", alignItems: "center", gap: "0.6rem", cursor: "pointer", fontSize: "0.8rem", color: C.charcoal }}>
+              <input
+                type="checkbox"
+                checked={promoEnabled}
+                onChange={e => setPromoEnabled(e.target.checked)}
+                style={{ accentColor: C.gold, width: 15, height: 15, cursor: "pointer" }}
+              />
+              Show the promo strip on the homepage
+            </label>
+            <div>
+              <FieldLabel>Promo Strip Message</FieldLabel>
+              <Input
+                value={promo}
+                onChange={setPromo}
+                placeholder="Scrolling promo bar text"
+              />
+            </div>
           </div>
         </SectionCard>
 
@@ -480,19 +526,48 @@ function TabHomepageContent() {
           >
             Our Story Section
           </div>
-          <div>
-            <FieldLabel>Story Text</FieldLabel>
-            <Textarea
-              value={story}
-              onChange={setStory}
-              rows={5}
-              placeholder="The brand story shown on the homepage..."
-            />
+          <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+            <div>
+              <FieldLabel>Section Heading</FieldLabel>
+              <Input value={storyHeading} onChange={setStoryHeading} placeholder="e.g. Yoruba craft, made for the world." />
+            </div>
+            <div>
+              <FieldLabel>Story Text</FieldLabel>
+              <Textarea
+                value={story}
+                onChange={setStory}
+                rows={7}
+                placeholder="The brand story shown on the homepage..."
+              />
+              <p style={{ fontSize: "0.63rem", color: "rgba(43,35,32,0.4)", marginTop: "4px" }}>
+                Leave a blank line between paragraphs.
+              </p>
+            </div>
+            <div>
+              <FieldLabel>Story Image URL</FieldLabel>
+              <Input value={storyImage} onChange={setStoryImage} placeholder="https://…" />
+            </div>
           </div>
         </SectionCard>
 
-        <div>
-          <SaveButton />
+        <div style={{ display: "flex", alignItems: "center", gap: "0.875rem", flexWrap: "wrap" }}>
+          <button
+            onClick={save}
+            disabled={saving}
+            style={{
+              backgroundColor: saved ? C.teal : C.gold,
+              color: saved ? "#fff" : C.charcoal,
+              border: "none", borderRadius: 6, padding: "0.55rem 1.5rem",
+              fontFamily: UI, fontSize: "0.8rem", fontWeight: 600,
+              cursor: saving ? "wait" : "pointer", opacity: saving ? 0.7 : 1,
+              letterSpacing: "0.02em", transition: "background-color 0.18s, color 0.18s",
+            }}
+          >
+            {saving ? "Saving…" : saved ? "Saved — live on the site" : "Save Changes"}
+          </button>
+          {error && (
+            <span style={{ fontSize: "0.75rem", color: C.maroon }}>{error}</span>
+          )}
         </div>
       </div>
 
@@ -1320,7 +1395,7 @@ type Tab = (typeof TABS)[number];
 
 // ── Page root ─────────────────────────────────────────────────────────────────
 
-export default function ConsoleSettings() {
+export default function ConsoleSettings({ homeContent }: { homeContent: HomeContent }) {
   const [activeTab, setActiveTab] = useState<Tab>("Store Profile");
 
   return (
@@ -1378,7 +1453,7 @@ export default function ConsoleSettings() {
         }}
       >
         {activeTab === "Store Profile" && <TabStoreProfile />}
-        {activeTab === "Homepage Content" && <TabHomepageContent />}
+        {activeTab === "Homepage Content" && <TabHomepageContent initial={homeContent} />}
         {activeTab === "Shipping & Delivery" && <TabShipping />}
         {activeTab === "Payments & Payout" && <TabPayments />}
         {activeTab === "Policies" && <TabPolicies />}

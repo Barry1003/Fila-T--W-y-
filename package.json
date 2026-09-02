@@ -19,10 +19,12 @@
     "@neondatabase/serverless": "^1.1.0",
     "@prisma/adapter-neon": "^7.10.0",
     "@prisma/client": "7.10.0",
+    "@vercel/blob": "^2.8.0",
     "next": "^15.5.4",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
-    "ws": "^8.21.3"
+    "ws": "^8.21.3",
+    "zod": "^4.5.4"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.13",

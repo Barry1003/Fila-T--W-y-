@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Link } from '@/lib/router';
 import { C, DISPLAY, UI, label } from '../tokens';
+import type { HomeContent } from '@/server/content-schema';
 import { ShieldIcon, BadgeIcon, GlobeIcon } from '../icons';
 
 const categories = [
@@ -40,7 +41,7 @@ const craftsmanship = [
   { icon: '◆', color: C.indigo, heading: 'Quality Materials', body: 'We source premium Aso-oke, velvet, and hand-dyed Adire. Materials are chosen for longevity — pieces meant to be kept, not discarded.' },
 ];
 
-export default function Home() {
+export default function Home({ content }: { content: HomeContent }) {
   const [promoDismissed, setPromoDismissed] = useState(false);
 
   return (
@@ -49,28 +50,30 @@ export default function Home() {
       <section style={{ position: 'relative', height: '90vh', minHeight: '580px', overflow: 'hidden' }}>
         <div style={{ position: 'absolute', inset: 0, backgroundColor: '#3d2a22' }} />
         <img
-          src="https://images.unsplash.com/photo-1784815840581-ecea314d9e7a?w=1800&h=1100&fit=crop&auto=format"
-          alt="Person in traditional colorful robe walking at golden hour"
+          src={content.hero.imageUrl}
+          alt=""
           style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 25%' }}
         />
         <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(100deg, rgba(43,35,32,0.82) 0%, rgba(43,35,32,0.55) 45%, rgba(43,35,32,0.15) 80%, rgba(43,35,32,0.05) 100%)' }} />
         <div className="hero-content" style={{ position: 'relative', zIndex: 2, height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '0 5rem', maxWidth: '820px' }}>
-          <div style={{ ...label, color: C.gold, fontSize: '0.62rem', marginBottom: '1.75rem', letterSpacing: '0.17em' }}>Worldwide Delivery Available</div>
+          <div style={{ ...label, color: C.gold, fontSize: '0.62rem', marginBottom: '1.75rem', letterSpacing: '0.17em' }}>{content.hero.eyebrow}</div>
           <h1 style={{ fontFamily: DISPLAY, fontSize: 'clamp(2.6rem, 5.2vw, 4.75rem)', color: C.cream, fontWeight: 400, lineHeight: 1.08, letterSpacing: '-0.025em', margin: '0 0 2.25rem' }}>
-            One Brand.<br />Endless Style.<br />Timeless Elegance.
+            {content.hero.headline.split('\n').map((line, i) => (
+              <span key={i} style={{ display: 'block' }}>{line}</span>
+            ))}
           </h1>
-          <Link to="/shop" className="shimmer-cta" style={{ display: 'inline-block', border: '1.5px solid rgba(250,246,240,0.7)', color: C.cream, ...label, padding: '0.9rem 2.5rem', textDecorationLine: 'none', letterSpacing: '0.15em', fontSize: '0.68rem', width: 'fit-content', backgroundColor: 'transparent' }}>
-            Shop the Collection
+          <Link to={content.hero.ctaHref} className="shimmer-cta" style={{ display: 'inline-block', border: '1.5px solid rgba(250,246,240,0.7)', color: C.cream, ...label, padding: '0.9rem 2.5rem', textDecorationLine: 'none', letterSpacing: '0.15em', fontSize: '0.68rem', width: 'fit-content', backgroundColor: 'transparent' }}>
+            {content.hero.ctaLabel}
           </Link>
         </div>
         <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '80px', background: `linear-gradient(to top, ${C.cream}, transparent)` }} />
       </section>
 
       {/* ── PROMO STRIP ── */}
-      {!promoDismissed && (
+      {content.promo.enabled && !promoDismissed && (
         <div style={{ backgroundColor: C.charcoal, color: C.cream, padding: '0.8rem 2.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
           <p style={{ ...label, fontSize: '0.64rem', margin: 0, textAlign: 'center', letterSpacing: '0.12em' }}>
-            Free worldwide shipping on your first order — Canada, US, UK &amp; Nigeria
+            {content.promo.text}
           </p>
           <button onClick={() => setPromoDismissed(true)} aria-label="Dismiss" style={{ position: 'absolute', right: '1.5rem', background: 'none', border: 'none', color: C.cream, cursor: 'pointer', fontSize: '1.1rem', opacity: 0.55, lineHeight: 1, padding: '2px 6px' }}>×</button>
         </div>
@@ -169,23 +172,19 @@ export default function Home() {
       <section className="section-pad" style={{ maxWidth: '1440px', margin: '0 auto', padding: '7rem 2.5rem' }}>
         <div className="story-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6rem', alignItems: 'center' }}>
           <div className="reveal-left" style={{ position: 'relative', aspectRatio: '4/5', overflow: 'hidden', backgroundColor: '#c8beb5' }}>
-            <img src="https://images.unsplash.com/photo-1661332306744-70f9ed1a7f40?w=900&h=1100&fit=crop&auto=format" alt="Couple in Yoruba traditional attire" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 12%', display: 'block' }} />
+            <img src={content.story.imageUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 12%', display: 'block' }} />
             <div style={{ position: 'absolute', inset: '1.25rem', border: '1px solid rgba(212,169,78,0.35)', pointerEvents: 'none' }} />
           </div>
           <div className="reveal-right">
             <div style={{ ...label, color: C.gold, fontSize: '0.625rem', marginBottom: '1.75rem', letterSpacing: '0.17em' }}>Our Story</div>
             <h2 style={{ fontFamily: DISPLAY, fontSize: 'clamp(1.75rem, 2.8vw, 2.5rem)', fontWeight: 400, letterSpacing: '-0.02em', marginBottom: '2rem', lineHeight: 1.18, color: C.charcoal }}>
-              Yoruba craft,<br />made for the world.
+              {content.story.heading}
             </h2>
-            <p style={{ fontFamily: UI, fontSize: '0.9375rem', lineHeight: 1.85, color: 'rgba(43,35,32,0.72)', marginBottom: '1.375rem' }}>
-              AdeClassics was born from a simple conviction: the artistry woven into every Yoruba filà, gele, and kaftan deserves a stage as global as the culture it carries. We are an international e-commerce store bringing premium Yoruba traditional wear — handcrafted in Nigeria — to customers in Canada, the UK, the US, and beyond.
-            </p>
-            <p style={{ fontFamily: UI, fontSize: '0.9375rem', lineHeight: 1.85, color: 'rgba(43,35,32,0.72)', marginBottom: '1.375rem' }}>
-              Every piece is handpicked by our team and every purchase is escrow-protected. When you buy here, you are not shopping for a product — you are participating in the preservation of a living tradition.
-            </p>
-            <p style={{ fontFamily: UI, fontSize: '0.9375rem', lineHeight: 1.85, color: 'rgba(43,35,32,0.72)', marginBottom: '2.25rem' }}>
-              Founded in Canada. Rooted in Yoruba culture. Delivered to your door, worldwide.
-            </p>
+            {content.story.body.split('\n\n').map((para, i, all) => (
+              <p key={i} style={{ fontFamily: UI, fontSize: '0.9375rem', lineHeight: 1.85, color: 'rgba(43,35,32,0.72)', marginBottom: i === all.length - 1 ? 0 : '1.375rem' }}>
+                {para}
+              </p>
+            ))}
             <a href="#" className="shimmer-cta" style={{ display: 'inline-block', backgroundColor: C.maroon, color: C.cream, ...label, padding: '0.875rem 2rem', textDecorationLine: 'none', fontSize: '0.65rem', letterSpacing: '0.14em' }}>
               Our Story
             </a>
