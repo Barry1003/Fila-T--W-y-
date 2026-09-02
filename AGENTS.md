@@ -104,13 +104,15 @@ than in columns — adding a field is a schema-and-form change, not a migration.
   open on live values.
 - `pnpm db:seed` does not touch `PageContent` — it is configuration the owner
   wrote, not sample data.
+- Pages currently editable: `home` (hero slides, story, promo strip) and
+  `about`. Each gets a tab in Store Settings.
 
 ## Landing page
 
 `src/middleware.ts` sends returning visitors from `/` straight to `/shop`,
 keyed on the `ac_seen_landing` cookie. It runs on the server so the landing
-page never flashes before the redirect. Clear that cookie to see the landing
-page again.
+page never flashes before the redirect. `/?preview=landing` always shows it,
+which is how to review the hero without clearing cookies.
 
 ## Conventions
 

@@ -956,6 +956,157 @@ body {
   }
 }
 
+/* ── Hero carousel ──────────────────────────────────────────────────────────── */
+
+.hero-carousel {
+  position: relative;
+  height: 90vh;
+  min-height: 580px;
+  overflow: hidden;
+  background-color: #3d2a22;
+}
+
+/* Slides are stacked and cross-faded; sliding a full-bleed photo reads as a
+   jolt at this size, and a fade keeps the eye on the garment. */
+.hero-slide {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.9s ease, visibility 0s linear 0.9s;
+}
+
+.hero-slide.active {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.9s ease;
+}
+
+.hero-slide img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 25%;
+}
+
+.hero-scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(100deg, rgba(43, 35, 32, 0.82) 0%, rgba(43, 35, 32, 0.55) 45%, rgba(43, 35, 32, 0.15) 100%);
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 2.5rem;
+}
+
+.hero-fade {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 80px;
+  z-index: 3;
+  pointer-events: none;
+  background: linear-gradient(to top, #FAF6F0, transparent);
+}
+
+.hero-controls {
+  position: absolute;
+  z-index: 4;
+  bottom: 5.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* A bar rather than a dot: it doubles as a progress meter for the current
+   slide, so the timing is visible instead of a surprise. */
+.hero-bar {
+  position: relative;
+  width: 44px;
+  height: 3px;
+  padding: 0;
+  border: none;
+  border-radius: 2px;
+  background: rgba(250, 246, 240, 0.32);
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.hero-bar.active {
+  background: rgba(250, 246, 240, 0.32);
+}
+
+.hero-bar-fill {
+  position: absolute;
+  inset: 0;
+  width: 0;
+  background: #D4A94E;
+  border-radius: 2px;
+}
+
+.hero-bar.active .hero-bar-fill {
+  animation-name: hero-bar-progress;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+}
+
+@keyframes hero-bar-progress {
+  from { width: 0; }
+  to   { width: 100%; }
+}
+
+.hero-play {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  margin-left: 0.35rem;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: rgba(250, 246, 240, 0.14);
+  color: rgba(250, 246, 240, 0.75);
+  cursor: pointer;
+  transition: background-color 0.15s, color 0.15s;
+}
+
+.hero-play:hover {
+  background: rgba(250, 246, 240, 0.26);
+  color: #FAF6F0;
+}
+
+/* Without motion the bars are position markers, not timers. */
+@media (prefers-reduced-motion: reduce) {
+  .hero-slide { transition: none; }
+  .hero-bar.active .hero-bar-fill { animation: none; width: 100%; }
+}
+
+@media (max-width: 900px) {
+  .hero-controls { bottom: 4.5rem; }
+  .hero-content { padding: 0 1.75rem; }
+}
+
+@media (max-width: 640px) {
+  .hero-carousel { height: 82vh; min-height: 500px; }
+  .hero-content { padding: 0 1.25rem; }
+  .hero-bar { width: 32px; }
+}
+
 /* ── Promotion carousel ─────────────────────────────────────────────────────── */
 
 .promo-carousel {

@@ -7,6 +7,7 @@ import type { PageSlug } from './content-schema';
 /** Which routes to rebuild when a page's content changes. */
 const AFFECTED_PATHS: Record<PageSlug, string[]> = {
   home: ['/'],
+  about: ['/about'],
 };
 
 /**

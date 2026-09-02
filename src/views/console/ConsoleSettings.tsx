@@ -3,7 +3,7 @@
 import { useState, useCallback } from "react";
 import { C, UI, DISPLAY, label } from "../../tokens";
 import { updatePageContent } from "@/server/content-actions";
-import type { HomeContent } from "@/server/content-schema";
+import type { HomeContent, HeroSlide, AboutContent } from "@/server/content-schema";
 
 // ── Shared primitives ────────────────────────────────────────────────────────
 
@@ -398,13 +398,206 @@ function TabStoreProfile() {
   );
 }
 
+function SlideIconButton({
+  children, label: lbl, onClick, disabled, danger,
+}: {
+  children: React.ReactNode; label: string; onClick: () => void; disabled?: boolean; danger?: boolean;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      disabled={disabled}
+      aria-label={lbl}
+      title={lbl}
+      style={{
+        width: 26, height: 26, display: "inline-flex", alignItems: "center", justifyContent: "center",
+        border: "1px solid rgba(43,35,32,0.15)", borderRadius: 5, background: "#fff",
+        color: danger ? C.maroon : "rgba(43,35,32,0.6)",
+        fontSize: "0.85rem", lineHeight: 1,
+        cursor: disabled ? "not-allowed" : "pointer",
+        opacity: disabled ? 0.35 : 1,
+      }}
+    >
+      {children}
+    </button>
+  );
+}
+
+// ── About Page tab ───────────────────────────────────────────────────────────
+
+function TabAboutContent({ initial }: { initial: AboutContent }) {
+  const [heroEyebrow, setHeroEyebrow] = useState(initial.hero.eyebrow);
+  const [heroHeading, setHeroHeading] = useState(initial.hero.heading);
+  const [heroImage, setHeroImage] = useState(initial.hero.imageUrl);
+
+  const [origin, setOrigin] = useState(initial.origin);
+  const [craft, setCraft] = useState(initial.craft);
+  const [values, setValues] = useState(initial.values);
+  const [quote, setQuote] = useState(initial.quote);
+
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function save() {
+    setSaving(true);
+    setError(null);
+    const result = await updatePageContent('about', {
+      hero: { eyebrow: heroEyebrow, heading: heroHeading, imageUrl: heroImage },
+      origin, craft, values, quote,
+    });
+    setSaving(false);
+    if (result.ok) {
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2600);
+    } else if ('unreachable' in result && result.unreachable) {
+      setError('Could not reach the database — nothing was saved. Try again in a moment.');
+    } else {
+      setError('Some fields could not be saved — check every image is a complete web address.');
+    }
+  }
+
+  const proseCard = (
+    title: string,
+    section: AboutContent['origin'],
+    set: (v: AboutContent['origin']) => void
+  ) => (
+    <SectionCard>
+      <div style={{ fontSize: "0.78rem", fontWeight: 600, color: C.charcoal, marginBottom: "1.25rem" }}>{title}</div>
+      <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+        <div>
+          <FieldLabel>Eyebrow Text</FieldLabel>
+          <Input value={section.eyebrow} onChange={v => set({ ...section, eyebrow: v })} placeholder="e.g. Where We Began" />
+        </div>
+        <div>
+          <FieldLabel>Heading</FieldLabel>
+          <Input value={section.heading} onChange={v => set({ ...section, heading: v })} placeholder="Section heading" />
+        </div>
+        <div>
+          <FieldLabel>Body</FieldLabel>
+          <Textarea value={section.body} onChange={v => set({ ...section, body: v })} rows={9} placeholder="Section copy…" />
+          <p style={{ fontSize: "0.63rem", color: "rgba(43,35,32,0.4)", marginTop: "4px" }}>
+            Leave a blank line between paragraphs.
+          </p>
+        </div>
+        <div>
+          <FieldLabel>Image URL</FieldLabel>
+          <Input value={section.imageUrl} onChange={v => set({ ...section, imageUrl: v })} placeholder="https://…" />
+        </div>
+      </div>
+    </SectionCard>
+  );
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem", maxWidth: 720 }}>
+      <SectionCard>
+        <div style={{ fontSize: "0.78rem", fontWeight: 600, color: C.charcoal, marginBottom: "1.25rem" }}>Page Header</div>
+        <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+          <div>
+            <FieldLabel>Eyebrow Text</FieldLabel>
+            <Input value={heroEyebrow} onChange={setHeroEyebrow} placeholder="e.g. Our Story" />
+          </div>
+          <div>
+            <FieldLabel>Heading</FieldLabel>
+            <Textarea value={heroHeading} onChange={setHeroHeading} rows={2} placeholder="Page heading" />
+          </div>
+          <div>
+            <FieldLabel>Header Image URL</FieldLabel>
+            <Input value={heroImage} onChange={setHeroImage} placeholder="https://…" />
+          </div>
+        </div>
+      </SectionCard>
+
+      {proseCard("Our Origin", origin, setOrigin)}
+      {proseCard("How We Work", craft, setCraft)}
+
+      <SectionCard>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "1.25rem" }}>
+          <div style={{ fontSize: "0.78rem", fontWeight: 600, color: C.charcoal }}>What We Stand For</div>
+          <button
+            onClick={() => setValues(v => (v.length < 6 ? [...v, { title: "", body: "" }] : v))}
+            disabled={values.length >= 6}
+            style={{
+              background: "none", border: "1px dashed rgba(43,35,32,0.25)", borderRadius: 5,
+              padding: "0.3rem 0.7rem", fontFamily: UI, fontSize: "0.72rem",
+              color: "rgba(43,35,32,0.6)", cursor: values.length >= 6 ? "not-allowed" : "pointer",
+              opacity: values.length >= 6 ? 0.5 : 1,
+            }}
+          >
+            + Add
+          </button>
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+          {values.map((v, i) => (
+            <div key={i} style={{ border: "1px solid rgba(43,35,32,0.12)", borderRadius: 8, padding: "1rem" }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "0.75rem" }}>
+                <span style={{ fontSize: "0.7rem", fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(43,35,32,0.45)" }}>
+                  Value {i + 1}
+                </span>
+                <SlideIconButton
+                  label={`Remove value ${i + 1}`}
+                  danger
+                  onClick={() => setValues(list => list.filter((_, n) => n !== i))}
+                >×</SlideIconButton>
+              </div>
+              <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+                <div>
+                  <FieldLabel>Title</FieldLabel>
+                  <Input value={v.title} onChange={val => setValues(list => list.map((x, n) => (n === i ? { ...x, title: val } : x)))} placeholder="e.g. Authentic Craft" />
+                </div>
+                <div>
+                  <FieldLabel>Description</FieldLabel>
+                  <Textarea value={v.body} onChange={val => setValues(list => list.map((x, n) => (n === i ? { ...x, body: val } : x)))} rows={3} placeholder="What this means…" />
+                </div>
+              </div>
+            </div>
+          ))}
+          {values.length === 0 && (
+            <p style={{ fontSize: "0.78rem", color: "rgba(43,35,32,0.45)", margin: 0 }}>
+              No values yet — the section is hidden on the page.
+            </p>
+          )}
+        </div>
+      </SectionCard>
+
+      <SectionCard>
+        <div style={{ fontSize: "0.78rem", fontWeight: 600, color: C.charcoal, marginBottom: "1.25rem" }}>Founder Quote</div>
+        <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+          <div>
+            <FieldLabel>Quote</FieldLabel>
+            <Textarea value={quote.text} onChange={v => setQuote(q => ({ ...q, text: v }))} rows={4} placeholder="The quote…" />
+          </div>
+          <div>
+            <FieldLabel>Attribution</FieldLabel>
+            <Input value={quote.attribution} onChange={v => setQuote(q => ({ ...q, attribution: v }))} placeholder="Name, role" />
+          </div>
+        </div>
+      </SectionCard>
+
+      <div style={{ display: "flex", alignItems: "center", gap: "0.875rem", flexWrap: "wrap" }}>
+        <button
+          onClick={save}
+          disabled={saving}
+          style={{
+            backgroundColor: saved ? C.teal : C.gold, color: saved ? "#fff" : C.charcoal,
+            border: "none", borderRadius: 6, padding: "0.55rem 1.5rem",
+            fontFamily: UI, fontSize: "0.8rem", fontWeight: 600,
+            cursor: saving ? "wait" : "pointer", opacity: saving ? 0.7 : 1,
+          }}
+        >
+          {saving ? "Saving…" : saved ? "Saved — live on the site" : "Save Changes"}
+        </button>
+        {error && <span style={{ fontSize: "0.75rem", color: C.maroon }}>{error}</span>}
+      </div>
+    </div>
+  );
+}
+
 // ── Homepage Content tab ──────────────────────────────────────────────────────
 
 function TabHomepageContent({ initial }: { initial: HomeContent }) {
-  const [eyebrow, setEyebrow] = useState(initial.hero.eyebrow);
-  const [headline, setHeadline] = useState(initial.hero.headline);
-  const [ctaLabel, setCtaLabel] = useState(initial.hero.ctaLabel);
-  const [heroImage, setHeroImage] = useState(initial.hero.imageUrl);
+  const [slides, setSlides] = useState<HeroSlide[]>(initial.hero.slides);
+  const [intervalSeconds, setIntervalSeconds] = useState(initial.hero.intervalSeconds);
   const [promoEnabled, setPromoEnabled] = useState(initial.promo.enabled);
   const [promo, setPromo] = useState(initial.promo.text);
   const [storyHeading, setStoryHeading] = useState(initial.story.heading);
@@ -415,11 +608,44 @@ function TabHomepageContent({ initial }: { initial: HomeContent }) {
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  function patchSlide(id: string, patch: Partial<HeroSlide>) {
+    setSlides(list => list.map(s => (s.id === id ? { ...s, ...patch } : s)));
+  }
+
+  function addSlide() {
+    setSlides(list => [
+      ...list,
+      {
+        id: `slide-${Date.now()}`,
+        eyebrow: "",
+        headline: "",
+        ctaLabel: "Shop now",
+        ctaHref: "/shop",
+        imageUrl: "https://images.unsplash.com/photo-1763823133159-c6f8ec380e33?w=1800&h=1100&fit=crop&auto=format",
+      },
+    ]);
+  }
+
+  function removeSlide(id: string) {
+    setSlides(list => (list.length > 1 ? list.filter(s => s.id !== id) : list));
+  }
+
+  function moveSlide(id: string, direction: -1 | 1) {
+    setSlides(list => {
+      const i = list.findIndex(s => s.id === id);
+      const j = i + direction;
+      if (i < 0 || j < 0 || j >= list.length) return list;
+      const next = [...list];
+      [next[i], next[j]] = [next[j], next[i]];
+      return next;
+    });
+  }
+
   async function save() {
     setSaving(true);
     setError(null);
     const result = await updatePageContent('home', {
-      hero: { eyebrow, headline, ctaLabel, ctaHref: initial.hero.ctaHref, imageUrl: heroImage },
+      hero: { slides, intervalSeconds },
       story: { heading: storyHeading, body: story, imageUrl: storyImage },
       promo: { enabled: promoEnabled, text: promo },
     });
@@ -430,7 +656,7 @@ function TabHomepageContent({ initial }: { initial: HomeContent }) {
     } else if ('unreachable' in result && result.unreachable) {
       setError('Could not reach the database — nothing was saved. Try again in a moment.');
     } else {
-      setError('Some fields could not be saved — check the image URLs are complete web addresses.');
+      setError('Some fields could not be saved — check every slide has a headline and a complete image URL.');
     }
   }
 
@@ -439,48 +665,93 @@ function TabHomepageContent({ initial }: { initial: HomeContent }) {
       {/* Fields */}
       <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
         <SectionCard>
-          <div
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "1rem", marginBottom: "1.25rem", flexWrap: "wrap" }}>
+            <div style={{ fontSize: "0.78rem", fontWeight: 600, color: C.charcoal }}>
+              Hero Slideshow
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "0.72rem", color: "rgba(43,35,32,0.55)" }}>
+              <label htmlFor="hero-interval">Seconds per slide</label>
+              <input
+                id="hero-interval"
+                type="number"
+                min={3}
+                max={30}
+                value={intervalSeconds}
+                onChange={e => setIntervalSeconds(Number(e.target.value))}
+                style={{
+                  width: 64, padding: "0.35rem 0.5rem",
+                  border: "1px solid rgba(43,35,32,0.15)", borderRadius: 5,
+                  fontFamily: UI, fontSize: "0.75rem", color: C.charcoal, outline: "none",
+                }}
+              />
+            </div>
+          </div>
+
+          <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+            {slides.map((slide, i) => (
+              <div
+                key={slide.id}
+                style={{
+                  border: "1px solid rgba(43,35,32,0.12)", borderRadius: 8,
+                  padding: "1rem", backgroundColor: "rgba(43,35,32,0.015)",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "0.875rem" }}>
+                  <span style={{ fontSize: "0.7rem", fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(43,35,32,0.45)" }}>
+                    Slide {i + 1}
+                  </span>
+                  <div style={{ display: "flex", gap: "0.25rem" }}>
+                    <SlideIconButton label={`Move slide ${i + 1} up`} disabled={i === 0} onClick={() => moveSlide(slide.id, -1)}>↑</SlideIconButton>
+                    <SlideIconButton label={`Move slide ${i + 1} down`} disabled={i === slides.length - 1} onClick={() => moveSlide(slide.id, 1)}>↓</SlideIconButton>
+                    <SlideIconButton label={`Remove slide ${i + 1}`} disabled={slides.length === 1} danger onClick={() => removeSlide(slide.id)}>×</SlideIconButton>
+                  </div>
+                </div>
+
+                <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+                  <div>
+                    <FieldLabel>Eyebrow Text</FieldLabel>
+                    <Input value={slide.eyebrow} onChange={v => patchSlide(slide.id, { eyebrow: v })} placeholder="e.g. The cap line" />
+                  </div>
+                  <div>
+                    <FieldLabel>Headline</FieldLabel>
+                    <Textarea value={slide.headline} onChange={v => patchSlide(slide.id, { headline: v })} rows={3} placeholder="Main hero headline" />
+                    <p style={{ fontSize: "0.63rem", color: "rgba(43,35,32,0.4)", marginTop: "4px" }}>
+                      Each new line becomes its own line on the hero.
+                    </p>
+                  </div>
+                  <div className="rg-2" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem" }}>
+                    <div>
+                      <FieldLabel>Button Label</FieldLabel>
+                      <Input value={slide.ctaLabel} onChange={v => patchSlide(slide.id, { ctaLabel: v })} placeholder="Shop the collection" />
+                    </div>
+                    <div>
+                      <FieldLabel>Button Link</FieldLabel>
+                      <Input value={slide.ctaHref} onChange={v => patchSlide(slide.id, { ctaHref: v })} placeholder="/shop" />
+                    </div>
+                  </div>
+                  <div>
+                    <FieldLabel>Slide Image URL</FieldLabel>
+                    <Input value={slide.imageUrl} onChange={v => patchSlide(slide.id, { imageUrl: v })} placeholder="https://…" />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <button
+            onClick={addSlide}
+            disabled={slides.length >= 8}
             style={{
-              fontSize: "0.78rem",
-              fontWeight: 600,
-              color: C.charcoal,
-              marginBottom: "1.25rem",
+              marginTop: "1rem", background: "none",
+              border: "1px dashed rgba(43,35,32,0.25)", borderRadius: 6,
+              padding: "0.6rem 1rem", width: "100%",
+              fontFamily: UI, fontSize: "0.78rem", color: "rgba(43,35,32,0.6)",
+              cursor: slides.length >= 8 ? "not-allowed" : "pointer",
+              opacity: slides.length >= 8 ? 0.5 : 1,
             }}
           >
-            Hero Section
-          </div>
-          <div
-            style={{ display: "flex", flexDirection: "column", gap: "1rem" }}
-          >
-            <div>
-              <FieldLabel>Eyebrow Text</FieldLabel>
-              <Input
-                value={eyebrow}
-                onChange={setEyebrow}
-                placeholder="e.g. New Arrivals · Summer 2026"
-              />
-            </div>
-            <div>
-              <FieldLabel>Hero Headline</FieldLabel>
-              <Textarea
-                value={headline}
-                onChange={setHeadline}
-                rows={3}
-                placeholder="Main hero headline"
-              />
-              <p style={{ fontSize: "0.63rem", color: "rgba(43,35,32,0.4)", marginTop: "4px" }}>
-                Each new line becomes its own line on the hero.
-              </p>
-            </div>
-            <div>
-              <FieldLabel>Button Label</FieldLabel>
-              <Input value={ctaLabel} onChange={setCtaLabel} placeholder="e.g. Shop the collection" />
-            </div>
-            <div>
-              <FieldLabel>Hero Image URL</FieldLabel>
-              <Input value={heroImage} onChange={setHeroImage} placeholder="https://…" />
-            </div>
-          </div>
+            + Add slide
+          </button>
         </SectionCard>
 
         <SectionCard>
@@ -615,10 +886,10 @@ function TabHomepageContent({ initial }: { initial: HomeContent }) {
                 textTransform: "uppercase",
                 color: C.gold,
                 marginBottom: "0.5rem",
-                opacity: eyebrow ? 1 : 0.3,
+                opacity: slides[0]?.eyebrow ? 1 : 0.3,
               }}
             >
-              {eyebrow || "Eyebrow text…"}
+              {slides[0]?.eyebrow || "Eyebrow text…"}
             </div>
             <div
               style={{
@@ -629,10 +900,10 @@ function TabHomepageContent({ initial }: { initial: HomeContent }) {
                 lineHeight: 1.25,
                 whiteSpace: "pre-line",
                 marginBottom: "0.875rem",
-                opacity: headline ? 1 : 0.3,
+                opacity: slides[0]?.headline ? 1 : 0.3,
               }}
             >
-              {headline || "Hero headline…"}
+              {slides[0]?.headline || "Hero headline…"}
             </div>
             <div
               style={{
@@ -1385,6 +1656,7 @@ function TabNotifications() {
 const TABS = [
   "Store Profile",
   "Homepage Content",
+  "About Page",
   "Shipping & Delivery",
   "Payments & Payout",
   "Policies",
@@ -1395,7 +1667,7 @@ type Tab = (typeof TABS)[number];
 
 // ── Page root ─────────────────────────────────────────────────────────────────
 
-export default function ConsoleSettings({ homeContent }: { homeContent: HomeContent }) {
+export default function ConsoleSettings({ homeContent, aboutContent }: { homeContent: HomeContent; aboutContent: AboutContent }) {
   const [activeTab, setActiveTab] = useState<Tab>("Store Profile");
 
   return (
@@ -1454,6 +1726,7 @@ export default function ConsoleSettings({ homeContent }: { homeContent: HomeCont
       >
         {activeTab === "Store Profile" && <TabStoreProfile />}
         {activeTab === "Homepage Content" && <TabHomepageContent initial={homeContent} />}
+        {activeTab === "About Page" && <TabAboutContent initial={aboutContent} />}
         {activeTab === "Shipping & Delivery" && <TabShipping />}
         {activeTab === "Payments & Payout" && <TabPayments />}
         {activeTab === "Policies" && <TabPolicies />}

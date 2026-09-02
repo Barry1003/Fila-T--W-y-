@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Link } from '@/lib/router';
 import { C, DISPLAY, UI, label } from '../tokens';
 import type { HomeContent } from '@/server/content-schema';
+import HeroCarousel from '../components/HeroCarousel';
 import { ShieldIcon, BadgeIcon, GlobeIcon } from '../icons';
 
 const categories = [
@@ -47,27 +48,7 @@ export default function Home({ content }: { content: HomeContent }) {
   return (
     <>
       {/* ── HERO ── */}
-      <section style={{ position: 'relative', height: '90vh', minHeight: '580px', overflow: 'hidden' }}>
-        <div style={{ position: 'absolute', inset: 0, backgroundColor: '#3d2a22' }} />
-        <img
-          src={content.hero.imageUrl}
-          alt=""
-          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 25%' }}
-        />
-        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(100deg, rgba(43,35,32,0.82) 0%, rgba(43,35,32,0.55) 45%, rgba(43,35,32,0.15) 80%, rgba(43,35,32,0.05) 100%)' }} />
-        <div className="hero-content" style={{ position: 'relative', zIndex: 2, height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '0 5rem', maxWidth: '820px' }}>
-          <div style={{ ...label, color: C.gold, fontSize: '0.62rem', marginBottom: '1.75rem', letterSpacing: '0.17em' }}>{content.hero.eyebrow}</div>
-          <h1 style={{ fontFamily: DISPLAY, fontSize: 'clamp(2.6rem, 5.2vw, 4.75rem)', color: C.cream, fontWeight: 400, lineHeight: 1.08, letterSpacing: '-0.025em', margin: '0 0 2.25rem' }}>
-            {content.hero.headline.split('\n').map((line, i) => (
-              <span key={i} style={{ display: 'block' }}>{line}</span>
-            ))}
-          </h1>
-          <Link to={content.hero.ctaHref} className="shimmer-cta" style={{ display: 'inline-block', border: '1.5px solid rgba(250,246,240,0.7)', color: C.cream, ...label, padding: '0.9rem 2.5rem', textDecorationLine: 'none', letterSpacing: '0.15em', fontSize: '0.68rem', width: 'fit-content', backgroundColor: 'transparent' }}>
-            {content.hero.ctaLabel}
-          </Link>
-        </div>
-        <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '80px', background: `linear-gradient(to top, ${C.cream}, transparent)` }} />
-      </section>
+      <HeroCarousel slides={content.hero.slides} intervalSeconds={content.hero.intervalSeconds} />
 
       {/* ── PROMO STRIP ── */}
       {content.promo.enabled && !promoDismissed && (

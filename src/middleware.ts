@@ -13,6 +13,12 @@ const SEEN_LANDING = 'ac_seen_landing';
 const ONE_YEAR = 60 * 60 * 24 * 365;
 
 export function middleware(request: NextRequest) {
+  // Once someone has seen the landing page it is otherwise unreachable, which
+  // makes it awkward to review. ?preview=landing always shows it.
+  if (request.nextUrl.searchParams.get('preview') === 'landing') {
+    return NextResponse.next();
+  }
+
   if (request.cookies.has(SEEN_LANDING)) {
     return NextResponse.redirect(new URL('/shop', request.url));
   }

@@ -6,6 +6,9 @@ import { getPageContent } from '@/server/content';
 export const dynamic = 'force-dynamic';
 
 export default async function Page() {
-  const homeContent = await getPageContent('home');
-  return <ConsoleSettings homeContent={homeContent} />;
+  const [homeContent, aboutContent] = await Promise.all([
+    getPageContent('home'),
+    getPageContent('about'),
+  ]);
+  return <ConsoleSettings homeContent={homeContent} aboutContent={aboutContent} />;
 }
