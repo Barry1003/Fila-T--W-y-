@@ -17,7 +17,7 @@ const STATS = [
   {
     label: "Today's Sales",
     value: "£2,840",
-    sub: "₦4.2M",
+    sub: null,
     trend: "+14%",
     trendUp: true,
     note: "vs yesterday",
@@ -44,7 +44,7 @@ const STATS = [
   {
     label: "Month Revenue",
     value: "£18,450",
-    sub: "₦27.4M",
+    sub: null,
     trend: "+8%",
     trendUp: true,
     note: "vs last month",

@@ -425,7 +425,6 @@ function OrderRow({ order: o, alt }: { order: Order; alt: boolean }) {
       {/* Total */}
       <td style={td}>
         <div style={{ fontSize: "0.8rem", fontWeight: 600, color: C.charcoal }}>£{o.totalGBP.toLocaleString()}</div>
-        <div style={{ fontSize: "0.67rem", color: "rgba(43,35,32,0.38)", marginTop: "1px" }}>₦{o.totalNGN.toLocaleString()}</div>
       </td>
 
       {/* Payment */}

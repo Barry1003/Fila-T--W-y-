@@ -65,9 +65,6 @@ const PHONE_CODES = [
 function cad(n: number) {
   return new Intl.NumberFormat('en-CA', { style: 'currency', currency: 'CAD', maximumFractionDigits: 0 }).format(n);
 }
-function ngn(n: number) {
-  return '₦' + new Intl.NumberFormat('en-NG').format(n);
-}
 function getGroup(countryVal: string): CountryGroup {
   return COUNTRIES.find(c => c.value === countryVal)?.group ?? 'intl';
 }
@@ -313,10 +310,10 @@ export default function Checkout() {
         <div className="checkout-head" style={{ maxWidth: '1240px', margin: '0 auto', padding: '0 2rem', height: '64px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <Link to="/" style={{ textDecorationLine: 'none' }}>
             <div style={{ fontFamily: DISPLAY, fontSize: '1.25rem', color: C.cream, fontWeight: 500, letterSpacing: '-0.01em', lineHeight: 1.05 }}>
-              Fila Tó Wúyì
+              AdeClassics
             </div>
             <div style={{ fontFamily: UI, fontSize: '0.525rem', color: C.gold, letterSpacing: '0.16em', textTransform: 'uppercase', marginTop: '2px' }}>
-              by AdeClassics
+              Timeless Elegance
             </div>
           </Link>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
@@ -529,7 +526,6 @@ export default function Checkout() {
                           </div>
                           <div style={{ fontFamily: UI, fontSize: '0.775rem', color: 'rgba(43,35,32,0.55)', marginTop: '2px' }}>
                             {m.days}
-                            {m.ngnCost > 0 && <span style={{ marginLeft: '0.5rem', color: 'rgba(43,35,32,0.4)' }}>· {ngn(m.ngnCost)}</span>}
                           </div>
                         </div>
                       </label>
@@ -719,9 +715,6 @@ export default function Checkout() {
                           <div style={{ fontFamily: UI, fontSize: '0.825rem', fontWeight: 600, color: C.charcoal }}>
                             {cad(it.cadPrice * it.qty)}
                           </div>
-                          <div style={{ fontFamily: UI, fontSize: '0.68rem', color: 'rgba(43,35,32,0.45)', marginTop: '1px' }}>
-                            {ngn(it.ngnPrice * it.qty)}
-                          </div>
                         </div>
                       </div>
                     ))}
@@ -746,7 +739,6 @@ export default function Checkout() {
                         <span style={{ fontFamily: UI, fontWeight: 700, fontSize: '0.95rem', color: C.charcoal }}>Total</span>
                         <div style={{ textAlign: 'right' }}>
                           <div style={{ fontFamily: DISPLAY, fontSize: '1.2rem', color: C.charcoal, fontWeight: 600 }}>{cad(totalCad)}</div>
-                          <div style={{ fontFamily: UI, fontSize: '0.725rem', color: 'rgba(43,35,32,0.45)', marginTop: '1px' }}>{ngn(totalNgn)}</div>
                         </div>
                       </div>
                     </div>
@@ -783,7 +775,7 @@ export default function Checkout() {
       <footer style={{ backgroundColor: C.maroon, borderTop: `1px solid rgba(212,169,78,0.15)` }}>
         <div style={{ maxWidth: '1240px', margin: '0 auto', padding: '1.25rem 2rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.75rem' }}>
           <span style={{ fontFamily: UI, fontSize: '0.65rem', color: 'rgba(250,246,240,0.45)', letterSpacing: '0.04em' }}>
-            © {new Date().getFullYear()} Fila Tó Wúyì by AdeClassics. All rights reserved.
+            © {new Date().getFullYear()} AdeClassics. All rights reserved.
           </span>
           <div style={{ display: 'flex', gap: '1.5rem' }}>
             {['Privacy Policy', 'Terms of Service', 'Returns'].map(lnk => (

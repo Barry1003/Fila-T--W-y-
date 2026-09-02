@@ -246,10 +246,6 @@ export default function ConsoleProductForm() {
       : []
   );
 
-  const estimatedNGN = priceGBP
-    ? `₦${(parseFloat(priceGBP) * 1481).toLocaleString("en-NG", { maximumFractionDigits: 0 })}`
-    : "—";
-
   function addVariant() {
     setVariants(vs => [...vs, { id: `v${Date.now()}`, size: "", color: "", stock: "" }]);
   }
@@ -366,15 +362,6 @@ export default function ConsoleProductForm() {
                     style={{ ...inputBase, paddingLeft: "1.6rem", width: "100%" }}
                   />
                 </div>
-              </div>
-              <div>
-                <FieldLabel>Naira Estimate (auto)</FieldLabel>
-                <div style={{ ...inputBase, backgroundColor: "rgba(43,35,32,0.03)", color: "rgba(43,35,32,0.5)", fontStyle: "italic", cursor: "default" }}>
-                  {estimatedNGN}
-                </div>
-                <p style={{ fontSize: "0.63rem", color: "rgba(43,35,32,0.35)", marginTop: "4px", lineHeight: 1.4 }}>
-                  ₦1 = £0.00068 · auto-updated daily
-                </p>
               </div>
             </div>
           </FormCard>

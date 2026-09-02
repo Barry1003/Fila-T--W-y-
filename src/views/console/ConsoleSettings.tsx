@@ -272,14 +272,14 @@ function Toggle({
 // ── Store Profile tab ─────────────────────────────────────────────────────────
 
 function TabStoreProfile() {
-  const [name, setName] = useState("Fila Tó Wúyì");
+  const [name, setName] = useState("AdeClassics");
   const [tagline, setTagline] = useState(
     "One Brand. Endless Style. Timeless Elegance."
   );
   const [bio, setBio] = useState(
-    "Fila Tó Wúyì is a premium African fashion house specialising in handcrafted Aso-Oke, Adire, and embroidered headwear — rooted in Yoruba craftsmanship and dressed for the global stage."
+    "AdeClassics is a premium African fashion house specialising in handcrafted Aso-Oke, Adire, and embroidered headwear — rooted in Yoruba craftsmanship and dressed for the global stage."
   );
-  const [email, setEmail] = useState("hello@filatowuyi.com");
+  const [email, setEmail] = useState("hello@adeclassics.com");
   const [phone, setPhone] = useState("+234 801 234 5678");
   const [address, setAddress] = useState("12 Bode Thomas Street, Surulere, Lagos, Nigeria");
 
@@ -407,7 +407,7 @@ function TabHomepageContent() {
     "Free shipping on orders over £150 · Use code FILAWELCOME for 10% off your first order"
   );
   const [story, setStory] = useState(
-    "Born from a love of Yoruba craftsmanship, Fila Tó Wúyì brings centuries-old weaving and embroidery traditions to discerning wardrobes worldwide. Every piece is handmade by master artisans in Lagos."
+    "Born from a love of Yoruba craftsmanship, AdeClassics brings centuries-old weaving and embroidery traditions to discerning wardrobes worldwide. Every piece is handmade by master artisans in Lagos."
   );
 
   return (
@@ -650,15 +650,14 @@ type Region = {
   standard: string;
   express: string;
   costGBP: string;
-  costNGN: string;
 };
 
 const DEFAULT_REGIONS: Region[] = [
-  { id: 1, name: "United Kingdom", standard: "3–5 business days", express: "Next day", costGBP: "£6.99", costNGN: "" },
-  { id: 2, name: "Canada", standard: "7–10 business days", express: "3–5 days", costGBP: "£12.00", costNGN: "" },
-  { id: 3, name: "United States", standard: "7–10 business days", express: "3–5 days", costGBP: "£10.00", costNGN: "" },
-  { id: 4, name: "Nigeria", standard: "2–4 business days", express: "Same day (Lagos)", costGBP: "£0", costNGN: "₦2,500" },
-  { id: 5, name: "Other / Rest of World", standard: "10–21 business days", express: "", costGBP: "£18.00", costNGN: "" },
+  { id: 1, name: "United Kingdom", standard: "3–5 business days", express: "Next day", costGBP: "£6.99" },
+  { id: 2, name: "Canada", standard: "7–10 business days", express: "3–5 days", costGBP: "£12.00" },
+  { id: 3, name: "United States", standard: "7–10 business days", express: "3–5 days", costGBP: "£10.00" },
+  { id: 4, name: "Nigeria", standard: "2–4 business days", express: "Same day (Lagos)", costGBP: "£0" },
+  { id: 5, name: "Other / Rest of World", standard: "10–21 business days", express: "", costGBP: "£18.00" },
 ];
 
 function TabShipping() {
@@ -674,7 +673,7 @@ function TabShipping() {
   const addRegion = () => {
     setRegions((prev) => [
       ...prev,
-      { id: nextId, name: "", standard: "", express: "", costGBP: "", costNGN: "" },
+      { id: nextId, name: "", standard: "", express: "", costGBP: "" },
     ]);
     setNextId((n) => n + 1);
   };
@@ -754,7 +753,6 @@ function TabShipping() {
                         ["standard", r.standard, "e.g. 3–5 days"],
                         ["express", r.express, "Optional"],
                         ["costGBP", r.costGBP, "£0.00"],
-                        ["costNGN", r.costNGN, "₦0"],
                       ] as [keyof Region, string, string][]
                     ).map(([field, val, ph]) => (
                       <td key={field} style={{ padding: "0.5rem 0.75rem" }}>
@@ -1118,13 +1116,13 @@ function TabPayments() {
 
 const POLICY_DEFAULTS: Record<string, string> = {
   "Returns Policy":
-    "We accept returns within 14 days of delivery. Items must be unworn, unwashed, and in original packaging. Custom-made garments are non-returnable unless faulty. To initiate a return, contact hello@filatowuyi.com with your order number.",
+    "We accept returns within 14 days of delivery. Items must be unworn, unwashed, and in original packaging. Custom-made garments are non-returnable unless faulty. To initiate a return, contact hello@adeclassics.com with your order number.",
   "Shipping Policy":
     "All orders are dispatched from Lagos, Nigeria within 2 business days. International orders are shipped via DHL or FedEx. Estimated delivery times vary by region — see our Shipping & Delivery table for details. We are not responsible for customs duties or import taxes.",
   "Terms of Service":
-    "By placing an order with Fila Tó Wúyì you agree to these terms. All prices are displayed in GBP (£). Payment is processed securely via Paystack or Flutterwave. We reserve the right to cancel any order at our discretion with a full refund.",
+    "By placing an order with AdeClassics you agree to these terms. All prices are displayed in GBP (£). Payment is processed securely via Paystack or Flutterwave. We reserve the right to cancel any order at our discretion with a full refund.",
   "Privacy Policy":
-    "We collect your name, email, shipping address, and payment details solely to fulfil your orders. We do not sell your data to third parties. Your data is stored securely and you may request deletion at any time by emailing privacy@filatowuyi.com.",
+    "We collect your name, email, shipping address, and payment details solely to fulfil your orders. We do not sell your data to third parties. Your data is stored securely and you may request deletion at any time by emailing privacy@adeclassics.com.",
 };
 
 function TabPolicies() {

@@ -335,9 +335,6 @@ export default function ConsoleOrderDetail() {
               )}
               <div style={{ borderTop: "1px solid rgba(43,35,32,0.1)", paddingTop: "0.5rem", marginTop: "0.125rem" }}>
                 <SummaryRow label="Total" value={`£${total}`} bold />
-                <div style={{ textAlign: "right", fontSize: "0.67rem", color: "rgba(43,35,32,0.38)", marginTop: "2px" }}>
-                  ₦{(total * RATE).toLocaleString("en-NG")}
-                </div>
               </div>
             </div>
             <div style={{

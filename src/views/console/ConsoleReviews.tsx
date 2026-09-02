@@ -27,7 +27,7 @@ const REVIEWS: Review[] = [
     rating: 5,
     date: "Aug 28, 2026",
     product: { name: "Aso-Oke Gele — Ivory & Gold Set", img: "photo-1714124731489-7eb16af0ac91" },
-    text: "Absolutely stunning craftsmanship. The Gele drapes perfectly and the colour is exactly what I wanted. Fila Tó Wúyì truly delivers on their promise of quality. I wore this to my cousin's traditional ceremony and received compliments all evening. Will definitely order again for my sister's wedding.",
+    text: "Absolutely stunning craftsmanship. The Gele drapes perfectly and the colour is exactly what I wanted. AdeClassics truly delivers on their promise of quality. I wore this to my cousin's traditional ceremony and received compliments all evening. Will definitely order again for my sister's wedding.",
     photos: [],
     reply: "Thank you so much, Chiamaka! We're overjoyed that the Gele was everything you hoped for — and congratulations on the ceremony! We can't wait to create something special for your sister's celebration too.",
     repliedAt: "Aug 29, 2026",

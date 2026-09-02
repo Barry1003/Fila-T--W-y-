@@ -702,11 +702,6 @@ function RequestDetailPanel({
                       }}
                     />
                   </div>
-                  {quotePrice && (
-                    <div style={{ fontSize: "0.68rem", color: "rgba(43,35,32,0.4)", marginTop: "3px" }}>
-                      ≈ ₦{(parseFloat(quotePrice) * 1481.3).toLocaleString("en-NG", { maximumFractionDigits: 0 })}
-                    </div>
-                  )}
                 </div>
                 <div>
                   <label style={{ display: "block", fontSize: "0.78rem", fontWeight: 500, color: C.charcoal, marginBottom: "0.375rem" }}>

@@ -57,17 +57,14 @@ const SEED: CartItem[] = [
 /* ─── Shipping options ──────────────────────────────────── */
 const SHIPPING_OPTS = [
   { id: 'ca-us', label: 'Canada / United States', cost: 0, costLabel: 'Free', est: '5–8 business days' },
-  { id: 'uk',    label: 'United Kingdom',          cost: 2500, costLabel: '₦2,500 / CA$5', est: '8–12 business days' },
-  { id: 'ng',    label: 'Nigeria',                  cost: 3500, costLabel: '₦3,500 / CA$7', est: '7–14 business days' },
-  { id: 'intl',  label: 'Rest of World',             cost: 5000, costLabel: '₦5,000 / CA$10', est: '10–18 business days' },
+  { id: 'uk',    label: 'United Kingdom',          cost: 2500, costLabel: 'CA$5', est: '8–12 business days' },
+  { id: 'ng',    label: 'Nigeria',                  cost: 3500, costLabel: 'CA$7', est: '7–14 business days' },
+  { id: 'intl',  label: 'Rest of World',             cost: 5000, costLabel: 'CA$10', est: '10–18 business days' },
 ];
 
 /* ─── Helpers ─────────────────────────────────────────────── */
 function cad(n: number) {
   return new Intl.NumberFormat('en-CA', { style: 'currency', currency: 'CAD', maximumFractionDigits: 0 }).format(n);
-}
-function ngn(n: number) {
-  return '₦' + new Intl.NumberFormat('en-NG').format(n);
 }
 
 /* ─── Trust signals ─────────────────────────────────────── */
@@ -260,9 +257,6 @@ export default function Cart() {
                         <div style={{ fontFamily: UI, fontSize: '0.875rem', fontWeight: 500, color: C.charcoal }}>
                           {cad(item.cadPrice)}
                         </div>
-                        <div style={{ fontFamily: UI, fontSize: '0.7rem', color: 'rgba(43,35,32,0.4)', marginTop: '1px' }}>
-                          {ngn(item.ngnPrice)}
-                        </div>
                       </div>
                       {/* Move to wishlist */}
                       <button
@@ -307,9 +301,6 @@ export default function Cart() {
                       </button>
                       <div style={{ fontFamily: UI, fontSize: '0.9rem', fontWeight: 600, color: C.charcoal }}>
                         {cad(lineCAD)}
-                      </div>
-                      <div style={{ fontFamily: UI, fontSize: '0.7rem', color: 'rgba(43,35,32,0.4)', marginTop: '2px' }}>
-                        {ngn(lineNGN)}
                       </div>
                     </div>
                   </div>
@@ -363,7 +354,6 @@ export default function Cart() {
                 <span style={{ fontFamily: UI, fontSize: '0.875rem', color: 'rgba(43,35,32,0.65)' }}>Subtotal</span>
                 <div style={{ textAlign: 'right' }}>
                   <div style={{ fontFamily: UI, fontSize: '0.9rem', fontWeight: 500, color: C.charcoal }}>{cad(subtotalCad)}</div>
-                  <div style={{ fontFamily: UI, fontSize: '0.7rem', color: 'rgba(43,35,32,0.4)' }}>{ngn(subtotalNgn)}</div>
                 </div>
               </div>
 
@@ -373,7 +363,6 @@ export default function Cart() {
                   <span style={{ fontFamily: UI, fontSize: '0.875rem', color: C.teal }}>Promo (FILA10 — 10% off)</span>
                   <div style={{ textAlign: 'right' }}>
                     <div style={{ fontFamily: UI, fontSize: '0.9rem', fontWeight: 500, color: C.teal }}>−{cad(discountCad)}</div>
-                    <div style={{ fontFamily: UI, fontSize: '0.7rem', color: 'rgba(59,138,147,0.65)' }}>−{ngn(discountNgn)}</div>
                   </div>
                 </div>
               )}
@@ -480,9 +469,6 @@ export default function Cart() {
                 <div style={{ textAlign: 'right' }}>
                   <div style={{ fontFamily: DISPLAY, fontSize: '1.375rem', fontWeight: 600, color: C.charcoal, letterSpacing: '-0.015em' }}>
                     {cad(totalCad)}
-                  </div>
-                  <div style={{ fontFamily: UI, fontSize: '0.78rem', color: 'rgba(43,35,32,0.5)', marginTop: '2px' }}>
-                    {ngn(totalNgn)}
                   </div>
                 </div>
               </div>

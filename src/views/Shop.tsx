@@ -73,9 +73,6 @@ function Sidebar({ selectedCats, onCat, priceMax, onPriceMax, selectedColors, on
           onChange={e => onPriceMax(Number(e.target.value))}
           style={{ width: '100%', accentColor: C.maroon, cursor: 'pointer' }}
         />
-        <div style={{ fontFamily: UI, fontSize: '0.8125rem', color: C.teal, marginTop: '0.4rem', fontWeight: 500 }}>
-          ≈ ₦ {(priceMax * 496).toLocaleString()} <span style={{ fontSize: '0.7rem', fontWeight: 400, opacity: 0.75 }}>NGN</span>
-        </div>
       </div>
 
       {/* Availability */}
@@ -129,7 +126,6 @@ function ProductCard({ p, view }: { p: Product; view: 'grid' | 'list' }) {
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
           <div style={{ fontFamily: UI, fontSize: '0.9375rem', marginBottom: '0.4rem', color: C.charcoal }}>{p.title}</div>
           <div style={{ fontFamily: UI, fontSize: '1rem', fontWeight: 600, color: C.charcoal }}>{fmt(p.cadNum, 'CAD $')}</div>
-          <div style={{ fontFamily: UI, fontSize: '0.8rem', color: C.teal, fontWeight: 500 }}>₦ {p.ngnNum.toLocaleString()}</div>
         </div>
       </Link>
     );
@@ -155,7 +151,6 @@ function ProductCard({ p, view }: { p: Product; view: 'grid' | 'list' }) {
       </div>
       <div style={{ fontFamily: UI, fontSize: '0.875rem', fontWeight: 400, marginBottom: '0.5rem', lineHeight: 1.4, color: C.charcoal }}>{p.title}</div>
       <div style={{ fontFamily: UI, fontSize: '1rem', fontWeight: 600, color: C.charcoal, lineHeight: 1 }}>{fmt(p.cadNum, 'CAD $')}</div>
-      <div style={{ fontFamily: UI, fontSize: '0.825rem', color: C.teal, fontWeight: 500, marginTop: '0.2rem' }}>₦ {p.ngnNum.toLocaleString()}</div>
     </Link>
   );
 }

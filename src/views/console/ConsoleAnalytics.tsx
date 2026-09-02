@@ -108,11 +108,6 @@ function fmtGBP(n: number): string {
   return `£${n.toLocaleString()}`;
 }
 
-function fmtNGN(n: number): string {
-  if (n >= 1_000_000) return `₦${(n / 1_000_000).toFixed(1)}M`;
-  return `₦${n.toLocaleString()}`;
-}
-
 function smoothPath(pts: { x: number; y: number }[]): string {
   if (pts.length < 2) return "";
   let d = `M ${pts[0].x.toFixed(1)} ${pts[0].y.toFixed(1)}`;
@@ -445,7 +440,6 @@ export default function ConsoleAnalytics() {
         <StatCard
           label="Total Revenue"
           primary={fmtGBP(stats.revenue)}
-          secondary={fmtNGN(stats.revenueNGN)}
           trend={stats.revTrend}
           accentColor={C.gold}
         />
@@ -458,7 +452,6 @@ export default function ConsoleAnalytics() {
         <StatCard
           label="Avg. Order Value"
           primary={`£${stats.aov}`}
-          secondary={fmtNGN(stats.aovNGN)}
           trend={stats.aovTrend}
           accentColor={C.maroon}
         />

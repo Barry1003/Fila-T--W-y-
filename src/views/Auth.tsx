@@ -429,10 +429,10 @@ export default function Auth() {
         <div style={{ maxWidth: '1240px', margin: '0 auto', padding: '0 2rem', height: '64px', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
           <Link to="/" style={{ textDecorationLine: 'none', textAlign: 'center' }}>
             <div style={{ fontFamily: DISPLAY, fontSize: '1.25rem', color: C.cream, fontWeight: 500, letterSpacing: '-0.01em', lineHeight: 1.05 }}>
-              Fila Tó Wúyì
+              AdeClassics
             </div>
             <div style={{ fontFamily: UI, fontSize: '0.525rem', color: C.gold, letterSpacing: '0.16em', textTransform: 'uppercase', marginTop: '2px' }}>
-              by AdeClassics
+              Timeless Elegance
             </div>
           </Link>
           <Link
@@ -480,7 +480,7 @@ export default function Auth() {
 
           {/* Eyebrow */}
           <p style={{ ...label, fontSize: '0.6rem', color: C.gold, letterSpacing: '0.2em', marginBottom: '0.6rem' }}>
-            Welcome to Fila Tó Wúyì
+            Welcome to AdeClassics
           </p>
 
           {/* Headline */}

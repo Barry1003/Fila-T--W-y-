@@ -114,7 +114,6 @@ function WishCard({ item, onRemove, onAddToCart }: { item: WishItem; onRemove: (
         {fmt(item.cadNum, 'CAD $')}
       </div>
       <div style={{ fontFamily: UI, fontSize: '0.8rem', color: C.teal, fontWeight: 500, marginTop: '0.2rem', marginBottom: '0.875rem' }}>
-        ₦ {item.ngnNum.toLocaleString()}
       </div>
 
       {/* CTA */}

@@ -24,7 +24,7 @@ const VALUES = [
       </svg>
     ),
     title: 'Made to Last',
-    body: "We source only the finest Aso-Oke, George lace, and Adire. A Fila Tó Wúyì piece is meant to outlast the occasion — and be worn again.",
+    body: "We source only the finest Aso-Oke, George lace, and Adire. An AdeClassics piece is meant to outlast the occasion — and be worn again.",
   },
   {
     icon: (
@@ -95,13 +95,13 @@ export default function About() {
               Born from a love of tradition and a gap in the market
             </h2>
             <p style={{ fontFamily: UI, fontSize: '0.95rem', color: 'rgba(43,35,32,0.68)', lineHeight: 1.78, marginBottom: '1.25rem' }}>
-              Fila Tó Wúyì — literally "the cap that suits you" in Yoruba — was founded by Adunola Okonkwo after years of searching for authentic Yoruba headwear outside Nigeria and finding nothing that met the standard her family had held for generations.
+              AdeClassics was founded by Adunola Okonkwo after years of searching for authentic Yoruba headwear outside Nigeria and finding nothing that met the standard her family had held for generations. Its cap line, Filà tó Wüyí — literally "the cap that suits you" in Yoruba — remains the house's signature.
             </p>
             <p style={{ fontFamily: UI, fontSize: '0.95rem', color: 'rgba(43,35,32,0.68)', lineHeight: 1.78, marginBottom: '1.25rem' }}>
               What she found instead were imitations — machine-made caps in synthetic fabrics, sold without the knowledge of what they were meant to represent. So she went back to the source: the workshops of Iseyin, the weavers of Ondo, the embroiders of Lagos Island, and the master cap-makers of Ibadan.
             </p>
             <p style={{ fontFamily: UI, fontSize: '0.95rem', color: 'rgba(43,35,32,0.68)', lineHeight: 1.78 }}>
-              The first collection was twelve pieces, handpicked, and sold through word of mouth. A decade later, Fila Tó Wúyì ships to over forty countries and remains guided by the same principle: every piece must be something you would keep.
+              The first collection was twelve pieces, handpicked, and sold through word of mouth. A decade later, AdeClassics ships to over forty countries and remains guided by the same principle: every piece must be something you would keep.
             </p>
           </div>
         </div>
@@ -123,7 +123,7 @@ export default function About() {
               Craft takes time. We do not rush it.
             </h2>
             <p style={{ fontFamily: UI, fontSize: '0.95rem', color: 'rgba(43,35,32,0.68)', lineHeight: 1.78, marginBottom: '1.25rem' }}>
-              Every Fila Tó Wúyì piece passes through multiple hands before it reaches you. The Aso-Oke is woven on narrow-strip looms by artisans who have spent decades mastering the geometry of the patterns. The Gele fabric is starched by hand, tested for stiffness, and cut to precise lengths.
+              Every AdeClassics piece passes through multiple hands before it reaches you. The Aso-Oke is woven on narrow-strip looms by artisans who have spent decades mastering the geometry of the patterns. The Gele fabric is starched by hand, tested for stiffness, and cut to precise lengths.
             </p>
             <p style={{ fontFamily: UI, fontSize: '0.95rem', color: 'rgba(43,35,32,0.68)', lineHeight: 1.78, marginBottom: '1.25rem' }}>
               Caps are shaped on wooden blocks — the same type of block Nigerian cap-makers have used for at least two hundred years. Embroidery is applied with needle and thread, never machine-stitched. Each completed piece is inspected by eye; we have no sensor more precise than a craftsperson who cares.

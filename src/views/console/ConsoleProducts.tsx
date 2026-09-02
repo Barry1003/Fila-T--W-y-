@@ -437,9 +437,6 @@ export default function ConsoleProducts() {
                         {/* Price */}
                         <td style={td}>
                           <div style={{ fontSize: "0.8rem", fontWeight: 600, color: C.charcoal }}>£{p.priceGBP.toLocaleString()}</div>
-                          <div style={{ fontSize: "0.67rem", color: "rgba(43,35,32,0.38)", marginTop: "1px" }}>
-                            ₦{p.priceNGN.toLocaleString()}
-                          </div>
                         </td>
 
                         {/* Stock */}

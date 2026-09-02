@@ -18,10 +18,10 @@ export default function Footer() {
         }}>
           <div>
             <div style={{ fontFamily: DISPLAY, fontSize: '2rem', fontWeight: 500, color: C.cream, letterSpacing: '-0.01em', marginBottom: '0.375rem' }}>
-              Fila Tó Wúyì
+              AdeClassics
             </div>
             <div style={{ ...label, color: C.gold, fontSize: '0.595rem', letterSpacing: '0.16em' }}>
-              by AdeClassics · One Brand. Endless Style. Timeless Elegance.
+              Timeless Elegance · One Brand. Endless Style.
             </div>
           </div>
           <div style={{ display: 'flex', gap: '1.25rem' }}>
@@ -89,7 +89,7 @@ export default function Footer() {
           flexWrap: 'wrap', gap: '1rem',
         }}>
           <span style={{ fontFamily: UI, fontSize: '0.775rem', color: 'rgba(250,246,240,0.4)' }}>
-            © 2026 Fila Tó Wúyì by AdeClassics — Worldwide delivery available.
+            © 2026 AdeClassics — Worldwide delivery available.
           </span>
           <div style={{ display: 'flex', gap: '1.5rem' }}>
             {['Privacy Policy', 'Terms of Use', 'Cookies'].map(l => (

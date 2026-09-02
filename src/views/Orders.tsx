@@ -149,9 +149,6 @@ const FILTER_TABS: { key: FilterTab; label: string }[] = [
 function fmtCad(n: number) {
   return 'CAD ' + new Intl.NumberFormat('en-CA', { style: 'currency', currency: 'CAD', maximumFractionDigits: 0 }).format(n);
 }
-function fmtNgn(n: number) {
-  return '₦' + new Intl.NumberFormat('en-NG').format(n);
-}
 
 const STATUS_CONFIG: Record<OrderStatus, { label: string; color: string; bg: string; border: string }> = {
   placed:     { label: 'Placed',     color: C.charcoal,              bg: 'rgba(43,35,32,0.06)',  border: 'rgba(43,35,32,0.22)' },
@@ -310,7 +307,6 @@ function OrderCard({ order }: { order: Order }) {
         {/* Total */}
         <div style={{ marginLeft: 'auto', textAlign: 'right' }}>
           <div style={{ fontFamily: UI, fontSize: '1rem', fontWeight: 700, color: C.charcoal }}>{fmtCad(order.cadTotal)}</div>
-          <div style={{ fontFamily: UI, fontSize: '0.72rem', color: 'rgba(43,35,32,0.42)', marginTop: '2px' }}>{fmtNgn(order.ngnTotal)}</div>
         </div>
 
         {/* Actions */}
@@ -376,7 +372,6 @@ function OrderCard({ order }: { order: Order }) {
                     </div>
                     <div style={{ textAlign: 'right', flexShrink: 0 }}>
                       <div style={{ fontFamily: UI, fontSize: '0.84rem', fontWeight: 600, color: C.charcoal }}>{fmtCad(item.cad * item.qty)}</div>
-                      <div style={{ fontFamily: UI, fontSize: '0.7rem', color: 'rgba(43,35,32,0.42)', marginTop: '2px' }}>{fmtNgn(item.ngn * item.qty)}</div>
                     </div>
                   </div>
                 ))}

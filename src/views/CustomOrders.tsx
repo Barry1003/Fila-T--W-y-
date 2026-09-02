@@ -170,10 +170,6 @@ const MY_REQUESTS: CustomRequest[] = [
 function fmtGBP(n: number) {
   return `£${n.toLocaleString("en-GB")}`;
 }
-function fmtNGN(n: number) {
-  return `₦${n.toLocaleString("en-NG")}`;
-}
-
 // ── Ref swatch (color placeholder for uploaded reference images) ───────────────
 
 function RefSwatch({ bg, size = 56 }: { bg: string; size?: number }) {
@@ -550,7 +546,6 @@ function ExpandedDetail({
                   {fmtGBP(req.quotedPriceGBP)}
                 </div>
                 <div style={{ fontFamily: UI, fontSize: "0.72rem", color: "rgba(43,35,32,0.42)", marginTop: 3 }}>
-                  ≈ {fmtNGN(req.quotedPriceGBP * 1481)}
                 </div>
               </div>
               {req.estimatedCompletion && (
@@ -645,7 +640,6 @@ function ExpandedDetail({
           >
             <div style={{ fontFamily: UI, fontSize: "0.6rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(43,35,32,0.38)", fontWeight: 500 }}>Agreed Price</div>
             <div style={{ fontFamily: UI, fontSize: "1.15rem", fontWeight: 700, color: C.charcoal, letterSpacing: "-0.02em" }}>{fmtGBP(req.quotedPriceGBP)}</div>
-            <div style={{ fontFamily: UI, fontSize: "0.7rem", color: "rgba(43,35,32,0.42)" }}>≈ {fmtNGN(req.quotedPriceGBP * 1481)}</div>
             {req.estimatedCompletion && (
               <>
                 <div style={{ fontFamily: UI, fontSize: "0.6rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(43,35,32,0.38)", fontWeight: 500, marginTop: 2 }}>Est. Completion</div>
@@ -676,7 +670,7 @@ function ExpandedDetail({
           >
             <div style={{ fontFamily: UI, fontSize: "0.7rem", fontWeight: 600, color: "#2A6E38" }}>Order complete ✓</div>
             <div style={{ fontFamily: UI, fontSize: "0.78rem", color: "rgba(43,35,32,0.6)", lineHeight: 1.5 }}>
-              Total paid: {fmtGBP(req.quotedPriceGBP)}<br />≈ {fmtNGN(req.quotedPriceGBP * 1481)}
+              Total paid: {fmtGBP(req.quotedPriceGBP)}
             </div>
           </div>
         )}

@@ -24,14 +24,14 @@ const catBgs = [
 ];
 
 const products = [
-  { id: 1, img: 'photo-1763823133159-c6f8ec380e33', tag: 'NEW',          title: 'Gobi Filà Cap — Burgundy Velvet',  cad: 'CAD $89',  ngn: '₦ 44,200'  },
-  { id: 2, img: 'photo-1714124731489-7eb16af0ac91', tag: 'NEW',          title: 'Aso-oke Gele — Ivory & Gold Set',  cad: 'CAD $145', ngn: '₦ 71,900'  },
-  { id: 3, img: 'photo-1765910083971-aa0e3688be46', tag: 'MADE TO ORDER', title: 'Embroidered Agbada Kaftan',        cad: 'CAD $310', ngn: '₦ 153,950' },
-  { id: 4, img: 'photo-1760086626077-55da1cb1ecb3', tag: 'NEW',          title: 'Ọjọ Ipele — Crimson Drape',        cad: 'CAD $78',  ngn: '₦ 38,750'  },
-  { id: 5, img: 'photo-1661332360810-28aa035f14db', tag: 'NEW',          title: 'Tailored Yoruba Trouser Set',      cad: 'CAD $195', ngn: '₦ 96,850'  },
-  { id: 6, img: 'photo-1632948056627-41482f69c38c', tag: 'SOLD OUT',     title: 'Adire Roundneck — Indigo',         cad: 'CAD $125', ngn: '₦ 62,000'  },
-  { id: 7, img: 'photo-1646133512747-babfd708d662', tag: 'NEW',          title: 'Hand-tooled Pam Slippers',         cad: 'CAD $160', ngn: '₦ 79,500'  },
-  { id: 8, img: 'photo-1542727284-f84ef8478587',   tag: 'MADE TO ORDER', title: 'Adire Prayer Mat — Heritage Weave', cad: 'CAD $55', ngn: '₦ 27,300'  },
+  { id: 1, img: 'photo-1763823133159-c6f8ec380e33', tag: 'NEW',          title: 'Gobi Filà Cap — Burgundy Velvet',  cad: 'CAD $89' },
+  { id: 2, img: 'photo-1714124731489-7eb16af0ac91', tag: 'NEW',          title: 'Aso-oke Gele — Ivory & Gold Set',  cad: 'CAD $145' },
+  { id: 3, img: 'photo-1765910083971-aa0e3688be46', tag: 'MADE TO ORDER', title: 'Embroidered Agbada Kaftan',        cad: 'CAD $310' },
+  { id: 4, img: 'photo-1760086626077-55da1cb1ecb3', tag: 'NEW',          title: 'Ọjọ Ipele — Crimson Drape',        cad: 'CAD $78' },
+  { id: 5, img: 'photo-1661332360810-28aa035f14db', tag: 'NEW',          title: 'Tailored Yoruba Trouser Set',      cad: 'CAD $195' },
+  { id: 6, img: 'photo-1632948056627-41482f69c38c', tag: 'SOLD OUT',     title: 'Adire Roundneck — Indigo',         cad: 'CAD $125' },
+  { id: 7, img: 'photo-1646133512747-babfd708d662', tag: 'NEW',          title: 'Hand-tooled Pam Slippers',         cad: 'CAD $160' },
+  { id: 8, img: 'photo-1542727284-f84ef8478587',   tag: 'MADE TO ORDER', title: 'Adire Prayer Mat — Heritage Weave', cad: 'CAD $55' },
 ];
 
 const craftsmanship = [
@@ -144,7 +144,6 @@ export default function Home() {
               </div>
               <div style={{ fontFamily: UI, fontSize: '0.875rem', fontWeight: 400, marginBottom: '0.7rem', lineHeight: 1.4, color: C.charcoal }}>{p.title}</div>
               <div style={{ fontFamily: UI, fontSize: '1rem', fontWeight: 600, color: C.charcoal, lineHeight: 1 }}>{p.cad}</div>
-              <div style={{ fontFamily: UI, fontSize: '0.825rem', fontWeight: 500, color: C.teal, marginTop: '0.2rem' }}>{p.ngn}</div>
             </Link>
           ))}
         </div>
@@ -179,7 +178,7 @@ export default function Home() {
               Yoruba craft,<br />made for the world.
             </h2>
             <p style={{ fontFamily: UI, fontSize: '0.9375rem', lineHeight: 1.85, color: 'rgba(43,35,32,0.72)', marginBottom: '1.375rem' }}>
-              Fila Tó Wúyì was born from a simple conviction: the artistry woven into every Yoruba filà, gele, and kaftan deserves a stage as global as the culture it carries. We are an international e-commerce store bringing premium Yoruba traditional wear — handcrafted in Nigeria — to customers in Canada, the UK, the US, and beyond.
+              AdeClassics was born from a simple conviction: the artistry woven into every Yoruba filà, gele, and kaftan deserves a stage as global as the culture it carries. We are an international e-commerce store bringing premium Yoruba traditional wear — handcrafted in Nigeria — to customers in Canada, the UK, the US, and beyond.
             </p>
             <p style={{ fontFamily: UI, fontSize: '0.9375rem', lineHeight: 1.85, color: 'rgba(43,35,32,0.72)', marginBottom: '1.375rem' }}>
               Every piece is handpicked by our team and every purchase is escrow-protected. When you buy here, you are not shopping for a product — you are participating in the preservation of a living tradition.

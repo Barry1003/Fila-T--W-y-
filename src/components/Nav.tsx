@@ -52,10 +52,10 @@ export default function Nav() {
           {/* Wordmark */}
           <Link to="/" onClick={close} style={{ textDecorationLine: 'none', flexShrink: 0 }}>
             <div className="nav-wordmark" style={{ fontFamily: DISPLAY, color: C.cream, fontWeight: 500, lineHeight: 1.05, letterSpacing: '-0.01em' }}>
-              Fila Tó Wúyì
+              AdeClassics
             </div>
             <div className="nav-wordmark-sub" style={{ ...label, color: C.gold, letterSpacing: '0.16em' }}>
-              by AdeClassics
+              Timeless Elegance
             </div>
           </Link>
 
@@ -135,10 +135,10 @@ export default function Nav() {
           <div className="nav-drawer-head">
             <div>
               <div style={{ fontFamily: DISPLAY, fontSize: '1.2rem', color: C.cream, fontWeight: 500, lineHeight: 1.1 }}>
-                Fila Tó Wúyì
+                AdeClassics
               </div>
               <div style={{ ...label, color: C.gold, fontSize: '0.53rem', letterSpacing: '0.15em', marginTop: '3px' }}>
-                by AdeClassics
+                Timeless Elegance
               </div>
             </div>
             <button onClick={close} className="nav-drawer-close" aria-label="Close menu">

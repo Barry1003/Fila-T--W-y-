@@ -391,7 +391,7 @@ function BannersTab({ onAdd }: { onAdd: () => void }) {
               }}
             >
               <span style={{ color: C.cream, fontSize: "0.55rem", fontFamily: UI, opacity: 0.8 }}>
-                Fila Tó Wúyì
+                AdeClassics
               </span>
               <div style={{ display: "flex", gap: "6px" }}>
                 {["Shop", "About"].map((l) => (
@@ -897,7 +897,7 @@ function CreateBannerPanel({ onClose }: { onClose: () => void }) {
                 }}
               >
                 <span style={{ color: C.cream, fontSize: "0.66rem", fontFamily: UI, opacity: 0.85 }}>
-                  Fila Tó Wúyì
+                  AdeClassics
                 </span>
                 <div style={{ display: "flex", gap: "12px" }}>
                   {["Shop", "Lookbook", "About"].map((l) => (

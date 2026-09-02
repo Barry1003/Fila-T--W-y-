@@ -28,7 +28,7 @@ const ARTICLES: Article[] = [
     image: 'https://images.unsplash.com/photo-1770777353033-e32b07f31a6e?w=1400&h=700&fit=crop&auto=format',
     body: [
       "The Gele is more than a headwrap — it is a cultural statement, a mark of elegance, and for many Yoruba women, an essential part of celebrating life's most important moments. Tying one beautifully takes practice, but the results are worth every minute.",
-      "Begin with a starched, crisp Gele fabric. The starch gives the fabric memory and structure, allowing it to hold its shape through an entire ceremony. Fila Tó Wúyì Gele fabrics are pre-starched to the right firmness: pliable enough to mould but firm enough to fan.",
+      "Begin with a starched, crisp Gele fabric. The starch gives the fabric memory and structure, allowing it to hold its shape through an entire ceremony. AdeClassics Gele fabrics are pre-starched to the right firmness: pliable enough to mould but firm enough to fan.",
       "Step 1 — Fold the fabric lengthwise into a long band, roughly 8–10 inches wide. The exact width affects the final volume; a narrower fold creates a sleeker silhouette, while a wider fold builds drama appropriate for an owambe or naming ceremony.",
       "Step 2 — Place the centre of the band at the back of the head, above the nape. Bring both ends forward, cross them at the forehead, and take them back again. This first pass creates the anchor around which the rest of the style is built.",
       "Step 3 — With the longer end, begin pleating and fanning upward, tucking each pleat behind the base wrap. The fan shape is the signature of a traditional Gele — the more even the pleats, the more polished the result.",

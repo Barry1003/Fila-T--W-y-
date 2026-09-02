@@ -28,9 +28,6 @@ const ADDRESS = {
 function cad(n: number) {
   return new Intl.NumberFormat('en-CA', { style: 'currency', currency: 'CAD', maximumFractionDigits: 0 }).format(n);
 }
-function ngn(n: number) {
-  return '₦' + new Intl.NumberFormat('en-NG').format(n);
-}
 
 const subtotalCad = ITEMS.reduce((s, it) => s + it.cadPrice * it.qty, 0);
 const subtotalNgn = ITEMS.reduce((s, it) => s + it.ngnPrice * it.qty, 0);
@@ -93,10 +90,10 @@ export default function OrderConfirmation() {
         <div style={{ maxWidth: '1240px', margin: '0 auto', padding: '0 2rem', height: '64px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <Link to="/" style={{ textDecorationLine: 'none' }}>
             <div style={{ fontFamily: DISPLAY, fontSize: '1.25rem', color: C.cream, fontWeight: 500, letterSpacing: '-0.01em', lineHeight: 1.05 }}>
-              Fila Tó Wúyì
+              AdeClassics
             </div>
             <div style={{ fontFamily: UI, fontSize: '0.525rem', color: C.gold, letterSpacing: '0.16em', textTransform: 'uppercase', marginTop: '2px' }}>
-              by AdeClassics
+              Timeless Elegance
             </div>
           </Link>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
@@ -195,7 +192,6 @@ export default function OrderConfirmation() {
                 </div>
                 <div style={{ flexShrink: 0, textAlign: 'right' }}>
                   <div style={{ fontFamily: UI, fontSize: '0.825rem', fontWeight: 600, color: C.charcoal }}>{cad(it.cadPrice * it.qty)}</div>
-                  <div style={{ fontFamily: UI, fontSize: '0.68rem', color: 'rgba(43,35,32,0.42)', marginTop: '1px' }}>{ngn(it.ngnPrice * it.qty)}</div>
                 </div>
               </div>
             ))}
@@ -215,7 +211,6 @@ export default function OrderConfirmation() {
               <span style={{ fontFamily: UI, fontWeight: 700, fontSize: '0.95rem', color: C.charcoal }}>Total</span>
               <div style={{ textAlign: 'right' }}>
                 <div style={{ fontFamily: DISPLAY, fontSize: '1.2rem', color: C.charcoal, fontWeight: 600 }}>{cad(totalCad)}</div>
-                <div style={{ fontFamily: UI, fontSize: '0.7rem', color: 'rgba(43,35,32,0.42)', marginTop: '1px' }}>{ngn(totalNgn)}</div>
               </div>
             </div>
           </div>
@@ -313,7 +308,7 @@ export default function OrderConfirmation() {
       <footer style={{ backgroundColor: C.maroon, borderTop: `1px solid rgba(212,169,78,0.15)` }}>
         <div style={{ maxWidth: '1240px', margin: '0 auto', padding: '1.25rem 2rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.75rem' }}>
           <span style={{ fontFamily: UI, fontSize: '0.65rem', color: 'rgba(250,246,240,0.45)', letterSpacing: '0.04em' }}>
-            © {new Date().getFullYear()} Fila Tó Wúyì by AdeClassics. All rights reserved.
+            © {new Date().getFullYear()} AdeClassics. All rights reserved.
           </span>
           <div style={{ display: 'flex', gap: '1.5rem' }}>
             {['Privacy Policy', 'Terms of Service', 'Returns'].map(lnk => (

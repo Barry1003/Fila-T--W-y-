@@ -44,8 +44,8 @@ function ShareModal({
   onClose: () => void;
 }) {
   const [copied, setCopied] = useState(false);
-  const productUrl = `https://filatowuyi.com/product/${product.id}`;
-  const shareText = `Check out ${product.title} on Fila Tó Wúyì — CAD $${product.cadNum.toLocaleString()}`;
+  const productUrl = `https://adeclassics.com/product/${product.id}`;
+  const shareText = `Check out ${product.title} on AdeClassics — CAD $${product.cadNum.toLocaleString()}`;
 
   function handleCopy() {
     navigator.clipboard.writeText(productUrl).then(() => {
@@ -109,7 +109,7 @@ function ShareModal({
     {
       name: 'Email',
       bg: '#3B8A93',
-      href: `mailto:?subject=${encodeURIComponent('A piece from Fila Tó Wúyì')}&body=${encodeURIComponent(shareText + '\n\n' + productUrl)}`,
+      href: `mailto:?subject=${encodeURIComponent('A piece from AdeClassics')}&body=${encodeURIComponent(shareText + '\n\n' + productUrl)}`,
       icon: (
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
           <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
@@ -154,15 +154,13 @@ function ShareModal({
             {/* Text block — mimics a WhatsApp / iMessage OG card */}
             <div style={{ padding: '0.75rem 1rem 0.9rem', backgroundColor: '#fff', borderTop: '1px solid rgba(43,35,32,0.07)' }}>
               <div style={{ fontFamily: UI, fontSize: '0.575rem', color: 'rgba(43,35,32,0.3)', letterSpacing: '0.13em', textTransform: 'uppercase', marginBottom: '0.3rem' }}>
-                filatowuyi.com
+                adeclassics.com
               </div>
               <div style={{ fontFamily: UI, fontSize: '0.925rem', fontWeight: 600, color: C.charcoal, lineHeight: 1.32, marginBottom: '0.3rem' }}>
                 {product.title}
               </div>
               <div style={{ fontFamily: UI, fontSize: '0.8rem', color: 'rgba(43,35,32,0.5)', display: 'flex', gap: '0.375rem', alignItems: 'baseline', flexWrap: 'wrap' }}>
                 <span style={{ fontWeight: 700, color: C.charcoal }}>CAD ${product.cadNum.toLocaleString()}</span>
-                <span style={{ opacity: 0.4 }}>·</span>
-                <span>₦ {product.ngnNum.toLocaleString()} NGN</span>
               </div>
             </div>
           </div>
@@ -393,10 +391,6 @@ export default function Product() {
             <div style={{ marginBottom: '2rem', paddingBottom: '2rem', borderBottom: '1px solid rgba(43,35,32,0.08)' }}>
               <div style={{ fontFamily: UI, fontSize: '2rem', fontWeight: 700, color: C.charcoal, lineHeight: 1, letterSpacing: '-0.025em' }}>
                 CAD ${product.cadNum.toLocaleString()}
-              </div>
-              <div style={{ fontFamily: UI, fontSize: '1.05rem', color: C.teal, marginTop: '0.35rem', fontWeight: 500 }}>
-                ₦ {product.ngnNum.toLocaleString()}{' '}
-                <span style={{ fontSize: '0.8rem', fontWeight: 400, opacity: 0.7 }}>NGN</span>
               </div>
             </div>
 
@@ -717,7 +711,6 @@ export default function Product() {
                 </div>
                 <div style={{ fontFamily: UI, fontSize: '0.875rem', fontWeight: 400, marginBottom: '0.5rem', lineHeight: 1.4 }}>{p.title}</div>
                 <div style={{ fontFamily: UI, fontSize: '1rem', fontWeight: 600 }}>CAD ${p.cadNum.toLocaleString()}</div>
-                <div style={{ fontFamily: UI, fontSize: '0.825rem', color: C.teal, marginTop: '0.2rem', fontWeight: 500 }}>₦ {p.ngnNum.toLocaleString()}</div>
               </Link>
             ))}
           </div>
