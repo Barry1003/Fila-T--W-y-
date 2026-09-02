@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 import '@/index.css';
+import AppwritePing from '@/components/AppwritePing';
 
 export const metadata: Metadata = {
   title: 'AdeClassics — Timeless Elegance',
@@ -10,7 +11,10 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <AppwritePing />
+        {children}
+      </body>
     </html>
   );
 }
