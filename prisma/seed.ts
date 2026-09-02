@@ -27,13 +27,23 @@ const prisma = new PrismaClient({ adapter: new PrismaNeon({ connectionString }) 
  */
 const RETRYABLE = new Set(['ETIMEDOUT', 'ECONNRESET', 'ENOTFOUND', 'ECONNREFUSED', 'EPIPE']);
 
+/**
+ * The Neon driver surfaces a dropped WebSocket as a DOM ErrorEvent, which
+ * carries no `code` — so match on shape as well as on error codes.
+ */
+function isRetryable(error: unknown): boolean {
+  const code = (error as { code?: string }).code;
+  if (code && RETRYABLE.has(code)) return true;
+  return (error as { type?: string })?.type === 'error';
+}
+
 async function withRetries<T>(label: string, fn: () => Promise<T>, attempts = 10): Promise<T> {
   for (let i = 1; ; i++) {
     try {
       return await fn();
     } catch (error) {
-      const code = (error as { code?: string }).code ?? '';
-      if (!RETRYABLE.has(code) || i >= attempts) throw error;
+      const code = (error as { code?: string }).code ?? 'socket error';
+      if (!isRetryable(error) || i >= attempts) throw error;
       const wait = Math.min(2 ** i * 400, 8000);
       console.warn(`  ${label}: ${code} (attempt ${i}/${attempts}) — retrying in ${wait}ms`);
       await new Promise(r => setTimeout(r, wait));
@@ -178,8 +188,18 @@ async function main() {
   for (const b of BANNERS) {
     await prisma.banner.create({
       data: {
-        text: b.text, ctaLabel: b.ctaLabel, status: b.status,
-        startsAt: date(b.startsAt), endsAt: date(b.endsAt),
+        text: b.text,
+        subtext: b.subtext,
+        badge: b.badge,
+        ctaLabel: b.ctaLabel,
+        status: b.status,
+        position: b.position,
+        productId: productsByTitle.get(b.productTitle) ?? null,
+        // No ctaHref: when a banner has a product, the view links to it via the
+        // relation. ctaHref is for promotions that point somewhere else.
+        ctaHref: null,
+        startsAt: date(b.startsAt),
+        endsAt: date(b.endsAt),
       },
     });
   }

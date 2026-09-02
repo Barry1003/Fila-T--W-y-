@@ -816,6 +816,181 @@ body {
   }
 }
 
+/* ── Promotion carousel ─────────────────────────────────────────────────────── */
+
+.promo-carousel {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 1.75rem 2.5rem 0;
+}
+
+.promo-viewport {
+  position: relative;
+  overflow: hidden;
+  border-radius: 10px;
+  background: #7A2E38;
+}
+
+.promo-track {
+  display: flex;
+  /* Each slide is exactly one viewport wide, so the track translates by 100%. */
+  width: 100%;
+}
+
+.promo-slide {
+  flex: 0 0 100%;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 44% 1fr;
+  align-items: stretch;
+  min-height: 360px;
+}
+
+.promo-media {
+  position: relative;
+  overflow: hidden;
+}
+
+/* Absolute so the photo fills whatever frame the layout gives it, rather than
+   stretching the row to its own intrinsic height. */
+.promo-media img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Fades the image into the maroon panel so the join is not a hard edge. */
+.promo-media::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(122, 46, 56, 0) 55%, rgba(122, 46, 56, 0.95) 100%);
+}
+
+.promo-badge {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  z-index: 1;
+  background: #D4A94E;
+  color: #2B2320;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 0.4rem 0.7rem;
+  border-radius: 3px;
+}
+
+.promo-body {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 2.5rem 3rem 2.5rem 1rem;
+  min-width: 0;
+}
+
+.promo-headline {
+  font-size: clamp(1.4rem, 2.6vw, 2.1rem);
+}
+
+.promo-cta {
+  align-self: flex-start;
+  margin-top: 1.4rem;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 1.5rem;
+  background: #D4A94E;
+  color: #2B2320;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  text-decoration-line: none;
+  border-radius: 4px;
+  transition: background-color 0.15s, transform 0.15s;
+}
+
+.promo-cta:hover {
+  background: #E4BC63;
+  transform: translateY(-1px);
+}
+
+.promo-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(250, 246, 240, 0.3);
+  border-radius: 50%;
+  background: rgba(43, 35, 32, 0.4);
+  color: #FAF6F0;
+  cursor: pointer;
+  transition: background-color 0.15s, border-color 0.15s;
+}
+
+.promo-arrow:hover {
+  background: rgba(43, 35, 32, 0.75);
+  border-color: #D4A94E;
+}
+
+.promo-arrow-prev { left: 0.875rem; }
+.promo-arrow-next { right: 0.875rem; }
+
+.promo-dots {
+  display: flex;
+  justify-content: center;
+  gap: 0.4rem;
+  margin-top: 0.875rem;
+}
+
+.promo-dot {
+  width: 7px;
+  height: 7px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: rgba(43, 35, 32, 0.2);
+  cursor: pointer;
+  transition: background-color 0.2s, width 0.2s;
+}
+
+.promo-dot.active {
+  width: 22px;
+  border-radius: 4px;
+  background: #7A2E38;
+}
+
+@media (max-width: 900px) {
+  .promo-carousel { padding: 1.25rem 1.25rem 0; }
+
+  /* Image on top, copy beneath — the side gradient would cut the image in half. */
+  .promo-slide { grid-template-columns: 1fr; min-height: 0; }
+  .promo-media { height: 260px; }
+  .promo-media::after {
+    background: linear-gradient(180deg, rgba(122, 46, 56, 0) 55%, rgba(122, 46, 56, 0.95) 100%);
+  }
+  .promo-body { padding: 1.5rem 1.5rem 2rem; }
+  .promo-arrow { top: auto; bottom: 1rem; transform: none; }
+}
+
+@media (max-width: 560px) {
+  .promo-carousel { padding: 1rem 1rem 0; }
+  .promo-body { padding: 1.25rem 1.15rem 1.75rem; }
+  .promo-media { height: 200px; }
+}
+
 /* ── Responsive grid utilities ──────────────────────────────────────────────── */
 
 /* Applied to grids whose column counts are set inline. Each one collapses at

@@ -5,8 +5,57 @@ import { Link } from '@/lib/router';
 import { C, DISPLAY, UI, label } from '../tokens';
 import { SlidersIcon, GridIcon, ListIcon, XIcon } from '../icons';
 import { ALL_PRODUCTS, ALL_CATEGORIES, ALL_COLORS, COLOR_HEX, type Product } from '../data/products';
+import PromoCarousel, { type Promo } from '../components/PromoCarousel';
 
 const fmt = (num: number, prefix: string) => `${prefix}${num.toLocaleString()}`;
+
+// ── Live promotions ───────────────────────────────────────────────────────────
+// Shaped like the Banner rows in prisma/schema.prisma, so swapping this for a
+// query later is a change of source rather than a change of markup. Each promo
+// borrows its image, title and price from the product it advertises.
+
+const PROMO_SOURCES: { productId: number; badge: string; text: string; subtext: string; ctaLabel: string }[] = [
+  {
+    productId: 4, badge: '20% off',
+    text: 'Aso-oke, woven to be worn again',
+    subtext: 'Our hand-woven Gele sets are 20% off through the end of the month with code ASOKEVIP.',
+    ctaLabel: 'Shop Gele',
+  },
+  {
+    productId: 1, badge: '10% off first order',
+    text: 'Your first cap, on us — almost',
+    subtext: 'New here? Code WELCOME10 takes 10% off anything in the collection.',
+    ctaLabel: 'Shop Filà',
+  },
+  {
+    productId: 8, badge: 'Free shipping',
+    text: 'Made to order, delivered free',
+    subtext: 'Orders over CAD $150 ship free worldwide with code FREESHIP25.',
+    ctaLabel: 'Shop Kaftans',
+  },
+  {
+    productId: 5, badge: '15% off',
+    text: 'Damask Gele, in every colour',
+    subtext: 'Fifteen percent off the full Gele range with code GELE15 while stock lasts.',
+    ctaLabel: 'Shop the offer',
+  },
+];
+
+const PROMOS: Promo[] = PROMO_SOURCES.flatMap(src => {
+  const product = ALL_PRODUCTS.find(p => p.id === src.productId);
+  if (!product) return [];
+  return [{
+    id: `promo-${src.productId}`,
+    badge: src.badge,
+    text: src.text,
+    subtext: src.subtext,
+    ctaLabel: src.ctaLabel,
+    ctaHref: `/product/${product.id}`,
+    imageUrl: `https://images.unsplash.com/${product.img}?w=900&h=900&fit=crop&auto=format`,
+    productTitle: product.title,
+    productPriceCad: product.cadNum,
+  }];
+});
 
 // ── Filter sidebar ────────────────────────────────────────────────────────────
 
@@ -202,6 +251,9 @@ export default function Shop() {
 
   return (
     <div style={{ backgroundColor: C.cream, minHeight: '100vh' }}>
+
+      {/* ── Running promotions ── */}
+      <PromoCarousel promos={PROMOS} />
 
       {/* ── Page header ── */}
       <div style={{ borderBottom: '1px solid rgba(43,35,32,0.08)', padding: '3rem 2.5rem 2.5rem', maxWidth: '1440px', margin: '0 auto' }}>

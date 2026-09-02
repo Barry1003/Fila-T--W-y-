@@ -37,21 +37,39 @@ export const DISCOUNT_CODES = [
   { code: 'NEWCUSTOMER', type: 'FIXED_AMOUNT' as const, value: 15, usedCount: 203, usageLimit: null, active: false, expiresAt: '2026-07-31' },
 ];
 
+/**
+ * Promotions as shoppers see them on the shop carousel. productTitle resolves
+ * to a real catalogue row at seed time, which gives each slide its image,
+ * name and price.
+ */
 export const BANNERS = [
   {
-    text: 'Free UK shipping on all orders over £150 — use code FREESHIP25',
-    ctaLabel: 'Shop Now', status: 'LIVE' as const,
-    startsAt: '2026-09-01', endsAt: '2026-09-30',
+    text: 'Aso-oke, woven to be worn again',
+    subtext: 'Our hand-woven Gele sets are 20% off through the end of the month with code ASOKEVIP.',
+    badge: '20% off', ctaLabel: 'Shop Gele', status: 'LIVE' as const,
+    productTitle: 'Aso-oke Gele — Ivory & Gold Set',
+    startsAt: '2026-09-01', endsAt: '2026-09-30', position: 0,
   },
   {
-    text: 'New Aso-Oke collection dropping 15 Oct — early access for newsletter subscribers',
-    ctaLabel: 'Sign up', status: 'SCHEDULED' as const,
-    startsAt: '2026-10-10', endsAt: '2026-10-30',
+    text: 'Your first cap, on us — almost',
+    subtext: 'New here? Code WELCOME10 takes 10% off anything in the collection.',
+    badge: '10% off first order', ctaLabel: 'Shop Filà', status: 'LIVE' as const,
+    productTitle: 'Gobi Filà Cap — Burgundy Velvet',
+    startsAt: '2026-09-01', endsAt: '2026-12-31', position: 1,
   },
   {
-    text: 'Summer sale: 15% off everything with SUMMER15',
-    ctaLabel: null, status: 'EXPIRED' as const,
-    startsAt: '2026-06-01', endsAt: '2026-08-31',
+    text: 'Made to order, delivered free',
+    subtext: 'Orders over CAD $150 ship free worldwide with code FREESHIP25.',
+    badge: 'Free shipping', ctaLabel: 'Shop Kaftans', status: 'LIVE' as const,
+    productTitle: 'Embroidered Agbada Kaftan',
+    startsAt: '2026-09-01', endsAt: '2026-10-15', position: 2,
+  },
+  {
+    text: 'Damask Gele, in every colour',
+    subtext: 'Fifteen percent off the full Gele range with code GELE15 while stock lasts.',
+    badge: '15% off', ctaLabel: 'Shop the offer', status: 'SCHEDULED' as const,
+    productTitle: 'Damask Gele — Teal & Coral',
+    startsAt: '2026-10-10', endsAt: '2026-10-30', position: 3,
   },
 ];
 
