@@ -143,12 +143,26 @@ model PaymentMethod {
 
 // ── Catalogue ────────────────────────────────────────────────────────────────
 
+/// Two levels deep in practice: a collection (parentId null) holding the
+/// categories shoppers actually browse. Self-referencing rather than a separate
+/// Collection model, so nesting deeper later needs no migration.
 model Category {
-  id       String    @id @default(cuid())
-  name     String    @unique
-  slug     String    @unique
-  position Int       @default(0)
+  id       String @id @default(cuid())
+  name     String @unique
+  slug     String @unique
+  position Int    @default(0)
+
+  /// Shown on the collection landing page. Null for leaf categories.
+  tagline String?
+  blurb   String?
+
+  parentId String?
+  parent   Category?  @relation("CategoryTree", fields: [parentId], references: [id], onDelete: SetNull)
+  children Category[] @relation("CategoryTree")
+
   products Product[]
+
+  @@index([parentId])
 }
 
 model Product {

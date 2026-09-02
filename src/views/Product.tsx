@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react';
 import { useParams, Link } from '@/lib/router';
 import { C, DISPLAY, UI, label } from '../tokens';
-import { ALL_PRODUCTS } from '../data/products';
+import { ALL_PRODUCTS, collectionOf } from '../data/products';
 
 const U = 'https://images.unsplash.com/';
 
@@ -278,7 +278,7 @@ export default function Product() {
     return [...same, ...others].slice(0, 4);
   }, [product]);
 
-  const isHeadwear = ['Filà', 'Gele', 'Ipele'].includes(product.category);
+  const isHeadwear = ['Fila Gobi', 'Abetiaja', 'Shisha', 'Fila Senator', 'Gele', 'Ipele'].includes(product.category);
   const isFootwear = ['Shoes', 'Pam Slippers'].includes(product.category);
   const isMTO = product.tag === 'MADE TO ORDER';
   const isSoldOut = product.tag === 'SOLD OUT';
@@ -326,7 +326,12 @@ export default function Product() {
           <span>/</span>
           <Link to="/shop" style={{ color: 'inherit', textDecorationLine: 'none' }}>Shop</Link>
           <span>/</span>
-          <Link to="/shop" style={{ color: 'inherit', textDecorationLine: 'none' }}>{product.category}</Link>
+          <Link
+            to={collectionOf(product.category) ? `/collections/${collectionOf(product.category)!.slug}` : '/shop'}
+            style={{ color: 'inherit', textDecorationLine: 'none' }}
+          >
+            {product.category}
+          </Link>
           <span>/</span>
           <span style={{ color: C.charcoal }}>{product.title}</span>
         </nav>

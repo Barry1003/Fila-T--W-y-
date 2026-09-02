@@ -4,7 +4,7 @@ import { Suspense, useState, useMemo } from 'react';
 import { Link, useSearchParams } from '@/lib/router';
 import { C, DISPLAY, UI, label } from '../tokens';
 import { SlidersIcon, GridIcon, ListIcon, XIcon } from '../icons';
-import { ALL_PRODUCTS, ALL_CATEGORIES, ALL_COLORS, COLOR_HEX, type Product } from '../data/products';
+import { ALL_PRODUCTS, COLLECTIONS, ALL_COLORS, COLOR_HEX, type Product } from '../data/products';
 import PromoCarousel, { type Promo } from '../components/PromoCarousel';
 
 const fmt = (num: number, prefix: string) => `${prefix}${num.toLocaleString()}`;
@@ -104,11 +104,13 @@ function Sidebar({ selectedCats, onCat, priceMax, onPriceMax, selectedColors, on
         </div>
       </div>
 
-      {/* Category */}
-      <div>
-        <div style={sectionHead}>Category</div>
-        {ALL_CATEGORIES.map(c => checkRow(selectedCats.includes(c), c, () => onCat(c)))}
-      </div>
+      {/* Category, grouped by the collection each one belongs to */}
+      {COLLECTIONS.map(collection => (
+        <div key={collection.slug}>
+          <div style={sectionHead}>{collection.name}</div>
+          {collection.categories.map(c => checkRow(selectedCats.includes(c), c, () => onCat(c)))}
+        </div>
+      ))}
 
       {/* Price range */}
       <div>

@@ -14,9 +14,9 @@ export interface Product {
 }
 
 export const ALL_PRODUCTS: Product[] = [
-  { id:  1, category: 'Filà',         tag: 'NEW',           title: 'Gobi Filà Cap — Burgundy Velvet',    cadNum:  89, ngnNum:  44200, img: 'photo-1763823133159-c6f8ec380e33', color: 'Burgundy', sizes: ['S','M','L','XL'],             inStock: true  },
-  { id:  2, category: 'Filà',         tag: 'NEW',           title: 'Classic Abetiaja — Cream Brocade',   cadNum:  95, ngnNum:  47150, img: 'photo-1647379380116-4af77a8632b0', color: 'Cream',    sizes: ['S','M','L'],                  inStock: true  },
-  { id:  3, category: 'Filà',         tag: 'MADE TO ORDER', title: 'Fìla Gòbì — Navy Aso-oke',          cadNum: 110, ngnNum:  54650, img: 'photo-1665646155658-bdcd66e854db', color: 'Navy',     sizes: ['S','M','L','XL'],             inStock: true  },
+  { id:  1, category: 'Fila Gobi',         tag: 'NEW',           title: 'Gobi Filà Cap — Burgundy Velvet',    cadNum:  89, ngnNum:  44200, img: 'photo-1763823133159-c6f8ec380e33', color: 'Burgundy', sizes: ['S','M','L','XL'],             inStock: true  },
+  { id:  2, category: 'Abetiaja',         tag: 'NEW',           title: 'Classic Abetiaja — Cream Brocade',   cadNum:  95, ngnNum:  47150, img: 'photo-1647379380116-4af77a8632b0', color: 'Cream',    sizes: ['S','M','L'],                  inStock: true  },
+  { id:  3, category: 'Fila Gobi',         tag: 'MADE TO ORDER', title: 'Fìla Gòbì — Navy Aso-oke',          cadNum: 110, ngnNum:  54650, img: 'photo-1665646155658-bdcd66e854db', color: 'Navy',     sizes: ['S','M','L','XL'],             inStock: true  },
   { id:  4, category: 'Gele',         tag: 'MADE TO ORDER', title: 'Aso-oke Gele — Ivory & Gold Set',   cadNum: 145, ngnNum:  71900, img: 'photo-1714124731489-7eb16af0ac91', color: 'Gold',     sizes: ['One Size'],                   inStock: true  },
   { id:  5, category: 'Gele',         tag: 'NEW',           title: 'Damask Gele — Teal & Coral',        cadNum: 120, ngnNum:  59600, img: 'photo-1655215081879-0ac1f535b575', color: 'Teal',     sizes: ['One Size'],                   inStock: true  },
   { id:  6, category: 'Ipele',        tag: 'NEW',           title: 'Ọjọ Ipele — Crimson Drape',         cadNum:  78, ngnNum:  38750, img: 'photo-1760086626077-55da1cb1ecb3', color: 'Crimson',  sizes: ['One Size'],                   inStock: true  },
@@ -34,7 +34,52 @@ export const ALL_PRODUCTS: Product[] = [
   { id: 18, category: 'Accessories',  tag: 'NEW',           title: 'Adire Clutch Bag — Blue & White',   cadNum:  72, ngnNum:  35750, img: 'photo-1666974931330-9b5bcc541347', color: 'Blue',     sizes: ['One Size'],                   inStock: true  },
 ];
 
-export const ALL_CATEGORIES = ['Filà', 'Gele', 'Ipele', 'Kaftan', 'Trousers', 'Roundneck', 'Shoes', 'Pam Slippers', 'Accessories'];
+/**
+ * Categories hang off a collection, which is what shoppers browse by. Filà tó
+ * Wüyí is the cap line, Pre-Order covers made-to-order tailoring and
+ * accessories, and Gele & Ipele covers the women's pieces.
+ *
+ * Some categories are deliberately empty — the shop stocks no Shisha or Senator
+ * caps yet, but they are part of the line and the console can fill them.
+ */
+export interface Collection {
+  slug: string;
+  name: string;
+  tagline: string;
+  blurb: string;
+  categories: string[];
+}
+
+export const COLLECTIONS: Collection[] = [
+  {
+    slug: 'fila-to-wuyi',
+    name: 'Filà tó Wüyí',
+    tagline: 'The cap line',
+    blurb: 'Hand-blocked Yoruba caps in Aso-oke, velvet and brocade — shaped on wooden blocks the way Nigerian cap-makers have done for two centuries.',
+    categories: ['Fila Gobi', 'Abetiaja', 'Shisha', 'Fila Senator'],
+  },
+  {
+    slug: 'gele-ipele',
+    name: 'Gele & Ipele',
+    tagline: 'Headwraps and shoulder drapes',
+    blurb: 'Starched Gele that holds its shape through a whole ceremony, and Ipele drapes woven to fall the way you want them to.',
+    categories: ['Gele', 'Ipele'],
+  },
+  {
+    slug: 'pre-order',
+    name: 'Pre-Order',
+    tagline: 'Made to order',
+    blurb: 'Kaftans, slippers, roundnecks and shoes cut to your measurements. Allow five to seven working days before dispatch.',
+    categories: ['Kaftan', 'Pam Slippers', 'Roundneck', 'Shoes', 'Trousers', 'Accessories'],
+  },
+];
+
+export const ALL_CATEGORIES = COLLECTIONS.flatMap(c => c.categories);
+
+/** The collection a category belongs to, or undefined if it is unfiled. */
+export function collectionOf(category: string): Collection | undefined {
+  return COLLECTIONS.find(c => c.categories.includes(category));
+}
 
 export const ALL_COLORS = ['Burgundy', 'Cream', 'Gold', 'Teal', 'Crimson', 'Indigo', 'Maroon', 'Charcoal', 'Rust', 'Tan', 'Multi', 'Blue', 'Navy'];
 

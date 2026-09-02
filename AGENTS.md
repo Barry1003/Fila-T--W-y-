@@ -71,6 +71,20 @@ after editing it run `pnpm db:migrate` and the client regenerates.
 - App and seed talk to Neon over HTTPS (port 443) through
   `@prisma/adapter-neon`. Only `prisma migrate` needs port 5432.
 
+## Catalogue taxonomy
+
+Two levels. `COLLECTIONS` in `src/data/products.ts` is the source of truth for
+the storefront: three collections (Filà tó Wüyí, Gele & Ipele, Pre-Order), each
+listing the categories under it. A product's `category` is always a leaf, never
+a collection.
+
+- `collectionOf(category)` maps a leaf back to its collection.
+- `/collections/[slug]` renders a collection, one block per category.
+- In the database, `Category` is self-referencing: collections have
+  `parentId: null` and carry `tagline`/`blurb`; leaves point at their parent.
+- Shisha and Fila Senator are deliberately empty — part of the line, no stock
+  yet. Collection pages render an empty state rather than hiding them.
+
 ## Landing page
 
 `src/middleware.ts` sends returning visitors from `/` straight to `/shop`,

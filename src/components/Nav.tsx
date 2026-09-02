@@ -9,8 +9,16 @@ import { SearchIcon, HeartIcon, UserIcon, CartIcon, GridIcon } from '../icons';
 const IS_OWNER = true;
 const CART_COUNT = 3;
 
+/** The collections sit under Shop rather than beside it — they are ways into
+ *  the catalogue, not siblings of Lookbook and About. */
+const COLLECTION_LINKS = [
+  { label: 'Shop All', to: '/shop' },
+  { label: 'Filà tó Wüyí', to: '/collections/fila-to-wuyi' },
+  { label: 'Gele & Ipele', to: '/collections/gele-ipele' },
+  { label: 'Pre-Order', to: '/collections/pre-order' },
+];
+
 const NAV_LINKS = [
-  { label: 'Shop', to: '/shop' },
   { label: 'Custom Order', to: '/help' },
   { label: 'Lookbook', to: '/lookbook' },
   { label: 'About', to: '/about' },
@@ -87,6 +95,25 @@ export default function Nav() {
 
           {/* Desktop nav links */}
           <div className="nav-center">
+            <div className="nav-dropdown">
+              <NavLink
+                to="/shop"
+                className={({ isActive }) => `nav-link nav-dropdown-trigger${isActive ? ' active' : ''}`}
+                style={{ ...label, color: C.cream, textDecorationLine: 'none', fontSize: '0.68rem' }}
+              >
+                Shop
+                <svg width="9" height="6" viewBox="0 0 10 6" fill="none" aria-hidden="true">
+                  <path d="M1 1l4 4 4-4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </NavLink>
+
+              <div className="nav-dropdown-menu">
+                {COLLECTION_LINKS.map(({ label: lbl, to }) => (
+                  <Link key={lbl} to={to} className="nav-dropdown-item">{lbl}</Link>
+                ))}
+              </div>
+            </div>
+
             {NAV_LINKS.map(({ label: lbl, to }) => (
               <NavLink
                 key={lbl}
@@ -178,6 +205,16 @@ export default function Nav() {
 
           <div className="nav-drawer-body">
             <SearchField className="nav-search nav-search-drawer" onSubmitted={close} />
+
+            <nav aria-label="Shop">
+              {COLLECTION_LINKS.map(({ label: lbl, to }) => (
+                <NavLink key={lbl} to={to} onClick={close} className={({ isActive }) => `nav-drawer-link${isActive ? ' active' : ''}`}>
+                  {lbl}
+                </NavLink>
+              ))}
+            </nav>
+
+            <div className="nav-drawer-section-label">More</div>
 
             <nav aria-label="Main">
               {NAV_LINKS.map(({ label: lbl, to }) => (

@@ -3,7 +3,7 @@ import { neonConfig } from '@neondatabase/serverless';
 import { PrismaNeon } from '@prisma/adapter-neon';
 import ws from 'ws';
 import { PrismaClient } from '../src/generated/prisma/index.js';
-import { ALL_CATEGORIES, ALL_PRODUCTS } from '../src/data/products.js';
+import { ALL_PRODUCTS, COLLECTIONS } from '../src/data/products.js';
 import {
   BANNERS, CONVERSATIONS, CUSTOMERS, CUSTOM_REQUESTS, DISCOUNT_CODES,
   ORDERS, OWNER, OWNER_ADDRESSES, OWNER_CARDS, PRODUCT_ALIASES, REVIEWS, WISHLIST_TITLES,
@@ -90,6 +90,8 @@ async function reset() {
   await prisma.productVariant.deleteMany();
   await prisma.productImage.deleteMany();
   await prisma.product.deleteMany();
+  // Children first: the self-relation is SetNull, but ordering keeps it clean.
+  await prisma.category.deleteMany({ where: { NOT: { parentId: null } } });
   await prisma.category.deleteMany();
   await prisma.paymentMethod.deleteMany();
   await prisma.address.deleteMany();
@@ -112,15 +114,32 @@ async function main() {
   console.log('Clearing existing rows…');
   await withRetries('reset', () => reset());
 
-  // Categories
+  // Collections, then the categories that hang off them.
   const categories = new Map<string, string>();
-  for (const [i, name] of ALL_CATEGORIES.entries()) {
-    const row = await prisma.category.create({
-      data: { name, slug: slugify(name), position: i },
+  let collectionCount = 0;
+
+  for (const [i, collection] of COLLECTIONS.entries()) {
+    const parent = await prisma.category.create({
+      data: {
+        name: collection.name,
+        slug: collection.slug,
+        tagline: collection.tagline,
+        blurb: collection.blurb,
+        position: i,
+      },
     });
-    categories.set(name, row.id);
+    categories.set(collection.name, parent.id);
+    collectionCount++;
+
+    for (const [j, name] of collection.categories.entries()) {
+      const child = await prisma.category.create({
+        data: { name, slug: slugify(name), position: j, parentId: parent.id },
+      });
+      categories.set(name, child.id);
+    }
   }
-  console.log(`  categories      ${categories.size}`);
+  console.log(`  collections     ${collectionCount}`);
+  console.log(`  categories      ${categories.size - collectionCount}`);
 
   // Products, with one image and one variant per size
   const productsByTitle = new Map<string, string>();

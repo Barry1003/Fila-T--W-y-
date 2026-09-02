@@ -375,6 +375,83 @@ body {
   .nav-wordmark-sub { font-size: 0.5rem; letter-spacing: 0.13em !important; }
 }
 
+/* ── Shop dropdown ──────────────────────────────────────────────────────────── */
+
+.nav-dropdown {
+  position: relative;
+}
+
+.nav-dropdown-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  opacity: 0.82;
+  border-bottom: 1px solid transparent;
+  padding-bottom: 2px;
+}
+
+.nav-dropdown-trigger.active,
+.nav-dropdown:hover .nav-dropdown-trigger,
+.nav-dropdown:focus-within .nav-dropdown-trigger {
+  opacity: 1;
+  border-bottom-color: #D4A94E;
+}
+
+.nav-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 0.9rem);
+  left: 50%;
+  transform: translateX(-50%) translateY(-4px);
+  min-width: 190px;
+  padding: 0.4rem;
+  background: #FAF6F0;
+  border: 1px solid rgba(43, 35, 32, 0.1);
+  border-radius: 8px;
+  box-shadow: 0 12px 32px rgba(43, 35, 32, 0.18);
+  display: flex;
+  flex-direction: column;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.16s ease, transform 0.16s ease, visibility 0s linear 0.16s;
+}
+
+/* Opens on hover and on keyboard focus, so it is reachable by tab. */
+.nav-dropdown:hover .nav-dropdown-menu,
+.nav-dropdown:focus-within .nav-dropdown-menu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+  transition-delay: 0s;
+}
+
+/* Bridges the gap between trigger and menu so the pointer can cross it. */
+.nav-dropdown-menu::before {
+  content: '';
+  position: absolute;
+  top: -0.9rem;
+  left: 0;
+  right: 0;
+  height: 0.9rem;
+}
+
+.nav-dropdown-item {
+  display: flex;
+  align-items: center;
+  min-height: 38px;
+  padding: 0 0.75rem;
+  border-radius: 5px;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 0.82rem;
+  color: #2B2320;
+  text-decoration-line: none;
+  white-space: nowrap;
+  transition: background-color 0.12s;
+}
+
+.nav-dropdown-item:hover {
+  background: rgba(212, 169, 78, 0.18);
+}
+
 /* ── Nav search ─────────────────────────────────────────────────────────────── */
 
 .nav-search {
@@ -1029,6 +1106,67 @@ body {
   .promo-carousel { padding: 1rem 1rem 0; }
   .promo-body { padding: 1.25rem 1.15rem 1.75rem; }
   .promo-media { height: 260px; }
+}
+
+/* ── Collection pages ───────────────────────────────────────────────────────── */
+
+.collection-masthead {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 4rem 2.5rem;
+}
+
+.collection-jump {
+  position: sticky;
+  top: 70px;
+  z-index: 30;
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding: 0.9rem 2.5rem;
+  background: #FAF6F0;
+  border-bottom: 1px solid rgba(43, 35, 32, 0.09);
+}
+
+.collection-chip {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 0 0.85rem;
+  border: 1px solid rgba(43, 35, 32, 0.14);
+  border-radius: 100px;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 0.78rem;
+  color: rgba(43, 35, 32, 0.68);
+  text-decoration-line: none;
+  white-space: nowrap;
+  transition: background-color 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.collection-chip:hover {
+  background: rgba(212, 169, 78, 0.16);
+  border-color: #D4A94E;
+  color: #2B2320;
+}
+
+.collection-body {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 2.5rem 2.5rem 4rem;
+}
+
+@media (max-width: 900px) {
+  .collection-masthead { padding: 2.75rem 1.25rem; }
+  .collection-jump { padding: 0.75rem 1.25rem; }
+  .collection-body { padding: 2rem 1.25rem 3rem; }
+}
+
+@media (max-width: 560px) {
+  .collection-jump { top: 62px; }
+  .collection-masthead { padding: 2.25rem 1rem; }
+  .collection-jump { padding: 0.7rem 1rem; }
+  .collection-body { padding: 1.5rem 1rem 2.5rem; }
 }
 
 /* ── Responsive grid utilities ──────────────────────────────────────────────── */
