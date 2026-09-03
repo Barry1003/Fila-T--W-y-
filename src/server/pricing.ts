@@ -44,11 +44,6 @@ export type OrderTotals = {
  * An empty cart is 0, not an error.
  */
 export function subtotal(lines: CartLine[]): number {
-  // Worked example — the other four are yours.
-  //
-  // reduce starts at 0, so an empty cart returns 0 without a special case.
-  // Every value here is already a whole number of cents, so the sum stays a
-  // whole number: no rounding needed at this step.
   return lines.reduce((total, line) => total + line.unitPriceCents * line.quantity, 0);
 }
 
@@ -56,51 +51,47 @@ export function subtotal(lines: CartLine[]): number {
 
 /**
  * How much a discount takes off, in cents.
- *
- * Think about, and decide deliberately:
- *   - A percentage that does not divide evenly. 10% of 8999 is 899.9 — round it,
- *     and be consistent, because the rounding is real money.
- *   - A fixed discount larger than the subtotal. The result must never be
- *     negative; nobody gets paid for ordering.
- *   - A subtotal of 0.
  */
 export function discountAmount(subtotalCents: number, discount: Discount | null): number {
-  // TODO
-  throw new Error('not implemented');
+  if (!discount || subtotalCents <= 0) {
+    return 0;
+  }
+
+  let calculatedDiscount = 0;
+
+  if (discount.kind === 'percentage') {
+    // Math.round handles uneven percentage divisions consistently
+    calculatedDiscount = Math.round(subtotalCents * (discount.value / 100));
+  } else if (discount.kind === 'fixed') {
+    calculatedDiscount = discount.value;
+  }
+
+  // Clamp at both ends. The upper bound stops a discount exceeding the cart;
+  // the lower bound stops a negative value — a code mistyped as -10 in the
+  // console — turning into a surcharge, because subtracting a negative adds.
+  return Math.max(0, Math.min(calculatedDiscount, subtotalCents));
 }
 
 // ── 3. Shipping ──────────────────────────────────────────────────────────────
 
 /**
  * Shipping cost in cents for a zone and speed.
- *
- * Cart.tsx currently does this:
- *
- *     const totalCad = subtotalCad - discountCad + (selectedShip.cost ? 7 : 0);
- *
- * which charges a flat 7 for every destination that is not free — so the United
- * Kingdom, Nigeria and the rest of the world are all billed the same regardless
- * of the rates shown a few lines above. That is the bug this function exists to
- * remove, so pick the rates deliberately rather than copying that line.
- *
- * Suggested rates (CAD, in cents), but they are yours to set:
- *   canada-us      standard 0      express 2500
- *   uk             standard 500    express 1800
- *   nigeria        standard 700    express 2000
- *   rest-of-world  standard 1000   express 2500
  */
 export function shippingCost(zone: ShippingZone, speed: ShippingSpeed): number {
-  // TODO
-  throw new Error('not implemented');
+  const rates: Record<ShippingZone, Record<ShippingSpeed, number>> = {
+    'canada-us':     { standard: 0,    express: 2500 },
+    'uk':            { standard: 500,  express: 1800 },
+    'nigeria':       { standard: 700,  express: 2000 },
+    'rest-of-world': { standard: 1000, express: 2500 }
+  };
+
+  return rates[zone][speed];
 }
 
 // ── 4. Putting it together ───────────────────────────────────────────────────
 
 /**
  * Every figure the cart, checkout and confirmation pages need.
- *
- * The discount applies to the subtotal only — never to shipping — and the total
- * can never fall below the shipping cost.
  */
 export function orderTotals(
   lines: CartLine[],
@@ -108,19 +99,35 @@ export function orderTotals(
   zone: ShippingZone,
   speed: ShippingSpeed
 ): OrderTotals {
-  // TODO: build this from the three functions above rather than recalculating.
-  throw new Error('not implemented');
+  const subtotalCents = subtotal(lines);
+  const discountCents = discountAmount(subtotalCents, discount);
+  const shippingCents = shippingCost(zone, speed);
+  
+  // Total is subtotal minus discount, plus shipping
+  const totalCents = (subtotalCents - discountCents) + shippingCents;
+
+  return {
+    subtotalCents,
+    discountCents,
+    shippingCents,
+    totalCents
+  };
 }
 
 // ── 5. Display ───────────────────────────────────────────────────────────────
 
 /**
  * Cents to a string the storefront can render: 8900 becomes "CAD $89.00".
- *
- * Intl.NumberFormat with 'en-CA' and currency 'CAD' does the formatting; your
- * job is the conversion from cents and choosing whether to show trailing zeros.
  */
 export function formatCad(cents: number): string {
-  // TODO
-  throw new Error('not implemented');
+  // Intl with currency 'CAD' renders "$89.00" — correct for Canada, but the
+  // storefront says "CAD $89" everywhere so shoppers in Lagos and London are
+  // not left guessing which dollar. Compose the prefix and let Intl handle the
+  // grouping and the decimals.
+  const amount = new Intl.NumberFormat('en-CA', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(cents / 100);
+
+  return `CAD $${amount}`;
 }

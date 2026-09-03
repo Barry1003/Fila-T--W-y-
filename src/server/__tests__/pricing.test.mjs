@@ -77,7 +77,33 @@ test('a discount bigger than the cart never makes a negative total', () => {
   assert.ok(t.totalCents >= 0, `total was ${t.totalCents}`);
 });
 
+test('a discount can never be negative, whatever the code says', () => {
+  // A discount stored as -10 in the console would otherwise *increase* the
+  // total: Math.min(-1000, subtotal) is -1000, and subtracting a negative adds.
+  assert.equal(discountAmount(10000, { kind: 'percentage', value: -10 }), 0);
+  assert.equal(discountAmount(10000, { kind: 'fixed', value: -500 }), 0);
+});
+
+test('a bad discount never inflates what someone owes', () => {
+  const t = orderTotals(
+    [{ unitPriceCents: 10000, quantity: 1 }],
+    { kind: 'percentage', value: -10 },
+    'canada-us',
+    'standard'
+  );
+  assert.ok(t.totalCents <= t.subtotalCents + t.shippingCents,
+    `total ${t.totalCents} exceeds subtotal plus shipping`);
+});
+
 test('formatting shows dollars, not cents', () => {
   assert.match(formatCad(8900), /89/);
   assert.ok(!formatCad(8900).includes('8900'), 'looks like raw cents');
+});
+
+test('formatting matches how the storefront writes prices', () => {
+  // "$89.00" alone is ambiguous to a shopper in Lagos or London.
+  assert.equal(formatCad(8900), 'CAD $89.00');
+  assert.equal(formatCad(0), 'CAD $0.00');
+  assert.equal(formatCad(5), 'CAD $0.05');
+  assert.equal(formatCad(123456789), 'CAD $1,234,567.89');
 });
