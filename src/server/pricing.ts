@@ -44,8 +44,12 @@ export type OrderTotals = {
  * An empty cart is 0, not an error.
  */
 export function subtotal(lines: CartLine[]): number {
-  // TODO
-  throw new Error('not implemented');
+  // Worked example — the other four are yours.
+  //
+  // reduce starts at 0, so an empty cart returns 0 without a special case.
+  // Every value here is already a whole number of cents, so the sum stays a
+  // whole number: no rounding needed at this step.
+  return lines.reduce((total, line) => total + line.unitPriceCents * line.quantity, 0);
 }
 
 // ── 2. Discounts ─────────────────────────────────────────────────────────────
