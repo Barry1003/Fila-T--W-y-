@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from "react";
-import { Link, useParams } from '@/lib/router';
+import { Link } from '@/lib/router';
+import type { FulfilStatus, OrderDetail } from '@/server/orders';
 import { C, UI } from "../../tokens";
 
 // ── Icons ─────────────────────────────────────────────────────────────────────
@@ -64,49 +65,6 @@ function LockIcon({ size = 12 }: { size?: number }) {
 
 // ── Mock order data ───────────────────────────────────────────────────────────
 
-type FulfilStatus = "new" | "processing" | "shipped" | "delivered" | "cancelled";
-
-const MOCK_ORDERS: Record<string, {
-  num: string; date: string; customer: string; email: string; phone: string;
-  address: string; status: FulfilStatus; payment: "paid" | "pending";
-  method: string; tracking: string; carrier: string;
-  items: { name: string; variant: string; qty: number; unitCad: number }[];
-  shipping: number; discount: number;
-}> = {
-  o1: {
-    num: "#FTW-2891", date: "1 Sep 2026", customer: "Chiamaka Eze",
-    email: "chiamaka@email.com", phone: "+44 7700 123456",
-    address: "14 Brixton Hill, London, SW2 1RJ, United Kingdom",
-    status: "new", payment: "paid", method: "Stripe (Visa ·· 4242)",
-    tracking: "", carrier: "Royal Mail",
-    items: [
-      { name: "Aso-Oke Gele Set", variant: "Size M · Ivory", qty: 2, unitCad: 585 },
-    ],
-    shipping: 21, discount: 0,
-  },
-  o2: {
-    num: "#FTW-2887", date: "31 Aug 2026", customer: "David Mensah",
-    email: "david@email.com", phone: "+44 7700 654321",
-    address: "77 Cowley Road, Oxford, OX4 1HY, United Kingdom",
-    status: "processing", payment: "paid", method: "Stripe (Mastercard ·· 5555)",
-    tracking: "", carrier: "DHL",
-    items: [
-      { name: "Yoruba Filà (Custom)", variant: "Size L · Burgundy", qty: 1, unitCad: 490 },
-    ],
-    shipping: 14, discount: 0,
-  },
-  o3: {
-    num: "#FTW-2882", date: "30 Aug 2026", customer: "Bola Adeyemi",
-    email: "bola@email.com", phone: "+44 7711 000111",
-    address: "33 Canal Street, Manchester, M1 3WB, United Kingdom",
-    status: "shipped", payment: "paid", method: "PayPal",
-    tracking: "JD000940012345678901", carrier: "Royal Mail",
-    items: [
-      { name: "Adire Wrapper Set", variant: "Standard · Indigo", qty: 1, unitCad: 335 },
-    ],
-    shipping: 17, discount: 34,
-  },
-};
 
 const FULFIL_STYLE: Record<FulfilStatus, { label: string; bg: string; color: string }> = {
   new:        { label: "New",        bg: "rgba(43,35,32,0.07)",   color: "rgba(43,35,32,0.55)" },
@@ -127,13 +85,10 @@ const RATE = 1481;
 
 // ── Main component ────────────────────────────────────────────────────────────
 
-export default function ConsoleOrderDetail() {
-  const { id } = useParams();
-  const raw = id && MOCK_ORDERS[id] ? MOCK_ORDERS[id] : MOCK_ORDERS["o1"];
-
+export default function ConsoleOrderDetail({ order: raw }: { order: OrderDetail }) {
   const [status, setStatus] = useState<FulfilStatus>(raw.status);
-  const [tracking, setTracking] = useState(raw.tracking);
-  const [carrier, setCarrier] = useState(raw.carrier);
+  const [tracking, setTracking] = useState(raw.tracking ?? "");
+  const [carrier, setCarrier] = useState(raw.carrier ?? "Royal Mail");
   const [notes, setNotes] = useState("");
   const [saved, setSaved] = useState(false);
 
@@ -142,7 +97,7 @@ export default function ConsoleOrderDetail() {
   const nextStatus = NEXT_STATUS[status];
 
   const subtotal = order.items.reduce((s, i) => s + i.unitCad * i.qty, 0);
-  const total = subtotal + order.shipping - order.discount;
+  const total = subtotal + order.shippingCad - order.discountCad;
 
   function advanceStatus() {
     if (nextStatus) setStatus(nextStatus);
@@ -167,7 +122,7 @@ export default function ConsoleOrderDetail() {
           Orders
         </Link>
         <span style={{ color: "rgba(43,35,32,0.28)", fontSize: "0.75rem" }}>/</span>
-        <span style={{ fontSize: "0.78rem", color: C.charcoal, fontWeight: 500 }}>{order.num}</span>
+        <span style={{ fontSize: "0.78rem", color: C.charcoal, fontWeight: 500 }}>{order.number}</span>
       </div>
 
       {/* ── Order header ──────────────────────────────────── */}
@@ -177,10 +132,10 @@ export default function ConsoleOrderDetail() {
       }}>
         <div>
           <h1 style={{ fontSize: "1.35rem", fontWeight: 700, color: C.charcoal, letterSpacing: "-0.02em", margin: "0 0 0.375rem" }}>
-            {order.num}
+            {order.number}
           </h1>
           <div style={{ display: "flex", alignItems: "center", gap: "0.625rem" }}>
-            <span style={{ fontSize: "0.75rem", color: "rgba(43,35,32,0.45)" }}>{order.date}</span>
+            <span style={{ fontSize: "0.75rem", color: "rgba(43,35,32,0.45)" }}>{order.placedAt}</span>
             <span style={{
               display: "inline-block", padding: "2px 9px", borderRadius: 100,
               fontSize: "0.67rem", fontWeight: 500,
@@ -223,15 +178,15 @@ export default function ConsoleOrderDetail() {
                 display: "flex", alignItems: "center", justifyContent: "center",
                 fontSize: "0.8rem", fontWeight: 700, flexShrink: 0, letterSpacing: "0.03em",
               }}>
-                {order.customer.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase()}
+                {order.customerName.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase()}
               </div>
               <div style={{ flex: 1 }}>
                 <div style={{ fontSize: "0.9rem", fontWeight: 600, color: C.charcoal, marginBottom: "0.625rem" }}>
-                  {order.customer}
+                  {order.customerName}
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: "0.375rem" }}>
-                  <InfoRow icon={<MailIcon />}>{order.email}</InfoRow>
-                  <InfoRow icon={<PhoneIcon />}>{order.phone}</InfoRow>
+                  <InfoRow icon={<MailIcon />}>{order.customerEmail}</InfoRow>
+                  <InfoRow icon={<PhoneIcon />}>{order.customerPhone}</InfoRow>
                   <InfoRow icon={<MapPinIcon />}>{order.address}</InfoRow>
                 </div>
               </div>
@@ -329,9 +284,9 @@ export default function ConsoleOrderDetail() {
           <SectionCard title="Payment">
             <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
               <SummaryRow label="Subtotal" value={`CAD $${subtotal}`} />
-              <SummaryRow label="Shipping" value={`CAD $${order.shipping}`} />
-              {order.discount > 0 && (
-                <SummaryRow label="Discount" value={`−CAD $${order.discount}`} valueColor={C.teal} />
+              <SummaryRow label="Shipping" value={`CAD $${order.shippingCad}`} />
+              {order.discountCad > 0 && (
+                <SummaryRow label="Discount" value={`−CAD $${order.discountCad}`} valueColor={C.teal} />
               )}
               <div style={{ borderTop: "1px solid rgba(43,35,32,0.1)", paddingTop: "0.5rem", marginTop: "0.125rem" }}>
                 <SummaryRow label="Total" value={`CAD $${total}`} bold />
@@ -347,7 +302,7 @@ export default function ConsoleOrderDetail() {
                 backgroundColor: C.teal, flexShrink: 0, display: "inline-block",
               }} />
               <span style={{ fontSize: "0.72rem", color: "rgba(43,35,32,0.6)", lineHeight: 1.3 }}>
-                <strong style={{ color: C.charcoal, fontWeight: 600 }}>Paid</strong> via {order.method}
+                <strong style={{ color: C.charcoal, fontWeight: 600 }}>Paid</strong> via {order.paymentMethod}
               </span>
             </div>
           </SectionCard>

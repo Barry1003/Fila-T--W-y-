@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Link } from '@/lib/router';
+import type { FulfilStatus, OrderListRow, PayStatus } from "@/server/orders";
 import { C, UI } from "../../tokens";
 
 // ── Icons ─────────────────────────────────────────────────────────────────────
@@ -72,37 +73,6 @@ function ChevronRight({ size = 14 }: { size?: number }) {
 
 // ── Types & data ──────────────────────────────────────────────────────────────
 
-type FulfilStatus = "new" | "processing" | "shipped" | "delivered" | "cancelled";
-type PayStatus = "paid" | "pending";
-
-type Order = {
-  id: string;
-  num: string;
-  date: string;
-  customer: string;
-  email: string;
-  itemCount: number;
-  items: string[];
-  totalCad: number;
-  totalNGN: number;
-  payment: PayStatus;
-  status: FulfilStatus;
-};
-
-const ORDERS: Order[] = [
-  { id: "o1", num: "#FTW-2891", date: "1 Sep 2026", customer: "Chiamaka Eze", email: "chiamaka@email.com", itemCount: 2, items: ["Aso-Oke Gele Set ×2"], totalCad: 1170, totalNGN: 1006480, payment: "paid", status: "new" },
-  { id: "o2", num: "#FTW-2887", date: "31 Aug 2026", customer: "David Mensah", email: "david@email.com", itemCount: 1, items: ["Yoruba Filà (Custom)"], totalCad: 490, totalNGN: 422085, payment: "paid", status: "processing" },
-  { id: "o3", num: "#FTW-2882", date: "30 Aug 2026", customer: "Bola Adeyemi", email: "bola@email.com", itemCount: 1, items: ["Adire Wrapper Set"], totalCad: 335, totalNGN: 288795, payment: "paid", status: "shipped" },
-  { id: "o4", num: "#FTW-2871", date: "29 Aug 2026", customer: "Ngozi Obi", email: "ngozi@email.com", itemCount: 1, items: ["Embroidered Cap (Large)"], totalCad: 206, totalNGN: 177720, payment: "paid", status: "delivered" },
-  { id: "o5", num: "#FTW-2869", date: "29 Aug 2026", customer: "Kwame Asante", email: "kwame@email.com", itemCount: 3, items: ["Aso-Oke Cap ×3"], totalCad: 722, totalNGN: 621620, payment: "paid", status: "new" },
-  { id: "o6", num: "#FTW-2860", date: "27 Aug 2026", customer: "Temi Fadare", email: "temi@email.com", itemCount: 1, items: ["Beaded Pam Slippers"], totalCad: 151, totalNGN: 130328, payment: "pending", status: "cancelled" },
-  { id: "o7", num: "#FTW-2856", date: "25 Aug 2026", customer: "Fatima Al-Amin", email: "fatima@email.com", itemCount: 2, items: ["Ankara Roundneck Shirt", "Bead Necklace Set"], totalCad: 315, totalNGN: 271023, payment: "paid", status: "processing" },
-  { id: "o8", num: "#FTW-2848", date: "23 Aug 2026", customer: "Samuel Okonkwo", email: "samuel@email.com", itemCount: 1, items: ["Agbada 3-Piece Set"], totalCad: 1170, totalNGN: 1006480, payment: "paid", status: "shipped" },
-  { id: "o9", num: "#FTW-2841", date: "20 Aug 2026", customer: "Ayo Babatunde", email: "ayo@email.com", itemCount: 1, items: ["Ipele Wrap (Silk Blend)"], totalCad: 421, totalNGN: 362945, payment: "paid", status: "delivered" },
-  { id: "o10", num: "#FTW-2838", date: "18 Aug 2026", customer: "Zainab Musa", email: "zainab@email.com", itemCount: 2, items: ["Leather Yoruba Shoes", "Adire Wrapper Set"], totalCad: 714, totalNGN: 614615, payment: "paid", status: "delivered" },
-  { id: "o11", num: "#FTW-2830", date: "15 Aug 2026", customer: "Emmanuel Diop", email: "emma@email.com", itemCount: 1, items: ["Aso-Oke Trousers"], totalCad: 275, totalNGN: 236960, payment: "pending", status: "new" },
-  { id: "o12", num: "#FTW-2822", date: "12 Aug 2026", customer: "Chioma Ibe", email: "chioma@email.com", itemCount: 1, items: ["Embroidered Kaftan (Men)"], totalCad: 722, totalNGN: 621620, payment: "paid", status: "delivered" },
-];
 
 // ── Status config ─────────────────────────────────────────────────────────────
 
@@ -117,6 +87,7 @@ const FULFIL_STYLE: Record<FulfilStatus, { label: string; bg: string; color: str
 const PAY_STYLE: Record<PayStatus, { label: string; bg: string; color: string }> = {
   paid:    { label: "Paid",    bg: "rgba(59,138,147,0.12)", color: C.teal },
   pending: { label: "Pending", bg: "rgba(43,35,32,0.07)",   color: "rgba(43,35,32,0.5)" },
+  refunded: { label: "Refunded", bg: "rgba(122,46,56,0.1)", color: C.maroon },
 };
 
 const TABS: { key: "all" | FulfilStatus; label: string }[] = [
@@ -171,7 +142,7 @@ function SelectField({ value, onChange, options }: { value: string; onChange: (v
 
 // ── Main component ────────────────────────────────────────────────────────────
 
-export default function ConsoleOrders() {
+export default function ConsoleOrders({ orders }: { orders: OrderListRow[] }) {
   const [activeTab, setActiveTab] = useState<"all" | FulfilStatus>("all");
   const [search, setSearch] = useState("");
   const [dateRange, setDateRange] = useState("");
@@ -179,19 +150,19 @@ export default function ConsoleOrders() {
   const [page, setPage] = useState(1);
 
   const tabCounts = TABS.reduce((acc, t) => {
-    acc[t.key] = t.key === "all" ? ORDERS.length : ORDERS.filter(o => o.status === t.key).length;
+    acc[t.key] = t.key === "all" ? orders.length : orders.filter(o => o.status === t.key).length;
     return acc;
   }, {} as Record<string, number>);
 
-  const filtered = ORDERS.filter(o => {
+  const filtered = orders.filter(o => {
     const matchTab = activeTab === "all" || o.status === activeTab;
     const q = search.toLowerCase();
-    const matchSearch = !q || o.num.toLowerCase().includes(q) || o.customer.toLowerCase().includes(q);
+    const matchSearch = !q || o.number.toLowerCase().includes(q) || o.customerName.toLowerCase().includes(q);
     return matchTab && matchSearch;
   }).sort((a, b) => {
-    if (sort === "Oldest") return a.num.localeCompare(b.num);
+    if (sort === "Oldest") return a.number.localeCompare(b.number);
     if (sort === "Highest Total") return b.totalCad - a.totalCad;
-    return b.num.localeCompare(a.num);
+    return b.number.localeCompare(a.number);
   });
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PER_PAGE));
@@ -375,7 +346,7 @@ export default function ConsoleOrders() {
 
 // ── Order row ─────────────────────────────────────────────────────────────────
 
-function OrderRow({ order: o, alt }: { order: Order; alt: boolean }) {
+function OrderRow({ order: o, alt }: { order: OrderListRow; alt: boolean }) {
   const [hovering, setHovering] = useState(false);
   const fulfil = FULFIL_STYLE[o.status];
   const pay = PAY_STYLE[o.payment];
@@ -397,19 +368,19 @@ function OrderRow({ order: o, alt }: { order: Order; alt: boolean }) {
           to={`/console/orders/${o.id}`}
           style={{ fontSize: "0.8rem", fontWeight: 700, color: C.maroon, textDecorationLine: "none", fontFamily: UI }}
         >
-          {o.num}
+          {o.number}
         </Link>
       </td>
 
       {/* Date */}
       <td style={td}>
-        <span style={{ fontSize: "0.77rem", color: "rgba(43,35,32,0.55)", whiteSpace: "nowrap" }}>{o.date}</span>
+        <span style={{ fontSize: "0.77rem", color: "rgba(43,35,32,0.55)", whiteSpace: "nowrap" }}>{o.placedAt}</span>
       </td>
 
       {/* Customer */}
       <td style={td}>
-        <div style={{ fontSize: "0.8rem", fontWeight: 500, color: C.charcoal }}>{o.customer}</div>
-        <div style={{ fontSize: "0.67rem", color: "rgba(43,35,32,0.4)", marginTop: "1px" }}>{o.email}</div>
+        <div style={{ fontSize: "0.8rem", fontWeight: 500, color: C.charcoal }}>{o.customerName}</div>
+        <div style={{ fontSize: "0.67rem", color: "rgba(43,35,32,0.4)", marginTop: "1px" }}>{o.customerEmail}</div>
       </td>
 
       {/* Items */}
@@ -418,7 +389,7 @@ function OrderRow({ order: o, alt }: { order: Order; alt: boolean }) {
           {o.itemCount} item{o.itemCount !== 1 ? "s" : ""}
         </div>
         <div style={{ fontSize: "0.67rem", color: "rgba(43,35,32,0.4)", marginTop: "1px", maxWidth: 180, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-          {o.items.join(", ")}
+          {o.itemLabels.join(", ")}
         </div>
       </td>
 
