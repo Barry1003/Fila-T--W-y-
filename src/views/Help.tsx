@@ -49,7 +49,7 @@ const FAQ_SECTIONS: FaqSection[] = [
       </svg>
     ),
     items: [
-      { id: 'c1', q: "Do you offer bespoke or custom orders?", a: "Yes. We accept custom orders for Gele, Filà, and coordinated aso-ebi sets. Use the Custom Order form on the site to submit your requirements, including occasion, colour preferences, and timeline." },
+      { id: 'c1', q: "Do you offer bespoke or custom orders?", a: "Yes. We accept custom orders for Gele, Filà, and coordinated aso-ebi sets. Use the Custom Order page to submit your requirements, including occasion, colour preferences, and timeline." },
       { id: 'c2', q: "How far in advance should I place a custom order?", a: "We recommend a minimum of 6 weeks for custom headwear and 10–12 weeks for full aso-ebi coordinated sets, especially for wedding orders. Rush timelines may incur a fee and are not always possible." },
       { id: 'c3', q: "Can you match a specific fabric or colour?", a: "In many cases, yes. Share a reference photo or fabric swatch during the enquiry process. We'll confirm availability and a colour match before taking payment." },
     ],

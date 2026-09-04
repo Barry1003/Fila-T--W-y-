@@ -1259,6 +1259,60 @@ body {
   .promo-media { height: 260px; }
 }
 
+/* ── Custom order request ───────────────────────────────────────────────────── */
+
+.custom-masthead {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 4rem 2.5rem;
+}
+
+.custom-help-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-shrink: 0;
+  min-height: 38px;
+  padding: 0 0.9rem;
+  border: 1px solid rgba(250, 246, 240, 0.35);
+  border-radius: 100px;
+  color: rgba(250, 246, 240, 0.85);
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 0.75rem;
+  text-decoration-line: none;
+  transition: background-color 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.custom-help-link:hover {
+  background: #D4A94E;
+  border-color: #D4A94E;
+  color: #2B2320;
+}
+
+.custom-steps {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 3rem 2.5rem 0;
+}
+
+.custom-form {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 3rem 2.5rem 5rem;
+}
+
+@media (max-width: 900px) {
+  .custom-masthead { padding: 2.75rem 1.25rem; }
+  .custom-steps { padding: 2rem 1.25rem 0; }
+  .custom-form { padding: 2rem 1.25rem 3.5rem; }
+}
+
+@media (max-width: 560px) {
+  .custom-masthead { padding: 2.25rem 1rem; }
+  .custom-steps { padding: 1.5rem 1rem 0; }
+  .custom-form { padding: 1.5rem 1rem 3rem; }
+}
+
 /* ── Collection pages ───────────────────────────────────────────────────────── */
 
 .collection-masthead {

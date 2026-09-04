@@ -20,7 +20,7 @@ const COLLECTION_LINKS = [
 ];
 
 const NAV_LINKS = [
-  { label: 'Custom Order', to: '/help' },
+  { label: 'Custom Order', to: '/custom-order' },
   { label: 'Lookbook', to: '/lookbook' },
   { label: 'About', to: '/about' },
 ];
