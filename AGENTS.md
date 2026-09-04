@@ -122,9 +122,48 @@ Prisma types.
 - Fetch sequentially rather than in `Promise.all`. Neon opens a socket per
   query and firing several at a sleeping compute makes a cold start fail.
   Derive what you can in memory instead (see `colorsOf`).
-- `withDbRetry` spans about nine seconds, which covers a Neon cold start. A
-  failure past that hits `src/app/(site)/error.tsx`, which keeps the nav and
-  footer and offers a retry.
+- `withDbRetry` spans about 27 seconds. Waking a suspended Neon compute was
+  measured at 2.6s, 9.4s, 10.5s and 22.2s across four cold starts, so a budget
+  sized for the median fails often; do not trim this schedule without
+  re-measuring. A failure past it hits `src/app/(site)/error.tsx`, which keeps
+  the nav and footer and offers a retry.
+
+## Cart and orders
+
+The cart lives in the browser — `CartProvider` in `src/lib/cart.tsx`, mounted in
+the root layout because Cart, Checkout and the confirmation sit in three
+different route groups. It persists to `localStorage` under `ac_cart_v1` and
+syncs across tabs.
+
+- `hydrated` is false until storage has been read. Render nothing cart-shaped
+  until it is true, or the server's empty cart and the client's full one
+  disagree and React throws a hydration error.
+- A line is identified by product **and** size, so two sizes of one cap are two
+  lines.
+
+`placeOrder` in `src/server/place-order.ts` is the only path that writes an
+order, and it trusts the browser for nothing but what was chosen:
+
+- The action takes `productId`, `size` and `quantity` — **never a price**. It
+  reads prices from the catalogue itself. Prices in the cart are for display, so
+  editing `localStorage` changes what a shopper sees and nothing they pay.
+- Stock is claimed with `updateMany(… stock: { gte: quantity })` inside the
+  transaction rather than read-then-write, so two shoppers cannot both take the
+  last cap.
+- Promo codes are checked against `DiscountCode` in `checkPromoCode` for
+  display, then looked up again in `placeOrder` before pricing. Unknown,
+  inactive, expired and used-up codes all return the same message so the live
+  codes cannot be enumerated.
+- Order numbers continue the `#FTW-2891` series, taken from the highest existing
+  number *numerically* — sorting them as strings puts `#FTW-999` after
+  `#FTW-1000`. A collision retries the whole transaction.
+- `Order.totalNgn` is nullable and left null: the store prices in CAD only, and
+  the seeded fixtures predate that.
+
+**Payment is not wired.** No provider has been chosen, so orders are written
+`PENDING` and the checkout tells the shopper a payment link will follow. There
+is deliberately no card form — collecting card numbers with nowhere to send them
+would be a liability, not a placeholder.
 
 ## Landing page
 

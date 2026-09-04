@@ -287,7 +287,9 @@ model Order {
   shipping Decimal @default(0) @db.Decimal(10, 2)
   discount Decimal @default(0) @db.Decimal(10, 2)
   total    Decimal @db.Decimal(10, 2)
-  totalNgn Decimal @db.Decimal(12, 2)
+  /// Legacy. The store prices in CAD only, so orders placed through the
+  /// storefront leave this null; the seeded fixtures predate that decision.
+  totalNgn Decimal? @db.Decimal(12, 2)
 
   discountCodeId String?
   placedAt       DateTime @default(now())

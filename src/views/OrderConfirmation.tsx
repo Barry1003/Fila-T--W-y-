@@ -2,37 +2,16 @@
 
 import { Link } from '@/lib/router';
 import { C, DISPLAY, UI, label } from '../tokens';
+import { formatCad } from '@/server/pricing';
+import type { OrderDetail } from '@/server/orders';
 
-/* ─── Order data (mirrors Checkout seed) ─────────────────────── */
-const ORDER_NUM = 'FTW-10492';
-const EMAIL = 'adunola@example.com';
-
-const ITEMS = [
-  { id: 8, title: 'Embroidered Agbada Kaftan', variant: 'Gold · Size L', cadPrice: 310, ngnPrice: 153950, qty: 1, img: 'photo-1765910083971-aa0e3688be46' },
-  { id: 1, title: 'Gobi Filà Cap — Burgundy Velvet', variant: 'Burgundy · Size M', cadPrice: 89, ngnPrice: 44200, qty: 2, img: 'photo-1763823133159-c6f8ec380e33' },
-  { id: 4, title: 'Aso-oke Gele — Ivory & Gold Set', variant: 'Gold · One Size', cadPrice: 145, ngnPrice: 71900, qty: 1, img: 'photo-1714124731489-7eb16af0ac91' },
-];
-
-const SHIPPING = { label: 'Standard', days: '5–8 business days', cadCost: 0, ngnCost: 0 };
-
-const ADDRESS = {
-  name: 'Adunola Okonkwo',
-  line1: '14 Adeola Hopewell Street',
-  city: 'Victoria Island',
-  state: 'Lagos',
-  postal: '101001',
-  country: 'Nigeria',
-};
-
-/* ─── Helpers ────────────────────────────────────────────────── */
-function cad(n: number) {
-  return new Intl.NumberFormat('en-CA', { style: 'currency', currency: 'CAD', maximumFractionDigits: 0 }).format(n);
-}
-
-const subtotalCad = ITEMS.reduce((s, it) => s + it.cadPrice * it.qty, 0);
-const subtotalNgn = ITEMS.reduce((s, it) => s + it.ngnPrice * it.qty, 0);
-const totalCad = subtotalCad + SHIPPING.cadCost;
-const totalNgn = subtotalNgn + SHIPPING.ngnCost;
+/**
+ * The order someone has just placed.
+ *
+ * This page used to render a fixture — a different customer's name, and a Lagos
+ * address that belonged to nobody. A shopper reaching it after checking out was
+ * shown someone else's delivery details as their own.
+ */
 
 /* ─── Progress bar (mirrors Checkout's, step 4 = Confirmation active) */
 const STEPS = ['Cart', 'Shipping', 'Payment', 'Confirmation'];
@@ -81,7 +60,7 @@ const TRUST = [
 ];
 
 /* ─── Page ───────────────────────────────────────────────────── */
-export default function OrderConfirmation() {
+export default function OrderConfirmation({ order }: { order: OrderDetail }) {
   return (
     <div style={{ backgroundColor: C.cream, minHeight: '100vh', fontFamily: UI, color: C.charcoal }}>
 
@@ -139,8 +118,8 @@ export default function OrderConfirmation() {
           </h1>
 
           <p style={{ fontFamily: UI, fontSize: '0.875rem', color: 'rgba(43,35,32,0.6)', lineHeight: 1.7, maxWidth: '460px' }}>
-            Order <strong style={{ color: C.charcoal }}>#{ORDER_NUM}</strong> confirmed — a confirmation email has been sent to{' '}
-            <span style={{ color: C.indigo, fontWeight: 500 }}>{EMAIL}</span>.
+            Order <strong style={{ color: C.charcoal }}>{order.number}</strong> confirmed — we have sent the details to{' '}
+            <span style={{ color: C.indigo, fontWeight: 500 }}>{order.customerEmail}</span>.
           </p>
         </div>
 
@@ -161,37 +140,26 @@ export default function OrderConfirmation() {
           }}>
             <div style={{ ...label, color: C.charcoal, fontSize: '0.65rem' }}>Order Summary</div>
             <div style={{ fontFamily: UI, fontSize: '0.72rem', color: 'rgba(43,35,32,0.45)', letterSpacing: '0.02em' }}>
-              #{ORDER_NUM}
+              {order.number}
             </div>
           </div>
 
           {/* Items */}
           <div style={{ padding: '1.125rem 1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            {ITEMS.map(it => (
-              <div key={it.id} style={{ display: 'flex', gap: '0.875rem', alignItems: 'flex-start' }}>
-                <div style={{ position: 'relative', flexShrink: 0 }}>
-                  <img
-                    src={`https://images.unsplash.com/${it.img}?w=80&h=80&fit=crop&auto=format`}
-                    alt={it.title}
-                    width={52} height={52}
-                    style={{ borderRadius: '4px', objectFit: 'cover', display: 'block', backgroundColor: 'rgba(43,35,32,0.08)' }}
-                  />
-                  <span style={{
-                    position: 'absolute', top: '-6px', right: '-6px',
-                    backgroundColor: C.charcoal, color: '#fff',
-                    borderRadius: '50%', width: '18px', height: '18px',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontFamily: UI, fontSize: '0.55rem', fontWeight: 700,
-                  }}>{it.qty}</span>
-                </div>
+            {order.items.map((it, idx) => (
+              <div key={`${it.name}:${it.variant ?? ''}:${idx}`} style={{ display: 'flex', gap: '0.875rem', alignItems: 'flex-start' }}>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontFamily: UI, fontSize: '0.8rem', fontWeight: 600, color: C.charcoal, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                    {it.title}
+                  <div style={{ fontFamily: UI, fontSize: '0.8rem', fontWeight: 600, color: C.charcoal }}>
+                    {it.name}
                   </div>
-                  <div style={{ fontFamily: UI, fontSize: '0.7rem', color: 'rgba(43,35,32,0.5)', marginTop: '2px' }}>{it.variant}</div>
+                  <div style={{ fontFamily: UI, fontSize: '0.7rem', color: 'rgba(43,35,32,0.5)', marginTop: '2px' }}>
+                    {[it.variant, it.qty > 1 ? `Qty ${it.qty}` : null].filter(Boolean).join(' · ')}
+                  </div>
                 </div>
                 <div style={{ flexShrink: 0, textAlign: 'right' }}>
-                  <div style={{ fontFamily: UI, fontSize: '0.825rem', fontWeight: 600, color: C.charcoal }}>{cad(it.cadPrice * it.qty)}</div>
+                  <div style={{ fontFamily: UI, fontSize: '0.825rem', fontWeight: 600, color: C.charcoal }}>
+                    {formatCad(Math.round(it.unitCad * it.qty * 100))}
+                  </div>
                 </div>
               </div>
             ))}
@@ -201,16 +169,24 @@ export default function OrderConfirmation() {
           <div style={{ padding: '1rem 1.5rem', borderTop: `1px solid rgba(43,35,32,0.1)`, display: 'flex', flexDirection: 'column', gap: '0.575rem' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
               <span style={{ fontFamily: UI, fontSize: '0.8rem', color: 'rgba(43,35,32,0.58)' }}>Subtotal</span>
-              <span style={{ fontFamily: UI, fontSize: '0.8rem', color: C.charcoal }}>{cad(subtotalCad)}</span>
+              <span style={{ fontFamily: UI, fontSize: '0.8rem', color: C.charcoal }}>{formatCad(Math.round(order.subtotalCad * 100))}</span>
             </div>
+            {order.discountCad > 0 && (
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                <span style={{ fontFamily: UI, fontSize: '0.8rem', color: C.teal }}>Discount</span>
+                <span style={{ fontFamily: UI, fontSize: '0.8rem', color: C.teal, fontWeight: 600 }}>−{formatCad(Math.round(order.discountCad * 100))}</span>
+              </div>
+            )}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-              <span style={{ fontFamily: UI, fontSize: '0.8rem', color: 'rgba(43,35,32,0.58)' }}>Shipping ({SHIPPING.label})</span>
-              <span style={{ fontFamily: UI, fontSize: '0.8rem', color: C.teal, fontWeight: 600 }}>Free</span>
+              <span style={{ fontFamily: UI, fontSize: '0.8rem', color: 'rgba(43,35,32,0.58)' }}>Shipping</span>
+              <span style={{ fontFamily: UI, fontSize: '0.8rem', color: order.shippingCad === 0 ? C.teal : C.charcoal, fontWeight: order.shippingCad === 0 ? 600 : 400 }}>
+                {order.shippingCad === 0 ? 'Free' : formatCad(Math.round(order.shippingCad * 100))}
+              </span>
             </div>
             <div style={{ borderTop: `1px solid rgba(43,35,32,0.1)`, paddingTop: '0.6rem', marginTop: '0.15rem', display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
               <span style={{ fontFamily: UI, fontWeight: 700, fontSize: '0.95rem', color: C.charcoal }}>Total</span>
               <div style={{ textAlign: 'right' }}>
-                <div style={{ fontFamily: DISPLAY, fontSize: '1.2rem', color: C.charcoal, fontWeight: 600 }}>{cad(totalCad)}</div>
+                <div style={{ fontFamily: DISPLAY, fontSize: '1.2rem', color: C.charcoal, fontWeight: 600 }}>{formatCad(Math.round(order.totalCad * 100))}</div>
               </div>
             </div>
           </div>
@@ -223,11 +199,9 @@ export default function OrderConfirmation() {
             {/* Ship to */}
             <div style={{ padding: '1rem 1.5rem', borderRight: `1px solid rgba(43,35,32,0.1)` }}>
               <div style={{ ...label, fontSize: '0.6rem', color: 'rgba(43,35,32,0.42)', marginBottom: '0.55rem' }}>Ship to</div>
-              <div style={{ fontFamily: UI, fontSize: '0.8rem', fontWeight: 600, color: C.charcoal, marginBottom: '0.2rem' }}>{ADDRESS.name}</div>
+              <div style={{ fontFamily: UI, fontSize: '0.8rem', fontWeight: 600, color: C.charcoal, marginBottom: '0.2rem' }}>{order.customerName}</div>
               <div style={{ fontFamily: UI, fontSize: '0.77rem', color: 'rgba(43,35,32,0.58)', lineHeight: 1.65 }}>
-                {ADDRESS.line1}<br />
-                {ADDRESS.city}, {ADDRESS.state} {ADDRESS.postal}<br />
-                {ADDRESS.country}
+                {order.address}
               </div>
             </div>
 
@@ -239,11 +213,11 @@ export default function OrderConfirmation() {
                   <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />
                 </svg>
                 <span style={{ fontFamily: UI, fontSize: '0.8rem', fontWeight: 600, color: C.charcoal }}>
-                  {SHIPPING.days}
+                  Placed {order.placedAt}
                 </span>
               </div>
               <div style={{ fontFamily: UI, fontSize: '0.72rem', color: 'rgba(43,35,32,0.48)', lineHeight: 1.55 }}>
-                Standard shipping to Nigeria. We'll email you a tracking number once dispatched.
+                We will confirm your pieces and email a payment link, then a tracking number once your order is dispatched.
               </div>
             </div>
           </div>

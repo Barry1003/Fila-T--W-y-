@@ -92,8 +92,33 @@ export async function getOrder(id: string): Promise<OrderDetail | null> {
     })
   );
 
-  if (!o) return null;
+  return o ? toDetail(o) : null;
+}
 
+/**
+ * The same detail, found by the number a customer was given.
+ *
+ * The confirmation page addresses an order this way: the shopper has just been
+ * handed "#FTW-1004", not a cuid, and the number is what they will quote back
+ * in an email. Unguessable it is not — but it reveals nothing the person who
+ * just placed the order was not already shown.
+ */
+export async function getOrderByNumber(number: string): Promise<OrderDetail | null> {
+  const o = await withDbRetry('get order by number', () =>
+    prisma.order.findUnique({
+      where: { number },
+      include: { items: true },
+    })
+  );
+
+  return o ? toDetail(o) : null;
+}
+
+type OrderRow = NonNullable<Awaited<ReturnType<typeof prisma.order.findUnique>>> & {
+  items: { name: string; variant: string | null; quantity: number; unitPrice: unknown }[];
+};
+
+function toDetail(o: OrderRow): OrderDetail {
   return {
     id: o.id,
     number: o.number,

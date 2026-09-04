@@ -3,12 +3,11 @@
 import { useCallback, useState } from 'react';
 import { Link, NavLink, useNavigate } from '@/lib/router';
 import { useOverlay } from '@/lib/useOverlay';
+import { useCart } from '@/lib/cart';
 import { signOut } from '@/server/auth-actions';
 import type { CurrentUser } from '@/server/auth';
 import { C, DISPLAY, label, UI } from '../tokens';
 import { SearchIcon, HeartIcon, UserIcon, CartIcon, GridIcon } from '../icons';
-
-const CART_COUNT = 3;
 
 /** The collections sit under Shop rather than beside it — they are ways into
  *  the catalogue, not siblings of Lookbook and About. */
@@ -31,9 +30,12 @@ const ACCOUNT_LINKS = [
 ];
 
 function CartBadge({ count }: { count: number }) {
+  // Nothing to announce on an empty cart, and a "0" badge reads as an error.
+  if (count < 1) return null;
+
   return (
     <span className="nav-cart-badge" aria-hidden="true">
-      {count}
+      {count > 99 ? '99+' : count}
     </span>
   );
 }
@@ -69,6 +71,11 @@ export default function Nav({ user }: { user: CurrentUser | null }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const close = useCallback(() => setMenuOpen(false), []);
   const isOwner = user?.role === 'OWNER';
+
+  // Zero until the stored cart has been read, so the server's markup and the
+  // first client render agree; the badge appears a moment later.
+  const { count: cartCount } = useCart();
+  const cartLabel = cartCount === 1 ? 'Cart, 1 item' : `Cart, ${cartCount} items`;
 
   useOverlay(menuOpen, close);
 
@@ -155,17 +162,17 @@ export default function Nav({ user }: { user: CurrentUser | null }) {
                 {icon}
               </Link>
             ))}
-            <Link to="/cart" className="nav-icon-btn" aria-label={`Cart, ${CART_COUNT} items`}>
+            <Link to="/cart" className="nav-icon-btn" aria-label={cartLabel}>
               <CartIcon />
-              <CartBadge count={CART_COUNT} />
+              <CartBadge count={cartCount} />
             </Link>
           </div>
 
           {/* Mobile actions — cart stays reachable without opening the menu */}
           <div className="nav-actions-mobile">
-            <Link to="/cart" className="nav-icon-btn" aria-label={`Cart, ${CART_COUNT} items`}>
+            <Link to="/cart" className="nav-icon-btn" aria-label={cartLabel}>
               <CartIcon />
-              <CartBadge count={CART_COUNT} />
+              <CartBadge count={cartCount} />
             </Link>
             <button
               className="nav-icon-btn"
@@ -238,7 +245,7 @@ export default function Nav({ user }: { user: CurrentUser | null }) {
               <Link to="/cart" onClick={close} className="nav-drawer-sublink">
                 <span className="nav-drawer-sublink-icon"><CartIcon /></span>
                 Cart
-                <span className="nav-drawer-count">{CART_COUNT}</span>
+                {cartCount > 0 && <span className="nav-drawer-count">{cartCount}</span>}
               </Link>
 
               {user ? (

@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import { Link } from '@/lib/router';
+import { useCart } from '@/lib/cart';
 import { C, DISPLAY, UI, label } from '../tokens';
 import type { CatalogueProduct } from '@/server/catalogue';
 
@@ -268,6 +269,27 @@ export default function Product({ product, related }: ProductProps) {
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState<'description' | 'sizing' | 'shipping'>('description');
   const [shareOpen, setShareOpen] = useState(false);
+  const [justAdded, setJustAdded] = useState(false);
+
+  const { add } = useCart();
+
+  function addToCart() {
+    add({
+      productId: product.id,
+      slug: product.slug,
+      title: product.title,
+      size: selectedSize,
+      color: product.color,
+      unitPriceCents: Math.round(product.priceCad * 100),
+      imageUrl: product.imageUrl,
+      quantity,
+    });
+
+    // Confirm in place rather than navigating away — most shoppers add more
+    // than one thing, and bouncing them to the cart each time interrupts that.
+    setJustAdded(true);
+    window.setTimeout(() => setJustAdded(false), 2600);
+  }
 
   // One stored image, shown at several crops until products carry a real
   // gallery. Unsplash-hosted URLs accept crop hints; anything else falls back
@@ -468,17 +490,19 @@ export default function Product({ product, related }: ProductProps) {
                 </div>
                 {/* Add to Cart */}
                 <button
+                  onClick={addToCart}
                   disabled={isSoldOut}
                   className={isSoldOut ? '' : 'shimmer-cta'}
                   style={{
                     flex: 1, height: '50px',
-                    backgroundColor: isSoldOut ? 'rgba(43,35,32,0.08)' : C.gold,
-                    color: isSoldOut ? 'rgba(43,35,32,0.3)' : C.charcoal,
+                    backgroundColor: isSoldOut ? 'rgba(43,35,32,0.08)' : justAdded ? C.teal : C.gold,
+                    color: isSoldOut ? 'rgba(43,35,32,0.3)' : justAdded ? C.cream : C.charcoal,
                     border: 'none', ...label, fontSize: '0.68rem', letterSpacing: '0.17em',
                     cursor: isSoldOut ? 'not-allowed' : 'pointer',
+                    transition: 'background-color 0.2s, color 0.2s',
                   }}
                 >
-                  {isSoldOut ? 'Sold Out' : 'Add to Cart'}
+                  {isSoldOut ? 'Sold Out' : justAdded ? 'Added to Cart' : 'Add to Cart'}
                 </button>
 
                 {/* Share button */}
@@ -713,7 +737,22 @@ export default function Product({ product, related }: ProductProps) {
                       <button onClick={e => e.preventDefault()} style={{ flex: 1, border: '1px solid rgba(250,246,240,0.55)', color: C.cream, background: 'transparent', ...label, fontSize: '0.585rem', padding: '0.55rem 0', cursor: 'pointer', letterSpacing: '0.12em', backdropFilter: 'blur(4px)' }}>
                         Quick View
                       </button>
-                      <button onClick={e => e.preventDefault()} style={{ flex: 1, border: 'none', color: C.charcoal, background: C.gold, ...label, fontSize: '0.585rem', padding: '0.55rem 0', cursor: 'pointer', letterSpacing: '0.12em' }}>
+                      <button
+                        onClick={e => {
+                          // The card is a link; adding should not also navigate.
+                          e.preventDefault();
+                          add({
+                            productId: p.id,
+                            slug: p.slug,
+                            title: p.title,
+                            size: p.sizes[0] ?? 'One Size',
+                            color: p.color,
+                            unitPriceCents: Math.round(p.priceCad * 100),
+                            imageUrl: p.imageUrl,
+                          });
+                        }}
+                        style={{ flex: 1, border: 'none', color: C.charcoal, background: C.gold, ...label, fontSize: '0.585rem', padding: '0.55rem 0', cursor: 'pointer', letterSpacing: '0.12em' }}
+                      >
                         Add to Cart
                       </button>
                     </div>

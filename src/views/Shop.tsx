@@ -4,6 +4,7 @@ import { Suspense, useState, useMemo } from 'react';
 import { Link, useSearchParams } from '@/lib/router';
 import { C, DISPLAY, UI, label } from '../tokens';
 import { SlidersIcon, GridIcon, ListIcon, XIcon } from '../icons';
+import { useCart } from '@/lib/cart';
 import { COLOR_HEX } from '../data/products';
 import type { CatalogueProduct, CatalogueCollection } from '@/server/catalogue';
 import PromoCarousel, { type Promo } from '../components/PromoCarousel';
@@ -170,6 +171,7 @@ function Sidebar({ collections, colors, selectedCats, onCat, priceMax, onPriceMa
 
 function ProductCard({ p, view }: { p: CatalogueProduct; view: 'grid' | 'list' }) {
   const [hovered, setHovered] = useState(false);
+  const { add } = useCart();
 
   if (view === 'list') {
     return (
@@ -199,7 +201,22 @@ function ProductCard({ p, view }: { p: CatalogueProduct; view: 'grid' | 'list' }
             <button onClick={e => e.preventDefault()} style={{ flex: 1, border: '1px solid rgba(250,246,240,0.55)', color: C.cream, background: 'transparent', ...label, fontSize: '0.585rem', padding: '0.55rem 0', cursor: 'pointer', letterSpacing: '0.12em', backdropFilter: 'blur(4px)' }}>
               Quick View
             </button>
-            <button onClick={e => e.preventDefault()} style={{ flex: 1, border: 'none', color: C.charcoal, background: C.gold, ...label, fontSize: '0.585rem', padding: '0.55rem 0', cursor: 'pointer', letterSpacing: '0.12em' }}>
+            <button
+              onClick={e => {
+                // The whole card is a link to the product; adding shouldn't navigate.
+                e.preventDefault();
+                add({
+                  productId: p.id,
+                  slug: p.slug,
+                  title: p.title,
+                  size: p.sizes[0] ?? 'One Size',
+                  color: p.color,
+                  unitPriceCents: Math.round(p.priceCad * 100),
+                  imageUrl: p.imageUrl,
+                });
+              }}
+              style={{ flex: 1, border: 'none', color: C.charcoal, background: C.gold, ...label, fontSize: '0.585rem', padding: '0.55rem 0', cursor: 'pointer', letterSpacing: '0.12em' }}
+            >
               Add to Cart
             </button>
           </div>

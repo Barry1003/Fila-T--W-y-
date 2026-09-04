@@ -2,54 +2,10 @@
 
 import { useState } from 'react';
 import { Link } from '@/lib/router';
+import { useCart } from '@/lib/cart';
+import { checkPromoCode } from '@/server/place-order';
 import { C, DISPLAY, UI, label } from '../tokens';
-import { formatCad, orderTotals, shippingCost, type ShippingZone } from '@/server/pricing';
-
-/* ─── Types ─────────────────────────────────────────────── */
-interface CartItem {
-  id: number;
-  title: string;
-  variant: string;
-  size: string;
-  color: string;
-  cadPrice: number;
-  qty: number;
-  img: string;
-}
-
-/* ─── Seed data (3 items) ──────────────────────────────── */
-const SEED: CartItem[] = [
-  {
-    id: 8,
-    title: 'Embroidered Agbada Kaftan',
-    variant: 'Gold · Size L',
-    size: 'L',
-    color: 'Gold',
-    cadPrice: 310,
-    qty: 1,
-    img: 'photo-1765910083971-aa0e3688be46',
-  },
-  {
-    id: 1,
-    title: 'Gobi Filà Cap — Burgundy Velvet',
-    variant: 'Burgundy · Size M',
-    size: 'M',
-    color: 'Burgundy',
-    cadPrice: 89,
-    qty: 2,
-    img: 'photo-1763823133159-c6f8ec380e33',
-  },
-  {
-    id: 4,
-    title: 'Aso-oke Gele — Ivory & Gold Set',
-    variant: 'Gold · One Size',
-    size: 'One Size',
-    color: 'Gold',
-    cadPrice: 145,
-    qty: 1,
-    img: 'photo-1714124731489-7eb16af0ac91',
-  },
-];
+import { formatCad, orderTotals, shippingCost, type Discount, type ShippingZone } from '@/server/pricing';
 
 /* ─── Shipping options ──────────────────────────────────── */
 const SHIPPING_OPTS: { id: string; zone: ShippingZone; label: string; est: string }[] = [
@@ -103,51 +59,54 @@ const TRUST = [
 
 /* ─── Component ─────────────────────────────────────────── */
 export default function Cart() {
-  const [items, setItems] = useState<CartItem[]>(SEED);
+  const { lines, count: itemCount, setQuantity, remove, hydrated } = useCart();
+
   const [shipping, setShipping] = useState('ca-us');
   const [promo, setPromo] = useState('');
-  const [promoApplied, setPromoApplied] = useState(false);
-  const [promoError, setPromoError] = useState(false);
-  const [wishlist, setWishlist] = useState<number[]>([]);
+  const [applied, setApplied] = useState<{ code: string; discount: Discount; description: string } | null>(null);
+  const [promoError, setPromoError] = useState('');
+  const [checking, setChecking] = useState(false);
 
   const selectedShip = SHIPPING_OPTS.find(o => o.id === shipping)!;
 
-  // Catalogue prices are whole dollars; pricing works in cents.
   const totals = orderTotals(
-    items.map(it => ({ unitPriceCents: it.cadPrice * 100, quantity: it.qty })),
-    promoApplied ? { kind: 'percentage', value: 10 } : null,
+    lines.map(line => ({ unitPriceCents: line.unitPriceCents, quantity: line.quantity })),
+    applied?.discount ?? null,
     selectedShip.zone,
     'standard'
   );
 
-  function setQty(id: number, qty: number) {
-    if (qty < 1) return;
-    setItems(prev => prev.map(it => it.id === id ? { ...it, qty } : it));
-  }
+  // The code is checked against the database rather than a string in this file,
+  // so the cart can only offer discounts the owner actually created.
+  async function applyPromo() {
+    setChecking(true);
+    setPromoError('');
 
-  function removeItem(id: number) {
-    setItems(prev => prev.filter(it => it.id !== id));
-  }
-
-  function moveToWishlist(id: number) {
-    setWishlist(prev => [...prev, id]);
-    removeItem(id);
-  }
-
-  function applyPromo() {
-    if (promo.toUpperCase() === 'FILA10') {
-      setPromoApplied(true);
-      setPromoError(false);
+    const result = await checkPromoCode(promo);
+    if (result.ok) {
+      setApplied({ code: result.code, discount: result.discount, description: result.description });
     } else {
-      setPromoError(true);
-      setPromoApplied(false);
+      setApplied(null);
+      setPromoError(result.message);
     }
+
+    setChecking(false);
   }
 
-  const itemCount = items.reduce((s, it) => s + it.qty, 0);
+  function clearPromo() {
+    setApplied(null);
+    setPromo('');
+    setPromoError('');
+  }
+
+  // Until localStorage has been read the cart looks empty, and showing the
+  // "nothing here" page to someone who has items would be wrong.
+  if (!hydrated) {
+    return <div style={{ backgroundColor: C.cream, minHeight: '70vh' }} aria-busy="true" />;
+  }
 
   /* ── Empty state ─────────────────────────────────────── */
-  if (items.length === 0) {
+  if (lines.length === 0) {
     return (
       <div style={{ backgroundColor: C.cream, minHeight: '70vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '5rem 2rem', textAlign: 'center' }}>
         <div style={{ marginBottom: '2rem', opacity: 0.18 }}>
@@ -179,11 +138,6 @@ export default function Cart() {
             Start Shopping
           </button>
         </Link>
-        {wishlist.length > 0 && (
-          <p style={{ fontFamily: UI, fontSize: '0.8rem', color: C.indigo, marginTop: '1.5rem' }}>
-            {wishlist.length} item{wishlist.length > 1 ? 's' : ''} saved to your wishlist
-          </p>
-        )}
       </div>
     );
   }
@@ -224,10 +178,10 @@ export default function Cart() {
             </div>
 
             {/* Line items */}
-            {items.map((item, idx) => {
-              const lineCAD = item.cadPrice * item.qty;
+            {lines.map((item, idx) => {
+              const lineTotalCents = item.unitPriceCents * item.quantity;
               return (
-                <div key={item.id}>
+                <div key={`${item.productId}:${item.size}`}>
                   <div style={{
                     display: 'grid',
                     gridTemplateColumns: '88px 1fr auto auto',
@@ -239,7 +193,7 @@ export default function Cart() {
                     {/* Thumbnail */}
                     <div style={{ width: '88px', height: '88px', backgroundColor: '#e8e2da', flexShrink: 0, overflow: 'hidden' }}>
                       <img
-                        src={`https://images.unsplash.com/${item.img}?w=176&h=176&fit=crop&auto=format`}
+                        src={item.imageUrl}
                         alt={item.title}
                         style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
                       />
@@ -247,41 +201,36 @@ export default function Cart() {
 
                     {/* Info */}
                     <div style={{ paddingTop: '2px' }}>
-                      <div style={{ fontFamily: DISPLAY, fontSize: '1.0625rem', fontWeight: 500, color: C.charcoal, lineHeight: 1.3, marginBottom: '0.3rem' }}>
-                        {item.title}
-                      </div>
+                      <Link to={`/product/${item.slug}`} style={{ textDecorationLine: 'none' }}>
+                        <div style={{ fontFamily: DISPLAY, fontSize: '1.0625rem', fontWeight: 500, color: C.charcoal, lineHeight: 1.3, marginBottom: '0.3rem' }}>
+                          {item.title}
+                        </div>
+                      </Link>
                       <div style={{ fontFamily: UI, fontSize: '0.8rem', color: 'rgba(43,35,32,0.5)', marginBottom: '0.75rem' }}>
-                        {item.variant}
+                        {item.color} · {item.size}
                       </div>
                       {/* Unit price */}
                       <div>
                         <div style={{ fontFamily: UI, fontSize: '0.875rem', fontWeight: 500, color: C.charcoal }}>
-                          {formatCad(item.cadPrice * 100)}
+                          {formatCad(item.unitPriceCents)}
                         </div>
                       </div>
-                      {/* Move to wishlist */}
-                      <button
-                        onClick={() => moveToWishlist(item.id)}
-                        style={{ background: 'none', border: 'none', fontFamily: UI, fontSize: '0.75rem', color: C.indigo, cursor: 'pointer', padding: '0.625rem 0 0', textDecorationLine: 'underline', textUnderlineOffset: '2px', display: 'block' }}
-                      >
-                        Move to Wishlist
-                      </button>
                     </div>
 
                     {/* Qty stepper */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0', border: `1px solid rgba(43,35,32,0.18)`, height: '38px', marginTop: '2px' }}>
                       <button
-                        onClick={() => setQty(item.id, item.qty - 1)}
+                        onClick={() => setQuantity(item.productId, item.size, item.quantity - 1)}
                         style={{ width: '34px', height: '100%', background: 'none', border: 'none', cursor: 'pointer', color: C.charcoal, fontSize: '1.1rem', lineHeight: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                         aria-label="Decrease quantity"
                       >
                         −
                       </button>
                       <span style={{ width: '32px', textAlign: 'center', fontFamily: UI, fontSize: '0.875rem', color: C.charcoal, userSelect: 'none' }}>
-                        {item.qty}
+                        {item.quantity}
                       </span>
                       <button
-                        onClick={() => setQty(item.id, item.qty + 1)}
+                        onClick={() => setQuantity(item.productId, item.size, item.quantity + 1)}
                         style={{ width: '34px', height: '100%', background: 'none', border: 'none', cursor: 'pointer', color: C.charcoal, fontSize: '1.1rem', lineHeight: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                         aria-label="Increase quantity"
                       >
@@ -292,7 +241,7 @@ export default function Cart() {
                     {/* Line total + remove */}
                     <div style={{ textAlign: 'right', paddingTop: '2px' }}>
                       <button
-                        onClick={() => removeItem(item.id)}
+                        onClick={() => remove(item.productId, item.size)}
                         style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(43,35,32,0.3)', marginBottom: '0.375rem', padding: '0', display: 'flex', marginLeft: 'auto', lineHeight: 0 }}
                         aria-label={`Remove ${item.title}`}
                       >
@@ -301,12 +250,12 @@ export default function Cart() {
                         </svg>
                       </button>
                       <div style={{ fontFamily: UI, fontSize: '0.9rem', fontWeight: 600, color: C.charcoal }}>
-                        {formatCad(lineCAD * 100)}
+                        {formatCad(lineTotalCents)}
                       </div>
                     </div>
                   </div>
 
-                  {idx < items.length - 1 && (
+                  {idx < lines.length - 1 && (
                     <div style={{ height: '1px', backgroundColor: 'rgba(43,35,32,0.08)' }} />
                   )}
                 </div>
@@ -359,9 +308,9 @@ export default function Cart() {
               </div>
 
               {/* Discount */}
-              {promoApplied && (
+              {applied && (
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '0.625rem' }}>
-                  <span style={{ fontFamily: UI, fontSize: '0.875rem', color: C.teal }}>Promo (FILA10 — 10% off)</span>
+                  <span style={{ fontFamily: UI, fontSize: '0.875rem', color: C.teal }}>Promo ({applied.code} — {applied.description})</span>
                   <div style={{ textAlign: 'right' }}>
                     <div style={{ fontFamily: UI, fontSize: '0.9rem', fontWeight: 500, color: C.teal }}>−{formatCad(totals.discountCents)}</div>
                   </div>
@@ -416,14 +365,16 @@ export default function Cart() {
                 <div style={{ display: 'flex', gap: '0.5rem' }}>
                   <input
                     type="text"
-                    placeholder="e.g. FILA10"
+                    placeholder="Enter code"
                     value={promo}
-                    onChange={e => { setPromo(e.target.value); setPromoError(false); }}
+                    disabled={!!applied}
+                    onChange={e => { setPromo(e.target.value); setPromoError(''); }}
+                    onKeyDown={e => { if (e.key === 'Enter' && !applied) { e.preventDefault(); applyPromo(); } }}
                     style={{
                       flex: 1,
                       padding: '0.65rem 0.75rem',
                       border: `1px solid ${promoError ? '#C0392B' : 'rgba(43,35,32,0.2)'}`,
-                      backgroundColor: C.cream,
+                      backgroundColor: applied ? 'rgba(43,35,32,0.04)' : C.cream,
                       fontFamily: UI,
                       fontSize: '0.8rem',
                       color: C.charcoal,
@@ -432,7 +383,8 @@ export default function Cart() {
                     }}
                   />
                   <button
-                    onClick={applyPromo}
+                    onClick={applied ? clearPromo : applyPromo}
+                    disabled={checking}
                     style={{
                       border: `1.5px solid ${C.maroon}`,
                       background: 'none',
@@ -440,23 +392,24 @@ export default function Cart() {
                       ...label,
                       fontSize: '0.6rem',
                       padding: '0 0.875rem',
-                      cursor: 'pointer',
+                      cursor: checking ? 'wait' : 'pointer',
                       whiteSpace: 'nowrap',
                       letterSpacing: '0.12em',
                       flexShrink: 0,
+                      opacity: checking ? 0.6 : 1,
                     }}
                   >
-                    Apply
+                    {checking ? 'Checking' : applied ? 'Remove' : 'Apply'}
                   </button>
                 </div>
                 {promoError && (
-                  <p style={{ fontFamily: UI, fontSize: '0.725rem', color: '#C0392B', marginTop: '0.375rem', margin: '0.375rem 0 0' }}>
-                    Invalid promo code. Try FILA10.
+                  <p style={{ fontFamily: UI, fontSize: '0.725rem', color: '#C0392B', margin: '0.375rem 0 0' }}>
+                    {promoError}
                   </p>
                 )}
-                {promoApplied && (
-                  <p style={{ fontFamily: UI, fontSize: '0.725rem', color: C.teal, marginTop: '0.375rem', margin: '0.375rem 0 0' }}>
-                    10% discount applied!
+                {applied && (
+                  <p style={{ fontFamily: UI, fontSize: '0.725rem', color: C.teal, margin: '0.375rem 0 0' }}>
+                    {applied.description} applied.
                   </p>
                 )}
               </div>
@@ -475,7 +428,10 @@ export default function Cart() {
               </div>
 
               {/* Checkout CTA */}
-              <Link to="/checkout" style={{ textDecorationLine: 'none', display: 'block', marginBottom: '0.875rem' }}>
+              <Link
+                to={applied ? `/checkout?promo=${encodeURIComponent(applied.code)}` : '/checkout'}
+                style={{ textDecorationLine: 'none', display: 'block', marginBottom: '0.875rem' }}
+              >
                 <span
                   className="shimmer-cta"
                   style={{

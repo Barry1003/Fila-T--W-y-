@@ -1,16 +1,11 @@
 'use client';
 
-import { useState, useRef } from 'react';
-import { Link, useNavigate } from '@/lib/router';
+import { Suspense, useEffect, useState, useRef } from 'react';
+import { Link, useNavigate, useSearchParams } from '@/lib/router';
+import { useCart } from '@/lib/cart';
+import { checkPromoCode, placeOrder } from '@/server/place-order';
 import { C, DISPLAY, UI, label } from '../tokens';
-import { formatCad, orderTotals, shippingCost, type ShippingSpeed, type ShippingZone } from '@/server/pricing';
-
-/* ─── Seed (same items as Cart) ────────────────────────────── */
-const ITEMS = [
-  { id: 8, title: 'Embroidered Agbada Kaftan', variant: 'Gold · Size L', cadPrice: 310, qty: 1, img: 'photo-1765910083971-aa0e3688be46' },
-  { id: 1, title: 'Gobi Filà Cap — Burgundy Velvet', variant: 'Burgundy · Size M', cadPrice: 89, qty: 2, img: 'photo-1763823133159-c6f8ec380e33' },
-  { id: 4, title: 'Aso-oke Gele — Ivory & Gold Set', variant: 'Gold · One Size', cadPrice: 145, qty: 1, img: 'photo-1714124731489-7eb16af0ac91' },
-];
+import { formatCad, orderTotals, shippingCost, type Discount, type ShippingSpeed, type ShippingZone } from '@/server/pricing';
 
 /* ─── Country + shipping matrix ──────────────────────────── */
 type CountryGroup = 'ca-us' | 'uk' | 'ng' | 'intl';
@@ -201,7 +196,35 @@ function PaymentBadge({ children }: { children: React.ReactNode }) {
 
 /* ─── Main component ─────────────────────────────────────────── */
 export default function Checkout() {
+  return (
+    <Suspense fallback={<div style={{ minHeight: '100vh', backgroundColor: C.cream }} />}>
+      <CheckoutContent />
+    </Suspense>
+  );
+}
+
+function CheckoutContent() {
   const navigate = useNavigate();
+  const searchParams = useSearchParams();
+  const { lines, clear, hydrated } = useCart();
+
+  // The cart passes an applied code through the URL. It is re-checked here, and
+  // checked a third time on the server — the query string only carries intent.
+  const promoParam = searchParams.get('promo') ?? '';
+  const [discount, setDiscount] = useState<{ code: string; discount: Discount; description: string } | null>(null);
+
+  useEffect(() => {
+    if (!promoParam) {
+      setDiscount(null);
+      return;
+    }
+
+    let current = true;
+    checkPromoCode(promoParam).then(result => {
+      if (current) setDiscount(result.ok ? { code: result.code, discount: result.discount, description: result.description } : null);
+    });
+    return () => { current = false; };
+  }, [promoParam]);
 
   // Contact
   const [email, setEmail] = useState('');
@@ -230,16 +253,15 @@ export default function Checkout() {
     setMethodId(SHIPPING_MATRIX[g][0].id);
   }
 
-  // Payment
-  const [cardNum, setCardNum] = useState('');
-  const [cardExp, setCardExp] = useState('');
-  const [cardCvc, setCardCvc] = useState('');
-  const [billingSame, setBillingSame] = useState(true);
   const [orderNotes, setOrderNotes] = useState('');
 
   // Validation
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [submitted, setSubmitted] = useState(false);
+
+  // Placing the order
+  const [placing, setPlacing] = useState(false);
+  const [placeError, setPlaceError] = useState('');
 
   function touch(field: string) { setTouched(t => ({ ...t, [field]: true })); }
 
@@ -249,38 +271,86 @@ export default function Checkout() {
   if (!address1.trim()) errors.address1 = 'Address is required.';
   if (!city.trim()) errors.city = 'City is required.';
   if (!postal.trim()) errors.postal = 'Postal / ZIP code is required.';
-  if (!cardNum.replace(/\s/g, '') || cardNum.replace(/\s/g, '').length < 15) errors.cardNum = 'Please enter a valid card number.';
-  if (!cardExp || !/^\d{2}\/\d{2}$/.test(cardExp)) errors.cardExp = 'Use MM/YY format.';
-  if (!cardCvc || cardCvc.length < 3) errors.cardCvc = 'Enter 3–4 digit CVC.';
 
-  // Totals — same module the cart uses, so the two cannot disagree.
+  // Totals — same module and the same cart the previous screen used, so the two
+  // cannot disagree about the bill.
   const totals = orderTotals(
-    ITEMS.map(it => ({ unitPriceCents: it.cadPrice * 100, quantity: it.qty })),
-    null,
+    lines.map(line => ({ unitPriceCents: line.unitPriceCents, quantity: line.quantity })),
+    discount?.discount ?? null,
     ZONE_OF[group],
     selectedMethod.speed
   );
 
-  function formatCard(val: string) {
-    return val.replace(/\D/g, '').slice(0, 16).replace(/(.{4})/g, '$1 ').trim();
-  }
-  function formatExpiry(val: string) {
-    const digits = val.replace(/\D/g, '').slice(0, 4);
-    if (digits.length >= 3) return digits.slice(0, 2) + '/' + digits.slice(2);
-    return digits;
-  }
-
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSubmitted(true);
-    if (Object.keys(errors).length === 0) {
-      navigate('/order-confirmation');
+    setPlaceError('');
+
+    if (Object.keys(errors).length > 0) return;
+    if (lines.length === 0) {
+      setPlaceError('Your cart is empty.');
+      return;
     }
+
+    setPlacing(true);
+
+    const result = await placeOrder({
+      email,
+      fullName,
+      phone: phone ? `${phoneCode} ${phone}` : '',
+      line1: address1,
+      line2: address2,
+      city,
+      state: stateProvince,
+      postal,
+      country: COUNTRIES.find(c => c.value === country)?.label ?? country,
+      shippingZone: ZONE_OF[group],
+      shippingSpeed: selectedMethod.speed,
+      promoCode: discount?.code ?? '',
+      notes: orderNotes,
+      // Only what was chosen. The server prices it.
+      lines: lines.map(line => ({
+        productId: line.productId,
+        size: line.size,
+        quantity: line.quantity,
+      })),
+    });
+
+    if (!result.ok) {
+      setPlacing(false);
+      setPlaceError(result.message);
+      return;
+    }
+
+    // Empty the cart only once the order is safely written, so a failure
+    // leaves the shopper with everything still in it.
+    clear();
+    navigate(`/order-confirmation?order=${encodeURIComponent(result.orderNumber)}`);
   }
 
   const showErr = (field: string) => (submitted || touched[field]) && !!errors[field];
 
   const summaryRef = useRef<HTMLDivElement>(null);
+
+  // Nothing to check out. Wait for the stored cart to load first, or someone
+  // arriving with a full cart would see this for a frame.
+  if (hydrated && lines.length === 0) {
+    return (
+      <div style={{ backgroundColor: C.cream, minHeight: '70vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '5rem 2rem', textAlign: 'center' }}>
+        <div style={{ fontFamily: DISPLAY, fontSize: '2rem', color: C.charcoal, fontWeight: 500, marginBottom: '0.75rem' }}>
+          There is nothing to check out
+        </div>
+        <p style={{ fontFamily: UI, fontSize: '0.9rem', color: 'rgba(43,35,32,0.55)', maxWidth: '340px', marginBottom: '2rem' }}>
+          Your cart is empty. Once you have added a piece, you can complete your order here.
+        </p>
+        <Link to="/shop" style={{ textDecorationLine: 'none' }}>
+          <span className="shimmer-cta" style={{ display: 'inline-block', backgroundColor: C.gold, color: C.charcoal, ...label, fontSize: '0.68rem', letterSpacing: '0.14em', padding: '0.9rem 2.25rem', cursor: 'pointer' }}>
+            Browse the Shop
+          </span>
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <div style={{ backgroundColor: C.cream, minHeight: '100vh', fontFamily: UI, color: C.charcoal }}>
@@ -540,90 +610,31 @@ export default function Checkout() {
                 </div>
               </section>
 
-              {/* 4. Payment */}
+              {/* 4. Payment — see the note below on why there is no card form */}
               <section>
                 <SectionLabel>Payment</SectionLabel>
-                {/* Accepted methods */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.25rem', flexWrap: 'wrap' }}>
-                  <span style={{ fontFamily: UI, fontSize: '0.7rem', color: 'rgba(43,35,32,0.5)', marginRight: '0.25rem' }}>Accepted:</span>
+                <div style={{
+                  border: `1px solid rgba(43,35,32,0.18)`,
+                  borderLeft: `3px solid ${C.gold}`,
+                  padding: '1.25rem 1.375rem',
+                  backgroundColor: 'rgba(212,169,78,0.06)',
+                }}>
+                  <div style={{ fontFamily: UI, fontSize: '0.875rem', fontWeight: 600, color: C.charcoal, marginBottom: '0.5rem' }}>
+                    We will send you a payment link
+                  </div>
+                  <p style={{ fontFamily: UI, fontSize: '0.825rem', color: 'rgba(43,35,32,0.65)', lineHeight: 1.65, margin: 0 }}>
+                    Place your order now and nothing is charged. We confirm the pieces and the
+                    shipping, then email a secure payment link to <strong>{email || 'your email address'}</strong>.
+                    Your order is held while you pay.
+                  </p>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '1rem', flexWrap: 'wrap' }}>
+                  <span style={{ fontFamily: UI, fontSize: '0.7rem', color: 'rgba(43,35,32,0.5)', marginRight: '0.25rem' }}>Payment accepted by:</span>
                   <PaymentBadge>VISA</PaymentBadge>
                   <PaymentBadge>Mastercard</PaymentBadge>
                   <PaymentBadge>Amex</PaymentBadge>
                   <PaymentBadge>Paystack</PaymentBadge>
                   <PaymentBadge>Flutterwave</PaymentBadge>
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                  <div>
-                    <label style={{ ...label, fontSize: '0.65rem', color: C.charcoal, display: 'block', marginBottom: '0.4rem' }}>
-                      Card number <span style={{ color: '#b94a48' }}>*</span>
-                    </label>
-                    <div style={{ position: 'relative' }}>
-                      <FocusInput
-                        type="text"
-                        inputMode="numeric"
-                        placeholder="1234 5678 9012 3456"
-                        value={cardNum}
-                        onChange={e => setCardNum(formatCard(e.target.value))}
-                        onBlur={() => touch('cardNum')}
-                        error={showErr('cardNum')}
-                        autoComplete="cc-number"
-                      />
-                      <div style={{ position: 'absolute', right: '0.875rem', top: '50%', transform: 'translateY(-50%)', opacity: 0.35 }}>
-                        <svg width="20" height="14" viewBox="0 0 24 16" fill="none">
-                          <rect x="0" y="0" width="24" height="16" rx="2" fill={C.charcoal} />
-                          <rect x="0" y="5" width="24" height="4" fill="rgba(0,0,0,0.4)" />
-                        </svg>
-                      </div>
-                    </div>
-                    {showErr('cardNum') && <FieldError msg={errors.cardNum} />}
-                  </div>
-                  <div className="rg-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
-                    <div>
-                      <label style={{ ...label, fontSize: '0.65rem', color: C.charcoal, display: 'block', marginBottom: '0.4rem' }}>
-                        Expiry <span style={{ color: '#b94a48' }}>*</span>
-                      </label>
-                      <FocusInput
-                        type="text"
-                        inputMode="numeric"
-                        placeholder="MM/YY"
-                        value={cardExp}
-                        onChange={e => setCardExp(formatExpiry(e.target.value))}
-                        onBlur={() => touch('cardExp')}
-                        error={showErr('cardExp')}
-                        autoComplete="cc-exp"
-                        maxLength={5}
-                      />
-                      {showErr('cardExp') && <FieldError msg={errors.cardExp} />}
-                    </div>
-                    <div>
-                      <label style={{ ...label, fontSize: '0.65rem', color: C.charcoal, display: 'block', marginBottom: '0.4rem' }}>
-                        CVC <span style={{ color: '#b94a48' }}>*</span>
-                      </label>
-                      <FocusInput
-                        type="text"
-                        inputMode="numeric"
-                        placeholder="123"
-                        value={cardCvc}
-                        onChange={e => setCardCvc(e.target.value.replace(/\D/g, '').slice(0, 4))}
-                        onBlur={() => touch('cardCvc')}
-                        error={showErr('cardCvc')}
-                        autoComplete="cc-csc"
-                        maxLength={4}
-                      />
-                      {showErr('cardCvc') && <FieldError msg={errors.cardCvc} />}
-                    </div>
-                  </div>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', cursor: 'pointer', userSelect: 'none' }}>
-                    <input
-                      type="checkbox"
-                      checked={billingSame}
-                      onChange={e => setBillingSame(e.target.checked)}
-                      style={{ width: '16px', height: '16px', accentColor: C.gold, flexShrink: 0 }}
-                    />
-                    <span style={{ fontFamily: UI, fontSize: '0.825rem', color: C.charcoal }}>
-                      Billing address same as shipping
-                    </span>
-                  </label>
                 </div>
               </section>
 
@@ -645,22 +656,28 @@ export default function Checkout() {
                     Please correct the highlighted fields before placing your order.
                   </div>
                 )}
+                {placeError && (
+                  <div role="alert" style={{ fontFamily: UI, fontSize: '0.775rem', color: '#b94a48', marginBottom: '1rem', padding: '0.75rem 1rem', backgroundColor: 'rgba(185,74,72,0.07)', borderRadius: '5px', border: '1px solid rgba(185,74,72,0.2)' }}>
+                    {placeError}
+                  </div>
+                )}
                 <button
                   type="submit"
-                  className="shimmer-place-order"
+                  disabled={placing}
+                  className={placing ? '' : 'shimmer-place-order'}
                   style={{
                     width: '100%', padding: '1.05rem 2rem',
-                    backgroundColor: C.gold, color: C.charcoal,
+                    backgroundColor: placing ? 'rgba(43,35,32,0.25)' : C.gold, color: C.charcoal,
                     fontFamily: UI, fontWeight: 700, fontSize: '0.875rem',
                     letterSpacing: '0.12em', textTransform: 'uppercase',
-                    border: 'none', borderRadius: '5px', cursor: 'pointer',
+                    border: 'none', borderRadius: '5px', cursor: placing ? 'wait' : 'pointer',
                     boxShadow: `0 2px 12px rgba(212,169,78,0.35)`,
                     transition: 'box-shadow 0.2s, transform 0.15s',
                   }}
                   onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.boxShadow = `0 4px 22px rgba(212,169,78,0.5)`; (e.currentTarget as HTMLButtonElement).style.transform = 'translateY(-1px)'; }}
                   onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.boxShadow = `0 2px 12px rgba(212,169,78,0.35)`; (e.currentTarget as HTMLButtonElement).style.transform = 'none'; }}
                 >
-                  Place Order — {formatCad(totals.totalCents)}
+                  {placing ? 'Placing your order…' : `Place Order — ${formatCad(totals.totalCents)}`}
                 </button>
                 {/* Trust row */}
                 <div style={{ display: 'flex', gap: '1.5rem', justifyContent: 'center', marginTop: '1rem', flexWrap: 'wrap' }}>
@@ -694,11 +711,11 @@ export default function Checkout() {
 
                   {/* Items */}
                   <div style={{ padding: '1rem 1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem', maxHeight: '260px', overflowY: 'auto' }}>
-                    {ITEMS.map(it => (
-                      <div key={it.id} style={{ display: 'flex', gap: '0.875rem', alignItems: 'flex-start' }}>
+                    {lines.map(it => (
+                      <div key={`${it.productId}:${it.size}`} style={{ display: 'flex', gap: '0.875rem', alignItems: 'flex-start' }}>
                         <div style={{ position: 'relative', flexShrink: 0 }}>
                           <img
-                            src={`https://images.unsplash.com/${it.img}?w=80&h=80&fit=crop&auto=format`}
+                            src={it.imageUrl}
                             alt={it.title}
                             width={52} height={52}
                             style={{ borderRadius: '4px', objectFit: 'cover', display: 'block', backgroundColor: 'rgba(43,35,32,0.08)' }}
@@ -709,17 +726,17 @@ export default function Checkout() {
                             borderRadius: '50%', width: '18px', height: '18px',
                             display: 'flex', alignItems: 'center', justifyContent: 'center',
                             fontFamily: UI, fontSize: '0.55rem', fontWeight: 700,
-                          }}>{it.qty}</span>
+                          }}>{it.quantity}</span>
                         </div>
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <div style={{ fontFamily: UI, fontSize: '0.8rem', fontWeight: 600, color: C.charcoal, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                             {it.title}
                           </div>
-                          <div style={{ fontFamily: UI, fontSize: '0.7rem', color: 'rgba(43,35,32,0.5)', marginTop: '2px' }}>{it.variant}</div>
+                          <div style={{ fontFamily: UI, fontSize: '0.7rem', color: 'rgba(43,35,32,0.5)', marginTop: '2px' }}>{it.color} · {it.size}</div>
                         </div>
                         <div style={{ flexShrink: 0, textAlign: 'right' }}>
                           <div style={{ fontFamily: UI, fontSize: '0.825rem', fontWeight: 600, color: C.charcoal }}>
-                            {formatCad(it.cadPrice * it.qty * 100)}
+                            {formatCad(it.unitPriceCents * it.quantity)}
                           </div>
                         </div>
                       </div>
@@ -730,12 +747,13 @@ export default function Checkout() {
                   <div style={{ padding: '1rem 1.5rem', borderTop: `1px solid rgba(43,35,32,0.1)`, display: 'flex', flexDirection: 'column', gap: '0.625rem' }}>
                     {[
                       { label: 'Subtotal', cents: totals.subtotalCents },
+                      ...(discount ? [{ label: `Promo (${discount.code})`, cents: -totals.discountCents }] : []),
                       { label: `Shipping (${selectedMethod.label})`, cents: totals.shippingCents, isFree: totals.shippingCents === 0 },
                     ].map(row => (
                       <div key={row.label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
                         <span style={{ fontFamily: UI, fontSize: '0.8rem', color: 'rgba(43,35,32,0.6)' }}>{row.label}</span>
                         <span style={{ fontFamily: UI, fontSize: '0.8rem', color: row.isFree ? C.teal : C.charcoal, fontWeight: row.isFree ? 600 : 400 }}>
-                          {row.isFree ? 'Free' : formatCad(row.cents)}
+                          {row.isFree ? 'Free' : row.cents < 0 ? `−${formatCad(Math.abs(row.cents))}` : formatCad(row.cents)}
                         </span>
                       </div>
                     ))}
