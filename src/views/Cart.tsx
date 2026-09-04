@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Link } from '@/lib/router';
 import { C, DISPLAY, UI, label } from '../tokens';
+import { formatCad, orderTotals, shippingCost, type ShippingZone } from '@/server/pricing';
 
 /* ─── Types ─────────────────────────────────────────────── */
 interface CartItem {
@@ -12,7 +13,6 @@ interface CartItem {
   size: string;
   color: string;
   cadPrice: number;
-  ngnPrice: number;
   qty: number;
   img: string;
 }
@@ -26,7 +26,6 @@ const SEED: CartItem[] = [
     size: 'L',
     color: 'Gold',
     cadPrice: 310,
-    ngnPrice: 153950,
     qty: 1,
     img: 'photo-1765910083971-aa0e3688be46',
   },
@@ -37,7 +36,6 @@ const SEED: CartItem[] = [
     size: 'M',
     color: 'Burgundy',
     cadPrice: 89,
-    ngnPrice: 44200,
     qty: 2,
     img: 'photo-1763823133159-c6f8ec380e33',
   },
@@ -48,24 +46,26 @@ const SEED: CartItem[] = [
     size: 'One Size',
     color: 'Gold',
     cadPrice: 145,
-    ngnPrice: 71900,
     qty: 1,
     img: 'photo-1714124731489-7eb16af0ac91',
   },
 ];
 
 /* ─── Shipping options ──────────────────────────────────── */
-const SHIPPING_OPTS = [
-  { id: 'ca-us', label: 'Canada / United States', cost: 0, costLabel: 'Free', est: '5–8 business days' },
-  { id: 'uk',    label: 'United Kingdom',          cost: 2500, costLabel: 'CA$5', est: '8–12 business days' },
-  { id: 'ng',    label: 'Nigeria',                  cost: 3500, costLabel: 'CA$7', est: '7–14 business days' },
-  { id: 'intl',  label: 'Rest of World',             cost: 5000, costLabel: 'CA$10', est: '10–18 business days' },
+const SHIPPING_OPTS: { id: string; zone: ShippingZone; label: string; est: string }[] = [
+  { id: 'ca-us', zone: 'canada-us',     label: 'Canada / United States', est: '5–8 business days' },
+  { id: 'uk',    zone: 'uk',            label: 'United Kingdom',         est: '8–12 business days' },
+  { id: 'ng',    zone: 'nigeria',       label: 'Nigeria',                est: '7–14 business days' },
+  { id: 'intl',  zone: 'rest-of-world', label: 'Rest of World',          est: '10–18 business days' },
 ];
 
-/* ─── Helpers ─────────────────────────────────────────────── */
-function cad(n: number) {
-  return new Intl.NumberFormat('en-CA', { style: 'currency', currency: 'CAD', maximumFractionDigits: 0 }).format(n);
+/** What a zone costs, written the way the option list shows it. */
+function shippingLabel(zone: ShippingZone): string {
+  const cents = shippingCost(zone, 'standard');
+  return cents === 0 ? 'Free' : formatCad(cents);
 }
+
+/* ─── Helpers ─────────────────────────────────────────────── */
 
 /* ─── Trust signals ─────────────────────────────────────── */
 const TRUST = [
@@ -111,12 +111,14 @@ export default function Cart() {
   const [wishlist, setWishlist] = useState<number[]>([]);
 
   const selectedShip = SHIPPING_OPTS.find(o => o.id === shipping)!;
-  const subtotalCad = items.reduce((s, it) => s + it.cadPrice * it.qty, 0);
-  const subtotalNgn = items.reduce((s, it) => s + it.ngnPrice * it.qty, 0);
-  const discountCad = promoApplied ? Math.round(subtotalCad * 0.1) : 0;
-  const discountNgn = promoApplied ? Math.round(subtotalNgn * 0.1) : 0;
-  const totalCad = subtotalCad - discountCad + (selectedShip.cost ? 7 : 0);
-  const totalNgn = subtotalNgn - discountNgn + selectedShip.cost;
+
+  // Catalogue prices are whole dollars; pricing works in cents.
+  const totals = orderTotals(
+    items.map(it => ({ unitPriceCents: it.cadPrice * 100, quantity: it.qty })),
+    promoApplied ? { kind: 'percentage', value: 10 } : null,
+    selectedShip.zone,
+    'standard'
+  );
 
   function setQty(id: number, qty: number) {
     if (qty < 1) return;
@@ -224,7 +226,6 @@ export default function Cart() {
             {/* Line items */}
             {items.map((item, idx) => {
               const lineCAD = item.cadPrice * item.qty;
-              const lineNGN = item.ngnPrice * item.qty;
               return (
                 <div key={item.id}>
                   <div style={{
@@ -255,7 +256,7 @@ export default function Cart() {
                       {/* Unit price */}
                       <div>
                         <div style={{ fontFamily: UI, fontSize: '0.875rem', fontWeight: 500, color: C.charcoal }}>
-                          {cad(item.cadPrice)}
+                          {formatCad(item.cadPrice * 100)}
                         </div>
                       </div>
                       {/* Move to wishlist */}
@@ -300,7 +301,7 @@ export default function Cart() {
                         </svg>
                       </button>
                       <div style={{ fontFamily: UI, fontSize: '0.9rem', fontWeight: 600, color: C.charcoal }}>
-                        {cad(lineCAD)}
+                        {formatCad(lineCAD * 100)}
                       </div>
                     </div>
                   </div>
@@ -353,7 +354,7 @@ export default function Cart() {
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '0.625rem' }}>
                 <span style={{ fontFamily: UI, fontSize: '0.875rem', color: 'rgba(43,35,32,0.65)' }}>Subtotal</span>
                 <div style={{ textAlign: 'right' }}>
-                  <div style={{ fontFamily: UI, fontSize: '0.9rem', fontWeight: 500, color: C.charcoal }}>{cad(subtotalCad)}</div>
+                  <div style={{ fontFamily: UI, fontSize: '0.9rem', fontWeight: 500, color: C.charcoal }}>{formatCad(totals.subtotalCents)}</div>
                 </div>
               </div>
 
@@ -362,7 +363,7 @@ export default function Cart() {
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '0.625rem' }}>
                   <span style={{ fontFamily: UI, fontSize: '0.875rem', color: C.teal }}>Promo (FILA10 — 10% off)</span>
                   <div style={{ textAlign: 'right' }}>
-                    <div style={{ fontFamily: UI, fontSize: '0.9rem', fontWeight: 500, color: C.teal }}>−{cad(discountCad)}</div>
+                    <div style={{ fontFamily: UI, fontSize: '0.9rem', fontWeight: 500, color: C.teal }}>−{formatCad(totals.discountCents)}</div>
                   </div>
                 </div>
               )}
@@ -372,8 +373,8 @@ export default function Cart() {
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.625rem' }}>
                   <span style={{ fontFamily: UI, fontSize: '0.875rem', color: 'rgba(43,35,32,0.65)' }}>Shipping</span>
                   <div style={{ textAlign: 'right' }}>
-                    <div style={{ fontFamily: UI, fontSize: '0.9rem', fontWeight: 500, color: selectedShip.cost === 0 ? C.teal : C.charcoal }}>
-                      {selectedShip.costLabel}
+                    <div style={{ fontFamily: UI, fontSize: '0.9rem', fontWeight: 500, color: totals.shippingCents === 0 ? C.teal : C.charcoal }}>
+                      {shippingLabel(selectedShip.zone)}
                     </div>
                     <div style={{ fontFamily: UI, fontSize: '0.7rem', color: 'rgba(43,35,32,0.4)' }}>{selectedShip.est}</div>
                   </div>
@@ -468,7 +469,7 @@ export default function Cart() {
                 <span style={{ fontFamily: DISPLAY, fontSize: '1.0625rem', color: C.charcoal, fontWeight: 500 }}>Total</span>
                 <div style={{ textAlign: 'right' }}>
                   <div style={{ fontFamily: DISPLAY, fontSize: '1.375rem', fontWeight: 600, color: C.charcoal, letterSpacing: '-0.015em' }}>
-                    {cad(totalCad)}
+                    {formatCad(totals.totalCents)}
                   </div>
                 </div>
               </div>

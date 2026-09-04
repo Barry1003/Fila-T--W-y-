@@ -3,12 +3,13 @@
 import { useState, useRef } from 'react';
 import { Link, useNavigate } from '@/lib/router';
 import { C, DISPLAY, UI, label } from '../tokens';
+import { formatCad, orderTotals, shippingCost, type ShippingSpeed, type ShippingZone } from '@/server/pricing';
 
 /* ─── Seed (same items as Cart) ────────────────────────────── */
 const ITEMS = [
-  { id: 8, title: 'Embroidered Agbada Kaftan', variant: 'Gold · Size L', cadPrice: 310, ngnPrice: 153950, qty: 1, img: 'photo-1765910083971-aa0e3688be46' },
-  { id: 1, title: 'Gobi Filà Cap — Burgundy Velvet', variant: 'Burgundy · Size M', cadPrice: 89, ngnPrice: 44200, qty: 2, img: 'photo-1763823133159-c6f8ec380e33' },
-  { id: 4, title: 'Aso-oke Gele — Ivory & Gold Set', variant: 'Gold · One Size', cadPrice: 145, ngnPrice: 71900, qty: 1, img: 'photo-1714124731489-7eb16af0ac91' },
+  { id: 8, title: 'Embroidered Agbada Kaftan', variant: 'Gold · Size L', cadPrice: 310, qty: 1, img: 'photo-1765910083971-aa0e3688be46' },
+  { id: 1, title: 'Gobi Filà Cap — Burgundy Velvet', variant: 'Burgundy · Size M', cadPrice: 89, qty: 2, img: 'photo-1763823133159-c6f8ec380e33' },
+  { id: 4, title: 'Aso-oke Gele — Ivory & Gold Set', variant: 'Gold · One Size', cadPrice: 145, qty: 1, img: 'photo-1714124731489-7eb16af0ac91' },
 ];
 
 /* ─── Country + shipping matrix ──────────────────────────── */
@@ -29,22 +30,30 @@ const COUNTRIES: { value: string; label: string; group: CountryGroup }[] = [
   { value: 'OTHER', label: 'Other', group: 'intl' },
 ];
 
-const SHIPPING_MATRIX: Record<CountryGroup, { id: string; label: string; days: string; cadCost: number; ngnCost: number }[]> = {
+/** Maps the checkout's country groups onto the pricing module's zones. */
+const ZONE_OF: Record<CountryGroup, ShippingZone> = {
+  'ca-us': 'canada-us',
+  uk: 'uk',
+  ng: 'nigeria',
+  intl: 'rest-of-world',
+};
+
+const SHIPPING_MATRIX: Record<CountryGroup, { id: string; label: string; days: string; speed: ShippingSpeed }[]> = {
   'ca-us': [
-    { id: 'ca-us-std', label: 'Standard', days: '5–8 business days', cadCost: 0, ngnCost: 0 },
-    { id: 'ca-us-exp', label: 'Express', days: '2–3 business days', cadCost: 25, ngnCost: 12500 },
+    { id: 'ca-us-std', label: 'Standard', days: '5–8 business days', speed: 'standard' },
+    { id: 'ca-us-exp', label: 'Express', days: '2–3 business days', speed: 'express' },
   ],
   'uk': [
-    { id: 'uk-std', label: 'Standard', days: '8–12 business days', cadCost: 5, ngnCost: 2500 },
-    { id: 'uk-exp', label: 'Express', days: '4–6 business days', cadCost: 18, ngnCost: 9000 },
+    { id: 'uk-std', label: 'Standard', days: '8–12 business days', speed: 'standard' },
+    { id: 'uk-exp', label: 'Express', days: '4–6 business days', speed: 'express' },
   ],
   'ng': [
-    { id: 'ng-std', label: 'Standard', days: '7–14 business days', cadCost: 7, ngnCost: 3500 },
-    { id: 'ng-exp', label: 'Express', days: '4–7 business days', cadCost: 20, ngnCost: 10000 },
+    { id: 'ng-std', label: 'Standard', days: '7–14 business days', speed: 'standard' },
+    { id: 'ng-exp', label: 'Express', days: '4–7 business days', speed: 'express' },
   ],
   'intl': [
-    { id: 'intl-std', label: 'Standard', days: '10–18 business days', cadCost: 10, ngnCost: 5000 },
-    { id: 'intl-exp', label: 'Express', days: '6–10 business days', cadCost: 25, ngnCost: 12500 },
+    { id: 'intl-std', label: 'Standard', days: '10–18 business days', speed: 'standard' },
+    { id: 'intl-exp', label: 'Express', days: '6–10 business days', speed: 'express' },
   ],
 };
 
@@ -62,9 +71,6 @@ const PHONE_CODES = [
 ];
 
 /* ─── Helpers ─────────────────────────────────────────────── */
-function cad(n: number) {
-  return new Intl.NumberFormat('en-CA', { style: 'currency', currency: 'CAD', maximumFractionDigits: 0 }).format(n);
-}
 function getGroup(countryVal: string): CountryGroup {
   return COUNTRIES.find(c => c.value === countryVal)?.group ?? 'intl';
 }
@@ -247,13 +253,13 @@ export default function Checkout() {
   if (!cardExp || !/^\d{2}\/\d{2}$/.test(cardExp)) errors.cardExp = 'Use MM/YY format.';
   if (!cardCvc || cardCvc.length < 3) errors.cardCvc = 'Enter 3–4 digit CVC.';
 
-  // Totals
-  const subtotalCad = ITEMS.reduce((s, it) => s + it.cadPrice * it.qty, 0);
-  const subtotalNgn = ITEMS.reduce((s, it) => s + it.ngnPrice * it.qty, 0);
-  const shipCad = selectedMethod.cadCost;
-  const shipNgn = selectedMethod.ngnCost;
-  const totalCad = subtotalCad + shipCad;
-  const totalNgn = subtotalNgn + shipNgn;
+  // Totals — same module the cart uses, so the two cannot disagree.
+  const totals = orderTotals(
+    ITEMS.map(it => ({ unitPriceCents: it.cadPrice * 100, quantity: it.qty })),
+    null,
+    ZONE_OF[group],
+    selectedMethod.speed
+  );
 
   function formatCard(val: string) {
     return val.replace(/\D/g, '').slice(0, 16).replace(/(.{4})/g, '$1 ').trim();
@@ -520,8 +526,8 @@ export default function Checkout() {
                             <span style={{ fontFamily: UI, fontWeight: 600, fontSize: '0.875rem', color: C.charcoal }}>
                               {m.label}
                             </span>
-                            <span style={{ fontFamily: UI, fontWeight: 600, fontSize: '0.875rem', color: m.cadCost === 0 ? C.teal : C.charcoal, flexShrink: 0 }}>
-                              {m.cadCost === 0 ? 'Free' : cad(m.cadCost)}
+                            <span style={{ fontFamily: UI, fontWeight: 600, fontSize: '0.875rem', color: shippingCost(ZONE_OF[group], m.speed) === 0 ? C.teal : C.charcoal, flexShrink: 0 }}>
+                              {shippingCost(ZONE_OF[group], m.speed) === 0 ? 'Free' : formatCad(shippingCost(ZONE_OF[group], m.speed))}
                             </span>
                           </div>
                           <div style={{ fontFamily: UI, fontSize: '0.775rem', color: 'rgba(43,35,32,0.55)', marginTop: '2px' }}>
@@ -654,7 +660,7 @@ export default function Checkout() {
                   onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.boxShadow = `0 4px 22px rgba(212,169,78,0.5)`; (e.currentTarget as HTMLButtonElement).style.transform = 'translateY(-1px)'; }}
                   onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.boxShadow = `0 2px 12px rgba(212,169,78,0.35)`; (e.currentTarget as HTMLButtonElement).style.transform = 'none'; }}
                 >
-                  Place Order — {cad(totalCad)}
+                  Place Order — {formatCad(totals.totalCents)}
                 </button>
                 {/* Trust row */}
                 <div style={{ display: 'flex', gap: '1.5rem', justifyContent: 'center', marginTop: '1rem', flexWrap: 'wrap' }}>
@@ -713,7 +719,7 @@ export default function Checkout() {
                         </div>
                         <div style={{ flexShrink: 0, textAlign: 'right' }}>
                           <div style={{ fontFamily: UI, fontSize: '0.825rem', fontWeight: 600, color: C.charcoal }}>
-                            {cad(it.cadPrice * it.qty)}
+                            {formatCad(it.cadPrice * it.qty * 100)}
                           </div>
                         </div>
                       </div>
@@ -723,13 +729,13 @@ export default function Checkout() {
                   {/* Totals */}
                   <div style={{ padding: '1rem 1.5rem', borderTop: `1px solid rgba(43,35,32,0.1)`, display: 'flex', flexDirection: 'column', gap: '0.625rem' }}>
                     {[
-                      { label: 'Subtotal', cad: subtotalCad, ngn: subtotalNgn },
-                      { label: `Shipping (${selectedMethod.label})`, cad: shipCad, ngn: shipNgn, isFree: shipCad === 0 },
+                      { label: 'Subtotal', cents: totals.subtotalCents },
+                      { label: `Shipping (${selectedMethod.label})`, cents: totals.shippingCents, isFree: totals.shippingCents === 0 },
                     ].map(row => (
                       <div key={row.label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
                         <span style={{ fontFamily: UI, fontSize: '0.8rem', color: 'rgba(43,35,32,0.6)' }}>{row.label}</span>
                         <span style={{ fontFamily: UI, fontSize: '0.8rem', color: row.isFree ? C.teal : C.charcoal, fontWeight: row.isFree ? 600 : 400 }}>
-                          {row.isFree ? 'Free' : cad(row.cad)}
+                          {row.isFree ? 'Free' : formatCad(row.cents)}
                         </span>
                       </div>
                     ))}
@@ -738,7 +744,7 @@ export default function Checkout() {
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
                         <span style={{ fontFamily: UI, fontWeight: 700, fontSize: '0.95rem', color: C.charcoal }}>Total</span>
                         <div style={{ textAlign: 'right' }}>
-                          <div style={{ fontFamily: DISPLAY, fontSize: '1.2rem', color: C.charcoal, fontWeight: 600 }}>{cad(totalCad)}</div>
+                          <div style={{ fontFamily: DISPLAY, fontSize: '1.2rem', color: C.charcoal, fontWeight: 600 }}>{formatCad(totals.totalCents)}</div>
                         </div>
                       </div>
                     </div>
