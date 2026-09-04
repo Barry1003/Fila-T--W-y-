@@ -139,6 +139,7 @@ async function main() {
         title: p.title,
         categoryId: categories.get(p.category)!,
         tag: p.tag === 'SOLD OUT' ? 'SOLD_OUT' : p.tag === 'MADE TO ORDER' ? 'MADE_TO_ORDER' : 'NEW',
+        status: 'PUBLISHED',
         color: p.color,
         inStock: p.inStock,
         priceCad: p.cadNum,

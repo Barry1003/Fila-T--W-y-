@@ -3,6 +3,15 @@
 import { useState } from "react";
 import { Link } from '@/lib/router';
 import { C, UI } from "../../tokens";
+import type { ConsoleProduct } from "@/server/catalogue";
+
+/** Out of stock is derived, never stored, so it cannot contradict the count. */
+type Status = "published" | "draft" | "outofstock";
+
+function statusOf(p: ConsoleProduct): Status {
+  if (p.status === "DRAFT") return "draft";
+  return p.stock === 0 ? "outofstock" : "published";
+}
 import { TagIcon, PenIcon, GridIcon } from "../../icons";
 
 // ── Icons ─────────────────────────────────────────────────────────────────────
@@ -57,34 +66,6 @@ function ChevronRightIcon({ size = 14 }: { size?: number }) {
 
 // ── Mock data ─────────────────────────────────────────────────────────────────
 
-type Status = "published" | "draft" | "outofstock";
-type Product = {
-  id: string;
-  name: string;
-  category: string;
-  priceCad: number;
-  priceNGN: number;
-  stock: number;
-  status: Status;
-  color: string;
-};
-
-const PRODUCTS: Product[] = [
-  { id: "p1", name: "Aso-Oke Gele Set", category: "Gele", priceCad: 585, priceNGN: 504000, stock: 8, status: "published", color: "#7A2E38" },
-  { id: "p2", name: "Yoruba Filà (Custom)", category: "Filà", priceCad: 490, priceNGN: 422200, stock: 12, status: "published", color: "#D4A94E" },
-  { id: "p3", name: "Adire Wrapper Set", category: "Ipele", priceCad: 335, priceNGN: 288900, stock: 5, status: "published", color: "#2E4A9E" },
-  { id: "p4", name: "Embroidered Kaftan (Men)", category: "Kaftan", priceCad: 722, priceNGN: 622000, stock: 0, status: "outofstock", color: "#3B8A93" },
-  { id: "p5", name: "Aso-Oke Cap — Classic", category: "Filà", priceCad: 241, priceNGN: 207200, stock: 22, status: "published", color: "#7A2E38" },
-  { id: "p6", name: "Beaded Pam Slippers", category: "Pam Slippers", priceCad: 151, priceNGN: 130200, stock: 3, status: "draft", color: "#D4A94E" },
-  { id: "p7", name: "Ankara Roundneck Shirt", category: "Roundneck Shirts", priceCad: 198, priceNGN: 170200, stock: 14, status: "published", color: "#2E4A9E" },
-  { id: "p8", name: "Bead & Cowrie Necklace Set", category: "Accessories", priceCad: 117, priceNGN: 100600, stock: 19, status: "published", color: "#3B8A93" },
-  { id: "p9", name: "Agbada 3-Piece Set", category: "Kaftan", priceCad: 1170, priceNGN: 1006400, stock: 2, status: "draft", color: "#7A2E38" },
-  { id: "p10", name: "Aso-Oke Trousers", category: "Trousers", priceCad: 275, priceNGN: 236800, stock: 0, status: "outofstock", color: "#D4A94E" },
-  { id: "p11", name: "Leather Yoruba Shoes", category: "Shoes", priceCad: 378, priceNGN: 325600, stock: 6, status: "published", color: "#2E4A9E" },
-  { id: "p12", name: "Ipele Wrap (Silk Blend)", category: "Ipele", priceCad: 421, priceNGN: 362600, stock: 9, status: "published", color: "#3B8A93" },
-];
-
-const CATEGORIES = ["All Categories", "Filà", "Gele", "Ipele", "Kaftan", "Trousers", "Roundneck Shirts", "Shoes", "Pam Slippers", "Accessories"];
 const STATUSES = ["All Status", "Published", "Draft", "Out of Stock"];
 const SORTS = ["Newest", "Name A–Z", "Price ↑", "Stock Level"];
 
@@ -117,26 +98,6 @@ function StatusBadge({ status }: { status: Status }) {
 }
 
 // ── Product thumbnail placeholder ─────────────────────────────────────────────
-
-function ProductThumb({ color, initials }: { color: string; initials: string }) {
-  return (
-    <div style={{
-      width: 38,
-      height: 38,
-      borderRadius: 6,
-      backgroundColor: color,
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      flexShrink: 0,
-      opacity: 0.85,
-    }}>
-      <span style={{ color: "#fff", fontSize: "0.6rem", fontWeight: 700, letterSpacing: "0.04em" }}>
-        {initials}
-      </span>
-    </div>
-  );
-}
 
 // ── Select / Input helpers ────────────────────────────────────────────────────
 
@@ -171,7 +132,7 @@ function SelectField({ value, onChange, options }: { value: string; onChange: (v
 
 // ── Main component ────────────────────────────────────────────────────────────
 
-export default function ConsoleProducts() {
+export default function ConsoleProducts({ products, categories }: { products: ConsoleProduct[]; categories: string[] }) {
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("All Categories");
   const [status, setStatus] = useState("All Status");
@@ -180,16 +141,20 @@ export default function ConsoleProducts() {
   const [page, setPage] = useState(1);
   const PER_PAGE = 8;
 
-  const filtered = PRODUCTS.filter(p => {
-    const matchSearch = p.name.toLowerCase().includes(search.toLowerCase()) || p.category.toLowerCase().includes(search.toLowerCase());
+  const CATEGORIES = ["All Categories", ...categories];
+
+  const filtered = products.filter(p => {
+    const q = search.toLowerCase();
+    const matchSearch = p.title.toLowerCase().includes(q) || p.category.toLowerCase().includes(q);
     const matchCat = category === "All Categories" || p.category === category;
+    const derived = statusOf(p);
     const matchStatus = status === "All Status" ||
-      (status === "Published" && p.status === "published") ||
-      (status === "Draft" && p.status === "draft") ||
-      (status === "Out of Stock" && p.status === "outofstock");
+      (status === "Published" && derived === "published") ||
+      (status === "Draft" && derived === "draft") ||
+      (status === "Out of Stock" && derived === "outofstock");
     return matchSearch && matchCat && matchStatus;
   }).sort((a, b) => {
-    if (sort === "Name A–Z") return a.name.localeCompare(b.name);
+    if (sort === "Name A–Z") return a.title.localeCompare(b.title);
     if (sort === "Price ↑") return a.priceCad - b.priceCad;
     if (sort === "Stock Level") return a.stock - b.stock;
     return 0;
@@ -414,13 +379,16 @@ export default function ConsoleProducts() {
                         {/* Product */}
                         <td style={td}>
                           <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-                            <ProductThumb
-                              color={p.color}
-                              initials={p.name.split(" ").slice(0, 2).map(w => w[0]).join("").toUpperCase()}
+                            <img
+                              src={p.imageUrl}
+                              alt=""
+                              width={38}
+                              height={38}
+                              style={{ width: 38, height: 38, objectFit: "cover", borderRadius: 5, flexShrink: 0 }}
                             />
                             <div>
                               <div style={{ fontSize: "0.8rem", fontWeight: 600, color: C.charcoal, lineHeight: 1.2 }}>
-                                {p.name}
+                                {p.title}
                               </div>
                               <div style={{ fontSize: "0.68rem", color: "rgba(43,35,32,0.4)", marginTop: "2px" }}>
                                 #{p.id.toUpperCase()}
@@ -455,7 +423,7 @@ export default function ConsoleProducts() {
 
                         {/* Status */}
                         <td style={td}>
-                          <StatusBadge status={p.status} />
+                          <StatusBadge status={statusOf(p)} />
                         </td>
 
                         {/* Actions */}

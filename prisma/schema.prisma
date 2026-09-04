@@ -23,6 +23,14 @@ enum Role {
   OWNER
 }
 
+/// Whether a product is visible in the storefront. "Out of stock" is not a
+/// status — it is derived from variant stock, so it cannot disagree with the
+/// actual numbers.
+enum ProductStatus {
+  DRAFT
+  PUBLISHED
+}
+
 enum ProductTag {
   NEW
   SOLD_OUT
@@ -179,6 +187,7 @@ model Product {
   title       String
   description String?
   categoryId  String
+  status      ProductStatus @default(PUBLISHED)
   tag         ProductTag?
   color       String
   inStock     Boolean     @default(true)

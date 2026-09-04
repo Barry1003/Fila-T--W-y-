@@ -1,4 +1,5 @@
 import 'server-only';
+import { unstable_cache } from 'next/cache';
 import { prisma } from '@/lib/prisma';
 import { withDbRetry } from './db';
 
@@ -23,6 +24,13 @@ export type CatalogueProduct = {
   color: string;
   sizes: string[];
   inStock: boolean;
+};
+
+/** What the console's product table needs, beyond what shoppers see. */
+export type ConsoleProduct = CatalogueProduct & {
+  status: 'DRAFT' | 'PUBLISHED';
+  /** Summed across variants — the console shows one number per product. */
+  stock: number;
 };
 
 export type CatalogueCollection = {
@@ -50,8 +58,9 @@ const productSelect = {
   color: true,
   inStock: true,
   priceCad: true,
+  status: true,
   images: { select: { url: true }, orderBy: { position: 'asc' }, take: 1 },
-  variants: { select: { size: true }, orderBy: { id: 'asc' } },
+  variants: { select: { size: true, stock: true }, orderBy: { id: 'asc' } },
   category: {
     select: { name: true, parent: { select: { slug: true, name: true } } },
   },
@@ -65,8 +74,9 @@ type ProductRow = {
   color: string;
   inStock: boolean;
   priceCad: unknown;
+  status: 'DRAFT' | 'PUBLISHED';
   images: { url: string }[];
-  variants: { size: string }[];
+  variants: { size: string; stock: number }[];
   category: { name: string; parent: { slug: string; name: string } | null };
 };
 
@@ -88,22 +98,67 @@ function toCatalogueProduct(row: ProductRow): CatalogueProduct {
   };
 }
 
-export async function listProducts(): Promise<CatalogueProduct[]> {
-  const rows = await withDbRetry('list products', () =>
+/**
+ * Caching, and why.
+ *
+ * Neon suspends idle computes and the connection that wakes one usually fails,
+ * so querying per request makes every visitor gamble on a cold start. Cached,
+ * the database is touched about once a minute and a blip during revalidation
+ * serves the previous result instead of an error.
+ *
+ * Call revalidateTag(CATALOGUE_TAG) after any write so the console's edits
+ * appear on the storefront immediately.
+ */
+export const CATALOGUE_TAG = 'catalogue';
+const CACHE = { tags: [CATALOGUE_TAG], revalidate: 60 };
+
+/** Published products only — drafts are the owner's business, not a shopper's. */
+export const listProducts = unstable_cache(
+  async (): Promise<CatalogueProduct[]> => {
+    const rows = await withDbRetry('list products', () =>
+      prisma.product.findMany({
+        where: { status: 'PUBLISHED' },
+        select: productSelect,
+        orderBy: { createdAt: 'asc' },
+      })
+    );
+    return (rows as unknown as ProductRow[]).map(toCatalogueProduct);
+  },
+  ['catalogue:products'],
+  CACHE
+);
+
+/**
+ * Every product, drafts included, with stock and status.
+ *
+ * Deliberately not cached: the console must show an edit the moment it saves.
+ */
+export async function listProductsForConsole(): Promise<ConsoleProduct[]> {
+  const rows = await withDbRetry('list products for console', () =>
     prisma.product.findMany({ select: productSelect, orderBy: { createdAt: 'asc' } })
   );
-  return (rows as unknown as ProductRow[]).map(toCatalogueProduct);
+
+  return (rows as unknown as ProductRow[]).map(row => ({
+    ...toCatalogueProduct(row),
+    status: row.status,
+    stock: row.variants.reduce((total, v) => total + v.stock, 0),
+  }));
 }
 
-export async function getProductBySlug(slug: string): Promise<CatalogueProduct | null> {
-  const row = await withDbRetry('get product', () =>
-    prisma.product.findUnique({ where: { slug }, select: productSelect })
-  );
-  return row ? toCatalogueProduct(row as unknown as ProductRow) : null;
-}
+export const getProductBySlug = unstable_cache(
+  async (slug: string): Promise<CatalogueProduct | null> => {
+    const row = await withDbRetry('get product', () =>
+      prisma.product.findUnique({ where: { slug }, select: productSelect })
+    );
+    return row ? toCatalogueProduct(row as unknown as ProductRow) : null;
+  },
+  ['catalogue:product'],
+  CACHE
+);
 
 /** Collections with their categories, in display order. */
-export async function listCollections(): Promise<CatalogueCollection[]> {
+export const listCollections = unstable_cache(
+  async (): Promise<CatalogueCollection[]> => {
   const rows = await withDbRetry('list collections', () =>
     prisma.category.findMany({
       where: { parentId: null },
@@ -125,7 +180,10 @@ export async function listCollections(): Promise<CatalogueCollection[]> {
     blurb: c.blurb ?? '',
     categories: c.children.map(child => child.name),
   }));
-}
+  },
+  ['catalogue:collections'],
+  CACHE
+);
 
 /** Colours present in a set of products, so the filter never offers a dead option. */
 export function colorsOf(products: CatalogueProduct[]): string[] {
