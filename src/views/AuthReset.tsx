@@ -44,16 +44,18 @@ export default function AuthReset() {
 
   const [show, setShow] = useState(false);
 
+  // Layout for the fields is on the elements (FIELD_CLS); colour/type here.
   const field: React.CSSProperties = {
-    width: '100%', padding: '0.8rem 0.9rem', fontFamily: UI, fontSize: '0.9rem',
-    border: '1px solid rgba(43,35,32,0.18)', borderRadius: 5, outline: 'none', color: C.charcoal,
+    fontFamily: UI, fontSize: '0.9rem',
+    border: '1px solid rgba(43,35,32,0.18)', outline: 'none', color: C.charcoal,
   };
+  const FIELD_CLS = 'w-full py-[0.8rem] px-[0.9rem] rounded-[5px]';
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: C.cream, display: 'grid', placeItems: 'center', padding: '2rem 1.25rem' }}>
-      <div style={{ width: '100%', maxWidth: '420px' }}>
+    <div className="min-h-screen grid place-items-center py-8 px-5" style={{ backgroundColor: C.cream }}>
+      <div className="w-full max-w-[420px]">
         <div style={{ ...label, color: C.gold, fontSize: '0.6rem', letterSpacing: '0.18em' }}>AdeClassics</div>
-        <h1 style={{ fontFamily: DISPLAY, fontSize: '1.9rem', fontWeight: 400, color: C.charcoal, margin: '0.5rem 0 1.5rem', letterSpacing: '-0.02em' }}>
+        <h1 className="mt-2 mx-0 mb-6" style={{ fontFamily: DISPLAY, fontSize: '1.9rem', fontWeight: 400, color: C.charcoal, letterSpacing: '-0.02em' }}>
           Choose a new password
         </h1>
 
@@ -67,16 +69,16 @@ export default function AuthReset() {
             Password updated. Taking you to sign in…
           </p>
         ) : (
-          <form onSubmit={submit} noValidate style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <form onSubmit={submit} noValidate className="flex flex-col gap-4">
             {error && (
-              <div role="alert" style={{ fontFamily: UI, fontSize: '0.82rem', color: C.maroon, backgroundColor: 'rgba(122,46,56,0.07)', border: '1px solid rgba(122,46,56,0.25)', borderRadius: 6, padding: '0.7rem 0.85rem' }}>
+              <div role="alert" className="rounded-[6px] py-[0.7rem] px-[0.85rem]" style={{ fontFamily: UI, fontSize: '0.82rem', color: C.maroon, backgroundColor: 'rgba(122,46,56,0.07)', border: '1px solid rgba(122,46,56,0.25)' }}>
                 {error}
               </div>
             )}
 
             <div>
-              <label htmlFor="pw" style={{ ...label, fontSize: '0.65rem', color: C.charcoal, display: 'block', marginBottom: '0.4rem' }}>New password</label>
-              <div style={{ position: 'relative' }}>
+              <label htmlFor="pw" className="block mb-[0.4rem]" style={{ ...label, fontSize: '0.65rem', color: C.charcoal }}>New password</label>
+              <div className="relative">
                 <input
                   id="pw"
                   type={show ? 'text' : 'password'}
@@ -84,17 +86,15 @@ export default function AuthReset() {
                   onChange={e => setPassword(e.target.value)}
                   autoComplete="new-password"
                   placeholder="Min. 8 characters"
-                  style={{ ...field, paddingRight: '2.75rem' }}
+                  className="w-full py-[0.8rem] pl-[0.9rem] pr-11 rounded-[5px]"
+                  style={field}
                 />
                 <button
                   type="button"
                   onClick={() => setShow(v => !v)}
                   aria-label={show ? 'Hide password' : 'Show password'}
-                  style={{
-                    position: 'absolute', right: '0.6rem', top: '50%', transform: 'translateY(-50%)',
-                    background: 'none', border: 'none', cursor: 'pointer', padding: '4px',
-                    color: 'rgba(43,35,32,0.45)', lineHeight: 0,
-                  }}
+                  className="absolute right-[0.6rem] top-1/2 -translate-y-1/2 cursor-pointer p-[4px]"
+                  style={{ background: 'none', border: 'none', color: 'rgba(43,35,32,0.45)', lineHeight: 0 }}
                 >
                   {show ? (
                     <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
@@ -112,7 +112,7 @@ export default function AuthReset() {
             </div>
 
             <div>
-              <label htmlFor="pw2" style={{ ...label, fontSize: '0.65rem', color: C.charcoal, display: 'block', marginBottom: '0.4rem' }}>Confirm password</label>
+              <label htmlFor="pw2" className="block mb-[0.4rem]" style={{ ...label, fontSize: '0.65rem', color: C.charcoal }}>Confirm password</label>
               <input
                 id="pw2"
                 type={show ? 'text' : 'password'}
@@ -120,6 +120,7 @@ export default function AuthReset() {
                 onChange={e => setConfirm(e.target.value)}
                 autoComplete="new-password"
                 placeholder="Re-enter password"
+                className={FIELD_CLS}
                 style={field}
               />
             </div>
@@ -127,10 +128,11 @@ export default function AuthReset() {
             <button
               type="submit"
               disabled={pending}
+              className="mt-[0.4rem] w-full p-[0.95rem] rounded-[5px] uppercase"
               style={{
-                marginTop: '0.4rem', width: '100%', padding: '0.95rem', border: 'none', borderRadius: 5,
+                border: 'none',
                 backgroundColor: C.gold, color: C.charcoal, fontFamily: UI, fontWeight: 700,
-                fontSize: '0.8rem', letterSpacing: '0.14em', textTransform: 'uppercase',
+                fontSize: '0.8rem', letterSpacing: '0.14em',
                 cursor: pending ? 'wait' : 'pointer', opacity: pending ? 0.7 : 1,
               }}
             >

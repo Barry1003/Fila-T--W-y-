@@ -78,15 +78,18 @@ interface SidebarProps {
   onClose?: () => void;
 }
 
+// Layout for a filter section heading; colour/type stay in sectionHead.
+const SECTION_HEAD_CLS = 'mb-3.5 pb-2';
+
 function Sidebar({ collections, colors, selectedCats, onCat, priceMax, onPriceMax, selectedColors, onColor, availability, onAvail, onClear, onClose }: SidebarProps) {
   const sectionHead: React.CSSProperties = {
-    ...label, fontSize: '0.595rem', color: C.charcoal, marginBottom: '0.875rem',
-    letterSpacing: '0.14em', paddingBottom: '0.5rem', borderBottom: '1px solid rgba(43,35,32,0.08)',
+    ...label, fontSize: '0.595rem', color: C.charcoal,
+    letterSpacing: '0.14em', borderBottom: '1px solid rgba(43,35,32,0.08)',
   };
 
   const checkRow = (checked: boolean, lbl: string, onChange: () => void) => (
-    <label key={lbl} style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', cursor: 'pointer', marginBottom: '0.5rem' }}>
-      <input type="checkbox" checked={checked} onChange={onChange} style={{ accentColor: C.maroon, width: '14px', height: '14px', cursor: 'pointer' }} />
+    <label key={lbl} className="flex items-center gap-2.5 cursor-pointer mb-2">
+      <input type="checkbox" checked={checked} onChange={onChange} className="w-3.5 h-3.5 cursor-pointer" style={{ accentColor: C.maroon }} />
       <span style={{ fontFamily: UI, fontSize: '0.8125rem', color: C.charcoal }}>{lbl}</span>
     </label>
   );
@@ -94,18 +97,18 @@ function Sidebar({ collections, colors, selectedCats, onCat, priceMax, onPriceMa
   const hasFilters = selectedCats.length > 0 || selectedColors.length > 0 || availability.length > 0 || priceMax < 350;
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+    <div className="flex flex-col gap-8">
       {/* Header row */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div className="flex justify-between items-center">
         <span style={{ ...label, fontSize: '0.68rem', color: C.charcoal }}>Filters</span>
-        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+        <div className="flex gap-4 items-center">
           {hasFilters && (
-            <button onClick={onClear} style={{ background: 'none', border: 'none', color: C.indigo, fontFamily: UI, fontSize: '0.775rem', cursor: 'pointer', padding: 0 }}>
+            <button onClick={onClear} className="p-0 cursor-pointer" style={{ background: 'none', border: 'none', color: C.indigo, fontFamily: UI, fontSize: '0.775rem' }}>
               Clear all
             </button>
           )}
           {onClose && (
-            <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: C.charcoal, display: 'flex', padding: '2px' }}><XIcon /></button>
+            <button onClick={onClose} className="flex p-[2px] cursor-pointer" style={{ background: 'none', border: 'none', color: C.charcoal }}><XIcon /></button>
           )}
         </div>
       </div>
@@ -113,35 +116,36 @@ function Sidebar({ collections, colors, selectedCats, onCat, priceMax, onPriceMa
       {/* Category, grouped by the collection each one belongs to */}
       {collections.map(collection => (
         <div key={collection.slug}>
-          <div style={sectionHead}>{collection.name}</div>
+          <div className={SECTION_HEAD_CLS} style={sectionHead}>{collection.name}</div>
           {collection.categories.map(c => checkRow(selectedCats.includes(c), c, () => onCat(c)))}
         </div>
       ))}
 
       {/* Price range */}
       <div>
-        <div style={sectionHead}>Price</div>
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+        <div className={SECTION_HEAD_CLS} style={sectionHead}>Price</div>
+        <div className="flex justify-between mb-2">
           <span style={{ fontFamily: UI, fontSize: '0.775rem', color: 'rgba(43,35,32,0.55)' }}>CAD $0</span>
           <span style={{ fontFamily: UI, fontSize: '0.775rem', color: C.charcoal, fontWeight: 500 }}>up to CAD ${priceMax}</span>
         </div>
         <input
           type="range" min={50} max={350} step={10} value={priceMax}
           onChange={e => onPriceMax(Number(e.target.value))}
-          style={{ width: '100%', accentColor: C.maroon, cursor: 'pointer' }}
+          className="w-full cursor-pointer"
+          style={{ accentColor: C.maroon }}
         />
       </div>
 
       {/* Availability */}
       <div>
-        <div style={sectionHead}>Availability</div>
+        <div className={SECTION_HEAD_CLS} style={sectionHead}>Availability</div>
         {['In Stock', 'Made to Order'].map(a => checkRow(availability.includes(a), a, () => onAvail(a)))}
       </div>
 
       {/* Color */}
       <div>
-        <div style={sectionHead}>Colour</div>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+        <div className={SECTION_HEAD_CLS} style={sectionHead}>Colour</div>
+        <div className="flex flex-wrap gap-2">
           {colors.map(col => {
             const active = selectedColors.includes(col);
             const bg = COLOR_HEX[col];
@@ -150,12 +154,11 @@ function Sidebar({ collections, colors, selectedCats, onCat, priceMax, onPriceMa
                 key={col}
                 onClick={() => onColor(col)}
                 title={col}
+                className="w-6 h-6 rounded-full cursor-pointer p-0 shrink-0"
                 style={{
-                  width: '24px', height: '24px', borderRadius: '50%',
                   background: bg, border: active ? `2px solid ${C.charcoal}` : '2px solid transparent',
                   outline: active ? `2px solid ${C.gold}` : '2px solid transparent',
                   outlineOffset: '1px',
-                  cursor: 'pointer', padding: 0, flexShrink: 0,
                   transition: 'outline 0.15s',
                 }}
               />
@@ -175,14 +178,14 @@ function ProductCard({ p, view }: { p: CatalogueProduct; view: 'grid' | 'list' }
 
   if (view === 'list') {
     return (
-      <Link to={`/product/${p.slug}`} style={{ display: 'flex', gap: '1.5rem', textDecorationLine: 'none', color: C.charcoal, padding: '1.25rem 0', borderBottom: '1px solid rgba(43,35,32,0.07)' }}
+      <Link to={`/product/${p.slug}`} className="flex gap-6 no-underline py-5" style={{ color: C.charcoal, borderBottom: '1px solid rgba(43,35,32,0.07)' }}
         onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}>
-        <div style={{ width: '120px', flexShrink: 0, aspectRatio: '3/4', backgroundColor: '#ddd5c8', overflow: 'hidden', position: 'relative' }}>
-          <img src={p.imageUrl} alt={p.title} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', transform: hovered ? 'scale(1.05)' : 'scale(1)', transition: 'transform 0.4s ease' }} />
-          <span style={{ position: 'absolute', top: '0.5rem', left: '0.5rem', backgroundColor: p.tag === 'NEW' ? C.maroon : C.charcoal, color: C.cream, ...label, fontSize: '0.52rem', padding: '2px 6px' }}>{p.tag}</span>
+        <div className="w-[120px] shrink-0 aspect-[3/4] overflow-hidden relative" style={{ backgroundColor: '#ddd5c8' }}>
+          <img src={p.imageUrl} alt={p.title} className="w-full h-full object-cover block" style={{ transform: hovered ? 'scale(1.05)' : 'scale(1)', transition: 'transform 0.4s ease' }} />
+          <span className="absolute top-2 left-2 py-[2px] px-[6px]" style={{ backgroundColor: p.tag === 'NEW' ? C.maroon : C.charcoal, color: C.cream, ...label, fontSize: '0.52rem' }}>{p.tag}</span>
         </div>
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-          <div style={{ fontFamily: UI, fontSize: '0.9375rem', marginBottom: '0.4rem', color: C.charcoal }}>{p.title}</div>
+        <div className="flex-1 flex flex-col justify-center">
+          <div className="mb-[0.4rem]" style={{ fontFamily: UI, fontSize: '0.9375rem', color: C.charcoal }}>{p.title}</div>
           <div style={{ fontFamily: UI, fontSize: '1rem', fontWeight: 600, color: C.charcoal }}>{fmt(p.priceCad, 'CAD $')}</div>
         </div>
       </Link>
@@ -190,15 +193,15 @@ function ProductCard({ p, view }: { p: CatalogueProduct; view: 'grid' | 'list' }
   }
 
   return (
-    <Link to={`/product/${p.slug}`} className="product-card" style={{ textDecorationLine: 'none', color: C.charcoal, display: 'block' }}>
-      <div style={{ position: 'relative', marginBottom: '1rem', backgroundColor: '#ddd5c8', overflow: 'hidden', aspectRatio: '3/4' }}>
-        <img className="product-img" src={p.imageUrl} alt={p.title} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-        <span style={{ position: 'absolute', top: '0.75rem', left: '0.75rem', backgroundColor: p.tag === 'NEW' ? C.maroon : C.charcoal, color: C.cream, ...label, fontSize: '0.56rem', padding: '3px 8px', letterSpacing: '0.12em' }}>
+    <Link to={`/product/${p.slug}`} className="product-card no-underline block" style={{ color: C.charcoal }}>
+      <div className="relative mb-4 overflow-hidden aspect-[3/4]" style={{ backgroundColor: '#ddd5c8' }}>
+        <img className="product-img w-full h-full object-cover block" src={p.imageUrl} alt={p.title} />
+        <span className="absolute top-3 left-3 py-[3px] px-[8px]" style={{ backgroundColor: p.tag === 'NEW' ? C.maroon : C.charcoal, color: C.cream, ...label, fontSize: '0.56rem', letterSpacing: '0.12em' }}>
           {p.tag}
         </span>
         <div className="product-overlay">
           <div className="product-overlay-btns">
-            <button onClick={e => e.preventDefault()} style={{ flex: 1, border: '1px solid rgba(250,246,240,0.55)', color: C.cream, background: 'transparent', ...label, fontSize: '0.585rem', padding: '0.55rem 0', cursor: 'pointer', letterSpacing: '0.12em', backdropFilter: 'blur(4px)' }}>
+            <button onClick={e => e.preventDefault()} className="flex-1 cursor-pointer py-[0.55rem]" style={{ border: '1px solid rgba(250,246,240,0.55)', color: C.cream, background: 'transparent', ...label, fontSize: '0.585rem', letterSpacing: '0.12em', backdropFilter: 'blur(4px)' }}>
               Quick View
             </button>
             <button
@@ -215,14 +218,15 @@ function ProductCard({ p, view }: { p: CatalogueProduct; view: 'grid' | 'list' }
                   imageUrl: p.imageUrl,
                 });
               }}
-              style={{ flex: 1, border: 'none', color: C.charcoal, background: C.gold, ...label, fontSize: '0.585rem', padding: '0.55rem 0', cursor: 'pointer', letterSpacing: '0.12em' }}
+              className="flex-1 cursor-pointer py-[0.55rem]"
+              style={{ border: 'none', color: C.charcoal, background: C.gold, ...label, fontSize: '0.585rem', letterSpacing: '0.12em' }}
             >
               Add to Cart
             </button>
           </div>
         </div>
       </div>
-      <div style={{ fontFamily: UI, fontSize: '0.875rem', fontWeight: 400, marginBottom: '0.5rem', lineHeight: 1.4, color: C.charcoal }}>{p.title}</div>
+      <div className="mb-2" style={{ fontFamily: UI, fontSize: '0.875rem', fontWeight: 400, lineHeight: 1.4, color: C.charcoal }}>{p.title}</div>
       <div style={{ fontFamily: UI, fontSize: '1rem', fontWeight: 600, color: C.charcoal, lineHeight: 1 }}>{fmt(p.priceCad, 'CAD $')}</div>
     </Link>
   );
@@ -285,43 +289,44 @@ function ShopContent({ products, collections, colors }: ShopProps) {
   };
 
   return (
-    <div style={{ backgroundColor: C.cream, minHeight: '100vh' }}>
+    <div className="min-h-screen" style={{ backgroundColor: C.cream }}>
 
       {/* ── Running promotions ── */}
       <PromoCarousel promos={buildPromos(products)} />
 
       {/* ── Page header ── */}
-      <div style={{ borderBottom: '1px solid rgba(43,35,32,0.08)', padding: '3rem 2.5rem 2.5rem', maxWidth: '1440px', margin: '0 auto' }}>
-        <div style={{ ...label, color: 'rgba(43,35,32,0.4)', fontSize: '0.58rem', marginBottom: '0.875rem', letterSpacing: '0.14em' }}>
-          <a href="/" style={{ color: 'inherit', textDecorationLine: 'none' }}>Home</a>
-          <span style={{ margin: '0 0.5rem', opacity: 0.5 }}>/</span>
+      <div className="pt-12 px-10 pb-10 max-w-[1440px] mx-auto" style={{ borderBottom: '1px solid rgba(43,35,32,0.08)' }}>
+        <div className="mb-3.5" style={{ ...label, color: 'rgba(43,35,32,0.4)', fontSize: '0.58rem', letterSpacing: '0.14em' }}>
+          <a href="/" className="no-underline" style={{ color: 'inherit' }}>Home</a>
+          <span className="mx-2" style={{ opacity: 0.5 }}>/</span>
           <span style={{ color: C.charcoal }}>Shop</span>
         </div>
-        <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
+        <div className="flex items-end justify-between flex-wrap gap-4">
           <div>
-            <h1 style={{ fontFamily: DISPLAY, fontSize: 'clamp(2rem, 4vw, 3.25rem)', fontWeight: 400, letterSpacing: '-0.022em', color: C.charcoal, margin: 0, lineHeight: 1.05 }}>
+            <h1 className="m-0" style={{ fontFamily: DISPLAY, fontSize: 'clamp(2rem, 4vw, 3.25rem)', fontWeight: 400, letterSpacing: '-0.022em', color: C.charcoal, lineHeight: 1.05 }}>
               {query ? `“${query}”` : selectedCats.length === 1 ? selectedCats[0] : 'Shop All'}
             </h1>
-            <p style={{ fontFamily: UI, fontSize: '0.8rem', color: 'rgba(43,35,32,0.45)', margin: '0.4rem 0 0' }}>
+            <p className="mt-[0.4rem] mx-0 mb-0" style={{ fontFamily: UI, fontSize: '0.8rem', color: 'rgba(43,35,32,0.45)' }}>
               {filtered.length} {filtered.length === 1 ? 'product' : 'products'}
             </p>
           </div>
 
           {/* Sort + view — desktop */}
-          <div className="shop-topbar-controls" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          <div className="shop-topbar-controls flex items-center gap-4">
             <select
               value={sortBy}
               onChange={e => setSortBy(e.target.value)}
-              style={{ fontFamily: UI, fontSize: '0.775rem', color: C.charcoal, border: '1px solid rgba(43,35,32,0.15)', backgroundColor: C.cream, padding: '0.5rem 0.875rem', cursor: 'pointer', outline: 'none', appearance: 'none', paddingRight: '1.75rem', backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'10\' height=\'6\'%3E%3Cpath d=\'M0 0l5 6 5-6z\' fill=\'%232B2320\'/%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.6rem center' }}
+              className="py-2 pl-3.5 pr-7 cursor-pointer appearance-none"
+              style={{ fontFamily: UI, fontSize: '0.775rem', color: C.charcoal, border: '1px solid rgba(43,35,32,0.15)', backgroundColor: C.cream, outline: 'none', backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'10\' height=\'6\'%3E%3Cpath d=\'M0 0l5 6 5-6z\' fill=\'%232B2320\'/%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.6rem center' }}
             >
               <option value="newest">Newest</option>
               <option value="price-asc">Price: Low – High</option>
               <option value="price-desc">Price: High – Low</option>
               <option value="best-selling">Best Selling</option>
             </select>
-            <div style={{ display: 'flex', border: '1px solid rgba(43,35,32,0.15)' }}>
+            <div className="flex" style={{ border: '1px solid rgba(43,35,32,0.15)' }}>
               {(['grid', 'list'] as const).map(m => (
-                <button key={m} onClick={() => setViewMode(m)} style={{ background: viewMode === m ? C.charcoal : 'none', color: viewMode === m ? C.cream : C.charcoal, border: 'none', padding: '0.5rem 0.625rem', cursor: 'pointer', display: 'flex', lineHeight: 0, transition: 'background 0.15s' }}>
+                <button key={m} onClick={() => setViewMode(m)} className="flex py-2 px-2.5 cursor-pointer" style={{ background: viewMode === m ? C.charcoal : 'none', color: viewMode === m ? C.cream : C.charcoal, border: 'none', lineHeight: 0, transition: 'background 0.15s' }}>
                   {m === 'grid' ? <GridIcon /> : <ListIcon />}
                 </button>
               ))}
@@ -331,19 +336,19 @@ function ShopContent({ products, collections, colors }: ShopProps) {
 
         {/* Active filter chips */}
         {hasFilters && (
-          <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginTop: '1.25rem' }}>
+          <div className="flex gap-2 flex-wrap mt-5">
             {selectedCats.map(c => (
-              <button key={c} onClick={() => setSelectedCats(prev => prev.filter(x => x !== c))} style={{ display: 'flex', alignItems: 'center', gap: '0.375rem', border: `1px solid ${C.maroon}`, color: C.maroon, backgroundColor: 'transparent', ...label, fontSize: '0.575rem', padding: '4px 10px', cursor: 'pointer' }}>
+              <button key={c} onClick={() => setSelectedCats(prev => prev.filter(x => x !== c))} className="flex items-center gap-1.5 py-[4px] px-[10px] cursor-pointer" style={{ border: `1px solid ${C.maroon}`, color: C.maroon, backgroundColor: 'transparent', ...label, fontSize: '0.575rem' }}>
                 {c} <XIcon />
               </button>
             ))}
             {selectedColors.map(c => (
-              <button key={c} onClick={() => setSelectedColors(prev => prev.filter(x => x !== c))} style={{ display: 'flex', alignItems: 'center', gap: '0.375rem', border: '1px solid rgba(43,35,32,0.2)', color: C.charcoal, backgroundColor: 'transparent', ...label, fontSize: '0.575rem', padding: '4px 10px', cursor: 'pointer' }}>
+              <button key={c} onClick={() => setSelectedColors(prev => prev.filter(x => x !== c))} className="flex items-center gap-1.5 py-[4px] px-[10px] cursor-pointer" style={{ border: '1px solid rgba(43,35,32,0.2)', color: C.charcoal, backgroundColor: 'transparent', ...label, fontSize: '0.575rem' }}>
                 {c} <XIcon />
               </button>
             ))}
             {priceMax < 350 && (
-              <button onClick={() => setPriceMax(350)} style={{ display: 'flex', alignItems: 'center', gap: '0.375rem', border: '1px solid rgba(43,35,32,0.2)', color: C.charcoal, backgroundColor: 'transparent', ...label, fontSize: '0.575rem', padding: '4px 10px', cursor: 'pointer' }}>
+              <button onClick={() => setPriceMax(350)} className="flex items-center gap-1.5 py-[4px] px-[10px] cursor-pointer" style={{ border: '1px solid rgba(43,35,32,0.2)', color: C.charcoal, backgroundColor: 'transparent', ...label, fontSize: '0.575rem' }}>
                 Up to CAD ${priceMax} <XIcon />
               </button>
             )}
@@ -352,35 +357,35 @@ function ShopContent({ products, collections, colors }: ShopProps) {
       </div>
 
       {/* ── Layout: sidebar + grid ── */}
-      <div style={{ maxWidth: '1440px', margin: '0 auto', padding: '2.5rem 2.5rem 6rem', display: 'flex', gap: '3.5rem', alignItems: 'flex-start' }}>
+      <div className="max-w-[1440px] mx-auto pt-10 px-10 pb-24 flex gap-14 items-start">
 
         {/* Desktop sidebar */}
-        <aside className="shop-sidebar" style={{ width: '220px', flexShrink: 0, position: 'sticky', top: '86px' }}>
+        <aside className="shop-sidebar w-[220px] shrink-0 sticky top-[86px]">
           <Sidebar {...sidebarProps} />
         </aside>
 
         {/* Main content */}
-        <div style={{ flex: 1, minWidth: 0 }}>
+        <div className="flex-1 min-w-0">
 
           {/* Mobile filter button */}
-          <div className="shop-mobile-filter" style={{ display: 'none', marginBottom: '1.25rem' }}>
-            <button onClick={() => setFilterOpen(true)} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', border: `1px solid rgba(43,35,32,0.2)`, backgroundColor: 'transparent', color: C.charcoal, ...label, fontSize: '0.65rem', padding: '0.6rem 1.125rem', cursor: 'pointer' }}>
+          <div className="shop-mobile-filter hidden mb-5">
+            <button onClick={() => setFilterOpen(true)} className="flex items-center gap-2 py-[0.6rem] px-[1.125rem] cursor-pointer" style={{ border: `1px solid rgba(43,35,32,0.2)`, backgroundColor: 'transparent', color: C.charcoal, ...label, fontSize: '0.65rem' }}>
               <SlidersIcon /> Filters {hasFilters ? `(${selectedCats.length + selectedColors.length + (priceMax < 350 ? 1 : 0)})` : ''}
             </button>
           </div>
 
           {/* Empty state */}
           {filtered.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: '6rem 2rem' }}>
-              <p style={{ fontFamily: UI, fontSize: '1rem', color: 'rgba(43,35,32,0.5)', marginBottom: '1rem' }}>
+            <div className="text-center py-24 px-8">
+              <p className="mb-4" style={{ fontFamily: UI, fontSize: '1rem', color: 'rgba(43,35,32,0.5)' }}>
                 No products match your filters.
               </p>
-              <button onClick={clearAll} style={{ background: 'none', border: 'none', color: C.gold, fontFamily: UI, fontSize: '0.875rem', cursor: 'pointer', textDecorationLine: 'underline', fontWeight: 500 }}>
+              <button onClick={clearAll} className="p-0 cursor-pointer underline" style={{ background: 'none', border: 'none', color: C.gold, fontFamily: UI, fontSize: '0.875rem', fontWeight: 500 }}>
                 Clear filters
               </button>
             </div>
           ) : viewMode === 'grid' ? (
-            <div className="shop-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1.5rem' }}>
+            <div className="shop-grid grid grid-cols-4 gap-6">
               {visible.map(p => <ProductCard key={p.id} p={p} view="grid" />)}
             </div>
           ) : (
@@ -391,12 +396,12 @@ function ShopContent({ products, collections, colors }: ShopProps) {
 
           {/* Pagination / Load More */}
           {filtered.length > 0 && (
-            <div style={{ marginTop: '3.5rem', textAlign: 'center' }}>
-              <p style={{ fontFamily: UI, fontSize: '0.775rem', color: 'rgba(43,35,32,0.45)', marginBottom: '1.25rem' }}>
+            <div className="mt-14 text-center">
+              <p className="mb-5" style={{ fontFamily: UI, fontSize: '0.775rem', color: 'rgba(43,35,32,0.45)' }}>
                 Showing {Math.min(visibleCount, filtered.length)} of {filtered.length} products
               </p>
               {hasMore ? (
-                <button onClick={() => setVisibleCount(v => v + 12)} className="shimmer-cta" style={{ border: `1.5px solid ${C.maroon}`, color: C.maroon, backgroundColor: 'transparent', ...label, padding: '0.875rem 2.5rem', cursor: 'pointer', fontSize: '0.68rem', letterSpacing: '0.14em' }}>
+                <button onClick={() => setVisibleCount(v => v + 12)} className="shimmer-cta cursor-pointer py-3.5 px-10" style={{ border: `1.5px solid ${C.maroon}`, color: C.maroon, backgroundColor: 'transparent', ...label, fontSize: '0.68rem', letterSpacing: '0.14em' }}>
                   Load More
                 </button>
               ) : (
@@ -409,9 +414,9 @@ function ShopContent({ products, collections, colors }: ShopProps) {
 
       {/* Mobile filter drawer */}
       {filterOpen && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 200 }}>
-          <div onClick={() => setFilterOpen(false)} style={{ position: 'absolute', inset: 0, backgroundColor: 'rgba(43,35,32,0.45)' }} />
-          <div style={{ position: 'absolute', top: 0, left: 0, bottom: 0, width: 'min(340px, 90vw)', backgroundColor: C.cream, padding: '2rem', overflowY: 'auto' }}>
+        <div className="fixed inset-0 z-[200]">
+          <div onClick={() => setFilterOpen(false)} className="absolute inset-0" style={{ backgroundColor: 'rgba(43,35,32,0.45)' }} />
+          <div className="absolute top-0 left-0 bottom-0 w-[min(340px,90vw)] p-8 overflow-y-auto" style={{ backgroundColor: C.cream }}>
             <Sidebar {...sidebarProps} onClose={() => setFilterOpen(false)} />
           </div>
         </div>
@@ -428,7 +433,7 @@ export type ShopProps = {
 
 export default function Shop(props: ShopProps) {
   return (
-    <Suspense fallback={<div style={{ minHeight: '100vh', backgroundColor: C.cream }} />}>
+    <Suspense fallback={<div className="min-h-screen" style={{ backgroundColor: C.cream }} />}>
       <ShopContent {...props} />
     </Suspense>
   );

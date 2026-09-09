@@ -162,14 +162,15 @@ const STATUS_CONFIG: Record<OrderStatus, { label: string; color: string; bg: str
 function StatusBadge({ status }: { status: OrderStatus }) {
   const s = STATUS_CONFIG[status];
   return (
-    <span style={{
-      ...label, fontSize: '0.6rem', letterSpacing: '0.1em',
-      color: s.color, backgroundColor: s.bg,
-      borderWidth: '1px', borderStyle: 'solid', borderColor: s.border,
-      borderRadius: '4px', padding: '0.25rem 0.6rem',
-      display: 'inline-flex', alignItems: 'center', gap: '0.3rem',
-    }}>
-      <span style={{ width: '5px', height: '5px', borderRadius: '50%', backgroundColor: s.color, flexShrink: 0 }} />
+    <span
+      className="rounded-[4px] py-1 px-[0.6rem] inline-flex items-center gap-[0.3rem]"
+      style={{
+        ...label, fontSize: '0.6rem', letterSpacing: '0.1em',
+        color: s.color, backgroundColor: s.bg,
+        borderWidth: '1px', borderStyle: 'solid', borderColor: s.border,
+      }}
+    >
+      <span className="w-[5px] h-[5px] rounded-full shrink-0" style={{ backgroundColor: s.color }} />
       {s.label}
     </span>
   );
@@ -178,39 +179,37 @@ function StatusBadge({ status }: { status: OrderStatus }) {
 /* ─── Timeline ────────────────────────────────────────────── */
 function OrderTimeline({ steps, cancelled }: { steps: TimelineStep[]; cancelled: boolean }) {
   return (
-    <div style={{ display: 'flex', alignItems: 'flex-start', gap: 0, marginTop: '1.5rem', overflowX: 'auto', paddingBottom: '0.25rem' }}>
+    <div className="flex items-start mt-6 overflow-x-auto pb-1">
       {steps.map((step, i) => {
         const isDone = !cancelled && step.state === 'done';
         const isActive = !cancelled && step.state === 'active';
         const dotColor = isDone ? C.teal : isActive ? C.gold : 'rgba(43,35,32,0.18)';
         const lineColor = isDone ? C.teal : 'rgba(43,35,32,0.12)';
         return (
-          <div key={step.key} style={{ display: 'flex', alignItems: 'flex-start', flex: i < steps.length - 1 ? 1 : 0, minWidth: '80px' }}>
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.4rem', flexShrink: 0 }}>
-              <div style={{
-                width: '18px', height: '18px', borderRadius: '50%',
-                backgroundColor: dotColor,
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                flexShrink: 0, boxShadow: isActive ? `0 0 0 3px rgba(212,169,78,0.22)` : 'none',
-              }}>
+          <div key={step.key} className="flex items-start min-w-[80px]" style={{ flex: i < steps.length - 1 ? 1 : 0 }}>
+            <div className="flex flex-col items-center gap-[0.4rem] shrink-0">
+              <div
+                className="w-[18px] h-[18px] rounded-full flex items-center justify-center shrink-0"
+                style={{ backgroundColor: dotColor, boxShadow: isActive ? `0 0 0 3px rgba(212,169,78,0.22)` : 'none' }}
+              >
                 {isDone && (
                   <svg width="9" height="9" viewBox="0 0 12 12" fill="none">
                     <polyline points="2,6 5,9 10,3" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
                 )}
-                {isActive && <div style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: C.charcoal }} />}
+                {isActive && <div className="w-[6px] h-[6px] rounded-full" style={{ backgroundColor: C.charcoal }} />}
               </div>
-              <div style={{ fontFamily: UI, fontSize: '0.65rem', color: isDone || isActive ? C.charcoal : 'rgba(43,35,32,0.38)', fontWeight: isActive ? 600 : 400, textAlign: 'center', lineHeight: 1.3, whiteSpace: 'nowrap' }}>
+              <div className="text-center whitespace-nowrap" style={{ fontFamily: UI, fontSize: '0.65rem', color: isDone || isActive ? C.charcoal : 'rgba(43,35,32,0.38)', fontWeight: isActive ? 600 : 400, lineHeight: 1.3 }}>
                 {step.label}
               </div>
               {step.date && (
-                <div style={{ fontFamily: UI, fontSize: '0.58rem', color: 'rgba(43,35,32,0.4)', textAlign: 'center' }}>
+                <div className="text-center" style={{ fontFamily: UI, fontSize: '0.58rem', color: 'rgba(43,35,32,0.4)' }}>
                   {step.date}
                 </div>
               )}
             </div>
             {i < steps.length - 1 && (
-              <div style={{ flex: 1, height: '2px', backgroundColor: lineColor, marginTop: '8px', marginLeft: '0', minWidth: '20px' }} />
+              <div className="flex-1 h-[2px] mt-2 min-w-[20px]" style={{ backgroundColor: lineColor }} />
             )}
           </div>
         );
@@ -235,18 +234,16 @@ function OrderCard({ order }: { order: Order }) {
   }
 
   return (
-    <div style={{
+    <div className="rounded-[10px] overflow-hidden" style={{
       backgroundColor: '#fff',
-      borderRadius: '10px',
       border: `1px solid rgba(43,35,32,0.1)`,
       boxShadow: '0 1px 10px rgba(43,35,32,0.05)',
-      overflow: 'hidden',
       transition: 'box-shadow 0.2s',
     }}>
       {/* ── Card header ─────────────────────────────── */}
-      <div style={{ padding: '1.25rem 1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.75rem' }}>
+      <div className="py-5 px-6 flex items-center justify-between flex-wrap gap-3">
         <div>
-          <div style={{ ...label, fontSize: '0.6rem', color: 'rgba(43,35,32,0.42)', letterSpacing: '0.1em', marginBottom: '0.2rem' }}>
+          <div className="mb-[0.2rem]" style={{ ...label, fontSize: '0.6rem', color: 'rgba(43,35,32,0.42)', letterSpacing: '0.1em' }}>
             Order · {order.date}
           </div>
           <div style={{ fontFamily: UI, fontSize: '0.92rem', fontWeight: 700, color: C.charcoal, letterSpacing: '0.01em' }}>
@@ -257,42 +254,35 @@ function OrderCard({ order }: { order: Order }) {
       </div>
 
       {/* ── Divider ──────────────────────────────────── */}
-      <div style={{ height: '1px', backgroundColor: 'rgba(43,35,32,0.07)', margin: '0 1.5rem' }} />
+      <div className="h-px mx-6" style={{ backgroundColor: 'rgba(43,35,32,0.07)' }} />
 
       {/* ── Thumbnails + total ────────────────────────── */}
-      <div style={{ padding: '1.25rem 1.5rem', display: 'flex', alignItems: 'center', gap: '1.25rem', flexWrap: 'wrap' }}>
+      <div className="py-5 px-6 flex items-center gap-5 flex-wrap">
         {/* Stacked thumbnails */}
-        <div style={{ display: 'flex', alignItems: 'center', position: 'relative', flexShrink: 0 }}>
+        <div className="flex items-center relative shrink-0">
           {order.items.slice(0, THUMB_SHOW).map((item, i) => (
             <div
               key={i}
+              className="relative rounded-[6px] overflow-hidden w-[46px] h-[46px] shrink-0"
               style={{
                 marginLeft: i === 0 ? 0 : '-10px',
                 zIndex: THUMB_SHOW - i,
-                position: 'relative',
-                borderRadius: '6px',
                 border: '2px solid #fff',
-                overflow: 'hidden',
-                width: '46px', height: '46px',
                 backgroundColor: 'rgba(43,35,32,0.07)',
-                flexShrink: 0,
               }}
             >
               <img
                 src={`https://images.unsplash.com/${item.img}?w=60&h=60&fit=crop&auto=format`}
                 alt={item.title}
-                style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                className="w-full h-full object-cover block"
               />
             </div>
           ))}
           {extra > 0 && (
-            <div style={{
-              marginLeft: '-10px', zIndex: 0,
-              width: '46px', height: '46px', borderRadius: '6px',
+            <div className="-ml-[10px] w-[46px] h-[46px] rounded-[6px] flex items-center justify-center shrink-0" style={{
+              zIndex: 0,
               border: '2px solid #fff',
               backgroundColor: 'rgba(43,35,32,0.08)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              flexShrink: 0,
             }}>
               <span style={{ fontFamily: UI, fontSize: '0.65rem', fontWeight: 700, color: C.charcoal }}>+{extra}</span>
             </div>
@@ -305,22 +295,21 @@ function OrderCard({ order }: { order: Order }) {
         </div>
 
         {/* Total */}
-        <div style={{ marginLeft: 'auto', textAlign: 'right' }}>
+        <div className="ml-auto text-right">
           <div style={{ fontFamily: UI, fontSize: '1rem', fontWeight: 700, color: C.charcoal }}>{fmtCad(order.cadTotal)}</div>
         </div>
 
         {/* Actions */}
-        <div style={{ display: 'flex', gap: '0.625rem', flexShrink: 0 }}>
+        <div className="flex gap-2.5 shrink-0">
           <button
             onClick={() => setExpanded(e => !e)}
+            className="rounded-[5px] py-2 px-3.5 cursor-pointer whitespace-nowrap"
             style={{
               fontFamily: UI, fontSize: '0.72rem', fontWeight: 600,
               letterSpacing: '0.05em', color: C.maroon,
               backgroundColor: 'transparent',
               borderWidth: '1.5px', borderStyle: 'solid', borderColor: C.maroon,
-              borderRadius: '5px', padding: '0.5rem 0.875rem',
-              cursor: 'pointer', transition: 'background 0.15s',
-              whiteSpace: 'nowrap',
+              transition: 'background 0.15s',
             }}
             onMouseEnter={e => (e.currentTarget.style.backgroundColor = 'rgba(122,46,56,0.06)')}
             onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
@@ -329,15 +318,14 @@ function OrderCard({ order }: { order: Order }) {
           </button>
           {order.status === 'shipped' && (
             <button
+              className="rounded-[5px] py-2 px-3.5 cursor-pointer whitespace-nowrap"
               style={{
                 fontFamily: UI, fontSize: '0.72rem', fontWeight: 700,
                 letterSpacing: '0.08em', color: C.charcoal,
                 backgroundColor: C.gold,
-                border: 'none', borderRadius: '5px',
-                padding: '0.5rem 0.875rem', cursor: 'pointer',
+                border: 'none',
                 boxShadow: '0 2px 10px rgba(212,169,78,0.35)',
                 transition: 'box-shadow 0.15s, transform 0.1s',
-                whiteSpace: 'nowrap',
               }}
               onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 4px 18px rgba(212,169,78,0.5)'; (e.currentTarget as HTMLButtonElement).style.transform = 'translateY(-1px)'; }}
               onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 2px 10px rgba(212,169,78,0.35)'; (e.currentTarget as HTMLButtonElement).style.transform = 'none'; }}
@@ -351,26 +339,27 @@ function OrderCard({ order }: { order: Order }) {
       {/* ── Expanded detail ───────────────────────────── */}
       {expanded && (
         <div style={{ borderTop: `1px solid rgba(43,35,32,0.08)`, backgroundColor: 'rgba(250,246,240,0.55)' }}>
-          <div className="rg-split" style={{ padding: '1.75rem 1.5rem', display: 'grid', gridTemplateColumns: '1fr 300px', gap: '2.5rem' }}>
+          <div className="rg-split grid grid-cols-[1fr_300px] py-7 px-6 gap-10">
 
             {/* LEFT — items + timeline */}
             <div>
               {/* Item list */}
-              <div style={{ ...label, fontSize: '0.6rem', color: 'rgba(43,35,32,0.42)', letterSpacing: '0.12em', marginBottom: '1rem' }}>Items in This Order</div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.875rem', marginBottom: '1.75rem' }}>
+              <div className="mb-4" style={{ ...label, fontSize: '0.6rem', color: 'rgba(43,35,32,0.42)', letterSpacing: '0.12em' }}>Items in This Order</div>
+              <div className="flex flex-col gap-3.5 mb-7">
                 {order.items.map((item, i) => (
-                  <div key={i} style={{ display: 'flex', gap: '0.875rem', alignItems: 'flex-start' }}>
+                  <div key={i} className="flex gap-3.5 items-start">
                     <img
                       src={`https://images.unsplash.com/${item.img}?w=80&h=80&fit=crop&auto=format`}
                       alt={item.title}
-                      style={{ width: '56px', height: '56px', borderRadius: '5px', objectFit: 'cover', flexShrink: 0, backgroundColor: 'rgba(43,35,32,0.07)' }}
+                      className="w-14 h-14 rounded-[5px] object-cover shrink-0"
+                      style={{ backgroundColor: 'rgba(43,35,32,0.07)' }}
                     />
-                    <div style={{ flex: 1, minWidth: 0 }}>
+                    <div className="flex-1 min-w-0">
                       <div style={{ fontFamily: UI, fontSize: '0.84rem', fontWeight: 600, color: C.charcoal, lineHeight: 1.3 }}>{item.title}</div>
-                      <div style={{ fontFamily: UI, fontSize: '0.74rem', color: 'rgba(43,35,32,0.5)', marginTop: '3px' }}>{item.variant}</div>
-                      <div style={{ fontFamily: UI, fontSize: '0.74rem', color: 'rgba(43,35,32,0.45)', marginTop: '2px' }}>Qty: {item.qty}</div>
+                      <div className="mt-[3px]" style={{ fontFamily: UI, fontSize: '0.74rem', color: 'rgba(43,35,32,0.5)' }}>{item.variant}</div>
+                      <div className="mt-[2px]" style={{ fontFamily: UI, fontSize: '0.74rem', color: 'rgba(43,35,32,0.45)' }}>Qty: {item.qty}</div>
                     </div>
-                    <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                    <div className="text-right shrink-0">
                       <div style={{ fontFamily: UI, fontSize: '0.84rem', fontWeight: 600, color: C.charcoal }}>{fmtCad(item.cad * item.qty)}</div>
                     </div>
                   </div>
@@ -378,16 +367,16 @@ function OrderCard({ order }: { order: Order }) {
               </div>
 
               {/* Timeline */}
-              <div style={{ ...label, fontSize: '0.6rem', color: 'rgba(43,35,32,0.42)', letterSpacing: '0.12em', marginBottom: '0.5rem' }}>Delivery Status</div>
+              <div className="mb-2" style={{ ...label, fontSize: '0.6rem', color: 'rgba(43,35,32,0.42)', letterSpacing: '0.12em' }}>Delivery Status</div>
               <OrderTimeline steps={order.timeline} cancelled={order.status === 'cancelled'} />
             </div>
 
             {/* RIGHT — shipping + tracking */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+            <div className="flex flex-col gap-6">
               {/* Shipping address */}
               <div>
-                <div style={{ ...label, fontSize: '0.6rem', color: 'rgba(43,35,32,0.42)', letterSpacing: '0.12em', marginBottom: '0.6rem' }}>Shipped To</div>
-                <div style={{ backgroundColor: '#fff', borderRadius: '6px', padding: '0.875rem 1rem', border: `1px solid rgba(43,35,32,0.1)`, fontFamily: UI, fontSize: '0.8rem', color: C.charcoal, lineHeight: 1.6 }}>
+                <div className="mb-[0.6rem]" style={{ ...label, fontSize: '0.6rem', color: 'rgba(43,35,32,0.42)', letterSpacing: '0.12em' }}>Shipped To</div>
+                <div className="rounded-[6px] py-3.5 px-4" style={{ backgroundColor: '#fff', border: `1px solid rgba(43,35,32,0.1)`, fontFamily: UI, fontSize: '0.8rem', color: C.charcoal, lineHeight: 1.6 }}>
                   {order.address}
                 </div>
               </div>
@@ -395,12 +384,13 @@ function OrderCard({ order }: { order: Order }) {
               {/* Tracking number */}
               {order.tracking && (
                 <div>
-                  <div style={{ ...label, fontSize: '0.6rem', color: 'rgba(43,35,32,0.42)', letterSpacing: '0.12em', marginBottom: '0.6rem' }}>Tracking Number</div>
-                  <div style={{ backgroundColor: '#fff', borderRadius: '6px', padding: '0.875rem 1rem', border: `1px solid rgba(43,35,32,0.1)`, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.75rem' }}>
-                    <span style={{ fontFamily: 'monospace', fontSize: '0.78rem', color: C.charcoal, letterSpacing: '0.03em', wordBreak: 'break-all' }}>{order.tracking}</span>
+                  <div className="mb-[0.6rem]" style={{ ...label, fontSize: '0.6rem', color: 'rgba(43,35,32,0.42)', letterSpacing: '0.12em' }}>Tracking Number</div>
+                  <div className="rounded-[6px] py-3.5 px-4 flex items-center justify-between gap-3" style={{ backgroundColor: '#fff', border: `1px solid rgba(43,35,32,0.1)` }}>
+                    <span className="break-all" style={{ fontFamily: 'monospace', fontSize: '0.78rem', color: C.charcoal, letterSpacing: '0.03em' }}>{order.tracking}</span>
                     <button
                       onClick={copyTracking}
-                      style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px', flexShrink: 0, color: copied ? C.teal : 'rgba(43,35,32,0.45)', transition: 'color 0.2s' }}
+                      className="p-[4px] shrink-0 cursor-pointer"
+                      style={{ background: 'none', border: 'none', color: copied ? C.teal : 'rgba(43,35,32,0.45)', transition: 'color 0.2s' }}
                       title="Copy tracking number"
                     >
                       {copied ? (
@@ -416,13 +406,13 @@ function OrderCard({ order }: { order: Order }) {
                     </button>
                   </div>
                   {copied && (
-                    <p style={{ fontFamily: UI, fontSize: '0.7rem', color: C.teal, marginTop: '0.35rem' }}>Copied to clipboard</p>
+                    <p className="mt-[0.35rem]" style={{ fontFamily: UI, fontSize: '0.7rem', color: C.teal }}>Copied to clipboard</p>
                   )}
                 </div>
               )}
 
               {/* Support link */}
-              <a href="#" style={{ fontFamily: UI, fontSize: '0.78rem', color: C.indigo, textDecorationLine: 'none', letterSpacing: '0.01em', borderBottom: `1px solid rgba(46,74,158,0.25)`, paddingBottom: '1px', width: 'fit-content' }}>
+              <a href="#" className="no-underline pb-[1px]" style={{ fontFamily: UI, fontSize: '0.78rem', color: C.indigo, letterSpacing: '0.01em', borderBottom: `1px solid rgba(46,74,158,0.25)` }}>
                 Need help with this order?
               </a>
             </div>
@@ -451,13 +441,13 @@ export default function Orders() {
       `}</style>
 
       {/* ── Page heading ──────────────────────────────── */}
-      <div style={{ marginBottom: '2rem' }}>
-        <h1 style={{ fontFamily: DISPLAY, fontSize: '2rem', fontWeight: 500, color: C.charcoal, letterSpacing: '-0.01em', lineHeight: 1.1, marginBottom: '1.5rem' }}>
+      <div className="mb-8">
+        <h1 className="mb-6" style={{ fontFamily: DISPLAY, fontSize: '2rem', fontWeight: 500, color: C.charcoal, letterSpacing: '-0.01em', lineHeight: 1.1 }}>
           Your Orders
         </h1>
 
         {/* Filter tabs */}
-        <div style={{ display: 'flex', gap: '0', borderBottom: `1px solid rgba(43,35,32,0.12)` }}>
+        <div className="flex" style={{ borderBottom: `1px solid rgba(43,35,32,0.12)` }}>
           {FILTER_TABS.map(tab => {
             const isActive = activeFilter === tab.key;
             const count = tab.key === 'all' ? ORDERS.length : ORDERS.filter(o => o.status === tab.key).length;
@@ -465,25 +455,23 @@ export default function Orders() {
               <button
                 key={tab.key}
                 onClick={() => setActiveFilter(tab.key)}
+                className="py-3 px-5 mb-[-1px] cursor-pointer flex items-center gap-[0.4rem] uppercase"
                 style={{
-                  background: 'none', border: 'none', cursor: 'pointer',
+                  background: 'none', border: 'none',
                   fontFamily: UI, fontSize: '0.72rem', fontWeight: isActive ? 700 : 500,
-                  letterSpacing: '0.1em', textTransform: 'uppercase',
+                  letterSpacing: '0.1em',
                   color: isActive ? C.charcoal : 'rgba(43,35,32,0.45)',
-                  padding: '0.75rem 1.25rem 0.75rem',
                   borderBottom: isActive ? `2px solid ${C.gold}` : '2px solid transparent',
-                  marginBottom: '-1px',
                   transition: 'color 0.15s, border-color 0.15s',
-                  display: 'flex', alignItems: 'center', gap: '0.4rem',
                 }}
               >
                 {tab.label}
                 {count > 0 && (
-                  <span style={{
+                  <span className="rounded-[10px] py-[1px] px-[6px]" style={{
                     fontFamily: UI, fontSize: '0.58rem', fontWeight: 700,
                     backgroundColor: isActive ? C.gold : 'rgba(43,35,32,0.1)',
                     color: isActive ? C.charcoal : 'rgba(43,35,32,0.5)',
-                    borderRadius: '10px', padding: '1px 6px', lineHeight: '1.6',
+                    lineHeight: '1.6',
                   }}>
                     {count}
                   </span>
@@ -496,28 +484,27 @@ export default function Orders() {
 
       {/* ── Order list / empty state ────────────────── */}
       {filtered.length === 0 ? (
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '5rem 2rem', textAlign: 'center' }}>
-          <div style={{ marginBottom: '1.25rem', opacity: 0.25 }}>
+        <div className="flex flex-col items-center justify-center py-20 px-8 text-center">
+          <div className="mb-5 opacity-25">
             <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke={C.charcoal} strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
               <line x1="3" y1="6" x2="21" y2="6" />
               <path d="M16 10a4 4 0 0 1-8 0" />
             </svg>
           </div>
-          <p style={{ fontFamily: DISPLAY, fontSize: '1.25rem', color: C.charcoal, fontWeight: 500, marginBottom: '0.5rem' }}>
+          <p className="mb-2" style={{ fontFamily: DISPLAY, fontSize: '1.25rem', color: C.charcoal, fontWeight: 500 }}>
             No orders here yet
           </p>
-          <p style={{ fontFamily: UI, fontSize: '0.84rem', color: 'rgba(43,35,32,0.5)', marginBottom: '1.75rem' }}>
+          <p className="mb-7" style={{ fontFamily: UI, fontSize: '0.84rem', color: 'rgba(43,35,32,0.5)' }}>
             {activeFilter === 'all' ? "You haven't placed an order yet." : `No ${activeFilter} orders found.`}
           </p>
           <a
             href="/shop"
+            className="no-underline rounded-[5px] py-3 px-7 uppercase"
             style={{
               fontFamily: UI, fontSize: '0.78rem', fontWeight: 700,
-              letterSpacing: '0.1em', textTransform: 'uppercase',
+              letterSpacing: '0.1em',
               color: C.charcoal, backgroundColor: C.gold,
-              textDecorationLine: 'none', borderRadius: '5px',
-              padding: '0.75rem 1.75rem',
               boxShadow: '0 2px 12px rgba(212,169,78,0.35)',
               transition: 'box-shadow 0.15s',
             }}
@@ -526,7 +513,7 @@ export default function Orders() {
           </a>
         </div>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+        <div className="flex flex-col gap-4">
           {filtered.map(order => (
             <OrderCard key={order.id} order={order} />
           ))}

@@ -94,7 +94,7 @@ const fieldError: React.CSSProperties = {
 /* ─── Sub-components ──────────────────────────────────────── */
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
-    <div style={{ ...label, color: C.maroon, marginBottom: '1.25rem', paddingBottom: '0.6rem', borderBottom: `1px solid rgba(122,46,56,0.18)` }}>
+    <div className="mb-5 pb-[0.6rem]" style={{ ...label, color: C.maroon, borderBottom: `1px solid rgba(122,46,56,0.18)` }}>
       {children}
     </div>
   );
@@ -102,7 +102,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 
 function FieldError({ msg }: { msg?: string }) {
   if (!msg) return null;
-  return <p style={{ fontFamily: UI, fontSize: '0.725rem', color: '#b94a48', marginTop: '0.3rem' }}>{msg}</p>;
+  return <p className="mt-[0.3rem]" style={{ fontFamily: UI, fontSize: '0.725rem', color: '#b94a48' }}>{msg}</p>;
 }
 
 function FocusInput(props: React.InputHTMLAttributes<HTMLInputElement> & { error?: boolean }) {
@@ -148,22 +148,20 @@ function FocusTextarea(props: React.TextareaHTMLAttributes<HTMLTextAreaElement> 
 const STEPS = ['Cart', 'Shipping', 'Payment', 'Confirmation'];
 function ProgressBar({ current }: { current: number }) {
   return (
-    <div className="checkout-steps" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0 }}>
+    <div className="checkout-steps flex items-center justify-center">
       {STEPS.map((s, i) => {
         const done = i < current;
         const active = i === current;
         return (
-          <div key={s} style={{ display: 'flex', alignItems: 'center' }}>
+          <div key={s} className="flex items-center">
             {i > 0 && (
-              <div className="checkout-step-line" style={{ width: '2.5rem', height: '1px', backgroundColor: done ? C.maroon : 'rgba(43,35,32,0.2)' }} />
+              <div className="checkout-step-line w-10 h-px" style={{ backgroundColor: done ? C.maroon : 'rgba(43,35,32,0.2)' }} />
             )}
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
-              <div style={{
-                width: '24px', height: '24px', borderRadius: '50%',
-                backgroundColor: done ? C.maroon : active ? C.gold : 'rgba(43,35,32,0.1)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                flexShrink: 0,
-              }}>
+            <div className="flex flex-col items-center gap-[4px]">
+              <div
+                className="w-6 h-6 rounded-full flex items-center justify-center shrink-0"
+                style={{ backgroundColor: done ? C.maroon : active ? C.gold : 'rgba(43,35,32,0.1)' }}
+              >
                 {done ? (
                   <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
                     <polyline points="2,6 5,9 10,3" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
@@ -188,7 +186,7 @@ function ProgressBar({ current }: { current: number }) {
 /* ─── Payment logos ─────────────────────────────────────────── */
 function PaymentBadge({ children }: { children: React.ReactNode }) {
   return (
-    <div style={{ border: '1px solid rgba(43,35,32,0.18)', borderRadius: '4px', padding: '4px 8px', fontFamily: UI, fontSize: '0.65rem', fontWeight: 600, color: C.charcoal, letterSpacing: '0.03em', backgroundColor: '#fff' }}>
+    <div className="rounded-[4px] py-[4px] px-[8px]" style={{ border: '1px solid rgba(43,35,32,0.18)', fontFamily: UI, fontSize: '0.65rem', fontWeight: 600, color: C.charcoal, letterSpacing: '0.03em', backgroundColor: '#fff' }}>
       {children}
     </div>
   );
@@ -197,7 +195,7 @@ function PaymentBadge({ children }: { children: React.ReactNode }) {
 /* ─── Main component ─────────────────────────────────────────── */
 export default function Checkout() {
   return (
-    <Suspense fallback={<div style={{ minHeight: '100vh', backgroundColor: C.cream }} />}>
+    <Suspense fallback={<div className="min-h-screen" style={{ backgroundColor: C.cream }} />}>
       <CheckoutContent />
     </Suspense>
   );
@@ -336,15 +334,15 @@ function CheckoutContent() {
   // arriving with a full cart would see this for a frame.
   if (hydrated && lines.length === 0) {
     return (
-      <div style={{ backgroundColor: C.cream, minHeight: '70vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '5rem 2rem', textAlign: 'center' }}>
-        <div style={{ fontFamily: DISPLAY, fontSize: '2rem', color: C.charcoal, fontWeight: 500, marginBottom: '0.75rem' }}>
+      <div className="min-h-[70vh] flex flex-col items-center justify-center py-20 px-8 text-center" style={{ backgroundColor: C.cream }}>
+        <div className="mb-3" style={{ fontFamily: DISPLAY, fontSize: '2rem', color: C.charcoal, fontWeight: 500 }}>
           There is nothing to check out
         </div>
-        <p style={{ fontFamily: UI, fontSize: '0.9rem', color: 'rgba(43,35,32,0.55)', maxWidth: '340px', marginBottom: '2rem' }}>
+        <p className="max-w-[340px] mb-8" style={{ fontFamily: UI, fontSize: '0.9rem', color: 'rgba(43,35,32,0.55)' }}>
           Your cart is empty. Once you have added a piece, you can complete your order here.
         </p>
-        <Link to="/shop" style={{ textDecorationLine: 'none' }}>
-          <span className="shimmer-cta" style={{ display: 'inline-block', backgroundColor: C.gold, color: C.charcoal, ...label, fontSize: '0.68rem', letterSpacing: '0.14em', padding: '0.9rem 2.25rem', cursor: 'pointer' }}>
+        <Link to="/shop" className="no-underline">
+          <span className="shimmer-cta inline-block py-[0.9rem] px-9 cursor-pointer" style={{ backgroundColor: C.gold, color: C.charcoal, ...label, fontSize: '0.68rem', letterSpacing: '0.14em' }}>
             Browse the Shop
           </span>
         </Link>
@@ -353,7 +351,7 @@ function CheckoutContent() {
   }
 
   return (
-    <div style={{ backgroundColor: C.cream, minHeight: '100vh', fontFamily: UI, color: C.charcoal }}>
+    <div className="min-h-screen" style={{ backgroundColor: C.cream, fontFamily: UI, color: C.charcoal }}>
       <style>{`
         .checkout-grid { display: grid; grid-template-columns: 1fr 380px; gap: 3rem; align-items: start; }
         .checkout-grid > * { min-width: 0; }
@@ -383,45 +381,45 @@ function CheckoutContent() {
 
       {/* ── Checkout Header ─────────────────────────────────── */}
       <header style={{ backgroundColor: C.maroon, borderBottom: `1px solid rgba(212,169,78,0.22)` }}>
-        <div className="checkout-head" style={{ maxWidth: '1240px', margin: '0 auto', padding: '0 2rem', height: '64px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Link to="/" style={{ textDecorationLine: 'none' }}>
+        <div className="checkout-head max-w-[1240px] mx-auto px-8 h-16 flex items-center justify-between">
+          <Link to="/" className="no-underline">
             <div style={{ fontFamily: DISPLAY, fontSize: '1.25rem', color: C.cream, fontWeight: 500, letterSpacing: '-0.01em', lineHeight: 1.05 }}>
               AdeClassics
             </div>
-            <div style={{ fontFamily: UI, fontSize: '0.525rem', color: C.gold, letterSpacing: '0.16em', textTransform: 'uppercase', marginTop: '2px' }}>
+            <div className="mt-[2px] uppercase" style={{ fontFamily: UI, fontSize: '0.525rem', color: C.gold, letterSpacing: '0.16em' }}>
               Timeless Elegance
             </div>
           </Link>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <div className="flex items-center gap-2">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={C.gold} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
               <path d="M7 11V7a5 5 0 0 1 10 0v4" />
             </svg>
-            <span style={{ fontFamily: UI, fontSize: '0.7rem', color: C.cream, letterSpacing: '0.08em', textTransform: 'uppercase', opacity: 0.85 }}>
+            <span className="uppercase" style={{ fontFamily: UI, fontSize: '0.7rem', color: C.cream, letterSpacing: '0.08em', opacity: 0.85 }}>
               Secure Checkout
             </span>
           </div>
         </div>
         {/* Progress bar */}
-        <div className="checkout-progress" style={{ backgroundColor: 'rgba(0,0,0,0.12)', padding: '0.7rem 2rem' }}>
+        <div className="checkout-progress py-[0.7rem] px-8" style={{ backgroundColor: 'rgba(0,0,0,0.12)' }}>
           <ProgressBar current={1} />
         </div>
       </header>
 
       {/* ── Page body ─────────────────────────────────────────── */}
-      <div className="checkout-body" style={{ maxWidth: '1240px', margin: '0 auto', padding: '3rem 2rem 5rem' }}>
+      <div className="checkout-body max-w-[1240px] mx-auto pt-12 px-8 pb-20">
         <form onSubmit={handleSubmit} noValidate>
           <div className="checkout-grid">
 
             {/* ══ LEFT COLUMN: Form ════════════════════════════ */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '2.5rem' }}>
+            <div className="flex flex-col gap-10">
 
               {/* 1. Contact */}
               <section>
                 <SectionLabel>Contact</SectionLabel>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                <div className="flex flex-col gap-4">
                   <div>
-                    <label style={{ ...label, fontSize: '0.65rem', color: C.charcoal, display: 'block', marginBottom: '0.4rem' }}>
+                    <label className="block mb-[0.4rem]" style={{ ...label, fontSize: '0.65rem', color: C.charcoal }}>
                       Email address <span style={{ color: '#b94a48' }}>*</span>
                     </label>
                     <FocusInput
@@ -436,14 +434,14 @@ function CheckoutContent() {
                     {showErr('email') && <FieldError msg={errors.email} />}
                   </div>
                   <div>
-                    <label style={{ ...label, fontSize: '0.65rem', color: C.charcoal, display: 'block', marginBottom: '0.4rem' }}>
+                    <label className="block mb-[0.4rem]" style={{ ...label, fontSize: '0.65rem', color: C.charcoal }}>
                       Phone <span style={{ opacity: 0.5 }}>(optional)</span>
                     </label>
-                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                    <div className="flex gap-2">
                       <FocusSelect
                         value={phoneCode}
                         onChange={e => setPhoneCode(e.target.value)}
-                        style={{ width: '130px', flexShrink: 0 }}
+                        className="w-[130px] shrink-0"
                       >
                         {PHONE_CODES.map(p => (
                           <option key={p.code} value={p.code}>{p.label}</option>
@@ -455,7 +453,7 @@ function CheckoutContent() {
                         value={phone}
                         onChange={e => setPhone(e.target.value)}
                         autoComplete="tel-national"
-                        style={{ flex: 1 }}
+                        className="flex-1"
                       />
                     </div>
                   </div>
@@ -465,9 +463,9 @@ function CheckoutContent() {
               {/* 2. Shipping Address */}
               <section>
                 <SectionLabel>Shipping Address</SectionLabel>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                <div className="flex flex-col gap-4">
                   <div>
-                    <label style={{ ...label, fontSize: '0.65rem', color: C.charcoal, display: 'block', marginBottom: '0.4rem' }}>
+                    <label className="block mb-[0.4rem]" style={{ ...label, fontSize: '0.65rem', color: C.charcoal }}>
                       Country <span style={{ color: '#b94a48' }}>*</span>
                     </label>
                     <FocusSelect
@@ -481,7 +479,7 @@ function CheckoutContent() {
                     </FocusSelect>
                   </div>
                   <div>
-                    <label style={{ ...label, fontSize: '0.65rem', color: C.charcoal, display: 'block', marginBottom: '0.4rem' }}>
+                    <label className="block mb-[0.4rem]" style={{ ...label, fontSize: '0.65rem', color: C.charcoal }}>
                       Full name <span style={{ color: '#b94a48' }}>*</span>
                     </label>
                     <FocusInput
@@ -496,7 +494,7 @@ function CheckoutContent() {
                     {showErr('fullName') && <FieldError msg={errors.fullName} />}
                   </div>
                   <div>
-                    <label style={{ ...label, fontSize: '0.65rem', color: C.charcoal, display: 'block', marginBottom: '0.4rem' }}>
+                    <label className="block mb-[0.4rem]" style={{ ...label, fontSize: '0.65rem', color: C.charcoal }}>
                       Address <span style={{ color: '#b94a48' }}>*</span>
                     </label>
                     <FocusInput
@@ -517,9 +515,9 @@ function CheckoutContent() {
                     onChange={e => setAddress2(e.target.value)}
                     autoComplete="address-line2"
                   />
-                  <div className="rg-3" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.75rem' }}>
-                    <div style={{ gridColumn: '1 / 2' }}>
-                      <label style={{ ...label, fontSize: '0.65rem', color: C.charcoal, display: 'block', marginBottom: '0.4rem' }}>
+                  <div className="rg-3 grid grid-cols-3 gap-3">
+                    <div className="col-[1/2]">
+                      <label className="block mb-[0.4rem]" style={{ ...label, fontSize: '0.65rem', color: C.charcoal }}>
                         City <span style={{ color: '#b94a48' }}>*</span>
                       </label>
                       <FocusInput
@@ -534,7 +532,7 @@ function CheckoutContent() {
                       {showErr('city') && <FieldError msg={errors.city} />}
                     </div>
                     <div>
-                      <label style={{ ...label, fontSize: '0.65rem', color: C.charcoal, display: 'block', marginBottom: '0.4rem' }}>
+                      <label className="block mb-[0.4rem]" style={{ ...label, fontSize: '0.65rem', color: C.charcoal }}>
                         State / Province
                       </label>
                       <FocusInput
@@ -546,7 +544,7 @@ function CheckoutContent() {
                       />
                     </div>
                     <div>
-                      <label style={{ ...label, fontSize: '0.65rem', color: C.charcoal, display: 'block', marginBottom: '0.4rem' }}>
+                      <label className="block mb-[0.4rem]" style={{ ...label, fontSize: '0.65rem', color: C.charcoal }}>
                         Postal / ZIP <span style={{ color: '#b94a48' }}>*</span>
                       </label>
                       <FocusInput
@@ -567,19 +565,16 @@ function CheckoutContent() {
               {/* 3. Shipping Method */}
               <section>
                 <SectionLabel>Shipping Method</SectionLabel>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
+                <div className="flex flex-col gap-[0.65rem]">
                   {SHIPPING_MATRIX[group].map(m => {
                     const active = methodId === m.id;
                     return (
                       <label
                         key={m.id}
+                        className="flex items-center gap-4 py-4 px-[1.125rem] rounded-[6px] cursor-pointer"
                         style={{
-                          display: 'flex', alignItems: 'center', gap: '1rem',
-                          padding: '1rem 1.125rem',
                           border: `1.5px solid ${active ? C.gold : 'rgba(43,35,32,0.2)'}`,
-                          borderRadius: '6px',
                           backgroundColor: active ? 'rgba(212,169,78,0.07)' : '#fff',
-                          cursor: 'pointer',
                           transition: 'border-color 0.15s, background-color 0.15s',
                         }}
                       >
@@ -589,18 +584,19 @@ function CheckoutContent() {
                           value={m.id}
                           checked={active}
                           onChange={() => setMethodId(m.id)}
-                          style={{ accentColor: C.gold, width: '16px', height: '16px', flexShrink: 0 }}
+                          className="w-4 h-4 shrink-0"
+                          style={{ accentColor: C.gold }}
                         />
-                        <div style={{ flex: 1 }}>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: '1rem' }}>
+                        <div className="flex-1">
+                          <div className="flex justify-between items-baseline gap-4">
                             <span style={{ fontFamily: UI, fontWeight: 600, fontSize: '0.875rem', color: C.charcoal }}>
                               {m.label}
                             </span>
-                            <span style={{ fontFamily: UI, fontWeight: 600, fontSize: '0.875rem', color: shippingCost(ZONE_OF[group], m.speed) === 0 ? C.teal : C.charcoal, flexShrink: 0 }}>
+                            <span className="shrink-0" style={{ fontFamily: UI, fontWeight: 600, fontSize: '0.875rem', color: shippingCost(ZONE_OF[group], m.speed) === 0 ? C.teal : C.charcoal }}>
                               {shippingCost(ZONE_OF[group], m.speed) === 0 ? 'Free' : formatCad(shippingCost(ZONE_OF[group], m.speed))}
                             </span>
                           </div>
-                          <div style={{ fontFamily: UI, fontSize: '0.775rem', color: 'rgba(43,35,32,0.55)', marginTop: '2px' }}>
+                          <div className="mt-[2px]" style={{ fontFamily: UI, fontSize: '0.775rem', color: 'rgba(43,35,32,0.55)' }}>
                             {m.days}
                           </div>
                         </div>
@@ -613,23 +609,25 @@ function CheckoutContent() {
               {/* 4. Payment — see the note below on why there is no card form */}
               <section>
                 <SectionLabel>Payment</SectionLabel>
-                <div style={{
-                  border: `1px solid rgba(43,35,32,0.18)`,
-                  borderLeft: `3px solid ${C.gold}`,
-                  padding: '1.25rem 1.375rem',
-                  backgroundColor: 'rgba(212,169,78,0.06)',
-                }}>
-                  <div style={{ fontFamily: UI, fontSize: '0.875rem', fontWeight: 600, color: C.charcoal, marginBottom: '0.5rem' }}>
+                <div
+                  className="py-5 px-[1.375rem]"
+                  style={{
+                    border: `1px solid rgba(43,35,32,0.18)`,
+                    borderLeft: `3px solid ${C.gold}`,
+                    backgroundColor: 'rgba(212,169,78,0.06)',
+                  }}
+                >
+                  <div className="mb-2" style={{ fontFamily: UI, fontSize: '0.875rem', fontWeight: 600, color: C.charcoal }}>
                     We will send you a payment link
                   </div>
-                  <p style={{ fontFamily: UI, fontSize: '0.825rem', color: 'rgba(43,35,32,0.65)', lineHeight: 1.65, margin: 0 }}>
+                  <p className="m-0" style={{ fontFamily: UI, fontSize: '0.825rem', color: 'rgba(43,35,32,0.65)', lineHeight: 1.65 }}>
                     Place your order now and nothing is charged. We confirm the pieces and the
                     shipping, then email a secure payment link to <strong>{email || 'your email address'}</strong>.
                     Your order is held while you pay.
                   </p>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '1rem', flexWrap: 'wrap' }}>
-                  <span style={{ fontFamily: UI, fontSize: '0.7rem', color: 'rgba(43,35,32,0.5)', marginRight: '0.25rem' }}>Payment accepted by:</span>
+                <div className="flex items-center gap-2 mt-4 flex-wrap">
+                  <span className="mr-1" style={{ fontFamily: UI, fontSize: '0.7rem', color: 'rgba(43,35,32,0.5)' }}>Payment accepted by:</span>
                   <PaymentBadge>VISA</PaymentBadge>
                   <PaymentBadge>Mastercard</PaymentBadge>
                   <PaymentBadge>Amex</PaymentBadge>
@@ -652,25 +650,24 @@ function CheckoutContent() {
               {/* Place Order CTA */}
               <div>
                 {submitted && Object.keys(errors).length > 0 && (
-                  <div style={{ fontFamily: UI, fontSize: '0.775rem', color: '#b94a48', marginBottom: '1rem', padding: '0.75rem 1rem', backgroundColor: 'rgba(185,74,72,0.07)', borderRadius: '5px', border: '1px solid rgba(185,74,72,0.2)' }}>
+                  <div className="mb-4 py-3 px-4 rounded-[5px]" style={{ fontFamily: UI, fontSize: '0.775rem', color: '#b94a48', backgroundColor: 'rgba(185,74,72,0.07)', border: '1px solid rgba(185,74,72,0.2)' }}>
                     Please correct the highlighted fields before placing your order.
                   </div>
                 )}
                 {placeError && (
-                  <div role="alert" style={{ fontFamily: UI, fontSize: '0.775rem', color: '#b94a48', marginBottom: '1rem', padding: '0.75rem 1rem', backgroundColor: 'rgba(185,74,72,0.07)', borderRadius: '5px', border: '1px solid rgba(185,74,72,0.2)' }}>
+                  <div role="alert" className="mb-4 py-3 px-4 rounded-[5px]" style={{ fontFamily: UI, fontSize: '0.775rem', color: '#b94a48', backgroundColor: 'rgba(185,74,72,0.07)', border: '1px solid rgba(185,74,72,0.2)' }}>
                     {placeError}
                   </div>
                 )}
                 <button
                   type="submit"
                   disabled={placing}
-                  className={placing ? '' : 'shimmer-place-order'}
+                  className={`w-full py-[1.05rem] px-8 rounded-[5px] uppercase ${placing ? '' : 'shimmer-place-order'}`}
                   style={{
-                    width: '100%', padding: '1.05rem 2rem',
                     backgroundColor: placing ? 'rgba(43,35,32,0.25)' : C.gold, color: C.charcoal,
                     fontFamily: UI, fontWeight: 700, fontSize: '0.875rem',
-                    letterSpacing: '0.12em', textTransform: 'uppercase',
-                    border: 'none', borderRadius: '5px', cursor: placing ? 'wait' : 'pointer',
+                    letterSpacing: '0.12em',
+                    border: 'none', cursor: placing ? 'wait' : 'pointer',
                     boxShadow: `0 2px 12px rgba(212,169,78,0.35)`,
                     transition: 'box-shadow 0.2s, transform 0.15s',
                   }}
@@ -680,12 +677,12 @@ function CheckoutContent() {
                   {placing ? 'Placing your order…' : `Place Order — ${formatCad(totals.totalCents)}`}
                 </button>
                 {/* Trust row */}
-                <div style={{ display: 'flex', gap: '1.5rem', justifyContent: 'center', marginTop: '1rem', flexWrap: 'wrap' }}>
+                <div className="flex gap-6 justify-center mt-4 flex-wrap">
                   {[
                     { icon: 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z', label: 'Escrow-Protected Payments' },
                     { icon: 'M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2zm0 0a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10A15.3 15.3 0 0 1 12 2zM2 12h20', label: 'Worldwide Delivery' },
                   ].map(t => (
-                    <div key={t.label} style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                    <div key={t.label} className="flex items-center gap-[0.4rem]">
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={C.maroon} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                         <path d={t.icon} />
                       </svg>
@@ -699,42 +696,39 @@ function CheckoutContent() {
             {/* ══ RIGHT COLUMN: Order summary ══════════════════ */}
             <aside className="checkout-summary-top" ref={summaryRef}>
               <div className="checkout-sticky">
-                <div style={{
+                <div className="rounded-lg overflow-hidden" style={{
                   backgroundColor: '#fff', border: `1px solid rgba(43,35,32,0.12)`,
-                  borderRadius: '8px', overflow: 'hidden',
                   boxShadow: '0 2px 16px rgba(43,35,32,0.06)',
                 }}>
                   {/* Header */}
-                  <div style={{ padding: '1.125rem 1.5rem', borderBottom: `1px solid rgba(43,35,32,0.1)`, backgroundColor: C.cream }}>
+                  <div className="py-[1.125rem] px-6" style={{ borderBottom: `1px solid rgba(43,35,32,0.1)`, backgroundColor: C.cream }}>
                     <div style={{ ...label, color: C.charcoal, fontSize: '0.65rem' }}>Order Summary</div>
                   </div>
 
                   {/* Items */}
-                  <div style={{ padding: '1rem 1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem', maxHeight: '260px', overflowY: 'auto' }}>
+                  <div className="py-4 px-6 flex flex-col gap-4 max-h-[260px] overflow-y-auto">
                     {lines.map(it => (
-                      <div key={`${it.productId}:${it.size}`} style={{ display: 'flex', gap: '0.875rem', alignItems: 'flex-start' }}>
-                        <div style={{ position: 'relative', flexShrink: 0 }}>
+                      <div key={`${it.productId}:${it.size}`} className="flex gap-3.5 items-start">
+                        <div className="relative shrink-0">
                           <img
                             src={it.imageUrl}
                             alt={it.title}
                             width={52} height={52}
-                            style={{ borderRadius: '4px', objectFit: 'cover', display: 'block', backgroundColor: 'rgba(43,35,32,0.08)' }}
+                            className="rounded-[4px] object-cover block"
+                            style={{ backgroundColor: 'rgba(43,35,32,0.08)' }}
                           />
-                          <span style={{
-                            position: 'absolute', top: '-6px', right: '-6px',
+                          <span className="absolute -top-[6px] -right-[6px] rounded-full w-[18px] h-[18px] flex items-center justify-center" style={{
                             backgroundColor: C.charcoal, color: '#fff',
-                            borderRadius: '50%', width: '18px', height: '18px',
-                            display: 'flex', alignItems: 'center', justifyContent: 'center',
                             fontFamily: UI, fontSize: '0.55rem', fontWeight: 700,
                           }}>{it.quantity}</span>
                         </div>
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <div style={{ fontFamily: UI, fontSize: '0.8rem', fontWeight: 600, color: C.charcoal, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        <div className="flex-1 min-w-0">
+                          <div className="truncate" style={{ fontFamily: UI, fontSize: '0.8rem', fontWeight: 600, color: C.charcoal }}>
                             {it.title}
                           </div>
-                          <div style={{ fontFamily: UI, fontSize: '0.7rem', color: 'rgba(43,35,32,0.5)', marginTop: '2px' }}>{it.color} · {it.size}</div>
+                          <div className="mt-[2px]" style={{ fontFamily: UI, fontSize: '0.7rem', color: 'rgba(43,35,32,0.5)' }}>{it.color} · {it.size}</div>
                         </div>
-                        <div style={{ flexShrink: 0, textAlign: 'right' }}>
+                        <div className="shrink-0 text-right">
                           <div style={{ fontFamily: UI, fontSize: '0.825rem', fontWeight: 600, color: C.charcoal }}>
                             {formatCad(it.unitPriceCents * it.quantity)}
                           </div>
@@ -744,13 +738,13 @@ function CheckoutContent() {
                   </div>
 
                   {/* Totals */}
-                  <div style={{ padding: '1rem 1.5rem', borderTop: `1px solid rgba(43,35,32,0.1)`, display: 'flex', flexDirection: 'column', gap: '0.625rem' }}>
+                  <div className="py-4 px-6 flex flex-col gap-2.5" style={{ borderTop: `1px solid rgba(43,35,32,0.1)` }}>
                     {[
                       { label: 'Subtotal', cents: totals.subtotalCents },
                       ...(discount ? [{ label: `Promo (${discount.code})`, cents: -totals.discountCents }] : []),
                       { label: `Shipping (${selectedMethod.label})`, cents: totals.shippingCents, isFree: totals.shippingCents === 0 },
                     ].map(row => (
-                      <div key={row.label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                      <div key={row.label} className="flex justify-between items-baseline">
                         <span style={{ fontFamily: UI, fontSize: '0.8rem', color: 'rgba(43,35,32,0.6)' }}>{row.label}</span>
                         <span style={{ fontFamily: UI, fontSize: '0.8rem', color: row.isFree ? C.teal : C.charcoal, fontWeight: row.isFree ? 600 : 400 }}>
                           {row.isFree ? 'Free' : row.cents < 0 ? `−${formatCad(Math.abs(row.cents))}` : formatCad(row.cents)}
@@ -758,10 +752,10 @@ function CheckoutContent() {
                       </div>
                     ))}
                     {/* Divider */}
-                    <div style={{ borderTop: `1px solid rgba(43,35,32,0.12)`, paddingTop: '0.625rem', marginTop: '0.25rem' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                    <div className="pt-2.5 mt-1" style={{ borderTop: `1px solid rgba(43,35,32,0.12)` }}>
+                      <div className="flex justify-between items-baseline">
                         <span style={{ fontFamily: UI, fontWeight: 700, fontSize: '0.95rem', color: C.charcoal }}>Total</span>
-                        <div style={{ textAlign: 'right' }}>
+                        <div className="text-right">
                           <div style={{ fontFamily: DISPLAY, fontSize: '1.2rem', color: C.charcoal, fontWeight: 600 }}>{formatCad(totals.totalCents)}</div>
                         </div>
                       </div>
@@ -769,7 +763,7 @@ function CheckoutContent() {
                   </div>
 
                   {/* Delivery estimate */}
-                  <div style={{ padding: '0.875rem 1.5rem', backgroundColor: `rgba(59,138,147,0.07)`, borderTop: `1px solid rgba(59,138,147,0.15)`, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <div className="py-3.5 px-6 flex items-center gap-2" style={{ backgroundColor: `rgba(59,138,147,0.07)`, borderTop: `1px solid rgba(59,138,147,0.15)` }}>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={C.teal} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />
                     </svg>
@@ -780,8 +774,8 @@ function CheckoutContent() {
                 </div>
 
                 {/* Back to cart */}
-                <div style={{ textAlign: 'center', marginTop: '1.25rem' }}>
-                  <Link to="/cart" style={{ fontFamily: UI, fontSize: '0.75rem', color: C.indigo, textDecorationLine: 'none', letterSpacing: '0.04em' }}
+                <div className="text-center mt-5">
+                  <Link to="/cart" className="no-underline" style={{ fontFamily: UI, fontSize: '0.75rem', color: C.indigo, letterSpacing: '0.04em' }}
                     onMouseEnter={e => (e.currentTarget.style.textDecoration = 'underline')}
                     onMouseLeave={e => (e.currentTarget.style.textDecoration = 'none')}
                   >
@@ -797,13 +791,13 @@ function CheckoutContent() {
 
       {/* ── Minimal Footer ──────────────────────────────────── */}
       <footer style={{ backgroundColor: C.maroon, borderTop: `1px solid rgba(212,169,78,0.15)` }}>
-        <div style={{ maxWidth: '1240px', margin: '0 auto', padding: '1.25rem 2rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.75rem' }}>
+        <div className="max-w-[1240px] mx-auto py-5 px-8 flex items-center justify-between flex-wrap gap-3">
           <span style={{ fontFamily: UI, fontSize: '0.65rem', color: 'rgba(250,246,240,0.45)', letterSpacing: '0.04em' }}>
             © {new Date().getFullYear()} AdeClassics. All rights reserved.
           </span>
-          <div style={{ display: 'flex', gap: '1.5rem' }}>
+          <div className="flex gap-6">
             {['Privacy Policy', 'Terms of Service', 'Returns'].map(lnk => (
-              <a key={lnk} href="#" style={{ fontFamily: UI, fontSize: '0.65rem', color: 'rgba(250,246,240,0.5)', textDecorationLine: 'none', letterSpacing: '0.04em' }}
+              <a key={lnk} href="#" className="no-underline" style={{ fontFamily: UI, fontSize: '0.65rem', color: 'rgba(250,246,240,0.5)', letterSpacing: '0.04em' }}
                 onMouseEnter={e => (e.currentTarget.style.color = C.gold)}
                 onMouseLeave={e => (e.currentTarget.style.color = 'rgba(250,246,240,0.5)')}
               >

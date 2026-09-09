@@ -146,38 +146,34 @@ function ArticleCard({ article, onSelect }: { article: Article; onSelect: (a: Ar
       onClick={() => onSelect(article)}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      style={{
-        textAlign: 'left',
-        background: 'none',
-        border: 'none',
-        padding: 0,
-        cursor: 'pointer',
-        display: 'flex',
-        flexDirection: 'column',
-      }}
+      className="text-left p-0 cursor-pointer flex flex-col"
+      style={{ background: 'none', border: 'none' }}
     >
-      <div style={{ width: '100%', aspectRatio: '4/3', overflow: 'hidden', borderRadius: '8px', marginBottom: '1rem', backgroundColor: '#e8e0d8' }}>
+      <div className="w-full aspect-[4/3] overflow-hidden rounded-lg mb-4" style={{ backgroundColor: '#e8e0d8' }}>
         <img
           src={article.image}
           alt={article.title}
-          style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.4s ease', transform: hovered ? 'scale(1.04)' : 'scale(1)' }}
+          className="w-full h-full object-cover"
+          style={{ transition: 'transform 0.4s ease', transform: hovered ? 'scale(1.04)' : 'scale(1)' }}
         />
       </div>
       <CatTag cat={article.category} />
-      <h3 style={{
-        fontFamily: DISPLAY,
-        fontSize: '1.1rem',
-        fontWeight: 500,
-        color: C.charcoal,
-        lineHeight: 1.3,
-        letterSpacing: '-0.01em',
-        margin: '0.5rem 0 0.4rem',
-        textDecorationLine: hovered ? 'underline' : 'none',
-        textDecorationColor: C.gold,
-      }}>
+      <h3
+        className="mt-2 mx-0 mb-[0.4rem]"
+        style={{
+          fontFamily: DISPLAY,
+          fontSize: '1.1rem',
+          fontWeight: 500,
+          color: C.charcoal,
+          lineHeight: 1.3,
+          letterSpacing: '-0.01em',
+          textDecorationLine: hovered ? 'underline' : 'none',
+          textDecorationColor: C.gold,
+        }}
+      >
         {article.title}
       </h3>
-      <p style={{ fontFamily: UI, fontSize: '0.84rem', color: 'rgba(43,35,32,0.58)', lineHeight: 1.55, margin: '0 0 0.75rem' }}>
+      <p className="m-0 mb-3" style={{ fontFamily: UI, fontSize: '0.84rem', color: 'rgba(43,35,32,0.58)', lineHeight: 1.55 }}>
         {article.excerpt}
       </p>
       <span style={{ fontFamily: UI, fontSize: '0.72rem', color: 'rgba(43,35,32,0.38)' }}>
@@ -192,32 +188,31 @@ function ArticleDetail({ article, onBack }: { article: Article; onBack: () => vo
   return (
     <div>
       {/* Hero */}
-      <div style={{ position: 'relative', height: '520px', overflow: 'hidden', backgroundColor: '#2B2320' }}>
+      <div className="relative h-[520px] overflow-hidden" style={{ backgroundColor: '#2B2320' }}>
         <img
           src={article.image.replace('w=600&h=420', 'w=1400&h=600')}
           alt={article.title}
-          style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.75 }}
+          className="w-full h-full object-cover"
+          style={{ opacity: 0.75 }}
         />
-        <div style={{
-          position: 'absolute', inset: 0,
-          background: 'linear-gradient(to top, rgba(43,35,32,0.88) 0%, rgba(43,35,32,0.2) 60%, transparent 100%)',
-          display: 'flex', flexDirection: 'column', justifyContent: 'flex-end',
-          padding: '3rem 2.5rem', maxWidth: '900px',
-        }}>
+        <div
+          className="absolute inset-0 flex flex-col justify-end py-12 px-10 max-w-[900px]"
+          style={{ background: 'linear-gradient(to top, rgba(43,35,32,0.88) 0%, rgba(43,35,32,0.2) 60%, transparent 100%)' }}
+        >
           <CatTag cat={article.category} />
-          <h1 style={{ fontFamily: DISPLAY, fontSize: 'clamp(1.6rem, 3vw, 2.5rem)', fontWeight: 500, color: C.cream, lineHeight: 1.2, letterSpacing: '-0.02em', marginTop: '0.75rem' }}>
+          <h1 className="mt-3" style={{ fontFamily: DISPLAY, fontSize: 'clamp(1.6rem, 3vw, 2.5rem)', fontWeight: 500, color: C.cream, lineHeight: 1.2, letterSpacing: '-0.02em' }}>
             {article.title}
           </h1>
-          <p style={{ fontFamily: UI, fontSize: '0.82rem', color: 'rgba(250,246,240,0.55)', marginTop: '0.75rem' }}>
+          <p className="mt-3" style={{ fontFamily: UI, fontSize: '0.82rem', color: 'rgba(250,246,240,0.55)' }}>
             {article.date} · {article.readTime}
           </p>
         </div>
       </div>
 
       {/* Breadcrumb + back */}
-      <div style={{ maxWidth: '1440px', margin: '0 auto', padding: '1.5rem 2.5rem 0' }}>
-        <nav style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontFamily: UI, fontSize: '0.75rem', color: 'rgba(43,35,32,0.42)' }}>
-          <button onClick={onBack} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, color: 'rgba(43,35,32,0.42)', fontFamily: UI, fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+      <div className="max-w-[1440px] mx-auto pt-6 px-10">
+        <nav className="flex items-center gap-2" style={{ fontFamily: UI, fontSize: '0.75rem', color: 'rgba(43,35,32,0.42)' }}>
+          <button onClick={onBack} className="p-0 cursor-pointer flex items-center gap-[0.3rem]" style={{ background: 'none', border: 'none', color: 'rgba(43,35,32,0.42)', fontFamily: UI, fontSize: '0.75rem' }}>
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6" /></svg>
             Lookbook
           </button>
@@ -227,16 +222,16 @@ function ArticleDetail({ article, onBack }: { article: Article; onBack: () => vo
       </div>
 
       {/* Body */}
-      <div style={{ maxWidth: '760px', margin: '0 auto', padding: '3rem 2.5rem 5rem' }}>
-        <p style={{ fontFamily: UI, fontSize: '1.1rem', color: 'rgba(43,35,32,0.7)', lineHeight: 1.7, marginBottom: '2.5rem', fontStyle: 'italic' }}>
+      <div className="max-w-[760px] mx-auto pt-12 px-10 pb-20">
+        <p className="mb-10" style={{ fontFamily: UI, fontSize: '1.1rem', color: 'rgba(43,35,32,0.7)', lineHeight: 1.7, fontStyle: 'italic' }}>
           {article.excerpt}
         </p>
 
         {article.body.map((para, i) => (
           <div key={i}>
             {para.startsWith('Step') || para.startsWith('Look') || para.startsWith('Storage') || para.startsWith('Cleaning') || para.startsWith('Reshaping') ? (
-              <div style={{ marginBottom: '1.5rem' }}>
-                <h3 style={{ fontFamily: DISPLAY, fontSize: '1.1rem', fontWeight: 500, color: C.charcoal, marginBottom: '0.5rem' }}>
+              <div className="mb-6">
+                <h3 className="mb-2" style={{ fontFamily: DISPLAY, fontSize: '1.1rem', fontWeight: 500, color: C.charcoal }}>
                   {para.split(' — ')[0]}
                 </h3>
                 <p style={{ fontFamily: UI, fontSize: '0.95rem', color: 'rgba(43,35,32,0.72)', lineHeight: 1.75 }}>
@@ -244,21 +239,22 @@ function ArticleDetail({ article, onBack }: { article: Article; onBack: () => vo
                 </p>
               </div>
             ) : (
-              <p style={{ fontFamily: UI, fontSize: '0.95rem', color: 'rgba(43,35,32,0.72)', lineHeight: 1.75, marginBottom: '1.5rem' }}>
+              <p className="mb-6" style={{ fontFamily: UI, fontSize: '0.95rem', color: 'rgba(43,35,32,0.72)', lineHeight: 1.75 }}>
                 {para}
               </p>
             )}
             {article.pullQuote && i === 1 && (
-              <blockquote style={{
-                borderLeft: `4px solid ${C.gold}`,
-                paddingLeft: '1.5rem',
-                margin: '2rem 0',
-                fontFamily: DISPLAY,
-                fontSize: '1.3rem',
-                fontStyle: 'italic',
-                color: C.charcoal,
-                lineHeight: 1.4,
-              }}>
+              <blockquote
+                className="pl-6 my-8"
+                style={{
+                  borderLeft: `4px solid ${C.gold}`,
+                  fontFamily: DISPLAY,
+                  fontSize: '1.3rem',
+                  fontStyle: 'italic',
+                  color: C.charcoal,
+                  lineHeight: 1.4,
+                }}
+              >
                 {article.pullQuote}
               </blockquote>
             )}
@@ -268,12 +264,12 @@ function ArticleDetail({ article, onBack }: { article: Article; onBack: () => vo
 
       {/* Related articles */}
       {related.length > 0 && (
-        <div style={{ borderTop: `1px solid rgba(43,35,32,0.09)`, paddingTop: '4rem', paddingBottom: '5rem', backgroundColor: '#fff' }}>
-          <div style={{ maxWidth: '1440px', margin: '0 auto', padding: '0 2.5rem' }}>
-            <div style={{ ...label, fontSize: '0.65rem', color: 'rgba(43,35,32,0.45)', marginBottom: '2rem', letterSpacing: '0.16em' }}>
+        <div className="pt-16 pb-20" style={{ borderTop: `1px solid rgba(43,35,32,0.09)`, backgroundColor: '#fff' }}>
+          <div className="max-w-[1440px] mx-auto px-10">
+            <div className="mb-8" style={{ ...label, fontSize: '0.65rem', color: 'rgba(43,35,32,0.45)', letterSpacing: '0.16em' }}>
               Related Stories
             </div>
-            <div className="article-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '2rem' }}>
+            <div className="article-grid grid grid-cols-3 gap-8">
               {related.map(a => (
                 <ArticleCard key={a.id} article={a} onSelect={() => {}} />
               ))}
@@ -309,68 +305,54 @@ export default function Lookbook() {
   }
 
   return (
-    <div style={{ backgroundColor: C.cream, paddingBottom: '6rem' }}>
+    <div className="pb-24" style={{ backgroundColor: C.cream }}>
 
       {/* Page header */}
-      <div style={{ maxWidth: '1440px', margin: '0 auto', padding: '4rem 2.5rem 0' }}>
-        <div style={{ ...label, fontSize: '0.62rem', color: C.gold, letterSpacing: '0.18em', marginBottom: '0.75rem' }}>
+      <div className="max-w-[1440px] mx-auto pt-16 px-10">
+        <div className="mb-3" style={{ ...label, fontSize: '0.62rem', color: C.gold, letterSpacing: '0.18em' }}>
           Stories & Style
         </div>
-        <h1 style={{ fontFamily: DISPLAY, fontSize: 'clamp(2rem, 4vw, 3rem)', fontWeight: 500, color: C.charcoal, letterSpacing: '-0.02em', lineHeight: 1.1, marginBottom: '0.75rem' }}>
+        <h1 className="mb-3" style={{ fontFamily: DISPLAY, fontSize: 'clamp(2rem, 4vw, 3rem)', fontWeight: 500, color: C.charcoal, letterSpacing: '-0.02em', lineHeight: 1.1 }}>
           Lookbook & Stories
         </h1>
-        <p style={{ fontFamily: UI, fontSize: '1rem', color: 'rgba(43,35,32,0.55)', lineHeight: 1.6, maxWidth: '520px', marginBottom: '3rem' }}>
+        <p className="max-w-[520px] mb-12" style={{ fontFamily: UI, fontSize: '1rem', color: 'rgba(43,35,32,0.55)', lineHeight: 1.6 }}>
           Cultural styling guides, care rituals, event inspiration, and a closer look at the craft behind every piece.
         </p>
 
         {/* Featured article */}
         <div
-          style={{
-            position: 'relative',
-            height: '520px',
-            borderRadius: '12px',
-            overflow: 'hidden',
-            marginBottom: '3rem',
-            cursor: 'pointer',
-            backgroundColor: '#2B2320',
-          }}
+          className="relative h-[520px] rounded-[12px] overflow-hidden mb-12 cursor-pointer"
+          style={{ backgroundColor: '#2B2320' }}
           onClick={() => setSelectedArticle(featured)}
         >
           <img
             src={featured.image}
             alt={featured.title}
-            style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.5s ease' }}
+            className="w-full h-full object-cover"
+            style={{ transition: 'transform 0.5s ease' }}
             onMouseEnter={e => (e.currentTarget.style.transform = 'scale(1.03)')}
             onMouseLeave={e => (e.currentTarget.style.transform = 'scale(1)')}
           />
-          <div style={{
-            position: 'absolute', inset: 0,
-            background: 'linear-gradient(to top, rgba(43,35,32,0.88) 0%, rgba(43,35,32,0.25) 55%, transparent 100%)',
-            display: 'flex', flexDirection: 'column', justifyContent: 'flex-end',
-            padding: '2.5rem 3rem',
-          }}>
+          <div
+            className="absolute inset-0 flex flex-col justify-end py-10 px-12"
+            style={{ background: 'linear-gradient(to top, rgba(43,35,32,0.88) 0%, rgba(43,35,32,0.25) 55%, transparent 100%)' }}
+          >
             <CatTag cat={featured.category} />
-            <h2 style={{ fontFamily: DISPLAY, fontSize: 'clamp(1.5rem, 2.8vw, 2.25rem)', fontWeight: 500, color: C.cream, lineHeight: 1.2, letterSpacing: '-0.02em', maxWidth: '600px', margin: '0.75rem 0 0.75rem' }}>
+            <h2 className="max-w-[600px] my-3" style={{ fontFamily: DISPLAY, fontSize: 'clamp(1.5rem, 2.8vw, 2.25rem)', fontWeight: 500, color: C.cream, lineHeight: 1.2, letterSpacing: '-0.02em' }}>
               {featured.title}
             </h2>
-            <p style={{ fontFamily: UI, fontSize: '0.9rem', color: 'rgba(250,246,240,0.72)', lineHeight: 1.55, maxWidth: '500px', marginBottom: '1.25rem' }}>
+            <p className="max-w-[500px] mb-5" style={{ fontFamily: UI, fontSize: '0.9rem', color: 'rgba(250,246,240,0.72)', lineHeight: 1.55 }}>
               {featured.excerpt}
             </p>
             <button
               onClick={e => { e.stopPropagation(); setSelectedArticle(featured); }}
+              className="inline-flex items-center gap-[0.4rem] py-[0.6rem] px-5 rounded-[4px] cursor-pointer self-start"
               style={{
                 ...label,
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '0.4rem',
                 fontSize: '0.65rem',
                 color: C.charcoal,
                 backgroundColor: C.gold,
                 border: 'none',
-                borderRadius: '4px',
-                padding: '0.6rem 1.25rem',
-                cursor: 'pointer',
-                alignSelf: 'flex-start',
               }}
             >
               Read Story
@@ -380,30 +362,28 @@ export default function Lookbook() {
             </button>
           </div>
           {/* Date + read time pill */}
-          <div style={{ position: 'absolute', top: '1.5rem', right: '1.5rem' }}>
-            <span style={{ fontFamily: UI, fontSize: '0.7rem', color: 'rgba(250,246,240,0.65)', backgroundColor: 'rgba(43,35,32,0.4)', borderRadius: '20px', padding: '0.3rem 0.75rem', backdropFilter: 'blur(4px)' }}>
+          <div className="absolute top-6 right-6">
+            <span className="rounded-[20px] py-[0.3rem] px-3" style={{ fontFamily: UI, fontSize: '0.7rem', color: 'rgba(250,246,240,0.65)', backgroundColor: 'rgba(43,35,32,0.4)', backdropFilter: 'blur(4px)' }}>
               {featured.date} · {featured.readTime}
             </span>
           </div>
         </div>
 
         {/* Category pills */}
-        <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '2.5rem', flexWrap: 'wrap' }}>
+        <div className="flex gap-2 mb-10 flex-wrap">
           {CATEGORIES.map(cat => {
             const active = activeCategory === cat;
             return (
               <button
                 key={cat}
                 onClick={() => { setActiveCategory(cat); setShowCount(6); }}
+                className="py-[0.45rem] px-4 rounded-[20px] cursor-pointer"
                 style={{
                   ...label,
                   fontSize: '0.64rem',
-                  padding: '0.45rem 1rem',
-                  borderRadius: '20px',
                   border: `1px solid ${active ? C.gold : 'rgba(43,35,32,0.18)'}`,
                   backgroundColor: active ? C.gold : 'transparent',
                   color: active ? C.charcoal : 'rgba(43,35,32,0.55)',
-                  cursor: 'pointer',
                   transition: 'all 0.15s',
                 }}
               >
@@ -415,31 +395,29 @@ export default function Lookbook() {
 
         {/* Article grid */}
         {visible.length > 0 ? (
-          <div className="article-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '2.5rem 2rem', marginBottom: '3rem' }}>
+          <div className="article-grid grid grid-cols-3 gap-y-10 gap-x-8 mb-12">
             {visible.map(article => (
               <ArticleCard key={article.id} article={article} onSelect={setSelectedArticle} />
             ))}
           </div>
         ) : (
-          <div style={{ textAlign: 'center', padding: '4rem 0', color: 'rgba(43,35,32,0.38)', fontFamily: UI, fontSize: '0.9rem' }}>
+          <div className="text-center py-16" style={{ color: 'rgba(43,35,32,0.38)', fontFamily: UI, fontSize: '0.9rem' }}>
             No stories in this category yet.
           </div>
         )}
 
         {/* Load More */}
         {visible.length < filtered.length && (
-          <div style={{ textAlign: 'center', marginTop: '1rem' }}>
+          <div className="text-center mt-4">
             <button
               onClick={() => setShowCount(c => c + 6)}
+              className="py-3 px-10 rounded-[4px] cursor-pointer"
               style={{
                 ...label,
                 fontSize: '0.65rem',
-                padding: '0.75rem 2.5rem',
                 border: `1px solid ${C.maroon}`,
-                borderRadius: '4px',
                 color: C.maroon,
                 backgroundColor: 'transparent',
-                cursor: 'pointer',
                 transition: 'all 0.15s',
               }}
               onMouseEnter={e => { e.currentTarget.style.backgroundColor = C.maroon; e.currentTarget.style.color = C.cream; }}

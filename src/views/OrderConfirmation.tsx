@@ -18,21 +18,20 @@ const STEPS = ['Cart', 'Shipping', 'Payment', 'Confirmation'];
 function ProgressBar() {
   const current = 3; // "Confirmation" step
   return (
-    <div className="checkout-steps" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+    <div className="checkout-steps flex items-center justify-center">
       {STEPS.map((s, i) => {
         const done = i < current;
         const active = i === current;
         return (
-          <div key={s} style={{ display: 'flex', alignItems: 'center' }}>
+          <div key={s} className="flex items-center">
             {i > 0 && (
-              <div className="checkout-step-line" style={{ width: '2.5rem', height: '1px', backgroundColor: done || active ? C.maroon : 'rgba(43,35,32,0.2)' }} />
+              <div className="checkout-step-line w-10 h-px" style={{ backgroundColor: done || active ? C.maroon : 'rgba(43,35,32,0.2)' }} />
             )}
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
-              <div style={{
-                width: '24px', height: '24px', borderRadius: '50%',
-                backgroundColor: active ? C.gold : done ? C.maroon : 'rgba(43,35,32,0.1)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-              }}>
+            <div className="flex flex-col items-center gap-[4px]">
+              <div
+                className="w-6 h-6 rounded-full flex items-center justify-center"
+                style={{ backgroundColor: active ? C.gold : done ? C.maroon : 'rgba(43,35,32,0.1)' }}
+              >
                 {done || active ? (
                   <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
                     <polyline points="2,6 5,9 10,3" stroke={active ? C.charcoal : '#fff'} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
@@ -62,82 +61,77 @@ const TRUST = [
 /* ─── Page ───────────────────────────────────────────────────── */
 export default function OrderConfirmation({ order }: { order: OrderDetail }) {
   return (
-    <div style={{ backgroundColor: C.cream, minHeight: '100vh', fontFamily: UI, color: C.charcoal }}>
+    <div className="min-h-screen" style={{ backgroundColor: C.cream, fontFamily: UI, color: C.charcoal }}>
 
       {/* ── Header (identical to Checkout) ──────────────────── */}
       <header style={{ backgroundColor: C.maroon, borderBottom: `1px solid rgba(212,169,78,0.22)` }}>
-        <div style={{ maxWidth: '1240px', margin: '0 auto', padding: '0 2rem', height: '64px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Link to="/" style={{ textDecorationLine: 'none' }}>
+        <div className="max-w-[1240px] mx-auto px-8 h-16 flex items-center justify-between">
+          <Link to="/" className="no-underline">
             <div style={{ fontFamily: DISPLAY, fontSize: '1.25rem', color: C.cream, fontWeight: 500, letterSpacing: '-0.01em', lineHeight: 1.05 }}>
               AdeClassics
             </div>
-            <div style={{ fontFamily: UI, fontSize: '0.525rem', color: C.gold, letterSpacing: '0.16em', textTransform: 'uppercase', marginTop: '2px' }}>
+            <div className="mt-[2px] uppercase" style={{ fontFamily: UI, fontSize: '0.525rem', color: C.gold, letterSpacing: '0.16em' }}>
               Timeless Elegance
             </div>
           </Link>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <div className="flex items-center gap-2">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={C.gold} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
               <path d="M7 11V7a5 5 0 0 1 10 0v4" />
             </svg>
-            <span style={{ fontFamily: UI, fontSize: '0.7rem', color: C.cream, letterSpacing: '0.08em', textTransform: 'uppercase', opacity: 0.85 }}>
+            <span className="uppercase" style={{ fontFamily: UI, fontSize: '0.7rem', color: C.cream, letterSpacing: '0.08em', opacity: 0.85 }}>
               Secure Checkout
             </span>
           </div>
         </div>
-        <div style={{ backgroundColor: 'rgba(0,0,0,0.12)', padding: '0.7rem 2rem' }}>
+        <div className="py-[0.7rem] px-8" style={{ backgroundColor: 'rgba(0,0,0,0.12)' }}>
           <ProgressBar />
         </div>
       </header>
 
       {/* ── Page body ─────────────────────────────────────────── */}
-      <div style={{ maxWidth: '680px', margin: '0 auto', padding: '4rem 2rem 5rem' }}>
+      <div className="max-w-[680px] mx-auto pt-16 px-8 pb-20">
 
         {/* ── Hero checkmark ─────────────────────────────────── */}
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', marginBottom: '3rem' }}>
+        <div className="flex flex-col items-center text-center mb-12">
           {/* Animated check circle */}
-          <div style={{
-            width: '72px', height: '72px', borderRadius: '50%',
-            backgroundColor: 'rgba(59,138,147,0.1)',
-            borderWidth: '2px', borderStyle: 'solid', borderColor: 'rgba(59,138,147,0.3)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            marginBottom: '1.75rem',
-            boxShadow: '0 0 0 8px rgba(59,138,147,0.06)',
-          }}>
+          <div
+            className="w-[72px] h-[72px] rounded-full flex items-center justify-center mb-7"
+            style={{
+              backgroundColor: 'rgba(59,138,147,0.1)',
+              borderWidth: '2px', borderStyle: 'solid', borderColor: 'rgba(59,138,147,0.3)',
+              boxShadow: '0 0 0 8px rgba(59,138,147,0.06)',
+            }}
+          >
             <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke={C.teal} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
               <polyline points="20 6 9 17 4 12" />
             </svg>
           </div>
 
-          <h1 style={{
-            fontFamily: DISPLAY, fontSize: '2.25rem', fontWeight: 500,
-            color: C.charcoal, letterSpacing: '-0.02em', lineHeight: 1.12,
-            marginBottom: '0.875rem',
-          }}>
+          <h1 className="mb-3.5" style={{ fontFamily: DISPLAY, fontSize: '2.25rem', fontWeight: 500, color: C.charcoal, letterSpacing: '-0.02em', lineHeight: 1.12 }}>
             Thank You for Your Order
           </h1>
 
-          <p style={{ fontFamily: UI, fontSize: '0.875rem', color: 'rgba(43,35,32,0.6)', lineHeight: 1.7, maxWidth: '460px' }}>
+          <p className="max-w-[460px]" style={{ fontFamily: UI, fontSize: '0.875rem', color: 'rgba(43,35,32,0.6)', lineHeight: 1.7 }}>
             Order <strong style={{ color: C.charcoal }}>{order.number}</strong> confirmed — we have sent the details to{' '}
             <span style={{ color: C.indigo, fontWeight: 500 }}>{order.customerEmail}</span>.
           </p>
         </div>
 
         {/* ── Order summary card ─────────────────────────────── */}
-        <div style={{
-          backgroundColor: '#fff',
-          borderWidth: '1px', borderStyle: 'solid', borderColor: 'rgba(43,35,32,0.12)',
-          borderRadius: '8px', overflow: 'hidden',
-          boxShadow: '0 2px 16px rgba(43,35,32,0.06)',
-          marginBottom: '2rem',
-        }}>
+        <div
+          className="rounded-lg overflow-hidden mb-8"
+          style={{
+            backgroundColor: '#fff',
+            borderWidth: '1px', borderStyle: 'solid', borderColor: 'rgba(43,35,32,0.12)',
+            boxShadow: '0 2px 16px rgba(43,35,32,0.06)',
+          }}
+        >
           {/* Card header */}
-          <div style={{
-            padding: '1rem 1.5rem',
-            backgroundColor: C.cream,
-            borderBottom: `1px solid rgba(43,35,32,0.1)`,
-            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          }}>
+          <div
+            className="py-4 px-6 flex items-center justify-between"
+            style={{ backgroundColor: C.cream, borderBottom: `1px solid rgba(43,35,32,0.1)` }}
+          >
             <div style={{ ...label, color: C.charcoal, fontSize: '0.65rem' }}>Order Summary</div>
             <div style={{ fontFamily: UI, fontSize: '0.72rem', color: 'rgba(43,35,32,0.45)', letterSpacing: '0.02em' }}>
               {order.number}
@@ -145,18 +139,18 @@ export default function OrderConfirmation({ order }: { order: OrderDetail }) {
           </div>
 
           {/* Items */}
-          <div style={{ padding: '1.125rem 1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <div className="py-[1.125rem] px-6 flex flex-col gap-4">
             {order.items.map((it, idx) => (
-              <div key={`${it.name}:${it.variant ?? ''}:${idx}`} style={{ display: 'flex', gap: '0.875rem', alignItems: 'flex-start' }}>
-                <div style={{ flex: 1, minWidth: 0 }}>
+              <div key={`${it.name}:${it.variant ?? ''}:${idx}`} className="flex gap-3.5 items-start">
+                <div className="flex-1 min-w-0">
                   <div style={{ fontFamily: UI, fontSize: '0.8rem', fontWeight: 600, color: C.charcoal }}>
                     {it.name}
                   </div>
-                  <div style={{ fontFamily: UI, fontSize: '0.7rem', color: 'rgba(43,35,32,0.5)', marginTop: '2px' }}>
+                  <div className="mt-[2px]" style={{ fontFamily: UI, fontSize: '0.7rem', color: 'rgba(43,35,32,0.5)' }}>
                     {[it.variant, it.qty > 1 ? `Qty ${it.qty}` : null].filter(Boolean).join(' · ')}
                   </div>
                 </div>
-                <div style={{ flexShrink: 0, textAlign: 'right' }}>
+                <div className="shrink-0 text-right">
                   <div style={{ fontFamily: UI, fontSize: '0.825rem', fontWeight: 600, color: C.charcoal }}>
                     {formatCad(Math.round(it.unitCad * it.qty * 100))}
                   </div>
@@ -166,49 +160,46 @@ export default function OrderConfirmation({ order }: { order: OrderDetail }) {
           </div>
 
           {/* Totals */}
-          <div style={{ padding: '1rem 1.5rem', borderTop: `1px solid rgba(43,35,32,0.1)`, display: 'flex', flexDirection: 'column', gap: '0.575rem' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+          <div className="py-4 px-6 flex flex-col gap-[0.575rem]" style={{ borderTop: `1px solid rgba(43,35,32,0.1)` }}>
+            <div className="flex justify-between items-baseline">
               <span style={{ fontFamily: UI, fontSize: '0.8rem', color: 'rgba(43,35,32,0.58)' }}>Subtotal</span>
               <span style={{ fontFamily: UI, fontSize: '0.8rem', color: C.charcoal }}>{formatCad(Math.round(order.subtotalCad * 100))}</span>
             </div>
             {order.discountCad > 0 && (
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+              <div className="flex justify-between items-baseline">
                 <span style={{ fontFamily: UI, fontSize: '0.8rem', color: C.teal }}>Discount</span>
                 <span style={{ fontFamily: UI, fontSize: '0.8rem', color: C.teal, fontWeight: 600 }}>−{formatCad(Math.round(order.discountCad * 100))}</span>
               </div>
             )}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+            <div className="flex justify-between items-baseline">
               <span style={{ fontFamily: UI, fontSize: '0.8rem', color: 'rgba(43,35,32,0.58)' }}>Shipping</span>
               <span style={{ fontFamily: UI, fontSize: '0.8rem', color: order.shippingCad === 0 ? C.teal : C.charcoal, fontWeight: order.shippingCad === 0 ? 600 : 400 }}>
                 {order.shippingCad === 0 ? 'Free' : formatCad(Math.round(order.shippingCad * 100))}
               </span>
             </div>
-            <div style={{ borderTop: `1px solid rgba(43,35,32,0.1)`, paddingTop: '0.6rem', marginTop: '0.15rem', display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+            <div className="flex justify-between items-baseline pt-[0.6rem] mt-[0.15rem]" style={{ borderTop: `1px solid rgba(43,35,32,0.1)` }}>
               <span style={{ fontFamily: UI, fontWeight: 700, fontSize: '0.95rem', color: C.charcoal }}>Total</span>
-              <div style={{ textAlign: 'right' }}>
+              <div className="text-right">
                 <div style={{ fontFamily: DISPLAY, fontSize: '1.2rem', color: C.charcoal, fontWeight: 600 }}>{formatCad(Math.round(order.totalCad * 100))}</div>
               </div>
             </div>
           </div>
 
           {/* Two-column: Shipping address + Delivery estimate */}
-          <div className="rg-2" style={{
-            display: 'grid', gridTemplateColumns: '1fr 1fr',
-            borderTop: `1px solid rgba(43,35,32,0.1)`,
-          }}>
+          <div className="rg-2 grid grid-cols-2" style={{ borderTop: `1px solid rgba(43,35,32,0.1)` }}>
             {/* Ship to */}
-            <div style={{ padding: '1rem 1.5rem', borderRight: `1px solid rgba(43,35,32,0.1)` }}>
-              <div style={{ ...label, fontSize: '0.6rem', color: 'rgba(43,35,32,0.42)', marginBottom: '0.55rem' }}>Ship to</div>
-              <div style={{ fontFamily: UI, fontSize: '0.8rem', fontWeight: 600, color: C.charcoal, marginBottom: '0.2rem' }}>{order.customerName}</div>
+            <div className="py-4 px-6" style={{ borderRight: `1px solid rgba(43,35,32,0.1)` }}>
+              <div className="mb-[0.55rem]" style={{ ...label, fontSize: '0.6rem', color: 'rgba(43,35,32,0.42)' }}>Ship to</div>
+              <div className="mb-[0.2rem]" style={{ fontFamily: UI, fontSize: '0.8rem', fontWeight: 600, color: C.charcoal }}>{order.customerName}</div>
               <div style={{ fontFamily: UI, fontSize: '0.77rem', color: 'rgba(43,35,32,0.58)', lineHeight: 1.65 }}>
                 {order.address}
               </div>
             </div>
 
             {/* Estimated delivery */}
-            <div style={{ padding: '1rem 1.5rem' }}>
-              <div style={{ ...label, fontSize: '0.6rem', color: 'rgba(43,35,32,0.42)', marginBottom: '0.55rem' }}>Estimated delivery</div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', marginBottom: '0.35rem' }}>
+            <div className="py-4 px-6">
+              <div className="mb-[0.55rem]" style={{ ...label, fontSize: '0.6rem', color: 'rgba(43,35,32,0.42)' }}>Estimated delivery</div>
+              <div className="flex items-center gap-[0.45rem] mb-[0.35rem]">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={C.teal} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />
                 </svg>
@@ -224,16 +215,14 @@ export default function OrderConfirmation({ order }: { order: OrderDetail }) {
         </div>
 
         {/* ── Action buttons ─────────────────────────────────── */}
-        <div style={{ display: 'flex', gap: '0.875rem', marginBottom: '2.5rem' }}>
+        <div className="flex gap-3.5 mb-10">
           <Link
             to="/account/orders"
+            className="flex-1 block text-center py-[0.95rem] px-6 rounded-[5px] uppercase no-underline"
             style={{
-              flex: 1, display: 'block', textAlign: 'center',
-              padding: '0.95rem 1.5rem',
               backgroundColor: C.gold, color: C.charcoal,
               fontFamily: UI, fontSize: '0.78rem', fontWeight: 700,
-              letterSpacing: '0.1em', textTransform: 'uppercase',
-              textDecorationLine: 'none', borderRadius: '5px',
+              letterSpacing: '0.1em',
               boxShadow: '0 2px 14px rgba(212,169,78,0.38)',
               transition: 'box-shadow 0.2s, transform 0.15s',
             }}
@@ -244,13 +233,11 @@ export default function OrderConfirmation({ order }: { order: OrderDetail }) {
           </Link>
           <Link
             to="/shop"
+            className="flex-1 block text-center py-[0.95rem] px-6 rounded-[5px] uppercase no-underline"
             style={{
-              flex: 1, display: 'block', textAlign: 'center',
-              padding: '0.95rem 1.5rem',
               backgroundColor: 'transparent', color: C.maroon,
               fontFamily: UI, fontSize: '0.78rem', fontWeight: 700,
-              letterSpacing: '0.1em', textTransform: 'uppercase',
-              textDecorationLine: 'none', borderRadius: '5px',
+              letterSpacing: '0.1em',
               borderWidth: '1.5px', borderStyle: 'solid', borderColor: C.maroon,
               transition: 'background-color 0.15s, color 0.15s',
             }}
@@ -262,12 +249,9 @@ export default function OrderConfirmation({ order }: { order: OrderDetail }) {
         </div>
 
         {/* ── Trust row ──────────────────────────────────────── */}
-        <div style={{
-          display: 'flex', justifyContent: 'center', gap: '2rem', flexWrap: 'wrap',
-          paddingTop: '1.5rem', borderTop: `1px solid rgba(43,35,32,0.08)`,
-        }}>
+        <div className="flex justify-center gap-8 flex-wrap pt-6" style={{ borderTop: `1px solid rgba(43,35,32,0.08)` }}>
           {TRUST.map(t => (
-            <div key={t.label} style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+            <div key={t.label} className="flex items-center gap-[0.45rem]">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={C.maroon} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                 <path d={t.path} />
               </svg>
@@ -280,13 +264,13 @@ export default function OrderConfirmation({ order }: { order: OrderDetail }) {
 
       {/* ── Minimal footer (identical to Checkout) ────────────── */}
       <footer style={{ backgroundColor: C.maroon, borderTop: `1px solid rgba(212,169,78,0.15)` }}>
-        <div style={{ maxWidth: '1240px', margin: '0 auto', padding: '1.25rem 2rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.75rem' }}>
+        <div className="max-w-[1240px] mx-auto py-5 px-8 flex items-center justify-between flex-wrap gap-3">
           <span style={{ fontFamily: UI, fontSize: '0.65rem', color: 'rgba(250,246,240,0.45)', letterSpacing: '0.04em' }}>
             © {new Date().getFullYear()} AdeClassics. All rights reserved.
           </span>
-          <div style={{ display: 'flex', gap: '1.5rem' }}>
+          <div className="flex gap-6">
             {['Privacy Policy', 'Terms of Service', 'Returns'].map(lnk => (
-              <a key={lnk} href="#" style={{ fontFamily: UI, fontSize: '0.65rem', color: 'rgba(250,246,240,0.5)', textDecorationLine: 'none', letterSpacing: '0.04em' }}
+              <a key={lnk} href="#" className="no-underline" style={{ fontFamily: UI, fontSize: '0.65rem', color: 'rgba(250,246,240,0.5)', letterSpacing: '0.04em' }}
                 onMouseEnter={e => (e.currentTarget.style.color = C.gold)}
                 onMouseLeave={e => (e.currentTarget.style.color = 'rgba(250,246,240,0.5)')}
               >

@@ -1,7 +1,10 @@
 'use client';
 
 import { useState } from "react";
-import { Link, useParams } from '@/lib/router';
+import { Link, useNavigate } from '@/lib/router';
+import { saveProduct } from '@/server/product-actions';
+import { PRODUCT_TAGS, TAG_LABELS } from '@/server/product-schema';
+import type { CategoryOption, ProductForEdit } from '@/server/catalogue';
 import { C, UI } from "../../tokens";
 
 // ── Icons ─────────────────────────────────────────────────────────────────────
@@ -55,23 +58,19 @@ function DragIcon({ size = 14 }: { size?: number }) {
 
 function FormCard({ title, children }: { title?: string; children: React.ReactNode }) {
   return (
-    <div style={{
-      backgroundColor: "#fff",
-      borderRadius: 8,
-      border: "1px solid rgba(43,35,32,0.07)",
-      padding: "1.25rem",
-    }}>
+    <div className="rounded-lg p-5" style={{ backgroundColor: "#fff", border: "1px solid rgba(43,35,32,0.07)" }}>
       {title && (
-        <h2 style={{
-          fontFamily: UI,
-          fontSize: "0.82rem",
-          fontWeight: 600,
-          color: C.charcoal,
-          margin: "0 0 1rem",
-          paddingBottom: "0.75rem",
-          borderBottom: "1px solid rgba(43,35,32,0.06)",
-          letterSpacing: "-0.01em",
-        }}>
+        <h2
+          className="mb-4 pb-3"
+          style={{
+            fontFamily: UI,
+            fontSize: "0.82rem",
+            fontWeight: 600,
+            color: C.charcoal,
+            borderBottom: "1px solid rgba(43,35,32,0.06)",
+            letterSpacing: "-0.01em",
+          }}
+        >
           {title}
         </h2>
       )}
@@ -82,16 +81,17 @@ function FormCard({ title, children }: { title?: string; children: React.ReactNo
 
 function FieldLabel({ children }: { children: React.ReactNode }) {
   return (
-    <label style={{
-      display: "block",
-      fontSize: "0.7rem",
-      fontWeight: 500,
-      color: "rgba(43,35,32,0.55)",
-      letterSpacing: "0.07em",
-      textTransform: "uppercase",
-      marginBottom: "0.375rem",
-      fontFamily: UI,
-    }}>
+    <label
+      className="block mb-1.5"
+      style={{
+        fontSize: "0.7rem",
+        fontWeight: 500,
+        color: "rgba(43,35,32,0.55)",
+        letterSpacing: "0.07em",
+        textTransform: "uppercase",
+        fontFamily: UI,
+      }}
+    >
       {children}
     </label>
   );
@@ -99,7 +99,8 @@ function FieldLabel({ children }: { children: React.ReactNode }) {
 
 // ── Variant row ───────────────────────────────────────────────────────────────
 
-type Variant = { id: string; size: string; color: string; stock: string };
+/** A size and how many of it. Colour is a product-level field — see the schema. */
+type Variant = { id: string; size: string; stock: string };
 
 function VariantRow({ v, onChange, onRemove }: {
   v: Variant;
@@ -107,19 +108,14 @@ function VariantRow({ v, onChange, onRemove }: {
   onRemove: () => void;
 }) {
   return (
-    <div style={{ display: "flex", gap: "0.5rem", alignItems: "center", marginBottom: "0.5rem" }}>
-      <span style={{ color: "rgba(43,35,32,0.25)", cursor: "grab", lineHeight: 0 }}><DragIcon /></span>
+    <div className="flex items-center gap-2 mb-2">
+      <span className="cursor-grab" style={{ color: "rgba(43,35,32,0.25)", lineHeight: 0 }}><DragIcon /></span>
       <input
         placeholder="Size"
         value={v.size}
         onChange={e => onChange({ ...v, size: e.target.value })}
-        style={{ ...inputBase, flex: "0 0 80px" }}
-      />
-      <input
-        placeholder="Colour"
-        value={v.color}
-        onChange={e => onChange({ ...v, color: e.target.value })}
-        style={{ ...inputBase, flex: 1 }}
+        className={`${INPUT_CLS} w-[120px] shrink-0`}
+        style={inputBase}
       />
       <input
         placeholder="Stock"
@@ -127,11 +123,13 @@ function VariantRow({ v, onChange, onRemove }: {
         min="0"
         value={v.stock}
         onChange={e => onChange({ ...v, stock: e.target.value })}
-        style={{ ...inputBase, flex: "0 0 72px" }}
+        className={`${INPUT_CLS} flex-1`}
+        style={inputBase}
       />
       <button
         onClick={onRemove}
-        style={{ background: "none", border: "none", cursor: "pointer", color: "rgba(43,35,32,0.35)", lineHeight: 0, padding: 2 }}
+        className="p-[2px] cursor-pointer"
+        style={{ background: "none", border: "none", color: "rgba(43,35,32,0.35)", lineHeight: 0 }}
         onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = C.maroon}
         onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = "rgba(43,35,32,0.35)"}
       >
@@ -143,41 +141,37 @@ function VariantRow({ v, onChange, onRemove }: {
 
 // ── Image slot ────────────────────────────────────────────────────────────────
 
-type MockImage = { id: string; label: string; color: string };
+type ImageEntry = { id: string; url: string };
 
-function ImageSlot({ img, isMain, onRemove }: { img: MockImage; isMain: boolean; onRemove: () => void }) {
+function ImageSlot({ img, isMain, onRemove }: { img: ImageEntry; isMain: boolean; onRemove: () => void }) {
   return (
-    <div style={{ position: "relative" }}>
-      <div style={{
-        width: "100%",
-        aspectRatio: "1",
-        borderRadius: 7,
-        backgroundColor: img.color,
-        opacity: 0.82,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-      }}>
-        <span style={{ color: "#fff", fontSize: "0.58rem", fontWeight: 700, letterSpacing: "0.05em" }}>{img.label}</span>
-      </div>
+    <div className="relative">
+      <img
+        src={img.url}
+        alt=""
+        className="block w-full aspect-square rounded-[7px] object-cover"
+        style={{ backgroundColor: "rgba(43,35,32,0.08)" }}
+      />
       {isMain && (
-        <span style={{
-          position: "absolute", top: 4, left: 4,
-          backgroundColor: C.gold, color: C.charcoal,
-          fontSize: "0.55rem", fontWeight: 700, letterSpacing: "0.06em",
-          padding: "2px 6px", borderRadius: 3, textTransform: "uppercase",
-        }}>Main</span>
+        <span
+          className="absolute top-1 left-1 py-[2px] px-[6px] rounded-[3px] uppercase"
+          style={{
+            backgroundColor: C.gold,
+            color: C.charcoal,
+            fontSize: "0.55rem",
+            fontWeight: 700,
+            letterSpacing: "0.06em",
+          }}
+        >
+          Main
+        </span>
       )}
       <button
+        type="button"
         onClick={onRemove}
-        style={{
-          position: "absolute", top: 4, right: 4,
-          width: 20, height: 20, borderRadius: "50%",
-          backgroundColor: "rgba(43,35,32,0.55)",
-          border: "none", cursor: "pointer",
-          display: "flex", alignItems: "center", justifyContent: "center",
-          color: "#fff", lineHeight: 0,
-        }}
+        aria-label="Remove image"
+        className="absolute top-1 right-1 w-5 h-5 rounded-full flex items-center justify-center cursor-pointer"
+        style={{ backgroundColor: "rgba(43,35,32,0.55)", border: "none", color: "#fff", lineHeight: 0 }}
       >
         <XIcon size={9} />
       </button>
@@ -185,14 +179,10 @@ function ImageSlot({ img, isMain, onRemove }: { img: MockImage; isMain: boolean;
   );
 }
 
-// ── Constants ─────────────────────────────────────────────────────────────────
-
-const CATEGORIES = ["Filà", "Gele", "Ipele", "Kaftan", "Trousers", "Roundneck Shirts", "Shoes", "Pam Slippers", "Accessories"];
-const TAGS = ["New Arrival", "Made to Order", "Limited Edition", "Bestseller", "Sale"];
-const SLOT_COLORS = [C.teal, "#2E4A9E", "rgba(43,35,32,0.55)", C.maroon, C.gold];
-const SLOT_LABELS = ["IMG1", "IMG2", "IMG3", "IMG4", "IMG5"];
-
 // ── Shared input style ────────────────────────────────────────────────────────
+
+/** Box/layout for every field control, as classes; colour and type stay in inputBase. */
+const INPUT_CLS = "block box-border rounded-[6px] px-3 py-2";
 
 const inputBase: React.CSSProperties = {
   fontFamily: UI,
@@ -200,82 +190,119 @@ const inputBase: React.CSSProperties = {
   color: "#2B2320",
   backgroundColor: "#fff",
   border: "1px solid rgba(43,35,32,0.14)",
-  borderRadius: 6,
-  padding: "0.5rem 0.75rem",
   outline: "none",
-  boxSizing: "border-box",
   lineHeight: 1.4,
-  display: "block",
 };
 
 // ── Main export ───────────────────────────────────────────────────────────────
 
-export default function ConsoleProductForm() {
-  const { id } = useParams();
-  const isEdit = Boolean(id && id !== "new");
+export type ProductFormProps = {
+  /** Absent when adding; the product being edited otherwise. */
+  product: ProductForEdit | null;
+  categories: CategoryOption[];
+  knownColors: string[];
+};
+
+export default function ConsoleProductForm({ product, categories, knownColors }: ProductFormProps) {
+  const navigate = useNavigate();
+  const isEdit = product !== null;
   const pageTitle = isEdit ? "Edit Product" : "Add New Product";
 
-  const [name, setName] = useState(isEdit ? "Yoruba Filà (Custom)" : "");
-  const [description, setDescription] = useState(isEdit ? "Handcrafted Yoruba Filà made to order in your choice of colour and embroidery pattern. Each cap takes 5–7 working days to complete." : "");
-  const [category, setCategory] = useState(isEdit ? "Filà" : "");
-  const [priceCad, setPriceCad] = useState(isEdit ? "285" : "");
-  const [productionDays, setProductionDays] = useState(isEdit ? "5–7" : "");
-  const [selectedTags, setSelectedTags] = useState<Set<string>>(isEdit ? new Set(["Made to Order"]) : new Set());
-  const [publishStatus, setPublishStatus] = useState<"published" | "draft">(isEdit ? "published" : "draft");
+  const [name, setName] = useState(product?.title ?? "");
+  const [description, setDescription] = useState(product?.description ?? "");
+  const [categoryId, setCategoryId] = useState(product?.categoryId ?? "");
+  const [color, setColor] = useState(product?.color ?? "");
+  // Kept as the typed string so the field can be empty; parsed on save.
+  const [priceCad, setPriceCad] = useState(product ? (product.priceCadCents / 100).toFixed(2) : "");
+  const [productionDays, setProductionDays] = useState(product?.productionDays ?? "");
+  const [tag, setTag] = useState<string>(product?.tag ?? "");
+  const [publishStatus, setPublishStatus] = useState<"PUBLISHED" | "DRAFT">(product?.status ?? "DRAFT");
   const [advancedOpen, setAdvancedOpen] = useState(false);
-  const [metaTitle, setMetaTitle] = useState("");
-  const [metaDesc, setMetaDesc] = useState("");
+  const [metaTitle, setMetaTitle] = useState(product?.metaTitle ?? "");
+  const [metaDesc, setMetaDesc] = useState(product?.metaDescription ?? "");
 
   const [variants, setVariants] = useState<Variant[]>(
-    isEdit
-      ? [
-          { id: "v1", size: "S", color: "Burgundy", stock: "4" },
-          { id: "v2", size: "M", color: "Burgundy", stock: "6" },
-          { id: "v3", size: "L", color: "Navy", stock: "2" },
-        ]
-      : [{ id: "v1", size: "", color: "", stock: "" }]
+    product && product.variants.length > 0
+      ? product.variants.map((v, i) => ({ id: `v${i}`, size: v.size, stock: String(v.stock) }))
+      : [{ id: "v0", size: "", stock: "" }]
   );
 
-  const [images, setImages] = useState<MockImage[]>(
-    isEdit
-      ? [
-          { id: "i1", label: "FRONT", color: C.maroon },
-          { id: "i2", label: "SIDE", color: C.gold },
-          { id: "i3", label: "DETAIL", color: "#2E4A9E" },
-        ]
-      : []
+  const [images, setImages] = useState<ImageEntry[]>(
+    (product?.imageUrls ?? []).map((url, i) => ({ id: `i${i}`, url }))
   );
+  const [imageDraft, setImageDraft] = useState("");
+
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
 
   function addVariant() {
-    setVariants(vs => [...vs, { id: `v${Date.now()}`, size: "", color: "", stock: "" }]);
+    setVariants(vs => [...vs, { id: `v${Date.now()}`, size: "", stock: "" }]);
   }
   function removeVariant(vid: string) {
-    setVariants(vs => vs.filter(v => v.id !== vid));
+    setVariants(vs => (vs.length > 1 ? vs.filter(v => v.id !== vid) : vs));
   }
   function updateVariant(vid: string, next: Variant) {
     setVariants(vs => vs.map(v => v.id === vid ? next : v));
   }
-  function addMockImage() {
-    const idx = images.length % 5;
-    setImages(imgs => [...imgs, { id: `i${Date.now()}`, label: SLOT_LABELS[idx], color: SLOT_COLORS[idx] }]);
+
+  function addImage() {
+    const url = imageDraft.trim();
+    if (!url) return;
+    setImages(imgs => [...imgs, { id: `i${Date.now()}`, url }]);
+    setImageDraft("");
   }
   function removeImage(iid: string) {
     setImages(imgs => imgs.filter(i => i.id !== iid));
   }
-  function toggleTag(tag: string) {
-    const next = new Set(selectedTags);
-    if (next.has(tag)) next.delete(tag); else next.add(tag);
-    setSelectedTags(next);
+
+  async function save(status: "PUBLISHED" | "DRAFT") {
+    setSaving(true);
+    setError("");
+    setFieldErrors({});
+
+    const result = await saveProduct({
+      id: product?.id,
+      title: name,
+      description,
+      categoryId,
+      color,
+      // Prices are typed in dollars and stored in cents; round once, here.
+      priceCadCents: Math.round((Number(priceCad) || 0) * 100),
+      productionDays,
+      tag: tag === "" ? null : tag,
+      status,
+      metaTitle,
+      metaDescription: metaDesc,
+      imageUrls: images.map(i => i.url),
+      variants: variants
+        // A blank trailing row is how people leave a form, not an error.
+        .filter(v => v.size.trim() !== "")
+        .map(v => ({ size: v.size.trim(), stock: Number(v.stock) || 0 })),
+    });
+
+    if (!result.ok) {
+      setSaving(false);
+      setError(result.message);
+      setFieldErrors(result.fieldErrors ?? {});
+      return;
+    }
+
+    setPublishStatus(status);
+    navigate('/console/products');
   }
 
+  const firstError = (field: string) => fieldErrors[field]?.[0];
+
   return (
-    <div className="console-page" style={{ padding: "1.75rem", fontFamily: UI, minHeight: "100%" }}>
+    <div className="console-page p-7 min-h-full" style={{ fontFamily: UI }}>
 
       {/* Breadcrumb */}
-      <div style={{ display: "flex", alignItems: "center", gap: "0.4rem", marginBottom: "1.25rem" }}>
+      <div className="flex items-center gap-[0.4rem] mb-5">
         <Link
           to="/console/products"
-          style={{ fontSize: "0.78rem", color: "rgba(43,35,32,0.45)", textDecorationLine: "none" }}
+          className="no-underline"
+          style={{ fontSize: "0.78rem", color: "rgba(43,35,32,0.45)" }}
           onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = C.charcoal}
           onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = "rgba(43,35,32,0.45)"}
         >
@@ -285,15 +312,15 @@ export default function ConsoleProductForm() {
         <span style={{ fontSize: "0.78rem", color: C.charcoal, fontWeight: 500 }}>{pageTitle}</span>
       </div>
 
-      <h1 style={{ fontSize: "1.35rem", fontWeight: 600, color: C.charcoal, letterSpacing: "-0.02em", margin: "0 0 1.5rem" }}>
+      <h1 className="mb-6" style={{ fontSize: "1.35rem", fontWeight: 600, color: C.charcoal, letterSpacing: "-0.02em" }}>
         {pageTitle}
       </h1>
 
       {/* Two-column layout */}
-      <div className="rg-split" style={{ display: "grid", gridTemplateColumns: "1fr 300px", gap: "1.25rem", alignItems: "start" }}>
+      <div className="rg-split grid grid-cols-[1fr_300px] gap-5 items-start">
 
         {/* ── LEFT ─────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+        <div className="flex flex-col gap-4">
 
           {/* Product details */}
           <FormCard title="Product Details">
@@ -303,7 +330,8 @@ export default function ConsoleProductForm() {
               placeholder="e.g. Aso-Oke Gele Set"
               value={name}
               onChange={e => setName(e.target.value)}
-              style={{ ...inputBase, width: "100%", marginBottom: "1rem" }}
+              className={`${INPUT_CLS} w-full mb-4`}
+              style={inputBase}
             />
 
             <FieldLabel>Description</FieldLabel>
@@ -312,32 +340,61 @@ export default function ConsoleProductForm() {
               value={description}
               onChange={e => setDescription(e.target.value)}
               rows={5}
-              style={{ ...inputBase, width: "100%", resize: "vertical", lineHeight: 1.6, marginBottom: "1rem" }}
+              className={`${INPUT_CLS} w-full mb-4 resize-y`}
+              style={{ ...inputBase, lineHeight: 1.6 }}
             />
 
             <FieldLabel>Category</FieldLabel>
-            <div style={{ position: "relative", width: "100%", marginBottom: "1rem" }}>
+            <div className="relative w-full mb-4">
               <select
-                value={category}
-                onChange={e => setCategory(e.target.value)}
-                style={{ ...inputBase, width: "100%", appearance: "none", paddingRight: "2rem", cursor: "pointer" }}
+                value={categoryId}
+                onChange={e => setCategoryId(e.target.value)}
+                className="block box-border w-full rounded-[6px] py-2 pl-3 pr-8 appearance-none cursor-pointer"
+                style={inputBase}
               >
-                <option value="">Select a category...</option>
-                {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+                <option value="">Select a category…</option>
+                {/* Grouped by collection, and leaves only — a product is never
+                    filed directly under "Pre-Order". */}
+                {[...new Set(categories.map(c => c.collectionName))].map(collection => (
+                  <optgroup key={collection} label={collection}>
+                    {categories.filter(c => c.collectionName === collection).map(c => (
+                      <option key={c.id} value={c.id}>{c.name}</option>
+                    ))}
+                  </optgroup>
+                ))}
               </select>
-              <span style={{ position: "absolute", right: "0.625rem", top: "50%", transform: "translateY(-50%)", pointerEvents: "none", color: "rgba(43,35,32,0.4)", lineHeight: 0 }}>
+              <span className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: "rgba(43,35,32,0.4)", lineHeight: 0 }}>
                 <ChevronDownIcon />
               </span>
             </div>
 
+            <FieldLabel>Colour</FieldLabel>
+            <input
+              type="text"
+              list="known-colours"
+              placeholder="e.g. Burgundy"
+              value={color}
+              onChange={e => setColor(e.target.value)}
+              className={`${INPUT_CLS} w-full ${firstError('color') ? "mb-1" : "mb-4"}`}
+              style={inputBase}
+            />
+            {/* Suggests what the catalogue already uses without forbidding a new one. */}
+            <datalist id="known-colours">
+              {knownColors.map(c => <option key={c} value={c} />)}
+            </datalist>
+            {firstError('color') && (
+              <p className="mb-4" style={{ fontSize: "0.68rem", color: C.maroon }}>{firstError('color')}</p>
+            )}
+
             <FieldLabel>Production Time (working days)</FieldLabel>
-            <div style={{ display: "flex", gap: "0.75rem", alignItems: "center" }}>
+            <div className="flex items-center gap-3">
               <input
                 type="text"
                 placeholder="e.g. 5–7"
                 value={productionDays}
                 onChange={e => setProductionDays(e.target.value)}
-                style={{ ...inputBase, width: 120 }}
+                className={`${INPUT_CLS} w-[120px]`}
+                style={inputBase}
               />
               <span style={{ fontSize: "0.72rem", color: "rgba(43,35,32,0.45)" }}>
                 Shown to buyers before checkout
@@ -347,11 +404,11 @@ export default function ConsoleProductForm() {
 
           {/* Pricing */}
           <FormCard title="Pricing">
-            <div className="rg-2" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+            <div className="rg-2 grid grid-cols-2 gap-4">
               <div>
                 <FieldLabel>Price (CAD)</FieldLabel>
-                <div style={{ position: "relative" }}>
-                  <span style={{ position: "absolute", left: "0.7rem", top: "50%", transform: "translateY(-50%)", fontSize: "0.82rem", color: "rgba(43,35,32,0.4)", fontWeight: 600 }}>CAD $</span>
+                <div className="relative">
+                  <span className="absolute left-[0.7rem] top-1/2 -translate-y-1/2" style={{ fontSize: "0.82rem", color: "rgba(43,35,32,0.4)", fontWeight: 600 }}>CAD $</span>
                   <input
                     type="number"
                     min="0"
@@ -359,7 +416,8 @@ export default function ConsoleProductForm() {
                     placeholder="0.00"
                     value={priceCad}
                     onChange={e => setPriceCad(e.target.value)}
-                    style={{ ...inputBase, paddingLeft: "1.6rem", width: "100%" }}
+                    className="block box-border w-full rounded-[6px] py-2 pr-3 pl-[1.6rem]"
+                    style={inputBase}
                   />
                 </div>
               </div>
@@ -368,7 +426,7 @@ export default function ConsoleProductForm() {
 
           {/* Variants */}
           <FormCard title="Variants">
-            <div style={{ display: "flex", gap: "0.5rem", marginBottom: "0.75rem", paddingLeft: "22px" }}>
+            <div className="flex gap-2 mb-3 pl-[22px]">
               {[["80px", "Size"], ["1", "Colour"], ["72px", "Stock"]].map(([w, h]) => (
                 <span key={h} style={{ flex: w === "1" ? 1 : `0 0 ${w}`, fontSize: "0.63rem", letterSpacing: "0.09em", textTransform: "uppercase", color: "rgba(43,35,32,0.38)", fontWeight: 500 }}>
                   {h}
@@ -385,15 +443,13 @@ export default function ConsoleProductForm() {
             ))}
             <button
               onClick={addVariant}
+              className="inline-flex items-center gap-[5px] mt-1.5 rounded-[6px] py-[0.4rem] px-3.5 cursor-pointer"
               style={{
-                display: "inline-flex", alignItems: "center", gap: "5px",
-                marginTop: "0.375rem",
                 background: "none",
                 border: "1px dashed rgba(43,35,32,0.2)",
-                borderRadius: 6,
-                padding: "0.4rem 0.875rem",
-                fontSize: "0.75rem", color: "rgba(43,35,32,0.5)",
-                cursor: "pointer", fontFamily: UI,
+                fontSize: "0.75rem",
+                color: "rgba(43,35,32,0.5)",
+                fontFamily: UI,
               }}
               onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = C.gold; (e.currentTarget as HTMLElement).style.color = C.charcoal; }}
               onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = "rgba(43,35,32,0.2)"; (e.currentTarget as HTMLElement).style.color = "rgba(43,35,32,0.5)"; }}
@@ -403,14 +459,11 @@ export default function ConsoleProductForm() {
           </FormCard>
 
           {/* SEO accordion */}
-          <div style={{ backgroundColor: "#fff", borderRadius: 8, border: "1px solid rgba(43,35,32,0.07)", overflow: "hidden" }}>
+          <div className="rounded-lg overflow-hidden" style={{ backgroundColor: "#fff", border: "1px solid rgba(43,35,32,0.07)" }}>
             <button
               onClick={() => setAdvancedOpen(o => !o)}
-              style={{
-                width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between",
-                padding: "0.875rem 1.25rem", background: "none", border: "none", cursor: "pointer",
-                fontFamily: UI, fontSize: "0.82rem", fontWeight: 600, color: C.charcoal,
-              }}
+              className="w-full flex items-center justify-between py-3.5 px-5 cursor-pointer"
+              style={{ background: "none", border: "none", fontFamily: UI, fontSize: "0.82rem", fontWeight: 600, color: C.charcoal }}
             >
               <span>Advanced — SEO</span>
               <span style={{ lineHeight: 0, transition: "transform 0.2s", transform: advancedOpen ? "rotate(180deg)" : "none" }}>
@@ -418,8 +471,8 @@ export default function ConsoleProductForm() {
               </span>
             </button>
             {advancedOpen && (
-              <div style={{ padding: "0 1.25rem 1.25rem", borderTop: "1px solid rgba(43,35,32,0.06)" }}>
-                <div style={{ height: "0.875rem" }} />
+              <div className="pt-0 px-5 pb-5" style={{ borderTop: "1px solid rgba(43,35,32,0.06)" }}>
+                <div className="h-3.5" />
                 <FieldLabel>Meta Title</FieldLabel>
                 <input
                   type="text"
@@ -427,7 +480,8 @@ export default function ConsoleProductForm() {
                   maxLength={60}
                   value={metaTitle}
                   onChange={e => setMetaTitle(e.target.value)}
-                  style={{ ...inputBase, width: "100%", marginBottom: "1rem" }}
+                  className={`${INPUT_CLS} w-full mb-4`}
+                  style={inputBase}
                 />
                 <FieldLabel>Meta Description</FieldLabel>
                 <textarea
@@ -436,10 +490,11 @@ export default function ConsoleProductForm() {
                   value={metaDesc}
                   onChange={e => setMetaDesc(e.target.value)}
                   rows={3}
-                  style={{ ...inputBase, width: "100%", resize: "vertical", lineHeight: 1.6 }}
+                  className={`${INPUT_CLS} w-full resize-y`}
+                  style={{ ...inputBase, lineHeight: 1.6 }}
                 />
                 {metaDesc && (
-                  <p style={{ fontSize: "0.63rem", color: "rgba(43,35,32,0.38)", marginTop: "4px", textAlign: "right" }}>
+                  <p className="mt-1 text-right" style={{ fontSize: "0.63rem", color: "rgba(43,35,32,0.38)" }}>
                     {metaDesc.length}/155
                   </p>
                 )}
@@ -449,48 +504,89 @@ export default function ConsoleProductForm() {
         </div>
 
         {/* ── RIGHT ────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: "1rem", position: "sticky", top: "1.5rem" }}>
+        <div className="flex flex-col gap-4 sticky top-6">
 
           {/* Save actions */}
           <FormCard>
-            <button style={{
-              width: "100%", backgroundColor: C.gold, color: C.charcoal, border: "none",
-              borderRadius: 7, padding: "0.625rem 1rem", fontSize: "0.82rem", fontWeight: 700,
-              cursor: "pointer", fontFamily: UI, letterSpacing: "0.01em", marginBottom: "0.5rem",
-            }}>
-              {isEdit ? "Save Changes" : "Save Product"}
+            {error && (
+              <div
+                role="alert"
+                className="rounded-[6px] py-[0.55rem] px-[0.7rem] mb-2.5"
+                style={{
+                  fontSize: "0.72rem",
+                  color: C.maroon,
+                  lineHeight: 1.5,
+                  backgroundColor: "rgba(122,31,42,0.06)",
+                  border: "1px solid rgba(122,31,42,0.18)",
+                }}
+              >
+                {error}
+              </div>
+            )}
+            <button
+              type="button"
+              onClick={() => save(publishStatus)}
+              disabled={saving}
+              className="w-full rounded-[7px] py-2.5 px-4 mb-2"
+              style={{
+                backgroundColor: saving ? "rgba(43,35,32,0.15)" : C.gold,
+                color: C.charcoal,
+                border: "none",
+                fontSize: "0.82rem",
+                fontWeight: 700,
+                cursor: saving ? "wait" : "pointer",
+                fontFamily: UI,
+                letterSpacing: "0.01em",
+              }}
+            >
+              {saving ? "Saving…" : isEdit ? "Save Changes" : "Save Product"}
             </button>
-            <button style={{
-              width: "100%", backgroundColor: "transparent", color: C.charcoal,
-              border: "1px solid rgba(43,35,32,0.18)", borderRadius: 7, padding: "0.575rem 1rem",
-              fontSize: "0.82rem", fontWeight: 500, cursor: "pointer", fontFamily: UI, letterSpacing: "0.01em",
-            }}>
+            {/* Saving as a draft is the same save with a different status, so
+                the two buttons cannot drift apart. */}
+            <button
+              type="button"
+              onClick={() => save("DRAFT")}
+              disabled={saving}
+              className="w-full rounded-[7px] py-[0.575rem] px-4"
+              style={{
+                backgroundColor: "transparent",
+                color: C.charcoal,
+                border: "1px solid rgba(43,35,32,0.18)",
+                fontSize: "0.82rem",
+                fontWeight: 500,
+                cursor: saving ? "wait" : "pointer",
+                fontFamily: UI,
+                letterSpacing: "0.01em",
+              }}
+            >
               Save as Draft
             </button>
           </FormCard>
 
           {/* Status toggle */}
           <FormCard title="Status">
-            <div style={{ display: "flex", gap: "0.5rem" }}>
-              {(["published", "draft"] as const).map(s => (
+            <div className="flex gap-2">
+              {(["PUBLISHED", "DRAFT"] as const).map(s => (
                 <button
                   key={s}
+                  type="button"
                   onClick={() => setPublishStatus(s)}
+                  className="flex-1 rounded-[6px] py-[0.45rem] px-0 cursor-pointer"
                   style={{
-                    flex: 1, padding: "0.45rem 0", borderRadius: 6,
                     border: publishStatus === s ? "none" : "1px solid rgba(43,35,32,0.14)",
                     backgroundColor: publishStatus === s
-                      ? (s === "published" ? C.teal : "rgba(43,35,32,0.08)")
+                      ? (s === "PUBLISHED" ? C.teal : "rgba(43,35,32,0.08)")
                       : "transparent",
                     color: publishStatus === s
-                      ? (s === "published" ? "#fff" : C.charcoal)
+                      ? (s === "PUBLISHED" ? "#fff" : C.charcoal)
                       : "rgba(43,35,32,0.45)",
                     fontSize: "0.75rem",
                     fontWeight: publishStatus === s ? 600 : 400,
-                    cursor: "pointer", fontFamily: UI, letterSpacing: "0.01em",
+                    fontFamily: UI,
+                    letterSpacing: "0.01em",
                   }}
                 >
-                  {s === "published" ? "Published" : "Draft"}
+                  {s === "PUBLISHED" ? "Published" : "Draft"}
                 </button>
               ))}
             </div>
@@ -498,62 +594,82 @@ export default function ConsoleProductForm() {
 
           {/* Images */}
           <FormCard title="Images">
-            <div className="rg-2" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.5rem", marginBottom: "0.75rem" }}>
+            <div className="rg-2 grid grid-cols-2 gap-2 mb-3">
               {images.map((img, i) => (
                 <ImageSlot key={img.id} img={img} isMain={i === 0} onRemove={() => removeImage(img.id)} />
               ))}
+            </div>
+            <div className="flex gap-[0.4rem] mb-2">
+              <input
+                type="url"
+                placeholder="Paste an image URL"
+                value={imageDraft}
+                onChange={e => setImageDraft(e.target.value)}
+                onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); addImage(); } }}
+                className={`${INPUT_CLS} flex-1 min-w-0`}
+                style={inputBase}
+              />
               <button
-                onClick={addMockImage}
+                type="button"
+                onClick={addImage}
+                aria-label="Add image"
+                className="shrink-0 rounded-[6px] px-[0.6rem] py-0 flex items-center cursor-pointer"
                 style={{
-                  aspectRatio: "1", borderRadius: 7,
-                  border: "2px dashed rgba(43,35,32,0.16)",
-                  backgroundColor: "rgba(43,35,32,0.02)",
-                  cursor: "pointer", display: "flex", flexDirection: "column",
-                  alignItems: "center", justifyContent: "center", gap: "6px",
-                  color: "rgba(43,35,32,0.35)", minHeight: 80,
+                  border: "1px dashed rgba(43,35,32,0.2)",
+                  background: "none",
+                  color: "rgba(43,35,32,0.5)",
+                  lineHeight: 0,
                 }}
                 onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = C.gold; (e.currentTarget as HTMLElement).style.color = C.charcoal; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = "rgba(43,35,32,0.16)"; (e.currentTarget as HTMLElement).style.color = "rgba(43,35,32,0.35)"; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = "rgba(43,35,32,0.2)"; (e.currentTarget as HTMLElement).style.color = "rgba(43,35,32,0.5)"; }}
               >
-                <UploadIcon size={20} />
-                <span style={{ fontSize: "0.62rem", fontFamily: UI }}>Add Image</span>
+                <UploadIcon size={15} />
               </button>
             </div>
+            {firstError('imageUrls') && (
+              <p className="mb-[0.4rem]" style={{ fontSize: "0.68rem", color: C.maroon }}>{firstError('imageUrls')}</p>
+            )}
             <p style={{ fontSize: "0.63rem", color: "rgba(43,35,32,0.38)", lineHeight: 1.5 }}>
-              First image is used as the main photo. Max 10 images, 8 MB each.
+              The first image is the main photo. Uploads need blob storage, which
+              is not configured yet — paste a link for now.
             </p>
           </FormCard>
 
           {/* Tags */}
           <FormCard title="Tags">
-            <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-              {TAGS.map(tag => (
+            <div className="flex flex-col gap-2">
+              {[{ value: "", label: "No tag" }, ...PRODUCT_TAGS.map(t => ({ value: t, label: TAG_LABELS[t] }))].map(option => (
                 <label
-                  key={tag}
+                  key={option.value || "none"}
+                  className="flex items-center gap-2.5 cursor-pointer select-none"
                   style={{
-                    display: "flex", alignItems: "center", gap: "0.625rem",
-                    cursor: "pointer", fontSize: "0.78rem",
-                    color: selectedTags.has(tag) ? C.charcoal : "rgba(43,35,32,0.6)",
-                    fontWeight: selectedTags.has(tag) ? 500 : 400,
-                    userSelect: "none",
+                    fontSize: "0.78rem",
+                    color: tag === option.value ? C.charcoal : "rgba(43,35,32,0.6)",
+                    fontWeight: tag === option.value ? 500 : 400,
                   }}
                 >
                   <input
-                    type="checkbox"
-                    checked={selectedTags.has(tag)}
-                    onChange={() => toggleTag(tag)}
-                    style={{ accentColor: C.maroon, cursor: "pointer", width: 14, height: 14 }}
+                    type="radio"
+                    name="productTag"
+                    checked={tag === option.value}
+                    onChange={() => setTag(option.value)}
+                    className="w-3.5 h-3.5 cursor-pointer"
+                    style={{ accentColor: C.maroon }}
                   />
-                  {tag}
+                  {option.label}
                 </label>
               ))}
             </div>
+            <p className="mt-2.5" style={{ fontSize: "0.63rem", color: "rgba(43,35,32,0.38)", lineHeight: 1.5 }}>
+              The badge shown on the product card. A product carries one at a time.
+            </p>
           </FormCard>
 
           {/* Back link */}
           <Link
             to="/console/products"
-            style={{ display: "block", textAlign: "center", fontSize: "0.72rem", color: "rgba(43,35,32,0.38)", textDecorationLine: "none", padding: "0.25rem" }}
+            className="block text-center no-underline p-1"
+            style={{ fontSize: "0.72rem", color: "rgba(43,35,32,0.38)" }}
             onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = C.charcoal}
             onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = "rgba(43,35,32,0.38)"}
           >

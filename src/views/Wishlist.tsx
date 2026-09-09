@@ -45,10 +45,11 @@ function WishCard({ item, onRemove, onAddToCart }: { item: WishItem; onRemove: (
   const tagColor = item.tag === 'NEW' ? C.maroon : item.tag === 'SOLD OUT' ? 'rgba(43,35,32,0.55)' : C.charcoal;
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column' }}>
+    <div className="flex flex-col">
       {/* Image */}
       <div
-        style={{ position: 'relative', backgroundColor: '#ddd5c8', overflow: 'hidden', aspectRatio: '3/4', marginBottom: '0.875rem' }}
+        className="relative overflow-hidden aspect-[3/4] mb-3.5"
+        style={{ backgroundColor: '#ddd5c8' }}
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
       >
@@ -56,8 +57,8 @@ function WishCard({ item, onRemove, onAddToCart }: { item: WishItem; onRemove: (
           <img
             src={`https://images.unsplash.com/${item.img}?w=600&h=800&fit=crop&auto=format`}
             alt={item.title}
+            className="w-full h-full object-cover block"
             style={{
-              width: '100%', height: '100%', objectFit: 'cover', display: 'block',
               transform: hovered ? 'scale(1.04)' : 'scale(1)',
               transition: 'transform 0.4s ease',
               opacity: isSoldOut ? 0.72 : 1,
@@ -66,12 +67,10 @@ function WishCard({ item, onRemove, onAddToCart }: { item: WishItem; onRemove: (
         </Link>
 
         {/* Tag badge */}
-        <span style={{
-          position: 'absolute', top: '0.75rem', left: '0.75rem',
-          backgroundColor: tagColor, color: C.cream,
-          ...label, fontSize: '0.56rem', padding: '3px 8px', letterSpacing: '0.12em',
-          pointerEvents: 'none',
-        }}>
+        <span
+          className="absolute top-3 left-3 py-[3px] px-[8px] pointer-events-none"
+          style={{ backgroundColor: tagColor, color: C.cream, ...label, fontSize: '0.56rem', letterSpacing: '0.12em' }}
+        >
           {item.tag}
         </span>
 
@@ -80,13 +79,11 @@ function WishCard({ item, onRemove, onAddToCart }: { item: WishItem; onRemove: (
           onClick={onRemove}
           onMouseEnter={() => setHeartHover(true)}
           onMouseLeave={() => setHeartHover(false)}
+          className="absolute top-3 right-3 w-8 h-8 rounded-full flex items-center justify-center cursor-pointer"
           style={{
-            position: 'absolute', top: '0.75rem', right: '0.75rem',
-            width: '32px', height: '32px', borderRadius: '50%',
             backgroundColor: heartHover ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.82)',
             backdropFilter: 'blur(4px)',
-            border: 'none', cursor: 'pointer',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            border: 'none',
             transition: 'background 0.15s, transform 0.15s',
             transform: heartHover ? 'scale(1.12)' : 'scale(1)',
             boxShadow: '0 1px 6px rgba(0,0,0,0.12)',
@@ -101,34 +98,33 @@ function WishCard({ item, onRemove, onAddToCart }: { item: WishItem; onRemove: (
 
         {/* Sold out dim overlay */}
         {isSoldOut && (
-          <div style={{ position: 'absolute', inset: 0, backgroundColor: 'rgba(250,246,240,0.15)', pointerEvents: 'none' }} />
+          <div className="absolute inset-0 pointer-events-none" style={{ backgroundColor: 'rgba(250,246,240,0.15)' }} />
         )}
       </div>
 
       {/* Text */}
-      <Link to={`/product/${slugify(item.title)}`} style={{ textDecorationLine: 'none', color: C.charcoal }}>
-        <div style={{ fontFamily: UI, fontSize: '0.875rem', lineHeight: 1.4, marginBottom: '0.45rem', color: C.charcoal }}>
+      <Link to={`/product/${slugify(item.title)}`} className="no-underline" style={{ color: C.charcoal }}>
+        <div className="mb-[0.45rem]" style={{ fontFamily: UI, fontSize: '0.875rem', lineHeight: 1.4, color: C.charcoal }}>
           {item.title}
         </div>
       </Link>
       <div style={{ fontFamily: UI, fontSize: '1rem', fontWeight: 600, color: C.charcoal, lineHeight: 1 }}>
         {fmt(item.cadNum, 'CAD $')}
       </div>
-      <div style={{ fontFamily: UI, fontSize: '0.8rem', color: C.teal, fontWeight: 500, marginTop: '0.2rem', marginBottom: '0.875rem' }}>
+      <div className="mt-[0.2rem] mb-3.5" style={{ fontFamily: UI, fontSize: '0.8rem', color: C.teal, fontWeight: 500 }}>
       </div>
 
       {/* CTA */}
       {isSoldOut ? (
         <button
           disabled
+          className="w-full py-[0.6rem] px-4 rounded-[4px] uppercase cursor-not-allowed"
           style={{
-            width: '100%', padding: '0.6rem 1rem',
             fontFamily: UI, fontSize: '0.7rem', fontWeight: 600,
-            letterSpacing: '0.08em', textTransform: 'uppercase',
+            letterSpacing: '0.08em',
             color: 'rgba(43,35,32,0.4)',
             backgroundColor: 'transparent',
             borderWidth: '1.5px', borderStyle: 'solid', borderColor: 'rgba(43,35,32,0.2)',
-            borderRadius: '4px', cursor: 'not-allowed',
           }}
         >
           Notify Me When Available
@@ -136,13 +132,13 @@ function WishCard({ item, onRemove, onAddToCart }: { item: WishItem; onRemove: (
       ) : (
         <button
           onClick={handleAddToCart}
+          className="w-full py-[0.6rem] px-4 rounded-[4px] uppercase cursor-pointer"
           style={{
-            width: '100%', padding: '0.6rem 1rem',
             fontFamily: UI, fontSize: '0.7rem', fontWeight: 700,
-            letterSpacing: '0.1em', textTransform: 'uppercase',
+            letterSpacing: '0.1em',
             color: added ? '#fff' : C.charcoal,
             backgroundColor: added ? C.teal : C.gold,
-            border: 'none', borderRadius: '4px', cursor: 'pointer',
+            border: 'none',
             boxShadow: added ? 'none' : '0 2px 10px rgba(212,169,78,0.3)',
             transition: 'background 0.25s, color 0.25s, box-shadow 0.25s',
           }}
@@ -154,11 +150,11 @@ function WishCard({ item, onRemove, onAddToCart }: { item: WishItem; onRemove: (
       {/* Remove link */}
       <button
         onClick={onRemove}
+        className="pt-[0.45rem] cursor-pointer text-left"
         style={{
-          background: 'none', border: 'none', cursor: 'pointer', padding: '0.45rem 0 0',
+          background: 'none', border: 'none',
           fontFamily: UI, fontSize: '0.72rem',
           color: 'rgba(43,35,32,0.38)',
-          textAlign: 'left',
           transition: 'color 0.15s',
         }}
         onMouseEnter={e => (e.currentTarget.style.color = C.maroon)}
@@ -195,12 +191,12 @@ export default function Wishlist() {
       `}</style>
 
       {/* ── Heading ───────────────────────────────────── */}
-      <div style={{ marginBottom: '2.25rem' }}>
-        <h1 style={{ fontFamily: DISPLAY, fontSize: '2rem', fontWeight: 500, color: C.charcoal, letterSpacing: '-0.01em', lineHeight: 1.1, display: 'inline' }}>
+      <div className="mb-9">
+        <h1 className="inline" style={{ fontFamily: DISPLAY, fontSize: '2rem', fontWeight: 500, color: C.charcoal, letterSpacing: '-0.01em', lineHeight: 1.1 }}>
           Your Wishlist
         </h1>
         {items.length > 0 && (
-          <span style={{ fontFamily: UI, fontSize: '0.78rem', color: 'rgba(43,35,32,0.42)', letterSpacing: '0.1em', textTransform: 'uppercase', marginLeft: '0.75rem' }}>
+          <span className="ml-3 uppercase" style={{ fontFamily: UI, fontSize: '0.78rem', color: 'rgba(43,35,32,0.42)', letterSpacing: '0.1em' }}>
             ({items.length} {items.length === 1 ? 'item' : 'items'})
           </span>
         )}
@@ -208,28 +204,26 @@ export default function Wishlist() {
 
       {/* ── Empty state ───────────────────────────────── */}
       {items.length === 0 ? (
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '5rem 2rem', textAlign: 'center' }}>
-          <div style={{ marginBottom: '1.5rem', opacity: 0.2 }}>
+        <div className="flex flex-col items-center justify-center py-20 px-8 text-center">
+          <div className="mb-6 opacity-20">
             <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke={C.charcoal} strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
             </svg>
           </div>
-          <p style={{ fontFamily: DISPLAY, fontSize: '1.25rem', color: C.charcoal, fontWeight: 500, marginBottom: '0.5rem' }}>
+          <p className="mb-2" style={{ fontFamily: DISPLAY, fontSize: '1.25rem', color: C.charcoal, fontWeight: 500 }}>
             Your wishlist is empty
           </p>
-          <p style={{ fontFamily: UI, fontSize: '0.84rem', color: 'rgba(43,35,32,0.5)', marginBottom: '1.75rem', maxWidth: '300px', lineHeight: 1.6 }}>
+          <p className="mb-7 max-w-[300px]" style={{ fontFamily: UI, fontSize: '0.84rem', color: 'rgba(43,35,32,0.5)', lineHeight: 1.6 }}>
             Save items you love for later — they'll appear here.
           </p>
           <Link
             to="/shop"
+            className="inline-block no-underline rounded-[5px] py-3 px-7 uppercase"
             style={{
               fontFamily: UI, fontSize: '0.78rem', fontWeight: 700,
-              letterSpacing: '0.1em', textTransform: 'uppercase',
+              letterSpacing: '0.1em',
               color: C.charcoal, backgroundColor: C.gold,
-              textDecorationLine: 'none', borderRadius: '5px',
-              padding: '0.75rem 1.75rem',
               boxShadow: '0 2px 12px rgba(212,169,78,0.35)',
-              display: 'inline-block',
             }}
           >
             Start Shopping

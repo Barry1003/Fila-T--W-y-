@@ -189,3 +189,96 @@ export const listCollections = unstable_cache(
 export function colorsOf(products: CatalogueProduct[]): string[] {
   return [...new Set(products.map(p => p.color))].sort();
 }
+
+/**
+ * One product in the shape the console's form edits.
+ *
+ * Separate from CatalogueProduct because the form needs what shoppers never
+ * see — the draft status, the meta fields, stock per size, every image rather
+ * than the first — and needs ids rather than names to write back.
+ */
+export type ProductForEdit = {
+  id: string;
+  title: string;
+  description: string;
+  categoryId: string;
+  color: string;
+  priceCadCents: number;
+  productionDays: string;
+  tag: 'NEW' | 'MADE_TO_ORDER' | 'SOLD_OUT' | null;
+  status: 'DRAFT' | 'PUBLISHED';
+  metaTitle: string;
+  metaDescription: string;
+  imageUrls: string[];
+  variants: { size: string; stock: number }[];
+};
+
+/** A leaf category, grouped under its collection for the form's picker. */
+export type CategoryOption = {
+  id: string;
+  name: string;
+  collectionName: string;
+};
+
+export async function getProductForEdit(id: string): Promise<ProductForEdit | null> {
+  const row = await withDbRetry('get product for edit', () =>
+    prisma.product.findUnique({
+      where: { id },
+      select: {
+        id: true, title: true, description: true, categoryId: true, color: true,
+        priceCad: true, productionDays: true, tag: true, status: true,
+        metaTitle: true, metaDescription: true,
+        images: { select: { url: true }, orderBy: { position: 'asc' } },
+        variants: { select: { size: true, stock: true }, orderBy: { size: 'asc' } },
+      },
+    })
+  );
+
+  if (!row) return null;
+
+  return {
+    id: row.id,
+    title: row.title,
+    description: row.description ?? '',
+    categoryId: row.categoryId,
+    color: row.color,
+    priceCadCents: Math.round(Number(row.priceCad) * 100),
+    productionDays: row.productionDays ?? '',
+    tag: row.tag,
+    status: row.status,
+    metaTitle: row.metaTitle ?? '',
+    metaDescription: row.metaDescription ?? '',
+    imageUrls: row.images.map(image => image.url),
+    variants: row.variants.map(variant => ({ size: variant.size, stock: variant.stock })),
+  };
+}
+
+/**
+ * The categories a product can be filed under — leaves only.
+ *
+ * A product's category is always a leaf, never a collection, so the picker must
+ * not offer "Pre-Order" as though it were a category of its own.
+ */
+export async function listCategoryOptions(): Promise<CategoryOption[]> {
+  const rows = await withDbRetry('list category options', () =>
+    prisma.category.findMany({
+      where: { parentId: { not: null } },
+      orderBy: [{ parent: { position: 'asc' } }, { position: 'asc' }],
+      select: { id: true, name: true, parent: { select: { name: true } } },
+    })
+  );
+
+  return rows.map(row => ({
+    id: row.id,
+    name: row.name,
+    collectionName: row.parent?.name ?? '',
+  }));
+}
+
+/** Colours already in the catalogue, so the form can suggest rather than dictate. */
+export async function listKnownColors(): Promise<string[]> {
+  const rows = await withDbRetry('list known colours', () =>
+    prisma.product.findMany({ distinct: ['color'], select: { color: true }, orderBy: { color: 'asc' } })
+  );
+  return rows.map(row => row.color);
+}

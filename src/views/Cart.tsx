@@ -102,28 +102,28 @@ export default function Cart() {
   // Until localStorage has been read the cart looks empty, and showing the
   // "nothing here" page to someone who has items would be wrong.
   if (!hydrated) {
-    return <div style={{ backgroundColor: C.cream, minHeight: '70vh' }} aria-busy="true" />;
+    return <div className="min-h-[70vh]" style={{ backgroundColor: C.cream }} aria-busy="true" />;
   }
 
   /* ── Empty state ─────────────────────────────────────── */
   if (lines.length === 0) {
     return (
-      <div style={{ backgroundColor: C.cream, minHeight: '70vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '5rem 2rem', textAlign: 'center' }}>
-        <div style={{ marginBottom: '2rem', opacity: 0.18 }}>
+      <div className="min-h-[70vh] flex flex-col items-center justify-center py-20 px-8 text-center" style={{ backgroundColor: C.cream }}>
+        <div className="mb-8 opacity-[0.18]">
           <svg width="88" height="88" viewBox="0 0 24 24" fill="none" stroke={C.charcoal} strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
             <circle cx="9" cy="21" r="1" /><circle cx="20" cy="21" r="1" />
             <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
           </svg>
         </div>
-        <div style={{ fontFamily: DISPLAY, fontSize: '2.25rem', color: C.charcoal, fontWeight: 500, letterSpacing: '-0.02em', marginBottom: '0.875rem' }}>
+        <div className="mb-3.5" style={{ fontFamily: DISPLAY, fontSize: '2.25rem', color: C.charcoal, fontWeight: 500, letterSpacing: '-0.02em' }}>
           Your cart is empty
         </div>
-        <p style={{ fontFamily: UI, fontSize: '0.95rem', color: 'rgba(43,35,32,0.55)', lineHeight: 1.7, maxWidth: '340px', marginBottom: '2.25rem' }}>
+        <p className="max-w-[340px] mb-9" style={{ fontFamily: UI, fontSize: '0.95rem', color: 'rgba(43,35,32,0.55)', lineHeight: 1.7 }}>
           Discover our collection of handcrafted Yoruba traditional wear — made to order and shipped worldwide.
         </p>
-        <Link to="/shop" style={{ textDecorationLine: 'none' }}>
+        <Link to="/shop" className="no-underline">
           <button
-            className="shimmer-cta"
+            className="shimmer-cta cursor-pointer py-[0.9rem] px-9"
             style={{
               backgroundColor: C.gold,
               color: C.charcoal,
@@ -131,8 +131,6 @@ export default function Cart() {
               ...label,
               fontSize: '0.68rem',
               letterSpacing: '0.14em',
-              padding: '0.9rem 2.25rem',
-              cursor: 'pointer',
             }}
           >
             Start Shopping
@@ -144,12 +142,12 @@ export default function Cart() {
 
   /* ── Full cart ──────────────────────────────────────── */
   return (
-    <div style={{ backgroundColor: C.cream, minHeight: '100vh' }}>
-      <div style={{ maxWidth: '1440px', margin: '0 auto', padding: '3.5rem 2.5rem 6rem' }}>
+    <div className="min-h-screen" style={{ backgroundColor: C.cream }}>
+      <div className="max-w-[1440px] mx-auto pt-14 px-10 pb-24">
 
         {/* Page header */}
-        <div style={{ marginBottom: '3rem', display: 'flex', alignItems: 'baseline', gap: '1rem', flexWrap: 'wrap' }}>
-          <h1 style={{ fontFamily: DISPLAY, fontSize: 'clamp(2rem,4vw,3rem)', fontWeight: 500, color: C.charcoal, letterSpacing: '-0.025em', margin: 0 }}>
+        <div className="mb-12 flex items-baseline gap-4 flex-wrap">
+          <h1 className="m-0" style={{ fontFamily: DISPLAY, fontSize: 'clamp(2rem,4vw,3rem)', fontWeight: 500, color: C.charcoal, letterSpacing: '-0.025em' }}>
             Your Cart
           </h1>
           <span style={{ ...label, fontSize: '0.7rem', color: 'rgba(43,35,32,0.45)', letterSpacing: '0.14em' }}>
@@ -158,23 +156,23 @@ export default function Cart() {
         </div>
 
         {/* Two-column grid */}
-        <div className="cart-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 384px', gap: '3.5rem', alignItems: 'start' }}>
+        <div className="cart-grid grid grid-cols-[1fr_384px] gap-14 items-start">
 
           {/* ─── Left: Items ─────────────────────────── */}
           <div>
             {/* Column headers */}
-            <div style={{
-              display: 'grid', gridTemplateColumns: '88px 1fr auto auto',
-              gap: '1rem', alignItems: 'center',
-              ...label, fontSize: '0.6rem', color: 'rgba(43,35,32,0.45)',
-              paddingBottom: '0.875rem',
-              borderBottom: `1px solid rgba(43,35,32,0.1)`,
-              marginBottom: '0',
-            }}>
+            <div
+              className="grid gap-4 items-center pb-3.5"
+              style={{
+                gridTemplateColumns: '88px 1fr auto auto',
+                ...label, fontSize: '0.6rem', color: 'rgba(43,35,32,0.45)',
+                borderBottom: `1px solid rgba(43,35,32,0.1)`,
+              }}
+            >
               <span />
               <span>Product</span>
-              <span style={{ textAlign: 'center' }}>Qty</span>
-              <span style={{ textAlign: 'right' }}>Total</span>
+              <span className="text-center">Qty</span>
+              <span className="text-right">Total</span>
             </div>
 
             {/* Line items */}
@@ -182,31 +180,27 @@ export default function Cart() {
               const lineTotalCents = item.unitPriceCents * item.quantity;
               return (
                 <div key={`${item.productId}:${item.size}`}>
-                  <div style={{
-                    display: 'grid',
-                    gridTemplateColumns: '88px 1fr auto auto',
-                    gap: '1rem',
-                    alignItems: 'start',
-                    padding: '1.875rem 0',
-                    position: 'relative',
-                  }}>
+                  <div
+                    className="grid gap-4 items-start py-[1.875rem] relative"
+                    style={{ gridTemplateColumns: '88px 1fr auto auto' }}
+                  >
                     {/* Thumbnail */}
-                    <div style={{ width: '88px', height: '88px', backgroundColor: '#e8e2da', flexShrink: 0, overflow: 'hidden' }}>
+                    <div className="w-[88px] h-[88px] shrink-0 overflow-hidden" style={{ backgroundColor: '#e8e2da' }}>
                       <img
                         src={item.imageUrl}
                         alt={item.title}
-                        style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                        className="w-full h-full object-cover block"
                       />
                     </div>
 
                     {/* Info */}
-                    <div style={{ paddingTop: '2px' }}>
-                      <Link to={`/product/${item.slug}`} style={{ textDecorationLine: 'none' }}>
-                        <div style={{ fontFamily: DISPLAY, fontSize: '1.0625rem', fontWeight: 500, color: C.charcoal, lineHeight: 1.3, marginBottom: '0.3rem' }}>
+                    <div className="pt-[2px]">
+                      <Link to={`/product/${item.slug}`} className="no-underline">
+                        <div className="mb-[0.3rem]" style={{ fontFamily: DISPLAY, fontSize: '1.0625rem', fontWeight: 500, color: C.charcoal, lineHeight: 1.3 }}>
                           {item.title}
                         </div>
                       </Link>
-                      <div style={{ fontFamily: UI, fontSize: '0.8rem', color: 'rgba(43,35,32,0.5)', marginBottom: '0.75rem' }}>
+                      <div className="mb-3" style={{ fontFamily: UI, fontSize: '0.8rem', color: 'rgba(43,35,32,0.5)' }}>
                         {item.color} · {item.size}
                       </div>
                       {/* Unit price */}
@@ -218,20 +212,22 @@ export default function Cart() {
                     </div>
 
                     {/* Qty stepper */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0', border: `1px solid rgba(43,35,32,0.18)`, height: '38px', marginTop: '2px' }}>
+                    <div className="flex items-center h-[38px] mt-[2px]" style={{ border: `1px solid rgba(43,35,32,0.18)` }}>
                       <button
                         onClick={() => setQuantity(item.productId, item.size, item.quantity - 1)}
-                        style={{ width: '34px', height: '100%', background: 'none', border: 'none', cursor: 'pointer', color: C.charcoal, fontSize: '1.1rem', lineHeight: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                        className="w-[34px] h-full flex items-center justify-center cursor-pointer"
+                        style={{ background: 'none', border: 'none', color: C.charcoal, fontSize: '1.1rem', lineHeight: 1 }}
                         aria-label="Decrease quantity"
                       >
                         −
                       </button>
-                      <span style={{ width: '32px', textAlign: 'center', fontFamily: UI, fontSize: '0.875rem', color: C.charcoal, userSelect: 'none' }}>
+                      <span className="w-[32px] text-center select-none" style={{ fontFamily: UI, fontSize: '0.875rem', color: C.charcoal }}>
                         {item.quantity}
                       </span>
                       <button
                         onClick={() => setQuantity(item.productId, item.size, item.quantity + 1)}
-                        style={{ width: '34px', height: '100%', background: 'none', border: 'none', cursor: 'pointer', color: C.charcoal, fontSize: '1.1rem', lineHeight: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                        className="w-[34px] h-full flex items-center justify-center cursor-pointer"
+                        style={{ background: 'none', border: 'none', color: C.charcoal, fontSize: '1.1rem', lineHeight: 1 }}
                         aria-label="Increase quantity"
                       >
                         +
@@ -239,10 +235,11 @@ export default function Cart() {
                     </div>
 
                     {/* Line total + remove */}
-                    <div style={{ textAlign: 'right', paddingTop: '2px' }}>
+                    <div className="text-right pt-[2px]">
                       <button
                         onClick={() => remove(item.productId, item.size)}
-                        style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(43,35,32,0.3)', marginBottom: '0.375rem', padding: '0', display: 'flex', marginLeft: 'auto', lineHeight: 0 }}
+                        className="flex ml-auto cursor-pointer mb-1.5 p-0"
+                        style={{ background: 'none', border: 'none', color: 'rgba(43,35,32,0.3)', lineHeight: 0 }}
                         aria-label={`Remove ${item.title}`}
                       >
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
@@ -256,27 +253,22 @@ export default function Cart() {
                   </div>
 
                   {idx < lines.length - 1 && (
-                    <div style={{ height: '1px', backgroundColor: 'rgba(43,35,32,0.08)' }} />
+                    <div className="h-px" style={{ backgroundColor: 'rgba(43,35,32,0.08)' }} />
                   )}
                 </div>
               );
             })}
 
             {/* Continue shopping link */}
-            <div style={{ marginTop: '2rem', paddingTop: '1.5rem', borderTop: '1px solid rgba(43,35,32,0.08)' }}>
-              <Link to="/shop" style={{ textDecorationLine: 'none' }}>
-                <button style={{
+            <div className="mt-8 pt-6" style={{ borderTop: '1px solid rgba(43,35,32,0.08)' }}>
+              <Link to="/shop" className="no-underline">
+                <button className="inline-flex items-center gap-2 cursor-pointer py-[0.7rem] px-6" style={{
                   background: 'none',
                   border: `1.5px solid ${C.maroon}`,
                   color: C.maroon,
                   ...label,
                   fontSize: '0.65rem',
                   letterSpacing: '0.13em',
-                  padding: '0.7rem 1.5rem',
-                  cursor: 'pointer',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '0.5rem',
                 }}>
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                     <line x1="19" y1="12" x2="5" y2="12" /><polyline points="12 19 5 12 12 5" />
@@ -288,40 +280,39 @@ export default function Cart() {
           </div>
 
           {/* ─── Right: Order Summary ─────────────────── */}
-          <div style={{ position: 'sticky', top: '88px' }}>
-            <div style={{
+          <div className="sticky top-[88px]">
+            <div className="p-8" style={{
               backgroundColor: C.cream,
               border: `1px solid rgba(43,35,32,0.14)`,
               boxShadow: '0 4px 32px rgba(43,35,32,0.07)',
-              padding: '2rem',
             }}>
-              <h2 style={{ fontFamily: DISPLAY, fontSize: '1.375rem', fontWeight: 500, color: C.charcoal, letterSpacing: '-0.015em', margin: '0 0 1.75rem' }}>
+              <h2 className="m-0 mb-7" style={{ fontFamily: DISPLAY, fontSize: '1.375rem', fontWeight: 500, color: C.charcoal, letterSpacing: '-0.015em' }}>
                 Order Summary
               </h2>
 
               {/* Subtotal */}
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '0.625rem' }}>
+              <div className="flex justify-between items-baseline mb-2.5">
                 <span style={{ fontFamily: UI, fontSize: '0.875rem', color: 'rgba(43,35,32,0.65)' }}>Subtotal</span>
-                <div style={{ textAlign: 'right' }}>
+                <div className="text-right">
                   <div style={{ fontFamily: UI, fontSize: '0.9rem', fontWeight: 500, color: C.charcoal }}>{formatCad(totals.subtotalCents)}</div>
                 </div>
               </div>
 
               {/* Discount */}
               {applied && (
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '0.625rem' }}>
+                <div className="flex justify-between items-baseline mb-2.5">
                   <span style={{ fontFamily: UI, fontSize: '0.875rem', color: C.teal }}>Promo ({applied.code} — {applied.description})</span>
-                  <div style={{ textAlign: 'right' }}>
+                  <div className="text-right">
                     <div style={{ fontFamily: UI, fontSize: '0.9rem', fontWeight: 500, color: C.teal }}>−{formatCad(totals.discountCents)}</div>
                   </div>
                 </div>
               )}
 
               {/* Shipping */}
-              <div style={{ marginBottom: '1.5rem' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.625rem' }}>
+              <div className="mb-6">
+                <div className="flex justify-between items-center mb-2.5">
                   <span style={{ fontFamily: UI, fontSize: '0.875rem', color: 'rgba(43,35,32,0.65)' }}>Shipping</span>
-                  <div style={{ textAlign: 'right' }}>
+                  <div className="text-right">
                     <div style={{ fontFamily: UI, fontSize: '0.9rem', fontWeight: 500, color: totals.shippingCents === 0 ? C.teal : C.charcoal }}>
                       {shippingLabel(selectedShip.zone)}
                     </div>
@@ -331,21 +322,17 @@ export default function Cart() {
                 <select
                   value={shipping}
                   onChange={e => setShipping(e.target.value)}
+                  className="w-full py-[0.6rem] pl-3 pr-8 cursor-pointer appearance-none"
                   style={{
-                    width: '100%',
-                    padding: '0.6rem 0.75rem',
                     border: `1px solid rgba(43,35,32,0.2)`,
                     backgroundColor: C.cream,
                     fontFamily: UI,
                     fontSize: '0.8rem',
                     color: C.charcoal,
                     outline: 'none',
-                    cursor: 'pointer',
-                    appearance: 'none',
                     backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%232B2320' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
                     backgroundRepeat: 'no-repeat',
                     backgroundPosition: 'right 0.75rem center',
-                    paddingRight: '2rem',
                   }}
                 >
                   {SHIPPING_OPTS.map(opt => (
@@ -355,14 +342,14 @@ export default function Cart() {
               </div>
 
               {/* Divider */}
-              <div style={{ height: '1px', backgroundColor: 'rgba(43,35,32,0.1)', marginBottom: '1.5rem' }} />
+              <div className="h-px mb-6" style={{ backgroundColor: 'rgba(43,35,32,0.1)' }} />
 
               {/* Promo code */}
-              <div style={{ marginBottom: '1.75rem' }}>
-                <div style={{ ...label, fontSize: '0.6rem', color: 'rgba(43,35,32,0.5)', marginBottom: '0.625rem', letterSpacing: '0.13em' }}>
+              <div className="mb-7">
+                <div className="mb-2.5" style={{ ...label, fontSize: '0.6rem', color: 'rgba(43,35,32,0.5)', letterSpacing: '0.13em' }}>
                   Promo Code
                 </div>
-                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                <div className="flex gap-2">
                   <input
                     type="text"
                     placeholder="Enter code"
@@ -370,32 +357,28 @@ export default function Cart() {
                     disabled={!!applied}
                     onChange={e => { setPromo(e.target.value); setPromoError(''); }}
                     onKeyDown={e => { if (e.key === 'Enter' && !applied) { e.preventDefault(); applyPromo(); } }}
+                    className="flex-1 py-[0.65rem] px-3 min-w-0"
                     style={{
-                      flex: 1,
-                      padding: '0.65rem 0.75rem',
                       border: `1px solid ${promoError ? '#C0392B' : 'rgba(43,35,32,0.2)'}`,
                       backgroundColor: applied ? 'rgba(43,35,32,0.04)' : C.cream,
                       fontFamily: UI,
                       fontSize: '0.8rem',
                       color: C.charcoal,
                       outline: 'none',
-                      minWidth: 0,
                     }}
                   />
                   <button
                     onClick={applied ? clearPromo : applyPromo}
                     disabled={checking}
+                    className="px-3.5 py-0 whitespace-nowrap shrink-0"
                     style={{
                       border: `1.5px solid ${C.maroon}`,
                       background: 'none',
                       color: C.maroon,
                       ...label,
                       fontSize: '0.6rem',
-                      padding: '0 0.875rem',
                       cursor: checking ? 'wait' : 'pointer',
-                      whiteSpace: 'nowrap',
                       letterSpacing: '0.12em',
-                      flexShrink: 0,
                       opacity: checking ? 0.6 : 1,
                     }}
                   >
@@ -403,24 +386,24 @@ export default function Cart() {
                   </button>
                 </div>
                 {promoError && (
-                  <p style={{ fontFamily: UI, fontSize: '0.725rem', color: '#C0392B', margin: '0.375rem 0 0' }}>
+                  <p className="mt-1.5 mx-0 mb-0" style={{ fontFamily: UI, fontSize: '0.725rem', color: '#C0392B' }}>
                     {promoError}
                   </p>
                 )}
                 {applied && (
-                  <p style={{ fontFamily: UI, fontSize: '0.725rem', color: C.teal, margin: '0.375rem 0 0' }}>
+                  <p className="mt-1.5 mx-0 mb-0" style={{ fontFamily: UI, fontSize: '0.725rem', color: C.teal }}>
                     {applied.description} applied.
                   </p>
                 )}
               </div>
 
               {/* Divider */}
-              <div style={{ height: '1px', backgroundColor: 'rgba(43,35,32,0.1)', marginBottom: '1.5rem' }} />
+              <div className="h-px mb-6" style={{ backgroundColor: 'rgba(43,35,32,0.1)' }} />
 
               {/* Total */}
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '1.875rem' }}>
+              <div className="flex justify-between items-baseline mb-[1.875rem]">
                 <span style={{ fontFamily: DISPLAY, fontSize: '1.0625rem', color: C.charcoal, fontWeight: 500 }}>Total</span>
-                <div style={{ textAlign: 'right' }}>
+                <div className="text-right">
                   <div style={{ fontFamily: DISPLAY, fontSize: '1.375rem', fontWeight: 600, color: C.charcoal, letterSpacing: '-0.015em' }}>
                     {formatCad(totals.totalCents)}
                   </div>
@@ -430,23 +413,17 @@ export default function Cart() {
               {/* Checkout CTA */}
               <Link
                 to={applied ? `/checkout?promo=${encodeURIComponent(applied.code)}` : '/checkout'}
-                style={{ textDecorationLine: 'none', display: 'block', marginBottom: '0.875rem' }}
+                className="block no-underline mb-3.5"
               >
                 <span
-                  className="shimmer-cta"
+                  className="shimmer-cta w-full block text-center p-4 rounded-[4px] cursor-pointer"
                   style={{
-                    width: '100%',
                     backgroundColor: C.gold,
                     color: C.charcoal,
                     border: 'none',
                     ...label,
                     fontSize: '0.7rem',
                     letterSpacing: '0.14em',
-                    padding: '1rem',
-                    cursor: 'pointer',
-                    display: 'block',
-                    textAlign: 'center',
-                    borderRadius: '4px',
                   }}
                 >
                   Proceed to Checkout
@@ -454,14 +431,12 @@ export default function Cart() {
               </Link>
 
               {/* Secondary CTA */}
-              <Link to="/shop" style={{ textDecorationLine: 'none', display: 'block', textAlign: 'center' }}>
-                <span style={{
+              <Link to="/shop" className="block text-center no-underline">
+                <span className="underline cursor-pointer" style={{
                   fontFamily: UI,
                   fontSize: '0.8rem',
                   color: C.indigo,
-                  textDecorationLine: 'underline',
                   textUnderlineOffset: '3px',
-                  cursor: 'pointer',
                 }}>
                   Continue Shopping
                 </span>
@@ -469,12 +444,12 @@ export default function Cart() {
             </div>
 
             {/* Trust signals */}
-            <div style={{ marginTop: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.875rem' }}>
+            <div className="mt-6 flex flex-col gap-3.5">
               {TRUST.map(t => (
-                <div key={t.title} style={{ display: 'flex', gap: '0.875rem', alignItems: 'flex-start' }}>
-                  <div style={{ flexShrink: 0, marginTop: '1px', opacity: 0.85 }}>{t.icon}</div>
+                <div key={t.title} className="flex gap-3.5 items-start">
+                  <div className="shrink-0 mt-[1px] opacity-[0.85]">{t.icon}</div>
                   <div>
-                    <div style={{ fontFamily: UI, fontSize: '0.8rem', fontWeight: 600, color: C.charcoal, marginBottom: '1px' }}>{t.title}</div>
+                    <div className="mb-[1px]" style={{ fontFamily: UI, fontSize: '0.8rem', fontWeight: 600, color: C.charcoal }}>{t.title}</div>
                     <div style={{ fontFamily: UI, fontSize: '0.73rem', color: 'rgba(43,35,32,0.5)', lineHeight: 1.5 }}>{t.body}</div>
                   </div>
                 </div>

@@ -57,12 +57,10 @@ const STATUS_STYLE: Record<Status, { bg: string; color: string; border: string }
 function StatusBadge({ status }: { status: Status }) {
   const s = STATUS_STYLE[status] ?? STATUS_STYLE.Placed;
   return (
-    <span style={{
-      ...label, fontSize: '0.58rem', letterSpacing: '0.1em',
-      padding: '0.22rem 0.65rem', borderRadius: '100px', whiteSpace: 'nowrap',
-      backgroundColor: s.bg, color: s.color, border: s.border,
-      flexShrink: 0,
-    }}>
+    <span
+      className="py-[0.22rem] px-[0.65rem] rounded-full whitespace-nowrap shrink-0"
+      style={{ ...label, fontSize: '0.58rem', letterSpacing: '0.1em', backgroundColor: s.bg, color: s.color, border: s.border }}
+    >
       {status}
     </span>
   );
@@ -107,11 +105,11 @@ const WISHLIST_PREVIEW = [
 /* ─── Section heading ──────────────────────────────────────── */
 function SectionHead({ title, linkTo, linkLabel }: { title: string; linkTo: string; linkLabel: string }) {
   return (
-    <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: '1.1rem' }}>
-      <h2 style={{ fontFamily: UI, fontSize: '0.72rem', fontWeight: 700, color: C.charcoal, letterSpacing: '0.12em', textTransform: 'uppercase' }}>
+    <div className="flex items-baseline justify-between mb-[1.1rem]">
+      <h2 className="uppercase" style={{ fontFamily: UI, fontSize: '0.72rem', fontWeight: 700, color: C.charcoal, letterSpacing: '0.12em' }}>
         {title}
       </h2>
-      <Link to={linkTo} style={{ fontFamily: UI, fontSize: '0.78rem', color: C.indigo, textDecorationLine: 'none', letterSpacing: '0.01em' }}>
+      <Link to={linkTo} className="no-underline" style={{ fontFamily: UI, fontSize: '0.78rem', color: C.indigo, letterSpacing: '0.01em' }}>
         {linkLabel} →
       </Link>
     </div>
@@ -122,11 +120,11 @@ function SectionHead({ title, linkTo, linkLabel }: { title: string; linkTo: stri
 export default function Account({ user }: { user: CurrentUser | null }) {
   return (
     <AccountShell>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '2.5rem' }}>
+      <div className="flex flex-col gap-10">
 
         {/* ── Greeting ─────────────────────────────────────── */}
         <div>
-          <h1 style={{ fontFamily: DISPLAY, fontSize: '2.1rem', fontWeight: 500, color: C.charcoal, letterSpacing: '-0.015em', lineHeight: 1.1, marginBottom: '0.4rem' }}>
+          <h1 className="mb-[0.4rem]" style={{ fontFamily: DISPLAY, fontSize: '2.1rem', fontWeight: 500, color: C.charcoal, letterSpacing: '-0.015em', lineHeight: 1.1 }}>
             {user ? `Welcome back, ${user.name.split(' ')[0]}` : 'Welcome back'}
           </h1>
           <p style={{ fontFamily: UI, fontSize: '0.875rem', color: 'rgba(43,35,32,0.48)', lineHeight: 1.6 }}>
@@ -135,22 +133,18 @@ export default function Account({ user }: { user: CurrentUser | null }) {
         </div>
 
         {/* ── Stat tiles ──────────────────────────────────── */}
-        <div className="rg-3" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem' }}>
+        <div className="rg-3 grid grid-cols-3 gap-4">
           {STATS.map(s => (
             <div
               key={s.label}
+              className="rounded-lg py-[1.4rem] px-6 flex flex-col gap-3"
               style={{
                 backgroundColor: '#fff',
-                borderRadius: '8px',
-                padding: '1.4rem 1.5rem',
                 border: `1px solid rgba(43,35,32,0.09)`,
                 boxShadow: '0 1px 8px rgba(43,35,32,0.045)',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '0.75rem',
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div className="flex items-center justify-between">
                 <div style={{ fontFamily: DISPLAY, fontSize: '2rem', fontWeight: 500, color: C.charcoal, letterSpacing: '-0.02em', lineHeight: 1 }}>
                   {s.value}
                 </div>
@@ -166,18 +160,14 @@ export default function Account({ user }: { user: CurrentUser | null }) {
         {/* ── Recent Orders ───────────────────────────────── */}
         <div>
           <SectionHead title="Recent Orders" linkTo="/account/orders" linkLabel="View all orders" />
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+          <div className="flex flex-col gap-[0.6rem]">
             {RECENT.map(order => (
               <div
                 key={order.id}
+                className="rounded-lg py-4 px-5 flex items-center gap-4"
                 style={{
                   backgroundColor: '#fff',
-                  borderRadius: '8px',
-                  padding: '1rem 1.25rem',
                   border: `1px solid rgba(43,35,32,0.09)`,
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '1rem',
                   transition: 'box-shadow 0.15s',
                 }}
                 onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.boxShadow = '0 2px 14px rgba(43,35,32,0.09)'; }}
@@ -187,23 +177,25 @@ export default function Account({ user }: { user: CurrentUser | null }) {
                   src={`https://images.unsplash.com/${order.img}?w=80&h=80&fit=crop&auto=format`}
                   alt=""
                   width={44} height={44}
-                  style={{ borderRadius: '5px', objectFit: 'cover', flexShrink: 0, backgroundColor: 'rgba(43,35,32,0.06)' }}
+                  className="rounded-[5px] object-cover shrink-0"
+                  style={{ backgroundColor: 'rgba(43,35,32,0.06)' }}
                 />
-                <div style={{ flex: 1, minWidth: 0 }}>
+                <div className="flex-1 min-w-0">
                   <div style={{ fontFamily: UI, fontSize: '0.82rem', fontWeight: 600, color: C.charcoal, lineHeight: 1.3 }}>
                     {order.title}
                   </div>
-                  <div style={{ fontFamily: UI, fontSize: '0.72rem', color: 'rgba(43,35,32,0.44)', marginTop: '2px', letterSpacing: '0.01em' }}>
+                  <div className="mt-[2px]" style={{ fontFamily: UI, fontSize: '0.72rem', color: 'rgba(43,35,32,0.44)', letterSpacing: '0.01em' }}>
                     #{order.id} · {order.date}
                   </div>
                 </div>
                 <StatusBadge status={order.status} />
-                <div style={{ fontFamily: UI, fontSize: '0.84rem', fontWeight: 500, color: C.charcoal, minWidth: '80px', textAlign: 'right', flexShrink: 0 }}>
+                <div className="min-w-[80px] text-right shrink-0" style={{ fontFamily: UI, fontSize: '0.84rem', fontWeight: 500, color: C.charcoal }}>
                   {order.total}
                 </div>
                 <Link
                   to="/account/orders"
-                  style={{ fontFamily: UI, fontSize: '0.72rem', color: C.indigo, textDecorationLine: 'none', letterSpacing: '0.01em', flexShrink: 0, whiteSpace: 'nowrap' }}
+                  className="no-underline shrink-0 whitespace-nowrap"
+                  style={{ fontFamily: UI, fontSize: '0.72rem', color: C.indigo, letterSpacing: '0.01em' }}
                 >
                   Details →
                 </Link>
@@ -215,29 +207,26 @@ export default function Account({ user }: { user: CurrentUser | null }) {
         {/* ── Wishlist preview ─────────────────────────────── */}
         <div>
           <SectionHead title="From Your Wishlist" linkTo="/account/wishlist" linkLabel="View wishlist" />
-          <div style={{ display: 'flex', gap: '1rem', overflowX: 'auto', paddingBottom: '0.5rem', scrollbarWidth: 'thin' }}>
+          <div className="flex gap-4 overflow-x-auto pb-2" style={{ scrollbarWidth: 'thin' }}>
             {WISHLIST_PREVIEW.map(item => (
               <div
                 key={item.id}
+                className="shrink-0 w-[168px] rounded-lg overflow-hidden"
                 style={{
-                  flexShrink: 0,
-                  width: '168px',
                   backgroundColor: '#fff',
-                  borderRadius: '8px',
                   border: `1px solid rgba(43,35,32,0.09)`,
-                  overflow: 'hidden',
                   boxShadow: '0 1px 6px rgba(43,35,32,0.04)',
                 }}
               >
-                <div style={{ position: 'relative', paddingTop: '100%', overflow: 'hidden' }}>
+                <div className="relative pt-[100%] overflow-hidden">
                   <img
                     src={`https://images.unsplash.com/${item.img}?w=340&h=340&fit=crop&auto=format`}
                     alt={item.title}
-                    style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
+                    className="absolute inset-0 w-full h-full object-cover"
                   />
                 </div>
-                <div style={{ padding: '0.75rem' }}>
-                  <div style={{ fontFamily: UI, fontSize: '0.75rem', fontWeight: 500, color: C.charcoal, lineHeight: 1.35, marginBottom: '0.35rem', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' } as React.CSSProperties}>
+                <div className="p-3">
+                  <div className="mb-[0.35rem] line-clamp-2" style={{ fontFamily: UI, fontSize: '0.75rem', fontWeight: 500, color: C.charcoal, lineHeight: 1.35 }}>
                     {item.title}
                   </div>
                   <div style={{ fontFamily: UI, fontSize: '0.78rem', fontWeight: 600, color: C.charcoal }}>
@@ -245,13 +234,11 @@ export default function Account({ user }: { user: CurrentUser | null }) {
                   </div>
                   <Link
                     to="/account/wishlist"
+                    className="block mt-[0.6rem] text-center py-[0.45rem] rounded-[4px] uppercase no-underline"
                     style={{
-                      display: 'block', marginTop: '0.6rem', textAlign: 'center',
                       fontFamily: UI, fontSize: '0.65rem', fontWeight: 700,
-                      letterSpacing: '0.1em', textTransform: 'uppercase',
-                      padding: '0.45rem 0',
+                      letterSpacing: '0.1em',
                       backgroundColor: C.gold, color: C.charcoal,
-                      borderRadius: '4px', textDecorationLine: 'none',
                       transition: 'opacity 0.15s',
                     }}
                     onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.opacity = '0.85'; }}
@@ -267,45 +254,34 @@ export default function Account({ user }: { user: CurrentUser | null }) {
 
         {/* ── Promo card ──────────────────────────────────── */}
         <div
-          style={{
-            borderRadius: '10px',
-            overflow: 'hidden',
-            position: 'relative',
-            background: `linear-gradient(135deg, ${C.maroon} 0%, #5A1E25 100%)`,
-            display: 'flex',
-            alignItems: 'center',
-            gap: '2rem',
-            padding: '2rem 2.5rem',
-          }}
+          className="rounded-[10px] overflow-hidden relative flex items-center gap-8 py-8 px-10"
+          style={{ background: `linear-gradient(135deg, ${C.maroon} 0%, #5A1E25 100%)` }}
         >
           {/* Decorative circle */}
-          <div style={{ position: 'absolute', right: '3rem', top: '-2rem', width: '160px', height: '160px', borderRadius: '50%', background: 'rgba(212,169,78,0.08)', pointerEvents: 'none' }} />
-          <div style={{ position: 'absolute', right: '6rem', bottom: '-3rem', width: '100px', height: '100px', borderRadius: '50%', background: 'rgba(212,169,78,0.06)', pointerEvents: 'none' }} />
+          <div className="absolute right-12 -top-8 w-40 h-40 rounded-full pointer-events-none" style={{ background: 'rgba(212,169,78,0.08)' }} />
+          <div className="absolute right-24 -bottom-12 w-[100px] h-[100px] rounded-full pointer-events-none" style={{ background: 'rgba(212,169,78,0.06)' }} />
 
-          <div style={{ flex: 1, position: 'relative' }}>
-            <div style={{ ...label, fontSize: '0.58rem', color: C.gold, letterSpacing: '0.2em', marginBottom: '0.5rem' }}>
+          <div className="flex-1 relative">
+            <div className="mb-2" style={{ ...label, fontSize: '0.58rem', color: C.gold, letterSpacing: '0.2em' }}>
               Limited Time Offer
             </div>
-            <h3 style={{ fontFamily: DISPLAY, fontSize: '1.5rem', fontWeight: 500, color: C.cream, lineHeight: 1.15, marginBottom: '0.6rem', letterSpacing: '-0.01em' }}>
+            <h3 className="mb-[0.6rem]" style={{ fontFamily: DISPLAY, fontSize: '1.5rem', fontWeight: 500, color: C.cream, lineHeight: 1.15, letterSpacing: '-0.01em' }}>
               Custom Made,<br />Just for You
             </h3>
-            <p style={{ fontFamily: UI, fontSize: '0.82rem', color: 'rgba(250,246,240,0.65)', lineHeight: 1.65, maxWidth: '340px' }}>
+            <p className="max-w-[340px]" style={{ fontFamily: UI, fontSize: '0.82rem', color: 'rgba(250,246,240,0.65)', lineHeight: 1.65 }}>
               Order a bespoke filà, agbada, or kaftan tailored to your measurements and fabric preference.
             </p>
           </div>
-          <div style={{ flexShrink: 0, position: 'relative' }}>
+          <div className="shrink-0 relative">
             <Link
               to="/shop"
+              className="inline-block no-underline uppercase whitespace-nowrap py-[0.85rem] px-7 rounded-[5px]"
               style={{
-                display: 'inline-block',
                 fontFamily: UI, fontSize: '0.72rem', fontWeight: 700,
-                letterSpacing: '0.12em', textTransform: 'uppercase',
-                padding: '0.85rem 1.75rem',
+                letterSpacing: '0.12em',
                 backgroundColor: C.gold, color: C.charcoal,
-                borderRadius: '5px', textDecorationLine: 'none',
                 boxShadow: '0 2px 12px rgba(212,169,78,0.4)',
                 transition: 'box-shadow 0.2s, transform 0.15s',
-                whiteSpace: 'nowrap',
               }}
               onMouseEnter={e => { const el = e.currentTarget as HTMLAnchorElement; el.style.boxShadow = '0 4px 20px rgba(212,169,78,0.55)'; el.style.transform = 'translateY(-1px)'; }}
               onMouseLeave={e => { const el = e.currentTarget as HTMLAnchorElement; el.style.boxShadow = '0 2px 12px rgba(212,169,78,0.4)'; el.style.transform = 'translateY(0)'; }}

@@ -77,36 +77,25 @@ function Accordion({ section, openItems, toggle }: {
   toggle: (id: string) => void;
 }) {
   return (
-    <div id={section.id} style={{ marginBottom: '3rem' }}>
-      <h2 style={{ fontFamily: DISPLAY, fontSize: '1.4rem', fontWeight: 500, color: C.charcoal, letterSpacing: '-0.01em', marginBottom: '1rem', paddingBottom: '0.75rem', borderBottom: `1px solid rgba(43,35,32,0.09)` }}>
+    <div id={section.id} className="mb-12">
+      <h2 className="mb-4 pb-3" style={{ fontFamily: DISPLAY, fontSize: '1.4rem', fontWeight: 500, color: C.charcoal, letterSpacing: '-0.01em', borderBottom: `1px solid rgba(43,35,32,0.09)` }}>
         {section.title}
       </h2>
-      <div style={{ display: 'flex', flexDirection: 'column' }}>
+      <div className="flex flex-col">
         {section.items.map(item => {
           const open = openItems.has(item.id);
           return (
             <div key={item.id} style={{ borderBottom: `1px solid rgba(43,35,32,0.07)` }}>
               <button
                 onClick={() => toggle(item.id)}
-                style={{
-                  width: '100%',
-                  textAlign: 'left',
-                  background: 'none',
-                  border: 'none',
-                  padding: '1.1rem 0',
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  gap: '1rem',
-                  cursor: 'pointer',
-                }}
+                className="w-full text-left py-[1.1rem] px-0 flex justify-between items-center gap-4 cursor-pointer"
+                style={{ background: 'none', border: 'none' }}
               >
                 <span style={{ fontFamily: UI, fontSize: '0.92rem', fontWeight: 500, color: C.charcoal, lineHeight: 1.4 }}>
                   {item.q}
                 </span>
-                <span style={{
+                <span className="shrink-0" style={{
                   color: C.gold,
-                  flexShrink: 0,
                   transition: 'transform 0.2s ease',
                   transform: open ? 'rotate(180deg)' : 'rotate(0deg)',
                   lineHeight: 0,
@@ -117,7 +106,7 @@ function Accordion({ section, openItems, toggle }: {
                 </span>
               </button>
               {open && (
-                <div style={{ padding: '0 0 1.25rem', fontFamily: UI, fontSize: '0.9rem', color: 'rgba(43,35,32,0.65)', lineHeight: 1.7 }}>
+                <div className="pb-5" style={{ fontFamily: UI, fontSize: '0.9rem', color: 'rgba(43,35,32,0.65)', lineHeight: 1.7 }}>
                   {item.a}
                 </div>
               )}
@@ -157,35 +146,33 @@ export default function Help() {
       : sec.items,
   })).filter(sec => sec.items.length > 0);
 
+  // Layout for fields is on the elements (INPUT_CLS); colour/type here.
   const inputBase: React.CSSProperties = {
-    width: '100%',
     border: `1px solid rgba(43,35,32,0.15)`,
-    borderRadius: '7px',
-    padding: '0.65rem 0.875rem',
     fontFamily: UI,
     fontSize: '0.875rem',
     color: C.charcoal,
     outline: 'none',
-    boxSizing: 'border-box',
     backgroundColor: 'rgba(43,35,32,0.02)',
     transition: 'border-color 0.12s',
   };
+  const INPUT_CLS = 'w-full box-border rounded-[7px] py-[0.65rem] px-3.5';
 
   return (
-    <div style={{ backgroundColor: C.cream, paddingBottom: '6rem' }}>
+    <div className="pb-24" style={{ backgroundColor: C.cream }}>
 
       {/* ── Header ───────────────────────────────────────── */}
-      <div style={{ backgroundColor: '#fff', borderBottom: `1px solid rgba(43,35,32,0.08)`, padding: '4.5rem 2.5rem 3rem' }}>
-        <div style={{ maxWidth: '820px', margin: '0 auto', textAlign: 'center' }}>
-          <div style={{ ...label, fontSize: '0.62rem', color: C.gold, letterSpacing: '0.18em', marginBottom: '0.875rem' }}>
+      <div className="pt-[4.5rem] px-10 pb-12" style={{ backgroundColor: '#fff', borderBottom: `1px solid rgba(43,35,32,0.08)` }}>
+        <div className="max-w-[820px] mx-auto text-center">
+          <div className="mb-3.5" style={{ ...label, fontSize: '0.62rem', color: C.gold, letterSpacing: '0.18em' }}>
             Help Centre
           </div>
-          <h1 style={{ fontFamily: DISPLAY, fontSize: 'clamp(2rem, 4vw, 3rem)', fontWeight: 500, color: C.charcoal, letterSpacing: '-0.02em', lineHeight: 1.1, marginBottom: '1.75rem' }}>
+          <h1 className="mb-7" style={{ fontFamily: DISPLAY, fontSize: 'clamp(2rem, 4vw, 3rem)', fontWeight: 500, color: C.charcoal, letterSpacing: '-0.02em', lineHeight: 1.1 }}>
             Help & Support
           </h1>
           {/* Search */}
-          <div style={{ position: 'relative', maxWidth: '560px', margin: '0 auto' }}>
-            <div style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'rgba(43,35,32,0.35)', lineHeight: 0 }}>
+          <div className="relative max-w-[560px] mx-auto">
+            <div className="absolute left-4 top-1/2 -translate-y-1/2" style={{ color: 'rgba(43,35,32,0.35)', lineHeight: 0 }}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
               </svg>
@@ -195,11 +182,10 @@ export default function Help() {
               placeholder="Search for help topics…"
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
+              className="w-full box-border rounded-[8px] py-[0.65rem] pr-3.5 pl-11"
               style={{
                 ...inputBase,
-                paddingLeft: '2.75rem',
                 fontSize: '0.95rem',
-                borderRadius: '8px',
                 boxShadow: '0 2px 12px rgba(43,35,32,0.06)',
                 backgroundColor: '#fff',
               }}
@@ -212,29 +198,23 @@ export default function Help() {
 
       {/* ── Topic category cards ──────────────────────────── */}
       {!searchQuery && (
-        <div style={{ maxWidth: '1440px', margin: '0 auto', padding: '3rem 2.5rem 0' }}>
-          <div className="help-cat-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1rem' }}>
+        <div className="max-w-[1440px] mx-auto pt-12 px-10">
+          <div className="help-cat-grid grid grid-cols-4 gap-4">
             {FAQ_SECTIONS.map(sec => (
               <a
                 key={sec.id}
                 href={`#${sec.id}`}
+                className="flex flex-col items-center gap-3 py-7 px-5 rounded-[10px] no-underline"
                 style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  gap: '0.75rem',
-                  padding: '1.75rem 1.25rem',
                   backgroundColor: '#fff',
                   border: `1px solid rgba(43,35,32,0.08)`,
-                  borderRadius: '10px',
-                  textDecorationLine: 'none',
                   transition: 'border-color 0.15s, box-shadow 0.15s',
                 }}
                 onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.borderColor = C.gold; (e.currentTarget as HTMLAnchorElement).style.boxShadow = '0 4px 20px rgba(43,35,32,0.07)'; }}
                 onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.borderColor = 'rgba(43,35,32,0.08)'; (e.currentTarget as HTMLAnchorElement).style.boxShadow = 'none'; }}
               >
                 <div style={{ color: C.maroon }}>{sec.icon}</div>
-                <span style={{ ...label, fontSize: '0.64rem', color: C.charcoal, letterSpacing: '0.12em', textAlign: 'center' }}>
+                <span className="text-center" style={{ ...label, fontSize: '0.64rem', color: C.charcoal, letterSpacing: '0.12em' }}>
                   {sec.title}
                 </span>
               </a>
@@ -244,9 +224,9 @@ export default function Help() {
       )}
 
       {/* ── FAQ Accordion ─────────────────────────────────── */}
-      <div style={{ maxWidth: '820px', margin: '0 auto', padding: '4rem 2.5rem 2rem' }}>
+      <div className="max-w-[820px] mx-auto pt-16 px-10 pb-8">
         {searchQuery && filteredSections.length === 0 && (
-          <div style={{ textAlign: 'center', padding: '3rem 0', fontFamily: UI, fontSize: '0.9rem', color: 'rgba(43,35,32,0.45)' }}>
+          <div className="text-center py-12" style={{ fontFamily: UI, fontSize: '0.9rem', color: 'rgba(43,35,32,0.45)' }}>
             No results for "{searchQuery}" — try different keywords or browse the sections below.
           </div>
         )}
@@ -256,62 +236,65 @@ export default function Help() {
       </div>
 
       {/* ── Contact block ─────────────────────────────────── */}
-      <div style={{ maxWidth: '1440px', margin: '0 auto', padding: '2rem 2.5rem 0' }}>
-        <div style={{ borderTop: `1px solid rgba(43,35,32,0.08)`, paddingTop: '4rem' }}>
-          <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
+      <div className="max-w-[1440px] mx-auto pt-8 px-10">
+        <div className="pt-16" style={{ borderTop: `1px solid rgba(43,35,32,0.08)` }}>
+          <div className="text-center mb-12">
             <h2 style={{ fontFamily: DISPLAY, fontSize: 'clamp(1.5rem, 2.5vw, 2rem)', fontWeight: 500, color: C.charcoal, letterSpacing: '-0.02em', lineHeight: 1.15 }}>
               Still need help?
             </h2>
-            <p style={{ fontFamily: UI, fontSize: '0.9rem', color: 'rgba(43,35,32,0.52)', marginTop: '0.5rem' }}>
+            <p className="mt-2" style={{ fontFamily: UI, fontSize: '0.9rem', color: 'rgba(43,35,32,0.52)' }}>
               Our customer care team is here Monday–Friday, 9am–6pm WAT.
             </p>
           </div>
 
-          <div className="contact-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4rem', alignItems: 'start' }}>
+          <div className="contact-grid grid grid-cols-2 gap-16 items-start">
 
             {/* Contact form */}
-            <div style={{ backgroundColor: '#fff', borderRadius: '10px', border: `1px solid rgba(43,35,32,0.08)`, padding: '2.25rem' }}>
+            <div className="rounded-[10px] p-9" style={{ backgroundColor: '#fff', border: `1px solid rgba(43,35,32,0.08)` }}>
               {sent ? (
-                <div style={{ textAlign: 'center', padding: '2rem 0' }}>
-                  <div style={{ color: C.teal, marginBottom: '1rem', lineHeight: 0 }}>
+                <div className="text-center py-8">
+                  <div className="mb-4" style={{ color: C.teal, lineHeight: 0 }}>
                     <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" />
                     </svg>
                   </div>
-                  <p style={{ fontFamily: DISPLAY, fontSize: '1.2rem', color: C.charcoal, marginBottom: '0.5rem' }}>Message sent!</p>
+                  <p className="mb-2" style={{ fontFamily: DISPLAY, fontSize: '1.2rem', color: C.charcoal }}>Message sent!</p>
                   <p style={{ fontFamily: UI, fontSize: '0.85rem', color: 'rgba(43,35,32,0.5)' }}>
                     We typically respond within 1–2 business days.
                   </p>
                   <button
                     onClick={() => { setSent(false); setName(''); setEmail(''); setOrderNum(''); setMessage(''); }}
-                    style={{ ...label, fontSize: '0.64rem', marginTop: '1.5rem', backgroundColor: 'transparent', border: `1px solid rgba(43,35,32,0.2)`, borderRadius: '6px', padding: '0.55rem 1.25rem', cursor: 'pointer', color: 'rgba(43,35,32,0.55)' }}
+                    className="mt-6 rounded-[6px] py-[0.55rem] px-5 cursor-pointer"
+                    style={{ ...label, fontSize: '0.64rem', backgroundColor: 'transparent', border: `1px solid rgba(43,35,32,0.2)`, color: 'rgba(43,35,32,0.55)' }}
                   >
                     Send Another
                   </button>
                 </div>
               ) : (
-                <form onSubmit={e => { e.preventDefault(); if (name && email && message) setSent(true); }} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                  <div className="rg-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                <form onSubmit={e => { e.preventDefault(); if (name && email && message) setSent(true); }} className="flex flex-col gap-4">
+                  <div className="rg-2 grid grid-cols-2 gap-4">
                     <div>
-                      <label style={{ ...label, display: 'block', fontSize: '0.64rem', color: 'rgba(43,35,32,0.5)', marginBottom: '0.4rem' }}>Name</label>
+                      <label className="block mb-[0.4rem]" style={{ ...label, fontSize: '0.64rem', color: 'rgba(43,35,32,0.5)' }}>Name</label>
                       <input
                         required
                         value={name}
                         onChange={e => setName(e.target.value)}
                         placeholder="Adunola Okonkwo"
+                        className={INPUT_CLS}
                         style={inputBase}
                         onFocus={e => (e.target.style.borderColor = C.gold)}
                         onBlur={e => (e.target.style.borderColor = 'rgba(43,35,32,0.15)')}
                       />
                     </div>
                     <div>
-                      <label style={{ ...label, display: 'block', fontSize: '0.64rem', color: 'rgba(43,35,32,0.5)', marginBottom: '0.4rem' }}>Email</label>
+                      <label className="block mb-[0.4rem]" style={{ ...label, fontSize: '0.64rem', color: 'rgba(43,35,32,0.5)' }}>Email</label>
                       <input
                         required
                         type="email"
                         value={email}
                         onChange={e => setEmail(e.target.value)}
                         placeholder="you@example.com"
+                        className={INPUT_CLS}
                         style={inputBase}
                         onFocus={e => (e.target.style.borderColor = C.gold)}
                         onBlur={e => (e.target.style.borderColor = 'rgba(43,35,32,0.15)')}
@@ -319,39 +302,39 @@ export default function Help() {
                     </div>
                   </div>
                   <div>
-                    <label style={{ ...label, display: 'block', fontSize: '0.64rem', color: 'rgba(43,35,32,0.5)', marginBottom: '0.4rem' }}>Order Number (optional)</label>
+                    <label className="block mb-[0.4rem]" style={{ ...label, fontSize: '0.64rem', color: 'rgba(43,35,32,0.5)' }}>Order Number (optional)</label>
                     <input
                       value={orderNum}
                       onChange={e => setOrderNum(e.target.value)}
                       placeholder="#FTW-10492"
+                      className={INPUT_CLS}
                       style={inputBase}
                       onFocus={e => (e.target.style.borderColor = C.gold)}
                       onBlur={e => (e.target.style.borderColor = 'rgba(43,35,32,0.15)')}
                     />
                   </div>
                   <div>
-                    <label style={{ ...label, display: 'block', fontSize: '0.64rem', color: 'rgba(43,35,32,0.5)', marginBottom: '0.4rem' }}>Message</label>
+                    <label className="block mb-[0.4rem]" style={{ ...label, fontSize: '0.64rem', color: 'rgba(43,35,32,0.5)' }}>Message</label>
                     <textarea
                       required
                       value={message}
                       onChange={e => setMessage(e.target.value)}
                       placeholder="Describe your question or issue…"
                       rows={5}
-                      style={{ ...inputBase, resize: 'vertical', lineHeight: 1.6 }}
+                      className={`${INPUT_CLS} resize-y`}
+                      style={{ ...inputBase, lineHeight: 1.6 }}
                       onFocus={e => (e.target.style.borderColor = C.gold)}
                       onBlur={e => (e.target.style.borderColor = 'rgba(43,35,32,0.15)')}
                     />
                   </div>
                   <button
                     type="submit"
+                    className="rounded-[7px] py-3 px-6 cursor-pointer"
                     style={{
                       ...label,
                       backgroundColor: C.gold,
                       color: C.charcoal,
                       border: 'none',
-                      borderRadius: '7px',
-                      padding: '0.75rem 1.5rem',
-                      cursor: 'pointer',
                       fontSize: '0.68rem',
                       transition: 'opacity 0.15s',
                     }}
@@ -365,43 +348,38 @@ export default function Help() {
             </div>
 
             {/* Contact info */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem', paddingTop: '0.5rem' }}>
+            <div className="flex flex-col gap-8 pt-2">
               <div>
-                <div style={{ ...label, fontSize: '0.62rem', color: 'rgba(43,35,32,0.45)', letterSpacing: '0.16em', marginBottom: '0.5rem' }}>Email</div>
-                <a href="mailto:support@filato.ca" style={{ fontFamily: UI, fontSize: '0.95rem', color: C.indigo, textDecorationLine: 'none', borderBottom: `1px solid rgba(46,74,158,0.25)`, paddingBottom: '1px' }}>
+                <div className="mb-2" style={{ ...label, fontSize: '0.62rem', color: 'rgba(43,35,32,0.45)', letterSpacing: '0.16em' }}>Email</div>
+                <a href="mailto:support@filato.ca" className="no-underline pb-[1px]" style={{ fontFamily: UI, fontSize: '0.95rem', color: C.indigo, borderBottom: `1px solid rgba(46,74,158,0.25)` }}>
                   support@filato.ca
                 </a>
               </div>
               <div>
-                <div style={{ ...label, fontSize: '0.62rem', color: 'rgba(43,35,32,0.45)', letterSpacing: '0.16em', marginBottom: '0.5rem' }}>Response Time</div>
+                <div className="mb-2" style={{ ...label, fontSize: '0.62rem', color: 'rgba(43,35,32,0.45)', letterSpacing: '0.16em' }}>Response Time</div>
                 <p style={{ fontFamily: UI, fontSize: '0.9rem', color: 'rgba(43,35,32,0.65)', lineHeight: 1.6 }}>
                   We typically respond within 1–2 business days. For urgent enquiries, mention "URGENT" in your subject line.
                 </p>
               </div>
               <div>
-                <div style={{ ...label, fontSize: '0.62rem', color: 'rgba(43,35,32,0.45)', letterSpacing: '0.16em', marginBottom: '0.5rem' }}>Hours</div>
+                <div className="mb-2" style={{ ...label, fontSize: '0.62rem', color: 'rgba(43,35,32,0.45)', letterSpacing: '0.16em' }}>Hours</div>
                 <p style={{ fontFamily: UI, fontSize: '0.9rem', color: 'rgba(43,35,32,0.65)', lineHeight: 1.6 }}>
                   Monday – Friday<br />9:00 AM – 6:00 PM WAT (West Africa Time)
                 </p>
               </div>
               <div>
-                <div style={{ ...label, fontSize: '0.62rem', color: 'rgba(43,35,32,0.45)', letterSpacing: '0.16em', marginBottom: '0.5rem' }}>Existing Customers</div>
-                <p style={{ fontFamily: UI, fontSize: '0.9rem', color: 'rgba(43,35,32,0.65)', lineHeight: 1.6, marginBottom: '0.75rem' }}>
+                <div className="mb-2" style={{ ...label, fontSize: '0.62rem', color: 'rgba(43,35,32,0.45)', letterSpacing: '0.16em' }}>Existing Customers</div>
+                <p className="mb-3" style={{ fontFamily: UI, fontSize: '0.9rem', color: 'rgba(43,35,32,0.65)', lineHeight: 1.6 }}>
                   For faster help with an existing order, log in and use your
                 </p>
                 <Link
                   to="/account/support"
+                  className="inline-flex items-center gap-[0.35rem] no-underline rounded-[5px] py-[0.45rem] px-3.5"
                   style={{
                     ...label,
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '0.35rem',
                     fontSize: '0.64rem',
                     color: C.maroon,
-                    textDecorationLine: 'none',
                     border: `1px solid rgba(122,46,56,0.3)`,
-                    borderRadius: '5px',
-                    padding: '0.45rem 0.875rem',
                   }}
                 >
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

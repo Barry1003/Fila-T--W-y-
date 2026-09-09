@@ -83,17 +83,15 @@ export default function Nav({ user }: { user: CurrentUser | null }) {
     <>
       <nav
         role="navigation"
+        className="sticky top-0 z-50"
         style={{
           backgroundColor: C.maroon,
-          position: 'sticky',
-          top: 0,
-          zIndex: 50,
           borderBottom: '1px solid rgba(212,169,78,0.18)',
         }}
       >
         <div className="nav-bar">
           {/* Wordmark */}
-          <Link to="/" onClick={close} style={{ textDecorationLine: 'none', flexShrink: 0 }}>
+          <Link to="/" onClick={close} className="no-underline shrink-0">
             <div className="nav-wordmark" style={{ fontFamily: DISPLAY, color: C.cream, fontWeight: 500, lineHeight: 1.05, letterSpacing: '-0.01em' }}>
               AdeClassics
             </div>
@@ -127,7 +125,7 @@ export default function Nav({ user }: { user: CurrentUser | null }) {
               <NavLink
                 key={lbl}
                 to={to}
-                className="nav-link"
+                className="nav-link pb-[2px]"
                 style={({ isActive }) => ({
                   ...label,
                   color: C.cream,
@@ -135,7 +133,6 @@ export default function Nav({ user }: { user: CurrentUser | null }) {
                   opacity: isActive ? 1 : 0.82,
                   fontSize: '0.68rem',
                   borderBottom: isActive ? `1px solid ${C.gold}` : '1px solid transparent',
-                  paddingBottom: '2px',
                 })}
               >
                 {lbl}
@@ -201,7 +198,7 @@ export default function Nav({ user }: { user: CurrentUser | null }) {
               <div style={{ fontFamily: DISPLAY, fontSize: '1.2rem', color: C.cream, fontWeight: 500, lineHeight: 1.1 }}>
                 AdeClassics
               </div>
-              <div style={{ ...label, color: C.gold, fontSize: '0.53rem', letterSpacing: '0.15em', marginTop: '3px' }}>
+              <div className="mt-[3px]" style={{ ...label, color: C.gold, fontSize: '0.53rem', letterSpacing: '0.15em' }}>
                 Timeless Elegance
               </div>
             </div>
@@ -250,7 +247,7 @@ export default function Nav({ user }: { user: CurrentUser | null }) {
 
               {user ? (
                 <form action={signOut}>
-                  <button type="submit" className="nav-drawer-sublink" style={{ width: '100%', background: 'none', border: 'none', cursor: 'pointer', font: 'inherit', textAlign: 'left' }}>
+                  <button type="submit" className="nav-drawer-sublink w-full cursor-pointer text-left" style={{ background: 'none', border: 'none', font: 'inherit' }}>
                     <span className="nav-drawer-sublink-icon">
                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />

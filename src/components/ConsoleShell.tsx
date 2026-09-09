@@ -47,20 +47,17 @@ function SidebarContent({ onNavClick }: { onNavClick?: () => void }) {
     <>
       {/* Wordmark + back link */}
       <div
-        style={{
-          padding: "1.375rem 1.25rem 1.125rem",
-          borderBottom: "1px solid rgba(250,246,240,0.1)",
-          flexShrink: 0,
-        }}
+        className="pt-[1.375rem] px-5 pb-[1.125rem] shrink-0"
+        style={{ borderBottom: "1px solid rgba(250,246,240,0.1)" }}
       >
         <div
+          className="mb-2"
           style={{
             fontFamily: DISPLAY,
             color: C.cream,
             fontSize: "1.05rem",
             fontWeight: 500,
             letterSpacing: "-0.01em",
-            marginBottom: "0.5rem",
             lineHeight: 1.1,
           }}
         >
@@ -68,15 +65,8 @@ function SidebarContent({ onNavClick }: { onNavClick?: () => void }) {
         </div>
         <Link
           to="/"
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: "4px",
-            color: "rgba(212,169,78,0.85)",
-            fontSize: "0.7rem",
-            textDecorationLine: "none",
-            letterSpacing: "0.01em",
-          }}
+          className="inline-flex items-center gap-[4px] no-underline"
+          style={{ color: "rgba(212,169,78,0.85)", fontSize: "0.7rem", letterSpacing: "0.01em" }}
         >
           ← Back to Store
         </Link>
@@ -84,7 +74,7 @@ function SidebarContent({ onNavClick }: { onNavClick?: () => void }) {
 
       {/* Nav list */}
       <nav
-        style={{ flex: 1, padding: "0.625rem 0", overflowY: "auto" }}
+        className="flex-1 py-2.5 overflow-y-auto"
         role="navigation"
         aria-label="Console navigation"
       >
@@ -94,13 +84,9 @@ function SidebarContent({ onNavClick }: { onNavClick?: () => void }) {
             to={to}
             end={end}
             onClick={onNavClick}
+            className="flex items-center gap-[0.6rem] py-[0.575rem] px-5 no-underline"
             style={({ isActive }) => ({
-              display: "flex",
-              alignItems: "center",
-              gap: "0.6rem",
-              padding: "0.575rem 1.25rem",
               color: isActive ? C.cream : "rgba(250,246,240,0.58)",
-              textDecorationLine: "none",
               fontSize: "0.8rem",
               fontWeight: isActive ? 500 : 400,
               borderLeft: `3px solid ${isActive ? C.gold : "transparent"}`,
@@ -109,7 +95,7 @@ function SidebarContent({ onNavClick }: { onNavClick?: () => void }) {
               lineHeight: 1.3,
             })}
           >
-            <span style={{ flexShrink: 0, opacity: 0.9 }}>{icon}</span>
+            <span className="shrink-0 opacity-90">{icon}</span>
             {label}
           </NavLink>
         ))}
@@ -117,20 +103,13 @@ function SidebarContent({ onNavClick }: { onNavClick?: () => void }) {
 
       {/* Owner profile */}
       <div
-        style={{
-          padding: "0.875rem 1.25rem",
-          borderTop: "1px solid rgba(250,246,240,0.1)",
-          flexShrink: 0,
-        }}
+        className="py-3.5 px-5 shrink-0"
+        style={{ borderTop: "1px solid rgba(250,246,240,0.1)" }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: "0.625rem", marginBottom: "0.625rem" }}>
+        <div className="flex items-center gap-2.5 mb-2.5">
           <div
-            style={{
-              width: 32, height: 32, borderRadius: "50%",
-              backgroundColor: C.gold, color: C.charcoal,
-              display: "flex", alignItems: "center", justifyContent: "center",
-              fontSize: "0.72rem", fontWeight: 700, flexShrink: 0, letterSpacing: "0.02em",
-            }}
+            className="w-8 h-8 rounded-full flex items-center justify-center shrink-0"
+            style={{ backgroundColor: C.gold, color: C.charcoal, fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em" }}
           >
             AO
           </div>
@@ -138,16 +117,14 @@ function SidebarContent({ onNavClick }: { onNavClick?: () => void }) {
             <div style={{ color: C.cream, fontSize: "0.78rem", fontWeight: 500, lineHeight: 1.2 }}>
               Adunola Okonkwo
             </div>
-            <div style={{ color: "rgba(250,246,240,0.4)", fontSize: "0.66rem", marginTop: "1px" }}>
+            <div className="mt-[1px]" style={{ color: "rgba(250,246,240,0.4)", fontSize: "0.66rem" }}>
               Store Owner
             </div>
           </div>
         </div>
         <button
-          style={{
-            background: "none", border: "none", cursor: "pointer",
-            color: "rgba(250,246,240,0.38)", fontSize: "0.7rem", padding: 0, textAlign: "left",
-          }}
+          className="p-0 cursor-pointer text-left"
+          style={{ background: "none", border: "none", color: "rgba(250,246,240,0.38)", fontSize: "0.7rem" }}
         >
           Log Out
         </button>
@@ -166,15 +143,7 @@ export default function ConsoleShell({ children }: { children: ReactNode }) {
   useOverlay(sidebarOpen, closeSidebar);
 
   return (
-    <div
-      style={{
-        display: "flex",
-        height: "100vh",
-        overflow: "hidden",
-        fontFamily: UI,
-        backgroundColor: "#EDE9E3",
-      }}
-    >
+    <div className="flex h-screen overflow-hidden" style={{ fontFamily: UI, backgroundColor: "#EDE9E3" }}>
       {/* Mobile sidebar overlay — only while the sidebar is actually open */}
       {sidebarOpen && (
         <div className="console-sidebar-overlay" onClick={closeSidebar} aria-hidden="true" />
@@ -182,44 +151,20 @@ export default function ConsoleShell({ children }: { children: ReactNode }) {
 
       {/* ── Sidebar ─────────────────────────────────────────── */}
       <aside
-        className={`console-sidebar${sidebarOpen ? " sidebar-open" : ""}`}
-        style={{
-          width: 240,
-          backgroundColor: C.maroon,
-          display: "flex",
-          flexDirection: "column",
-          flexShrink: 0,
-          overflow: "hidden",
-        }}
+        className={`console-sidebar${sidebarOpen ? " sidebar-open" : ""} w-60 flex flex-col shrink-0 overflow-hidden`}
+        style={{ backgroundColor: C.maroon }}
       >
         <SidebarContent onNavClick={closeSidebar} />
       </aside>
 
       {/* ── Main column ─────────────────────────────────────── */}
-      <div
-        style={{
-          flex: 1,
-          display: "flex",
-          flexDirection: "column",
-          overflow: "hidden",
-          minWidth: 0,
-        }}
-      >
+      <div className="flex-1 flex flex-col overflow-hidden min-w-0">
         {/* Top bar */}
         <header
-          style={{
-            height: 52,
-            backgroundColor: "#fff",
-            borderBottom: "1px solid rgba(43,35,32,0.08)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            padding: "0 1.75rem",
-            flexShrink: 0,
-            gap: "0.75rem",
-          }}
+          className="h-13 flex items-center justify-between px-7 shrink-0 gap-3"
+          style={{ backgroundColor: "#fff", borderBottom: "1px solid rgba(43,35,32,0.08)" }}
         >
-          <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", minWidth: 0 }}>
+          <div className="flex items-center gap-3 min-w-0">
             {/* Hamburger — mobile only */}
             <button
               className="console-hamburger"
@@ -234,41 +179,24 @@ export default function ConsoleShell({ children }: { children: ReactNode }) {
             </button>
 
             <span
-              style={{
-                fontFamily: UI,
-                fontSize: "0.95rem",
-                fontWeight: 600,
-                color: C.charcoal,
-                letterSpacing: "-0.01em",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-                whiteSpace: "nowrap",
-              }}
+              className="overflow-hidden text-ellipsis whitespace-nowrap"
+              style={{ fontFamily: UI, fontSize: "0.95rem", fontWeight: 600, color: C.charcoal, letterSpacing: "-0.01em" }}
             >
               {title}
             </span>
           </div>
 
-          <div style={{ display: "flex", alignItems: "center", gap: "1rem", flexShrink: 0 }}>
+          <div className="flex items-center gap-4 shrink-0">
             {/* Notifications */}
             <button
-              style={{
-                background: "none", border: "none", cursor: "pointer",
-                position: "relative", padding: "4px",
-                color: C.charcoal, opacity: 0.65,
-                display: "flex", alignItems: "center",
-              }}
+              className="relative flex items-center cursor-pointer p-[4px]"
+              style={{ background: "none", border: "none", color: C.charcoal, opacity: 0.65 }}
               aria-label="Notifications"
             >
               <BellIcon size={18} />
               <span
-                style={{
-                  position: "absolute", top: 0, right: 0,
-                  width: 15, height: 15,
-                  backgroundColor: C.maroon, color: "#fff",
-                  borderRadius: "50%", fontSize: "0.53rem", fontWeight: 700,
-                  display: "flex", alignItems: "center", justifyContent: "center", lineHeight: 1,
-                }}
+                className="absolute top-0 right-0 w-[15px] h-[15px] rounded-full flex items-center justify-center"
+                style={{ backgroundColor: C.maroon, color: "#fff", fontSize: "0.53rem", fontWeight: 700, lineHeight: 1 }}
               >
                 4
               </span>
@@ -276,12 +204,8 @@ export default function ConsoleShell({ children }: { children: ReactNode }) {
 
             {/* Avatar */}
             <div
-              style={{
-                width: 30, height: 30, borderRadius: "50%",
-                backgroundColor: C.gold, color: C.charcoal,
-                display: "flex", alignItems: "center", justifyContent: "center",
-                fontSize: "0.68rem", fontWeight: 700, cursor: "pointer", letterSpacing: "0.02em",
-              }}
+              className="w-[30px] h-[30px] rounded-full flex items-center justify-center cursor-pointer"
+              style={{ backgroundColor: C.gold, color: C.charcoal, fontSize: "0.68rem", fontWeight: 700, letterSpacing: "0.02em" }}
             >
               AO
             </div>
@@ -289,7 +213,7 @@ export default function ConsoleShell({ children }: { children: ReactNode }) {
         </header>
 
         {/* Content */}
-        <main style={{ flex: 1, overflowY: "auto", backgroundColor: "#EDE9E3" }}>
+        <main className="flex-1 overflow-y-auto" style={{ backgroundColor: "#EDE9E3" }}>
           {children}
         </main>
       </div>

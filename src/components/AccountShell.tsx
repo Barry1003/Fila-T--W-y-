@@ -121,7 +121,7 @@ const SIGN_OUT_ICON = (
 
 export default function AccountShell({ children }: { children: React.ReactNode }) {
   return (
-    <div style={{ backgroundColor: C.cream, minHeight: 'calc(100vh - 70px)', fontFamily: UI }}>
+    <div className="min-h-[calc(100vh-70px)]" style={{ backgroundColor: C.cream, fontFamily: UI }}>
 
       {/* ── Mobile nav — a scrolling tab strip replaces the sidebar ─────── */}
       <div className="account-mobile-nav">
@@ -129,7 +129,7 @@ export default function AccountShell({ children }: { children: React.ReactNode }
           <div className="account-mobile-avatar">
             <span style={{ fontFamily: DISPLAY, fontSize: '0.95rem', color: C.cream, fontWeight: 500, lineHeight: 1 }}>A</span>
           </div>
-          <div style={{ minWidth: 0 }}>
+          <div className="min-w-0">
             <div className="account-mobile-name">Adunola Okonkwo</div>
             <div className="account-mobile-email">adunola@example.com</div>
           </div>
@@ -150,40 +150,33 @@ export default function AccountShell({ children }: { children: React.ReactNode }
         </nav>
       </div>
 
-      <div className="account-layout" style={{ maxWidth: '1440px', margin: '0 auto', padding: '3rem 2.5rem', display: 'grid', gridTemplateColumns: '240px 1fr', gap: '3rem', alignItems: 'start' }}>
+      <div className="account-layout max-w-[1440px] mx-auto py-12 px-10 grid grid-cols-[240px_1fr] gap-12 items-start">
 
         {/* ── Sidebar ────────────────────────────────────── */}
         <aside className="account-sidebar-col">
           {/* Avatar block */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.875rem', marginBottom: '2rem', paddingBottom: '1.75rem', borderBottom: `1px solid rgba(43,35,32,0.1)` }}>
-            <div style={{
-              width: '44px', height: '44px', borderRadius: '50%',
-              background: `linear-gradient(135deg, ${C.maroon} 0%, rgba(122,46,56,0.6) 100%)`,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              flexShrink: 0,
-            }}>
+          <div className="flex items-center gap-3.5 mb-8 pb-7" style={{ borderBottom: `1px solid rgba(43,35,32,0.1)` }}>
+            <div
+              className="w-11 h-11 rounded-full flex items-center justify-center shrink-0"
+              style={{ background: `linear-gradient(135deg, ${C.maroon} 0%, rgba(122,46,56,0.6) 100%)` }}
+            >
               <span style={{ fontFamily: DISPLAY, fontSize: '1.1rem', color: C.cream, fontWeight: 500, lineHeight: 1 }}>A</span>
             </div>
             <div>
               <div style={{ fontFamily: UI, fontSize: '0.875rem', fontWeight: 600, color: C.charcoal, lineHeight: 1.3 }}>Adunola Okonkwo</div>
-              <div style={{ fontFamily: UI, fontSize: '0.72rem', color: 'rgba(43,35,32,0.48)', marginTop: '2px' }}>adunola@example.com</div>
+              <div className="mt-[2px]" style={{ fontFamily: UI, fontSize: '0.72rem', color: 'rgba(43,35,32,0.48)' }}>adunola@example.com</div>
             </div>
           </div>
 
           {/* Nav items */}
-          <nav style={{ display: 'flex', flexDirection: 'column', gap: '0.15rem' }}>
+          <nav className="flex flex-col gap-[0.15rem]">
             {ITEMS.map(item => (
               <NavLink
                 key={item.key}
                 to={item.to}
                 end={item.to === '/account'}
+                className="flex items-center gap-3 py-[0.65rem] px-3.5 rounded-[5px] no-underline"
                 style={({ isActive }) => ({
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.75rem',
-                  padding: '0.65rem 0.875rem',
-                  borderRadius: '5px',
-                  textDecorationLine: 'none',
                   fontFamily: UI,
                   fontSize: '0.84rem',
                   fontWeight: isActive ? 600 : 400,
@@ -195,7 +188,7 @@ export default function AccountShell({ children }: { children: React.ReactNode }
               >
                 {({ isActive }) => (
                   <>
-                    <span style={{ color: isActive ? C.gold : 'rgba(43,35,32,0.38)', flexShrink: 0, lineHeight: 0 }}>
+                    <span className="shrink-0" style={{ color: isActive ? C.gold : 'rgba(43,35,32,0.38)', lineHeight: 0 }}>
                       {item.icon}
                     </span>
                     {item.label}
@@ -206,12 +199,10 @@ export default function AccountShell({ children }: { children: React.ReactNode }
 
             {/* Sign out */}
             <form action={signOut}><button
+              className="flex items-center gap-3 py-[0.65rem] px-3.5 mt-3 rounded-[5px] cursor-pointer text-left"
               style={{
-                display: 'flex', alignItems: 'center', gap: '0.75rem',
-                padding: '0.65rem 0.875rem', marginTop: '0.75rem',
-                background: 'none', border: 'none', cursor: 'pointer',
+                background: 'none', border: 'none',
                 fontFamily: UI, fontSize: '0.84rem', color: 'rgba(43,35,32,0.45)',
-                textAlign: 'left', borderRadius: '5px',
                 transition: 'color 0.15s',
               }}
               onMouseEnter={e => (e.currentTarget.style.color = C.maroon)}
@@ -224,7 +215,7 @@ export default function AccountShell({ children }: { children: React.ReactNode }
         </aside>
 
         {/* ── Main content ───────────────────────────────── */}
-        <main style={{ minWidth: 0 }}>
+        <main className="min-w-0">
           {children}
         </main>
       </div>

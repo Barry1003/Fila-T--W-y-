@@ -192,10 +192,13 @@ model Product {
   color       String
   inStock     Boolean     @default(true)
 
-  /// Catalogue prices as shown to customers. Console figures in other
-  /// currencies are display conversions, not a separate stored price.
+  /// The catalogue price. Console figures in other currencies are display
+  /// conversions, not a separate stored price.
   priceCad Decimal @db.Decimal(10, 2)
-  priceNgn Decimal @db.Decimal(12, 2)
+
+  /// Legacy, like Order.totalNgn — the store quotes CAD only. Products added
+  /// through the console leave this null; the seeded catalogue predates it.
+  priceNgn Decimal? @db.Decimal(12, 2)
 
   /// Free text because the studio quotes ranges, e.g. "5–7".
   productionDays String?

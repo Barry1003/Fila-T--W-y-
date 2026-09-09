@@ -96,18 +96,18 @@ export default function PromoCarousel({ promos }: { promos: Promo[] }) {
                   </div>
                 )}
 
-                <h2 style={{ fontFamily: DISPLAY, color: C.cream, margin: '0.5rem 0 0', fontWeight: 400, letterSpacing: '-0.02em', lineHeight: 1.1 }} className="promo-headline">
+                <h2 className="promo-headline mt-2 mx-0 mb-0" style={{ fontFamily: DISPLAY, color: C.cream, fontWeight: 400, letterSpacing: '-0.02em', lineHeight: 1.1 }}>
                   {p.text}
                 </h2>
 
                 {p.subtext && (
-                  <p style={{ fontFamily: UI, color: 'rgba(250,246,240,0.72)', fontSize: '0.875rem', lineHeight: 1.6, margin: '0.75rem 0 0', maxWidth: '42ch' }}>
+                  <p className="mt-3 mx-0 mb-0 max-w-[42ch]" style={{ fontFamily: UI, color: 'rgba(250,246,240,0.72)', fontSize: '0.875rem', lineHeight: 1.6 }}>
                     {p.subtext}
                   </p>
                 )}
 
                 {p.productPriceCad !== null && (
-                  <div style={{ fontFamily: UI, color: C.cream, fontSize: '1.05rem', fontWeight: 600, marginTop: '0.9rem' }}>
+                  <div className="mt-[0.9rem]" style={{ fontFamily: UI, color: C.cream, fontSize: '1.05rem', fontWeight: 600 }}>
                     CAD ${p.productPriceCad.toLocaleString()}
                   </div>
                 )}

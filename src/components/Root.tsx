@@ -49,7 +49,7 @@ export default function Root({ children, user }: { children: ReactNode; user: Cu
   useScrollReveal();
 
   return (
-    <div style={{ backgroundColor: C.cream, color: C.charcoal, fontFamily: UI, overflowX: 'hidden', minHeight: '100vh' }}>
+    <div className="overflow-x-hidden min-h-screen" style={{ backgroundColor: C.cream, color: C.charcoal, fontFamily: UI }}>
       <Nav user={user} />
       <main>
         {children}

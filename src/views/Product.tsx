@@ -121,22 +121,22 @@ function ShareModal({
   ];
 
   return (
-    <div style={{ position: 'fixed', inset: 0, zIndex: 500, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1.5rem' }}>
+    <div className="fixed inset-0 z-[500] flex items-center justify-center p-6">
       {/* Backdrop */}
-      <div onClick={onClose} style={{ position: 'absolute', inset: 0, backgroundColor: 'rgba(43,35,32,0.58)', backdropFilter: 'blur(5px)' }} />
+      <div onClick={onClose} className="absolute inset-0" style={{ backgroundColor: 'rgba(43,35,32,0.58)', backdropFilter: 'blur(5px)' }} />
 
       {/* Modal card */}
-      <div style={{ position: 'relative', backgroundColor: C.cream, borderRadius: '14px', width: '100%', maxWidth: '440px', padding: '2rem', boxShadow: '0 32px 80px rgba(43,35,32,0.28)', zIndex: 1, maxHeight: '92dvh', overflowY: 'auto' }}>
+      <div className="relative rounded-[14px] w-full max-w-[440px] p-8 z-[1] max-h-[92dvh] overflow-y-auto" style={{ backgroundColor: C.cream, boxShadow: '0 32px 80px rgba(43,35,32,0.28)' }}>
 
         {/* Close */}
-        <button onClick={onClose} style={{ position: 'absolute', top: '1.125rem', right: '1.125rem', background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(43,35,32,0.38)', padding: '5px', display: 'flex', lineHeight: 0 }}>
+        <button onClick={onClose} className="absolute top-[1.125rem] right-[1.125rem] p-[5px] flex cursor-pointer" style={{ background: 'none', border: 'none', color: 'rgba(43,35,32,0.38)', lineHeight: 0 }}>
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
             <path d="M18 6L6 18M6 6l12 12"/>
           </svg>
         </button>
 
         {/* Title */}
-        <h2 style={{ fontFamily: DISPLAY, fontSize: '1.5rem', fontWeight: 400, color: C.charcoal, margin: '0 0 1.5rem', letterSpacing: '-0.018em', lineHeight: 1.15 }}>
+        <h2 className="m-0 mb-6" style={{ fontFamily: DISPLAY, fontSize: '1.5rem', fontWeight: 400, color: C.charcoal, letterSpacing: '-0.018em', lineHeight: 1.15 }}>
           Share This Product
         </h2>
 
@@ -145,22 +145,22 @@ function ShareModal({
           href={productUrl}
           target="_blank"
           rel="noopener noreferrer"
-          style={{ display: 'block', textDecorationLine: 'none', marginBottom: '0.625rem' }}
+          className="block no-underline mb-2.5"
         >
-          <div style={{ border: '1px solid rgba(43,35,32,0.11)', borderRadius: '10px', overflow: 'hidden', boxShadow: '0 2px 14px rgba(43,35,32,0.09)' }}>
+          <div className="rounded-[10px] overflow-hidden" style={{ border: '1px solid rgba(43,35,32,0.11)', boxShadow: '0 2px 14px rgba(43,35,32,0.09)' }}>
             {/* Product image — same as PDP main */}
-            <div style={{ height: '180px', overflow: 'hidden', backgroundColor: '#ddd5c8', position: 'relative' }}>
-              <img src={imgSrc} alt={product.title} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+            <div className="h-[180px] overflow-hidden relative" style={{ backgroundColor: '#ddd5c8' }}>
+              <img src={imgSrc} alt={product.title} className="w-full h-full object-cover block" />
             </div>
             {/* Text block — mimics a WhatsApp / iMessage OG card */}
-            <div style={{ padding: '0.75rem 1rem 0.9rem', backgroundColor: '#fff', borderTop: '1px solid rgba(43,35,32,0.07)' }}>
-              <div style={{ fontFamily: UI, fontSize: '0.575rem', color: 'rgba(43,35,32,0.3)', letterSpacing: '0.13em', textTransform: 'uppercase', marginBottom: '0.3rem' }}>
+            <div className="pt-3 px-4 pb-[0.9rem]" style={{ backgroundColor: '#fff', borderTop: '1px solid rgba(43,35,32,0.07)' }}>
+              <div className="mb-[0.3rem] uppercase" style={{ fontFamily: UI, fontSize: '0.575rem', color: 'rgba(43,35,32,0.3)', letterSpacing: '0.13em' }}>
                 adeclassics.com
               </div>
-              <div style={{ fontFamily: UI, fontSize: '0.925rem', fontWeight: 600, color: C.charcoal, lineHeight: 1.32, marginBottom: '0.3rem' }}>
+              <div className="mb-[0.3rem]" style={{ fontFamily: UI, fontSize: '0.925rem', fontWeight: 600, color: C.charcoal, lineHeight: 1.32 }}>
                 {product.title}
               </div>
-              <div style={{ fontFamily: UI, fontSize: '0.8rem', color: 'rgba(43,35,32,0.5)', display: 'flex', gap: '0.375rem', alignItems: 'baseline', flexWrap: 'wrap' }}>
+              <div className="flex gap-1.5 items-baseline flex-wrap" style={{ fontFamily: UI, fontSize: '0.8rem', color: 'rgba(43,35,32,0.5)' }}>
                 <span style={{ fontWeight: 700, color: C.charcoal }}>CAD ${product.priceCad.toLocaleString()}</span>
               </div>
             </div>
@@ -168,21 +168,21 @@ function ShareModal({
         </a>
 
         {/* Caption */}
-        <p style={{ fontFamily: UI, fontSize: '0.695rem', color: 'rgba(43,35,32,0.38)', lineHeight: 1.6, margin: '0 0 1.5rem' }}>
+        <p className="m-0 mb-6" style={{ fontFamily: UI, fontSize: '0.695rem', color: 'rgba(43,35,32,0.38)', lineHeight: 1.6 }}>
           This is how it'll appear when shared — tap it to open the product page
         </p>
 
         {/* Channel buttons */}
-        <div style={{ display: 'flex', justifyContent: 'center', gap: '0.875rem', marginBottom: '1.625rem' }}>
+        <div className="flex justify-center gap-3.5 mb-[1.625rem]">
           {channels.map(ch => (
             <a
               key={ch.name}
               href={ch.href}
               target="_blank"
               rel="noopener noreferrer"
-              style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.375rem', textDecorationLine: 'none' }}
+              className="flex flex-col items-center gap-1.5 no-underline"
             >
-              <span style={{ width: '46px', height: '46px', borderRadius: '50%', backgroundColor: ch.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 2px 8px rgba(43,35,32,0.14)' }}>
+              <span className="w-[46px] h-[46px] rounded-full flex items-center justify-center shrink-0" style={{ backgroundColor: ch.bg, boxShadow: '0 2px 8px rgba(43,35,32,0.14)' }}>
                 {ch.icon}
               </span>
               <span style={{ fontFamily: UI, fontSize: '0.565rem', color: 'rgba(43,35,32,0.42)', letterSpacing: '0.04em' }}>{ch.name}</span>
@@ -191,26 +191,24 @@ function ShareModal({
         </div>
 
         {/* Copy-link row */}
-        <div style={{ display: 'flex', border: '1px solid rgba(43,35,32,0.13)', borderRadius: '6px', overflow: 'hidden', backgroundColor: '#fff' }}>
+        <div className="flex rounded-[6px] overflow-hidden" style={{ border: '1px solid rgba(43,35,32,0.13)', backgroundColor: '#fff' }}>
           <input
             readOnly
             value={productUrl}
-            style={{ flex: 1, padding: '0.7rem 0.875rem', border: 'none', outline: 'none', fontFamily: UI, fontSize: '0.775rem', color: 'rgba(43,35,32,0.45)', backgroundColor: 'transparent', minWidth: 0 }}
+            className="flex-1 py-[0.7rem] px-3.5 min-w-0"
+            style={{ border: 'none', outline: 'none', fontFamily: UI, fontSize: '0.775rem', color: 'rgba(43,35,32,0.45)', backgroundColor: 'transparent' }}
           />
           <button
             onClick={handleCopy}
+            className="px-5 py-0 cursor-pointer whitespace-nowrap shrink-0"
             style={{
               backgroundColor: copied ? C.teal : C.gold,
               color: copied ? C.cream : C.charcoal,
               border: 'none',
               ...label,
               fontSize: '0.575rem',
-              padding: '0 1.25rem',
-              cursor: 'pointer',
               letterSpacing: '0.12em',
-              flexShrink: 0,
               transition: 'background-color 0.28s, color 0.28s',
-              whiteSpace: 'nowrap',
             }}
           >
             {copied ? 'Copied ✓' : 'Copy'}
@@ -218,12 +216,7 @@ function ShareModal({
         </div>
 
         {/* Toast */}
-        <div style={{
-          marginTop: '0.875rem',
-          display: 'flex',
-          justifyContent: 'center',
-          height: '1.5rem',
-        }}>
+        <div className="mt-3.5 flex justify-center h-6">
           <span style={{
             fontFamily: UI,
             fontSize: '0.72rem',
@@ -245,7 +238,7 @@ function ShareModal({
 
 function Stars({ rating, size = 13 }: { rating: number; size?: number }) {
   return (
-    <span style={{ display: 'inline-flex', gap: '2px', verticalAlign: 'middle' }}>
+    <span className="inline-flex gap-[2px]" style={{ verticalAlign: 'middle' }}>
       {[1, 2, 3, 4, 5].map(n => (
         <svg key={n} width={size} height={size} viewBox="0 0 24 24"
           fill={n <= Math.round(rating) ? C.gold : 'none'}
@@ -344,18 +337,19 @@ export default function Product({ product, related }: ProductProps) {
   ];
 
   return (
-    <div style={{ backgroundColor: C.cream, minHeight: '100vh' }}>
-      <div style={{ maxWidth: '1440px', margin: '0 auto', padding: '0 2.5rem' }}>
+    <div className="min-h-screen" style={{ backgroundColor: C.cream }}>
+      <div className="max-w-[1440px] mx-auto px-10">
 
         {/* ── Breadcrumb ── */}
-        <nav style={{ padding: '2rem 0 0', display: 'flex', gap: '0.5rem', alignItems: 'center', flexWrap: 'wrap', ...label, fontSize: '0.565rem', color: 'rgba(43,35,32,0.38)', letterSpacing: '0.13em' }}>
-          <Link to="/" style={{ color: 'inherit', textDecorationLine: 'none' }}>Home</Link>
+        <nav className="pt-8 flex gap-2 items-center flex-wrap" style={{ ...label, fontSize: '0.565rem', color: 'rgba(43,35,32,0.38)', letterSpacing: '0.13em' }}>
+          <Link to="/" className="no-underline" style={{ color: 'inherit' }}>Home</Link>
           <span>/</span>
-          <Link to="/shop" style={{ color: 'inherit', textDecorationLine: 'none' }}>Shop</Link>
+          <Link to="/shop" className="no-underline" style={{ color: 'inherit' }}>Shop</Link>
           <span>/</span>
           <Link
             to={product.collectionSlug ? `/collections/${product.collectionSlug}` : '/shop'}
-            style={{ color: 'inherit', textDecorationLine: 'none' }}
+            className="no-underline"
+            style={{ color: 'inherit' }}
           >
             {product.category}
           </Link>
@@ -364,55 +358,55 @@ export default function Product({ product, related }: ProductProps) {
         </nav>
 
         {/* ── Two-column layout ── */}
-        <div className="pdp-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '5rem', padding: '3rem 0 5rem', alignItems: 'start' }}>
+        <div className="pdp-grid grid grid-cols-2 gap-20 pt-12 pb-20 items-start">
 
           {/* LEFT: Image gallery */}
           <div>
-            <div style={{ position: 'relative', aspectRatio: '4/5', overflow: 'hidden', backgroundColor: '#ddd5c8', marginBottom: '0.875rem' }}>
+            <div className="relative aspect-[4/5] overflow-hidden mb-3.5" style={{ backgroundColor: '#ddd5c8' }}>
               <img
                 key={mainIdx}
-                className="pdp-main-img"
+                className="pdp-main-img w-full h-full object-cover block"
                 src={gallery[mainIdx].main}
                 alt={product.title}
-                style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
               />
-              <span style={{ position: 'absolute', top: '1rem', left: '1rem', backgroundColor: isSoldOut ? C.charcoal : isMTO ? C.charcoal : C.maroon, color: C.cream, ...label, fontSize: '0.575rem', padding: '4px 10px', letterSpacing: '0.12em' }}>
+              <span className="absolute top-4 left-4 py-[4px] px-[10px]" style={{ backgroundColor: isSoldOut ? C.charcoal : isMTO ? C.charcoal : C.maroon, color: C.cream, ...label, fontSize: '0.575rem', letterSpacing: '0.12em' }}>
                 {product.tag}
               </span>
             </div>
             {/* Thumbnail strip */}
-            <div style={{ display: 'flex', gap: '0.625rem' }}>
+            <div className="flex gap-2.5">
               {gallery.map((g, i) => (
                 <button
                   key={i}
                   onClick={() => setMainIdx(i)}
+                  className="flex-1 aspect-square overflow-hidden p-0 cursor-pointer"
                   style={{
-                    flex: 1, aspectRatio: '1', overflow: 'hidden', padding: 0, border: 'none',
+                    border: 'none',
                     outline: mainIdx === i ? `2px solid ${C.gold}` : '2px solid transparent',
-                    outlineOffset: '2px', cursor: 'pointer', backgroundColor: '#ddd5c8',
+                    outlineOffset: '2px', backgroundColor: '#ddd5c8',
                     transition: 'outline 0.15s',
                   }}
                 >
-                  <img src={g.thumb} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                  <img src={g.thumb} alt="" className="w-full h-full object-cover block" />
                 </button>
               ))}
             </div>
           </div>
 
           {/* RIGHT: Product info */}
-          <div style={{ paddingTop: '0.25rem' }}>
+          <div className="pt-1">
             {/* Category eyebrow */}
-            <div style={{ ...label, color: C.teal, fontSize: '0.58rem', marginBottom: '0.875rem', letterSpacing: '0.16em' }}>
+            <div className="mb-3.5" style={{ ...label, color: C.teal, fontSize: '0.58rem', letterSpacing: '0.16em' }}>
               {product.category}
             </div>
 
             {/* Title */}
-            <h1 style={{ fontFamily: DISPLAY, fontSize: 'clamp(1.75rem, 2.6vw, 2.5rem)', fontWeight: 400, letterSpacing: '-0.022em', color: C.charcoal, margin: '0 0 1rem', lineHeight: 1.12 }}>
+            <h1 className="m-0 mb-4" style={{ fontFamily: DISPLAY, fontSize: 'clamp(1.75rem, 2.6vw, 2.5rem)', fontWeight: 400, letterSpacing: '-0.022em', color: C.charcoal, lineHeight: 1.12 }}>
               {product.title}
             </h1>
 
             {/* Stars + review count */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', marginBottom: '1.75rem' }}>
+            <div className="flex items-center gap-2.5 mb-7">
               <Stars rating={AVG_RATING} size={14} />
               <span style={{ fontFamily: UI, fontSize: '0.8rem', color: 'rgba(43,35,32,0.5)' }}>
                 {AVG_RATING} · {TOTAL_REVIEWS} reviews
@@ -420,7 +414,7 @@ export default function Product({ product, related }: ProductProps) {
             </div>
 
             {/* Price block */}
-            <div style={{ marginBottom: '2rem', paddingBottom: '2rem', borderBottom: '1px solid rgba(43,35,32,0.08)' }}>
+            <div className="mb-8 pb-8" style={{ borderBottom: '1px solid rgba(43,35,32,0.08)' }}>
               <div style={{ fontFamily: UI, fontSize: '2rem', fontWeight: 700, color: C.charcoal, lineHeight: 1, letterSpacing: '-0.025em' }}>
                 CAD ${product.priceCad.toLocaleString()}
               </div>
@@ -428,26 +422,27 @@ export default function Product({ product, related }: ProductProps) {
 
             {/* Size selector */}
             {hasVariableSizes && (
-              <div style={{ marginBottom: '1.75rem' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '0.875rem' }}>
+              <div className="mb-7">
+                <div className="flex justify-between items-baseline mb-3.5">
                   <span style={{ ...label, fontSize: '0.58rem', color: C.charcoal }}>Size</span>
                   <button
                     onClick={() => setActiveTab('sizing')}
-                    style={{ background: 'none', border: 'none', fontFamily: UI, fontSize: '0.775rem', color: C.indigo, cursor: 'pointer', padding: 0, textDecorationLine: 'underline' }}>
+                    className="p-0 cursor-pointer underline"
+                    style={{ background: 'none', border: 'none', fontFamily: UI, fontSize: '0.775rem', color: C.indigo }}>
                     Size Guide
                   </button>
                 </div>
-                <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                <div className="flex gap-2 flex-wrap">
                   {product.sizes.map(s => (
                     <button
                       key={s}
                       onClick={() => setSelectedSize(s)}
+                      className="min-w-[46px] py-2 px-3 cursor-pointer"
                       style={{
-                        minWidth: '46px', padding: '0.5rem 0.75rem',
                         border: selectedSize === s ? `2px solid ${C.gold}` : '1px solid rgba(43,35,32,0.18)',
                         backgroundColor: selectedSize === s ? 'rgba(212,169,78,0.07)' : 'transparent',
                         color: C.charcoal, fontFamily: UI, fontSize: '0.825rem',
-                        cursor: 'pointer', transition: 'border-color 0.15s, background 0.15s', outline: 'none',
+                        transition: 'border-color 0.15s, background 0.15s', outline: 'none',
                       }}
                     >
                       {s}
@@ -458,9 +453,8 @@ export default function Product({ product, related }: ProductProps) {
             )}
 
             {/* Stock status */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.125rem' }}>
-              <span style={{
-                width: '8px', height: '8px', borderRadius: '50%', flexShrink: 0,
+            <div className="flex items-center gap-2 mb-[1.125rem]">
+              <span className="w-2 h-2 rounded-full shrink-0" style={{
                 backgroundColor: isSoldOut ? 'rgba(43,35,32,0.25)' : isMTO ? C.gold : C.teal,
                 boxShadow: isSoldOut ? 'none' : `0 0 0 3px ${isMTO ? 'rgba(212,169,78,0.15)' : 'rgba(59,138,147,0.15)'}`,
               }} />
@@ -470,8 +464,8 @@ export default function Product({ product, related }: ProductProps) {
             </div>
 
             {/* Estimated delivery */}
-            <div style={{ marginBottom: '2rem', padding: '0.875rem 1.125rem', backgroundColor: 'rgba(59,138,147,0.055)', borderLeft: `2.5px solid ${C.teal}` }}>
-              <div style={{ ...label, color: C.charcoal, fontSize: '0.57rem', marginBottom: '0.5rem', letterSpacing: '0.13em' }}>Estimated Delivery</div>
+            <div className="mb-8 py-3.5 px-[1.125rem]" style={{ backgroundColor: 'rgba(59,138,147,0.055)', borderLeft: `2.5px solid ${C.teal}` }}>
+              <div className="mb-2" style={{ ...label, color: C.charcoal, fontSize: '0.57rem', letterSpacing: '0.13em' }}>Estimated Delivery</div>
               <div style={{ fontFamily: UI, fontSize: '0.8rem', color: 'rgba(43,35,32,0.7)', lineHeight: 1.75 }}>
                 Canada / US / UK: 7–10 business days<br />
                 Nigeria: 2–4 business days
@@ -479,22 +473,21 @@ export default function Product({ product, related }: ProductProps) {
             </div>
 
             {/* Quantity + CTA */}
-            <div style={{ marginBottom: '0.875rem' }}>
-              <div style={{ ...label, fontSize: '0.57rem', color: C.charcoal, marginBottom: '0.75rem', letterSpacing: '0.13em' }}>Quantity</div>
-              <div style={{ display: 'flex', gap: '0.75rem' }}>
+            <div className="mb-3.5">
+              <div className="mb-3" style={{ ...label, fontSize: '0.57rem', color: C.charcoal, letterSpacing: '0.13em' }}>Quantity</div>
+              <div className="flex gap-3">
                 {/* Stepper */}
-                <div style={{ display: 'flex', border: '1px solid rgba(43,35,32,0.18)', height: '50px', flexShrink: 0 }}>
-                  <button onClick={() => setQuantity(q => Math.max(1, q - 1))} style={{ width: '46px', background: 'none', border: 'none', cursor: 'pointer', color: C.charcoal, fontSize: '1.15rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>−</button>
-                  <span style={{ width: '42px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: UI, fontSize: '0.9375rem', color: C.charcoal, borderLeft: '1px solid rgba(43,35,32,0.12)', borderRight: '1px solid rgba(43,35,32,0.12)' }}>{quantity}</span>
-                  <button onClick={() => setQuantity(q => q + 1)} style={{ width: '46px', background: 'none', border: 'none', cursor: 'pointer', color: C.charcoal, fontSize: '1.15rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>+</button>
+                <div className="flex h-[50px] shrink-0" style={{ border: '1px solid rgba(43,35,32,0.18)' }}>
+                  <button onClick={() => setQuantity(q => Math.max(1, q - 1))} className="w-[46px] flex items-center justify-center cursor-pointer" style={{ background: 'none', border: 'none', color: C.charcoal, fontSize: '1.15rem' }}>−</button>
+                  <span className="w-[42px] flex items-center justify-center" style={{ fontFamily: UI, fontSize: '0.9375rem', color: C.charcoal, borderLeft: '1px solid rgba(43,35,32,0.12)', borderRight: '1px solid rgba(43,35,32,0.12)' }}>{quantity}</span>
+                  <button onClick={() => setQuantity(q => q + 1)} className="w-[46px] flex items-center justify-center cursor-pointer" style={{ background: 'none', border: 'none', color: C.charcoal, fontSize: '1.15rem' }}>+</button>
                 </div>
                 {/* Add to Cart */}
                 <button
                   onClick={addToCart}
                   disabled={isSoldOut}
-                  className={isSoldOut ? '' : 'shimmer-cta'}
+                  className={`flex-1 h-[50px] ${isSoldOut ? '' : 'shimmer-cta'}`}
                   style={{
-                    flex: 1, height: '50px',
                     backgroundColor: isSoldOut ? 'rgba(43,35,32,0.08)' : justAdded ? C.teal : C.gold,
                     color: isSoldOut ? 'rgba(43,35,32,0.3)' : justAdded ? C.cream : C.charcoal,
                     border: 'none', ...label, fontSize: '0.68rem', letterSpacing: '0.17em',
@@ -509,14 +502,11 @@ export default function Product({ product, related }: ProductProps) {
                 <button
                   onClick={() => setShareOpen(true)}
                   title="Share this product"
+                  className="w-[50px] h-[50px] shrink-0 rounded-full flex items-center justify-center cursor-pointer"
                   style={{
-                    width: '50px', height: '50px', flexShrink: 0,
                     border: `1.5px solid ${C.maroon}`,
                     backgroundColor: 'transparent',
                     color: C.maroon,
-                    borderRadius: '50%',
-                    cursor: 'pointer',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
                     transition: 'background 0.18s, color 0.18s',
                   }}
                   onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.backgroundColor = C.maroon; (e.currentTarget as HTMLButtonElement).style.color = C.cream; }}
@@ -532,20 +522,20 @@ export default function Product({ product, related }: ProductProps) {
             </div>
 
             {/* Custom size link */}
-            <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-              <a href="#" style={{ fontFamily: UI, fontSize: '0.8125rem', color: C.indigo, textDecorationLine: 'none', borderBottom: `1px solid ${C.indigo}`, paddingBottom: '1px' }}>
+            <div className="text-center mb-8">
+              <a href="#" className="no-underline pb-[1px]" style={{ fontFamily: UI, fontSize: '0.8125rem', color: C.indigo, borderBottom: `1px solid ${C.indigo}` }}>
                 Request Custom Size →
               </a>
             </div>
 
             {/* Trust row */}
-            <div style={{ borderTop: '1px solid rgba(43,35,32,0.08)', paddingTop: '1.5rem', display: 'flex', gap: '1.5rem', flexWrap: 'wrap' }}>
+            <div className="pt-6 flex gap-6 flex-wrap" style={{ borderTop: '1px solid rgba(43,35,32,0.08)' }}>
               {[
                 { mark: '🔒', text: 'Escrow-protected payment' },
                 { mark: '✦', text: 'Authentic Yoruba craft' },
                 { mark: '↩', text: 'Easy 14-day returns' },
               ].map(({ mark, text }) => (
-                <div key={text} style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                <div key={text} className="flex items-center gap-[0.4rem]">
                   <span style={{ fontSize: '0.875rem' }}>{mark}</span>
                   <span style={{ fontFamily: UI, fontSize: '0.75rem', color: 'rgba(43,35,32,0.55)' }}>{text}</span>
                 </div>
@@ -555,20 +545,19 @@ export default function Product({ product, related }: ProductProps) {
         </div>
 
         {/* ── TABS ── */}
-        <div style={{ borderTop: '1px solid rgba(43,35,32,0.09)', paddingBottom: '5rem' }}>
+        <div className="pb-20" style={{ borderTop: '1px solid rgba(43,35,32,0.09)' }}>
           {/* Tab nav */}
-          <div style={{ display: 'flex', borderBottom: '1px solid rgba(43,35,32,0.09)', marginBottom: '3rem' }}>
+          <div className="flex mb-12" style={{ borderBottom: '1px solid rgba(43,35,32,0.09)' }}>
             {tabs.map(tab => (
               <button
                 key={tab.key}
                 onClick={() => setActiveTab(tab.key)}
+                className="py-5 px-8 mb-[-1px] cursor-pointer"
                 style={{
                   ...label, fontSize: '0.605rem', letterSpacing: '0.14em',
                   color: activeTab === tab.key ? C.charcoal : 'rgba(43,35,32,0.4)',
-                  background: 'none', border: 'none', cursor: 'pointer',
-                  padding: '1.25rem 2rem',
+                  background: 'none', border: 'none',
                   borderBottom: activeTab === tab.key ? `2px solid ${C.gold}` : '2px solid transparent',
-                  marginBottom: '-1px',
                   transition: 'color 0.18s, border-color 0.18s',
                 }}
               >
@@ -577,19 +566,19 @@ export default function Product({ product, related }: ProductProps) {
             ))}
           </div>
 
-          <div style={{ maxWidth: '700px' }}>
+          <div className="max-w-[700px]">
             {/* Description */}
             {activeTab === 'description' && (
               <div>
-                <p style={{ fontFamily: UI, fontSize: '0.9375rem', lineHeight: 1.85, color: 'rgba(43,35,32,0.72)', marginBottom: '1.25rem' }}>
+                <p className="mb-5" style={{ fontFamily: UI, fontSize: '0.9375rem', lineHeight: 1.85, color: 'rgba(43,35,32,0.72)' }}>
                   The {product.title} is a handcrafted piece made with premium materials sourced and finished in Nigeria. Each one is individually sewn and inspected before shipping — reflecting the standard of quality AdeClassics has maintained since its founding.
                 </p>
-                <p style={{ fontFamily: UI, fontSize: '0.9375rem', lineHeight: 1.85, color: 'rgba(43,35,32,0.72)', marginBottom: '1.25rem' }}>
+                <p className="mb-5" style={{ fontFamily: UI, fontSize: '0.9375rem', lineHeight: 1.85, color: 'rgba(43,35,32,0.72)' }}>
                   This {product.category.toLowerCase()} is constructed using traditional techniques passed down through generations of Yoruba craftspeople. The rich tones and textures are a direct result of careful material selection and hand-finishing — no shortcuts, no compromises.
                 </p>
-                <div style={{ marginTop: '2.25rem' }}>
-                  <div style={{ ...label, color: C.charcoal, fontSize: '0.58rem', marginBottom: '1rem', letterSpacing: '0.14em' }}>Materials & Care</div>
-                  <ul style={{ fontFamily: UI, fontSize: '0.875rem', lineHeight: 2.1, color: 'rgba(43,35,32,0.7)', paddingLeft: '1.25rem', margin: 0 }}>
+                <div className="mt-9">
+                  <div className="mb-4" style={{ ...label, color: C.charcoal, fontSize: '0.58rem', letterSpacing: '0.14em' }}>Materials & Care</div>
+                  <ul className="m-0 pl-5" style={{ fontFamily: UI, fontSize: '0.875rem', lineHeight: 2.1, color: 'rgba(43,35,32,0.7)' }}>
                     <li>Premium Aso-oke or velvet, depending on colourway</li>
                     <li>Hand-stitched finishing — no factory shortcuts</li>
                     <li>Dry clean recommended; or gentle hand wash in cold water</li>
@@ -603,7 +592,7 @@ export default function Product({ product, related }: ProductProps) {
             {/* Sizing guide */}
             {activeTab === 'sizing' && (
               <div>
-                <p style={{ fontFamily: UI, fontSize: '0.9375rem', lineHeight: 1.75, color: 'rgba(43,35,32,0.72)', marginBottom: '1.75rem' }}>
+                <p className="mb-7" style={{ fontFamily: UI, fontSize: '0.9375rem', lineHeight: 1.75, color: 'rgba(43,35,32,0.72)' }}>
                   {isHeadwear
                     ? 'Measure your head circumference at its widest point — approximately 1 cm above the eyebrows and ears. When between sizes, we recommend sizing up.'
                     : isFootwear
@@ -611,11 +600,11 @@ export default function Product({ product, related }: ProductProps) {
                     : 'For garments, measure your chest at its fullest point and your natural waist. All garments include a 2 cm seam allowance. For custom measurements, use the Request Custom Size link above.'}
                 </p>
                 <div className="table-scroll">
-                  <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 420, fontFamily: UI, fontSize: '0.875rem' }}>
+                  <table className="w-full min-w-[420px]" style={{ borderCollapse: 'collapse', fontFamily: UI, fontSize: '0.875rem' }}>
                     <thead>
                       <tr style={{ borderBottom: `2px solid ${C.gold}` }}>
                         {sizingHeaders.map(h => (
-                          <th key={h} style={{ textAlign: 'left', padding: '0.75rem 1rem 0.75rem 0', color: C.charcoal, ...label, fontSize: '0.565rem', fontWeight: 600 }}>{h}</th>
+                          <th key={h} className="text-left py-3 pr-4 pl-0" style={{ color: C.charcoal, ...label, fontSize: '0.565rem', fontWeight: 600 }}>{h}</th>
                         ))}
                       </tr>
                     </thead>
@@ -623,7 +612,7 @@ export default function Product({ product, related }: ProductProps) {
                       {sizingRows.map((row, i) => (
                         <tr key={i} style={{ borderBottom: '1px solid rgba(43,35,32,0.07)', backgroundColor: i % 2 === 1 ? 'rgba(43,35,32,0.02)' : 'transparent' }}>
                           {row.map((cell, j) => (
-                            <td key={j} style={{ padding: '0.75rem 1rem 0.75rem 0', color: j === 0 ? C.charcoal : 'rgba(43,35,32,0.65)', fontWeight: j === 0 ? 600 : 400 }}>{cell}</td>
+                            <td key={j} className="py-3 pr-4 pl-0" style={{ color: j === 0 ? C.charcoal : 'rgba(43,35,32,0.65)', fontWeight: j === 0 ? 600 : 400 }}>{cell}</td>
                           ))}
                         </tr>
                       ))}
@@ -636,9 +625,9 @@ export default function Product({ product, related }: ProductProps) {
             {/* Shipping & Returns */}
             {activeTab === 'shipping' && (
               <div>
-                <div style={{ marginBottom: '2.25rem' }}>
-                  <div style={{ ...label, color: C.charcoal, fontSize: '0.58rem', marginBottom: '1rem', letterSpacing: '0.14em' }}>Shipping</div>
-                  <ul style={{ fontFamily: UI, fontSize: '0.875rem', lineHeight: 2.1, color: 'rgba(43,35,32,0.7)', paddingLeft: '1.25rem', margin: 0 }}>
+                <div className="mb-9">
+                  <div className="mb-4" style={{ ...label, color: C.charcoal, fontSize: '0.58rem', letterSpacing: '0.14em' }}>Shipping</div>
+                  <ul className="m-0 pl-5" style={{ fontFamily: UI, fontSize: '0.875rem', lineHeight: 2.1, color: 'rgba(43,35,32,0.7)' }}>
                     <li>Canada / US / UK: standard 7–10 business days; express 3–5 days</li>
                     <li>Nigeria: 2–4 business days via our Lagos fulfilment partner</li>
                     <li>All other countries: 10–18 business days</li>
@@ -647,8 +636,8 @@ export default function Product({ product, related }: ProductProps) {
                   </ul>
                 </div>
                 <div>
-                  <div style={{ ...label, color: C.charcoal, fontSize: '0.58rem', marginBottom: '1rem', letterSpacing: '0.14em' }}>Returns</div>
-                  <ul style={{ fontFamily: UI, fontSize: '0.875rem', lineHeight: 2.1, color: 'rgba(43,35,32,0.7)', paddingLeft: '1.25rem', margin: 0 }}>
+                  <div className="mb-4" style={{ ...label, color: C.charcoal, fontSize: '0.58rem', letterSpacing: '0.14em' }}>Returns</div>
+                  <ul className="m-0 pl-5" style={{ fontFamily: UI, fontSize: '0.875rem', lineHeight: 2.1, color: 'rgba(43,35,32,0.7)' }}>
                     <li>In-stock items: 14-day return window from delivery date</li>
                     <li>Made-to-order items are final sale — crafted to your dimensions</li>
                     <li>Items must be unworn, unwashed, with original packaging intact</li>
@@ -664,52 +653,52 @@ export default function Product({ product, related }: ProductProps) {
 
       {/* ── REVIEWS ── */}
       <section style={{ borderTop: '1px solid rgba(43,35,32,0.09)', backgroundColor: 'rgba(122,46,56,0.025)' }}>
-        <div style={{ maxWidth: '1440px', margin: '0 auto', padding: '5rem 2.5rem' }}>
-          <h2 style={{ fontFamily: DISPLAY, fontSize: 'clamp(1.75rem, 2.6vw, 2.5rem)', fontWeight: 400, letterSpacing: '-0.022em', color: C.charcoal, marginBottom: '3rem' }}>
+        <div className="max-w-[1440px] mx-auto py-20 px-10">
+          <h2 className="mb-12" style={{ fontFamily: DISPLAY, fontSize: 'clamp(1.75rem, 2.6vw, 2.5rem)', fontWeight: 400, letterSpacing: '-0.022em', color: C.charcoal }}>
             Customer Reviews.
           </h2>
 
           {/* Summary row */}
-          <div className="pdp-review-summary" style={{ display: 'grid', gridTemplateColumns: 'auto 1fr', gap: '3.5rem', alignItems: 'start', marginBottom: '3.5rem', maxWidth: '660px' }}>
-            <div style={{ textAlign: 'center' }}>
+          <div className="pdp-review-summary grid grid-cols-[auto_1fr] gap-14 items-start mb-14 max-w-[660px]">
+            <div className="text-center">
               <div style={{ fontFamily: DISPLAY, fontSize: '4rem', fontWeight: 400, color: C.charcoal, lineHeight: 1 }}>{AVG_RATING}</div>
-              <div style={{ margin: '0.4rem 0' }}><Stars rating={AVG_RATING} size={16} /></div>
+              <div className="my-[0.4rem]"><Stars rating={AVG_RATING} size={16} /></div>
               <div style={{ fontFamily: UI, fontSize: '0.75rem', color: 'rgba(43,35,32,0.42)' }}>{TOTAL_REVIEWS} reviews</div>
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', paddingTop: '0.625rem' }}>
+            <div className="flex flex-col gap-2 pt-2.5">
               {RATING_DIST.map(({ stars, count }) => (
-                <div key={stars} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                  <span style={{ fontFamily: UI, fontSize: '0.75rem', color: 'rgba(43,35,32,0.5)', width: '10px', textAlign: 'right', flexShrink: 0 }}>{stars}</span>
+                <div key={stars} className="flex items-center gap-3">
+                  <span className="w-[10px] text-right shrink-0" style={{ fontFamily: UI, fontSize: '0.75rem', color: 'rgba(43,35,32,0.5)' }}>{stars}</span>
                   <svg width="11" height="11" viewBox="0 0 24 24" fill={C.gold} stroke={C.gold} strokeWidth="1">
                     <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
                   </svg>
-                  <div style={{ flex: 1, height: '6px', backgroundColor: 'rgba(43,35,32,0.1)', borderRadius: '3px', overflow: 'hidden' }}>
-                    <div style={{ height: '100%', width: `${TOTAL_REVIEWS > 0 ? (count / TOTAL_REVIEWS) * 100 : 0}%`, backgroundColor: C.gold, borderRadius: '3px' }} />
+                  <div className="flex-1 h-[6px] rounded-[3px] overflow-hidden" style={{ backgroundColor: 'rgba(43,35,32,0.1)' }}>
+                    <div className="h-full rounded-[3px]" style={{ width: `${TOTAL_REVIEWS > 0 ? (count / TOTAL_REVIEWS) * 100 : 0}%`, backgroundColor: C.gold }} />
                   </div>
-                  <span style={{ fontFamily: UI, fontSize: '0.75rem', color: 'rgba(43,35,32,0.42)', width: '20px', flexShrink: 0 }}>{count}</span>
+                  <span className="w-[20px] shrink-0" style={{ fontFamily: UI, fontSize: '0.75rem', color: 'rgba(43,35,32,0.42)' }}>{count}</span>
                 </div>
               ))}
             </div>
           </div>
 
           {/* Review cards */}
-          <div className="pdp-reviews-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1.5rem', marginBottom: '2.5rem' }}>
+          <div className="pdp-reviews-grid grid grid-cols-3 gap-6 mb-10">
             {MOCK_REVIEWS.map(review => (
-              <div key={review.id} style={{ backgroundColor: C.cream, padding: '1.875rem', border: '1px solid rgba(43,35,32,0.08)' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
+              <div key={review.id} className="p-[1.875rem]" style={{ backgroundColor: C.cream, border: '1px solid rgba(43,35,32,0.08)' }}>
+                <div className="flex justify-between items-start mb-4">
                   <div>
-                    <div style={{ fontFamily: UI, fontSize: '0.9rem', fontWeight: 600, color: C.charcoal, marginBottom: '0.2rem' }}>{review.name}</div>
+                    <div className="mb-[0.2rem]" style={{ fontFamily: UI, fontSize: '0.9rem', fontWeight: 600, color: C.charcoal }}>{review.name}</div>
                     <div style={{ fontFamily: UI, fontSize: '0.75rem', color: 'rgba(43,35,32,0.42)' }}>{review.location}</div>
                   </div>
                   <Stars rating={review.rating} size={12} />
                 </div>
-                <p style={{ fontFamily: UI, fontSize: '0.875rem', lineHeight: 1.78, color: 'rgba(43,35,32,0.7)', margin: '0 0 1rem' }}>"{review.text}"</p>
+                <p className="m-0 mb-4" style={{ fontFamily: UI, fontSize: '0.875rem', lineHeight: 1.78, color: 'rgba(43,35,32,0.7)' }}>"{review.text}"</p>
                 <div style={{ fontFamily: UI, fontSize: '0.72rem', color: 'rgba(43,35,32,0.32)' }}>{review.date}</div>
               </div>
             ))}
           </div>
 
-          <button style={{ border: `1.5px solid ${C.gold}`, color: C.charcoal, backgroundColor: 'transparent', ...label, fontSize: '0.655rem', padding: '0.875rem 2.25rem', cursor: 'pointer', letterSpacing: '0.14em' }}>
+          <button className="py-3.5 px-9 cursor-pointer" style={{ border: `1.5px solid ${C.gold}`, color: C.charcoal, backgroundColor: 'transparent', ...label, fontSize: '0.655rem', letterSpacing: '0.14em' }}>
             Write a Review
           </button>
         </div>
@@ -717,24 +706,24 @@ export default function Product({ product, related }: ProductProps) {
 
       {/* ── RELATED PRODUCTS ── */}
       <section style={{ borderTop: '1px solid rgba(43,35,32,0.09)' }}>
-        <div style={{ maxWidth: '1440px', margin: '0 auto', padding: '5rem 2.5rem' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '2.5rem' }}>
-            <h2 style={{ fontFamily: DISPLAY, fontSize: 'clamp(1.75rem, 2.6vw, 2.5rem)', fontWeight: 400, letterSpacing: '-0.022em', color: C.charcoal, margin: 0 }}>
+        <div className="max-w-[1440px] mx-auto py-20 px-10">
+          <div className="flex justify-between items-baseline mb-10">
+            <h2 className="m-0" style={{ fontFamily: DISPLAY, fontSize: 'clamp(1.75rem, 2.6vw, 2.5rem)', fontWeight: 400, letterSpacing: '-0.022em', color: C.charcoal }}>
               You May Also Like.
             </h2>
-            <Link to="/shop" style={{ ...label, color: C.indigo, textDecorationLine: 'none', fontSize: '0.64rem' }}>View All →</Link>
+            <Link to="/shop" className="no-underline" style={{ ...label, color: C.indigo, fontSize: '0.64rem' }}>View All →</Link>
           </div>
-          <div className="pdp-related-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1.5rem' }}>
+          <div className="pdp-related-grid grid grid-cols-4 gap-6">
             {related.map(p => (
-              <Link key={p.id} to={`/product/${p.slug}`} className="product-card" style={{ textDecorationLine: 'none', color: C.charcoal, display: 'block' }}>
-                <div style={{ position: 'relative', marginBottom: '1rem', backgroundColor: '#ddd5c8', overflow: 'hidden', aspectRatio: '3/4' }}>
-                  <img className="product-img" src={p.imageUrl} alt={p.title} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-                  <span style={{ position: 'absolute', top: '0.75rem', left: '0.75rem', backgroundColor: p.tag === 'NEW' ? C.maroon : C.charcoal, color: C.cream, ...label, fontSize: '0.56rem', padding: '3px 8px', letterSpacing: '0.12em' }}>
+              <Link key={p.id} to={`/product/${p.slug}`} className="product-card no-underline block" style={{ color: C.charcoal }}>
+                <div className="relative mb-4 overflow-hidden aspect-[3/4]" style={{ backgroundColor: '#ddd5c8' }}>
+                  <img className="product-img w-full h-full object-cover block" src={p.imageUrl} alt={p.title} />
+                  <span className="absolute top-3 left-3 py-[3px] px-[8px]" style={{ backgroundColor: p.tag === 'NEW' ? C.maroon : C.charcoal, color: C.cream, ...label, fontSize: '0.56rem', letterSpacing: '0.12em' }}>
                     {p.tag}
                   </span>
                   <div className="product-overlay">
                     <div className="product-overlay-btns">
-                      <button onClick={e => e.preventDefault()} style={{ flex: 1, border: '1px solid rgba(250,246,240,0.55)', color: C.cream, background: 'transparent', ...label, fontSize: '0.585rem', padding: '0.55rem 0', cursor: 'pointer', letterSpacing: '0.12em', backdropFilter: 'blur(4px)' }}>
+                      <button onClick={e => e.preventDefault()} className="flex-1 cursor-pointer py-[0.55rem]" style={{ border: '1px solid rgba(250,246,240,0.55)', color: C.cream, background: 'transparent', ...label, fontSize: '0.585rem', letterSpacing: '0.12em', backdropFilter: 'blur(4px)' }}>
                         Quick View
                       </button>
                       <button
@@ -751,14 +740,15 @@ export default function Product({ product, related }: ProductProps) {
                             imageUrl: p.imageUrl,
                           });
                         }}
-                        style={{ flex: 1, border: 'none', color: C.charcoal, background: C.gold, ...label, fontSize: '0.585rem', padding: '0.55rem 0', cursor: 'pointer', letterSpacing: '0.12em' }}
+                        className="flex-1 cursor-pointer py-[0.55rem]"
+                        style={{ border: 'none', color: C.charcoal, background: C.gold, ...label, fontSize: '0.585rem', letterSpacing: '0.12em' }}
                       >
                         Add to Cart
                       </button>
                     </div>
                   </div>
                 </div>
-                <div style={{ fontFamily: UI, fontSize: '0.875rem', fontWeight: 400, marginBottom: '0.5rem', lineHeight: 1.4 }}>{p.title}</div>
+                <div className="mb-2" style={{ fontFamily: UI, fontSize: '0.875rem', fontWeight: 400, lineHeight: 1.4 }}>{p.title}</div>
                 <div style={{ fontFamily: UI, fontSize: '1rem', fontWeight: 600 }}>CAD ${p.priceCad.toLocaleString()}</div>
               </Link>
             ))}
