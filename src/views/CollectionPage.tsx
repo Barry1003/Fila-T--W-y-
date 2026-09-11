@@ -1,64 +1,48 @@
 'use client';
 
-import { useMemo } from 'react';
-import { Link, useParams } from '@/lib/router';
+import { Link } from '@/lib/router';
 import { C, DISPLAY, UI, label } from '../tokens';
-import { slugify } from '@/lib/slug';
-import { ALL_PRODUCTS, COLLECTIONS, type Product } from '../data/products';
+import type { CatalogueProduct, CatalogueCollection } from '@/server/catalogue';
 
-function ProductCard({ p }: { p: Product }) {
+function ProductCard({ p }: { p: CatalogueProduct }) {
   return (
-    <Link to={`/product/${slugify(p.title)}`} className="no-underline block" style={{ color: 'inherit' }}>
+    <Link to={`/product/${p.slug}`} className="no-underline block" style={{ color: 'inherit' }}>
       <div className="relative aspect-[3/4] overflow-hidden mb-3" style={{ backgroundColor: 'rgba(43,35,32,0.05)' }}>
         <img
-          src={`https://images.unsplash.com/${p.img}?w=600&h=800&fit=crop&auto=format`}
+          src={p.imageUrl}
           alt={p.title}
           loading="lazy"
           className="w-full h-full object-cover block"
         />
-        <span
-          className="absolute top-3 left-3 py-[0.3rem] px-2"
-          style={{
-            ...label, fontSize: '0.55rem',
-            backgroundColor: p.tag === 'SOLD OUT' ? 'rgba(43,35,32,0.82)' : C.maroon,
-            color: C.cream,
-          }}
-        >
-          {p.tag}
-        </span>
+        {p.tag && (
+          <span
+            className="absolute top-3 left-3 py-[0.3rem] px-2"
+            style={{
+              ...label, fontSize: '0.55rem',
+              backgroundColor: p.tag === 'SOLD OUT' ? 'rgba(43,35,32,0.82)' : C.maroon,
+              color: C.cream,
+            }}
+          >
+            {p.tag}
+          </span>
+        )}
       </div>
       <div style={{ fontFamily: UI, fontSize: '0.85rem', color: C.charcoal, lineHeight: 1.4 }}>{p.title}</div>
       <div className="mt-[0.2rem]" style={{ fontFamily: UI, fontSize: '0.9rem', fontWeight: 600, color: C.charcoal }}>
-        CAD ${p.cadNum.toLocaleString()}
+        CAD ${p.priceCad.toLocaleString()}
       </div>
     </Link>
   );
 }
 
-export default function CollectionPage() {
-  const { slug } = useParams();
-  const collection = COLLECTIONS.find(c => c.slug === slug);
-
-  const grouped = useMemo(() => {
-    if (!collection) return [];
-    return collection.categories.map(name => ({
-      name,
-      products: ALL_PRODUCTS.filter(p => p.category === name),
-    }));
-  }, [collection]);
-
-  if (!collection) {
-    return (
-      <div className="min-h-[70vh] grid place-items-center py-16 px-6 text-center" style={{ backgroundColor: C.cream }}>
-        <div>
-          <h1 className="m-0" style={{ fontFamily: DISPLAY, fontSize: '1.75rem', color: C.charcoal }}>Collection not found</h1>
-          <Link to="/shop" className="mt-4 inline-block" style={{ fontFamily: UI, fontSize: '0.85rem', color: C.maroon }}>
-            Browse the shop
-          </Link>
-        </div>
-      </div>
-    );
-  }
+export default function CollectionPage({ collection, products }: {
+  collection: CatalogueCollection;
+  products: CatalogueProduct[];
+}) {
+  const grouped = collection.categories.map(name => ({
+    name,
+    products: products.filter(p => p.category === name),
+  }));
 
   const total = grouped.reduce((n, g) => n + g.products.length, 0);
 

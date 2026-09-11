@@ -310,6 +310,7 @@ function CheckoutContent() {
       lines: lines.map(line => ({
         productId: line.productId,
         size: line.size,
+        color: line.color,
         quantity: line.quantity,
       })),
     });

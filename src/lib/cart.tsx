@@ -44,8 +44,8 @@ type CartContextValue = {
    */
   hydrated: boolean;
   add: (line: NewCartLine) => void;
-  setQuantity: (productId: string, size: string, quantity: number) => void;
-  remove: (productId: string, size: string) => void;
+  setQuantity: (productId: string, size: string, color: string, quantity: number) => void;
+  remove: (productId: string, size: string, color: string) => void;
   clear: () => void;
 };
 
@@ -54,9 +54,13 @@ const MAX_PER_LINE = 20;
 
 const CartContext = createContext<CartContextValue | null>(null);
 
-/** A size of the same product is its own line, the way a shopper thinks of it. */
-function sameLine(line: CartLine, productId: string, size: string): boolean {
-  return line.productId === productId && line.size === size;
+/**
+ * A product in a given size and colour is its own line, the way a shopper thinks
+ * of it — two colours of the same cap are two lines, and stock is claimed per
+ * size+colour at checkout, so the identity here must match.
+ */
+function sameLine(line: CartLine, productId: string, size: string, color: string): boolean {
+  return line.productId === productId && line.size === size && line.color === color;
 }
 
 /**
@@ -133,40 +137,41 @@ export function CartProvider({ children }: { children: ReactNode }) {
     const quantity = Math.max(1, Math.floor(incoming.quantity ?? 1));
 
     setLines(prev => {
-      const existing = prev.find(line => sameLine(line, incoming.productId, incoming.size));
+      const existing = prev.find(line => sameLine(line, incoming.productId, incoming.size, incoming.color));
       if (!existing) {
         return [...prev, { ...incoming, quantity: Math.min(quantity, MAX_PER_LINE) }];
       }
 
-      // Adding the same size again tops up the line rather than duplicating it.
+      // Adding the same size and colour again tops up the line rather than
+      // duplicating it.
       return prev.map(line =>
-        sameLine(line, incoming.productId, incoming.size)
+        sameLine(line, incoming.productId, incoming.size, incoming.color)
           ? { ...line, quantity: Math.min(line.quantity + quantity, MAX_PER_LINE) }
           : line
       );
     });
   }, []);
 
-  const setQuantity = useCallback((productId: string, size: string, quantity: number) => {
+  const setQuantity = useCallback((productId: string, size: string, color: string, quantity: number) => {
     const next = Math.floor(quantity);
 
     // Stepping below one is how a shopper removes the last of something.
     if (next < 1) {
-      setLines(prev => prev.filter(line => !sameLine(line, productId, size)));
+      setLines(prev => prev.filter(line => !sameLine(line, productId, size, color)));
       return;
     }
 
     setLines(prev =>
       prev.map(line =>
-        sameLine(line, productId, size)
+        sameLine(line, productId, size, color)
           ? { ...line, quantity: Math.min(next, MAX_PER_LINE) }
           : line
       )
     );
   }, []);
 
-  const remove = useCallback((productId: string, size: string) => {
-    setLines(prev => prev.filter(line => !sameLine(line, productId, size)));
+  const remove = useCallback((productId: string, size: string, color: string) => {
+    setLines(prev => prev.filter(line => !sameLine(line, productId, size, color)));
   }, []);
 
   const clear = useCallback(() => setLines([]), []);

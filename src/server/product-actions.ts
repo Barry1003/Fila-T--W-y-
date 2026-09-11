@@ -70,7 +70,6 @@ export async function saveProduct(raw: unknown): Promise<SaveProductResult> {
         slug,
         description: input.description || null,
         categoryId: input.categoryId,
-        color: input.color,
         priceCad: new Prisma.Decimal(input.priceCadCents).dividedBy(100),
         productionDays: input.productionDays || null,
         tag: input.tag,
@@ -82,7 +81,14 @@ export async function saveProduct(raw: unknown): Promise<SaveProductResult> {
         inStock: input.variants.some(variant => variant.stock > 0),
       };
 
-      const images = input.imageUrls.map((url, position) => ({ url, position, alt: input.title }));
+      const images = input.images.map((image, position) => ({
+        url: image.url,
+        position,
+        alt: input.title,
+        // Empty means the photo is general; store null so a query can tell the
+        // two apart.
+        color: image.color || null,
+      }));
 
       if (!input.id) {
         const created = await prisma.product.create({
@@ -113,21 +119,17 @@ export async function saveProduct(raw: unknown): Promise<SaveProductResult> {
           });
         }
 
-        // Sizes nobody ordered can go; sizes on an existing order must not,
-        // because OrderItem keeps the size as text and the variant row is what
-        // stock is counted against. Update what stays, delete only the rest.
-        const keeping = new Set(input.variants.map(variant => variant.size));
-        await tx.productVariant.deleteMany({
-          where: { productId: updated.id, size: { notIn: [...keeping] } },
+        // Because size+color is unique and we don't have FKs to variants,
+        // we can safely clear and recreate them to simplify keeping them in sync.
+        await tx.productVariant.deleteMany({ where: { productId: updated.id } });
+        await tx.productVariant.createMany({
+          data: input.variants.map(variant => ({
+            productId: updated.id,
+            size: variant.size,
+            color: variant.color,
+            stock: variant.stock,
+          })),
         });
-
-        for (const variant of input.variants) {
-          await tx.productVariant.upsert({
-            where: { productId_size: { productId: updated.id, size: variant.size } },
-            create: { productId: updated.id, size: variant.size, stock: variant.stock },
-            update: { stock: variant.stock },
-          });
-        }
 
         return updated;
       });

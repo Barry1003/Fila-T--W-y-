@@ -68,7 +68,7 @@ const BLANK_PAY: PayForm = {
 /* ─── Card brand icons ───────────────────────────────────────── */
 function VisaIcon() {
   return (
-    <svg width="42" height="28" viewBox="0 0 42 28" style={{ display: 'block', flexShrink: 0 }}>
+    <svg className="block shrink-0" width="42" height="28" viewBox="0 0 42 28">
       <rect width="42" height="28" rx="4" fill="#1A1F71" />
       <text x="50%" y="19" textAnchor="middle" fill="#fff" fontSize="13" fontWeight="800"
         fontFamily="Arial,Helvetica,sans-serif" letterSpacing="1.5">VISA</text>
@@ -78,7 +78,7 @@ function VisaIcon() {
 
 function MastercardIcon() {
   return (
-    <svg width="42" height="28" viewBox="0 0 42 28" style={{ display: 'block', flexShrink: 0 }}>
+    <svg className="block shrink-0" width="42" height="28" viewBox="0 0 42 28">
       <rect width="42" height="28" rx="4" fill="#1D1D1B" />
       <circle cx="16" cy="14" r="8" fill="#EB001B" />
       <circle cx="26" cy="14" r="8" fill="#F79E1B" />
@@ -94,11 +94,10 @@ function FInput({ label: lbl, placeholder, type = 'text', value, onChange, requi
 }) {
   const [focused, setFocused] = useState(false);
   return (
-    <div style={{ marginBottom: '1.05rem' }}>
-      <label style={{
-        display: 'block', fontFamily: UI, fontSize: '0.66rem', fontWeight: 600,
-        letterSpacing: '0.1em', textTransform: 'uppercase',
-        color: 'rgba(43,35,32,0.52)', marginBottom: '0.38rem',
+    <div className="mb-[1.05rem]">
+      <label className="block mb-[0.38rem] uppercase font-semibold tracking-[0.1em]" style={{
+        fontFamily: UI, fontSize: '0.66rem',
+        color: 'rgba(43,35,32,0.52)',
       }}>
         {lbl}{required && <span style={{ color: C.maroon }}> *</span>}
       </label>
@@ -109,15 +108,11 @@ function FInput({ label: lbl, placeholder, type = 'text', value, onChange, requi
         onChange={e => onChange(e.target.value)}
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
+        className="block w-full py-2.5 px-3.5 rounded-[5px] box-border border-[1.5px] border-solid outline-none transition-colors duration-150"
         style={{
-          display: 'block', width: '100%', padding: '0.625rem 0.875rem',
           fontFamily: UI, fontSize: '0.875rem', color: C.charcoal,
           backgroundColor: '#fff',
-          borderWidth: '1.5px', borderStyle: 'solid',
           borderColor: focused ? C.gold : 'rgba(43,35,32,0.18)',
-          borderRadius: '5px', outline: 'none',
-          transition: 'border-color 0.15s',
-          boxSizing: 'border-box',
         }}
       />
     </div>
@@ -129,11 +124,10 @@ function FSelect({ label: lbl, value, onChange, options }: {
 }) {
   const [focused, setFocused] = useState(false);
   return (
-    <div style={{ marginBottom: '1.05rem' }}>
-      <label style={{
-        display: 'block', fontFamily: UI, fontSize: '0.66rem', fontWeight: 600,
-        letterSpacing: '0.1em', textTransform: 'uppercase',
-        color: 'rgba(43,35,32,0.52)', marginBottom: '0.38rem',
+    <div className="mb-[1.05rem]">
+      <label className="block mb-[0.38rem] uppercase font-semibold tracking-[0.1em]" style={{
+        fontFamily: UI, fontSize: '0.66rem',
+        color: 'rgba(43,35,32,0.52)',
       }}>
         {lbl}
       </label>
@@ -142,20 +136,13 @@ function FSelect({ label: lbl, value, onChange, options }: {
         onChange={e => onChange(e.target.value)}
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
+        className="block w-full py-2.5 px-3.5 pr-10 rounded-[5px] box-border cursor-pointer appearance-none border-[1.5px] border-solid outline-none transition-colors duration-150 bg-no-repeat"
         style={{
-          display: 'block', width: '100%', padding: '0.625rem 0.875rem',
           fontFamily: UI, fontSize: '0.875rem', color: C.charcoal,
           backgroundColor: '#fff',
-          borderWidth: '1.5px', borderStyle: 'solid',
           borderColor: focused ? C.gold : 'rgba(43,35,32,0.18)',
-          borderRadius: '5px', outline: 'none',
-          transition: 'border-color 0.15s',
-          boxSizing: 'border-box', cursor: 'pointer',
-          appearance: 'none',
           backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='rgba(43,35,32,0.4)' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E")`,
-          backgroundRepeat: 'no-repeat',
           backgroundPosition: 'right 0.875rem center',
-          paddingRight: '2.5rem',
         }}
       >
         {options.map(o => <option key={o} value={o}>{o}</option>)}
@@ -166,14 +153,15 @@ function FSelect({ label: lbl, value, onChange, options }: {
 
 function FCheckbox({ checked, onChange, children }: { checked: boolean; onChange: (v: boolean) => void; children: React.ReactNode }) {
   return (
-    <label style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', cursor: 'pointer' }}>
+    <label className="flex items-center gap-2.5 cursor-pointer">
       <input
         type="checkbox"
         checked={checked}
         onChange={e => onChange(e.target.checked)}
-        style={{ width: '15px', height: '15px', accentColor: C.gold, cursor: 'pointer', flexShrink: 0 }}
+        className="w-[15px] h-[15px] shrink-0 cursor-pointer"
+        style={{ accentColor: C.gold }}
       />
-      <span style={{ fontFamily: UI, fontSize: '0.82rem', color: C.charcoal, lineHeight: 1.4 }}>{children}</span>
+      <span className="leading-[1.4]" style={{ fontFamily: UI, fontSize: '0.82rem', color: C.charcoal }}>{children}</span>
     </label>
   );
 }
@@ -184,32 +172,27 @@ function SlideOver({ title, onClose, onSave, saveLabel, children }: {
   children: React.ReactNode;
 }) {
   return (
-    <div style={{ position: 'fixed', inset: 0, zIndex: 1000, display: 'flex', alignItems: 'stretch' }}>
+    <div className="fixed inset-0 z-[1000] flex items-stretch">
       <div
         onClick={onClose}
-        style={{ flex: 1, backgroundColor: 'rgba(43,35,32,0.42)', backdropFilter: 'blur(3px)', cursor: 'pointer' }}
+        className="flex-1 cursor-pointer bg-[rgba(43,35,32,0.42)] backdrop-blur-[3px]"
       />
-      <div style={{
-        width: 'min(520px, 92vw)', backgroundColor: C.cream,
-        display: 'flex', flexDirection: 'column',
-        boxShadow: '-16px 0 56px rgba(43,35,32,0.18)',
+      <div className="w-[min(520px,92vw)] flex flex-col shadow-[-16px_0_56px_rgba(43,35,32,0.18)]" style={{
+        backgroundColor: C.cream,
       }}>
         {/* Header */}
-        <div style={{
-          padding: '1.75rem 2rem', borderBottom: `1px solid rgba(43,35,32,0.1)`,
-          display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0,
-        }}>
-          <h2 style={{
-            fontFamily: DISPLAY, fontSize: '1.375rem', fontWeight: 500,
-            color: C.charcoal, letterSpacing: '-0.01em', lineHeight: 1.2,
+        <div className="py-7 px-8 flex items-center justify-between shrink-0 border-b border-solid border-[rgba(43,35,32,0.1)]">
+          <h2 className="font-medium tracking-[-0.01em] leading-[1.2]" style={{
+            fontFamily: DISPLAY, fontSize: '1.375rem',
+            color: C.charcoal,
           }}>
             {title}
           </h2>
           <button
             onClick={onClose}
+            className="p-[6px] rounded-[4px] cursor-pointer bg-none border-none leading-none transition-colors duration-150"
             style={{
-              background: 'none', border: 'none', cursor: 'pointer', padding: '6px', lineHeight: 0,
-              color: 'rgba(43,35,32,0.38)', borderRadius: '4px', transition: 'color 0.15s',
+              color: 'rgba(43,35,32,0.38)',
             }}
             onMouseEnter={e => (e.currentTarget.style.color = C.charcoal)}
             onMouseLeave={e => (e.currentTarget.style.color = 'rgba(43,35,32,0.38)')}
@@ -222,38 +205,28 @@ function SlideOver({ title, onClose, onSave, saveLabel, children }: {
         </div>
 
         {/* Body */}
-        <div style={{ flex: 1, padding: '1.75rem 2rem', overflowY: 'auto' }}>
+        <div className="flex-1 py-7 px-8 overflow-y-auto">
           {children}
         </div>
 
         {/* Footer */}
-        <div style={{
-          padding: '1.25rem 2rem', borderTop: `1px solid rgba(43,35,32,0.1)`,
-          display: 'flex', gap: '0.75rem', flexShrink: 0,
-          backgroundColor: '#fff',
-        }}>
+        <div className="py-5 px-8 flex gap-3 shrink-0 border-t border-solid border-[rgba(43,35,32,0.1)] bg-white">
           <button
             onClick={onSave}
+            className="flex-1 py-[0.8rem] px-5 rounded-[5px] cursor-pointer uppercase font-bold tracking-[0.1em] border-none shadow-[0_2px_14px_rgba(212,169,78,0.38)] transition-opacity duration-150"
             style={{
-              flex: 1, padding: '0.8rem 1.25rem',
               backgroundColor: C.gold, color: C.charcoal,
-              fontFamily: UI, fontSize: '0.7rem', fontWeight: 700,
-              letterSpacing: '0.1em', textTransform: 'uppercase',
-              border: 'none', borderRadius: '5px', cursor: 'pointer',
-              boxShadow: '0 2px 14px rgba(212,169,78,0.38)', transition: 'opacity 0.15s',
+              fontFamily: UI, fontSize: '0.7rem',
             }}
           >
             {saveLabel}
           </button>
           <button
             onClick={onClose}
+            className="py-[0.8rem] px-[1.125rem] rounded-[5px] cursor-pointer uppercase font-semibold tracking-[0.08em] bg-transparent border-[1.5px] border-solid border-[rgba(43,35,32,0.2)] transition-colors duration-150"
             style={{
-              padding: '0.8rem 1.125rem',
-              backgroundColor: 'transparent', color: 'rgba(43,35,32,0.52)',
-              fontFamily: UI, fontSize: '0.7rem', fontWeight: 600,
-              letterSpacing: '0.08em', textTransform: 'uppercase',
-              borderWidth: '1.5px', borderStyle: 'solid', borderColor: 'rgba(43,35,32,0.2)',
-              borderRadius: '5px', cursor: 'pointer', transition: 'border-color 0.15s, color 0.15s',
+              color: 'rgba(43,35,32,0.52)',
+              fontFamily: UI, fontSize: '0.7rem',
             }}
             onMouseEnter={e => { e.currentTarget.style.borderColor = C.charcoal; e.currentTarget.style.color = C.charcoal; }}
             onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(43,35,32,0.2)'; e.currentTarget.style.color = 'rgba(43,35,32,0.52)'; }}
@@ -283,16 +256,16 @@ function AddressSlideOver({ initial, isEdit, onSave, onClose }: {
       <FInput label="Full Name" value={form.name} onChange={set('name')} required />
       <FInput label="Address Line 1" value={form.line1} onChange={set('line1')} required />
       <FInput label="Address Line 2" placeholder="Apartment, suite, etc. (optional)" value={form.line2} onChange={set('line2')} />
-      <div className="rg-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 0.75rem' }}>
+      <div className="rg-2 grid grid-cols-2 gap-x-3">
         <FInput label="City" value={form.city} onChange={set('city')} required />
         <FInput label="State / Province" value={form.state} onChange={set('state')} required />
       </div>
-      <div className="rg-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 0.75rem' }}>
+      <div className="rg-2 grid grid-cols-2 gap-x-3">
         <FInput label="Postal / ZIP" value={form.postal} onChange={set('postal')} required />
         <FSelect label="Country" value={form.country} onChange={set('country')} options={COUNTRIES} />
       </div>
       <FInput label="Phone Number" type="tel" placeholder="+1 000 000 0000" value={form.phone} onChange={set('phone')} required />
-      <div style={{ paddingTop: '0.75rem', marginTop: '0.25rem', borderTop: `1px solid rgba(43,35,32,0.08)` }}>
+      <div className="pt-3 mt-1 border-t border-solid border-[rgba(43,35,32,0.08)]">
         <FCheckbox checked={form.isDefault} onChange={v => set('isDefault')(v)}>
           Set as default shipping address
         </FCheckbox>
@@ -314,14 +287,14 @@ function PaymentSlideOver({ onSave, onClose }: { onSave: () => void; onClose: ()
       saveLabel="Save Card"
     >
       <FInput label="Card Number" placeholder="1234 5678 9012 3456" value={form.cardNumber} onChange={set('cardNumber')} required />
-      <div className="rg-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 0.75rem' }}>
+      <div className="rg-2 grid grid-cols-2 gap-x-3">
         <FInput label="Expiry (MM / YY)" placeholder="09/27" value={form.expiry} onChange={set('expiry')} required />
         <FInput label="CVC" type="password" placeholder="•••" value={form.cvc} onChange={set('cvc')} required />
       </div>
       <FInput label="Name on Card" placeholder="As it appears on card" value={form.nameOnCard} onChange={set('nameOnCard')} required />
 
-      <div style={{ paddingTop: '1rem', marginTop: '0.5rem', borderTop: `1px solid rgba(43,35,32,0.08)` }}>
-        <div style={{ ...label, fontSize: '0.65rem', color: 'rgba(43,35,32,0.52)', marginBottom: '0.875rem' }}>
+      <div className="pt-4 mt-2 border-t border-solid border-[rgba(43,35,32,0.08)]">
+        <div className="mb-[0.875rem]" style={{ ...label, fontSize: '0.65rem', color: 'rgba(43,35,32,0.52)' }}>
           Billing Address
         </div>
         <FCheckbox checked={form.sameAsShipping} onChange={v => set('sameAsShipping')(v)}>
@@ -330,18 +303,12 @@ function PaymentSlideOver({ onSave, onClose }: { onSave: () => void; onClose: ()
       </div>
 
       {/* Trust note */}
-      <div style={{
-        display: 'flex', alignItems: 'flex-start', gap: '0.6rem',
-        marginTop: '1.5rem', padding: '0.875rem 1rem',
-        backgroundColor: 'rgba(59,138,147,0.06)',
-        borderWidth: '1px', borderStyle: 'solid', borderColor: 'rgba(59,138,147,0.18)',
-        borderRadius: '6px',
-      }}>
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={C.teal} strokeWidth="2.2" strokeLinecap="round" style={{ flexShrink: 0, marginTop: '1px' }}>
+      <div className="flex items-start gap-[0.6rem] mt-6 py-[0.875rem] px-4 rounded-[6px] border border-solid border-[rgba(59,138,147,0.18)] bg-[rgba(59,138,147,0.06)]">
+        <svg className="shrink-0 mt-[1px]" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={C.teal} strokeWidth="2.2" strokeLinecap="round">
           <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
           <path d="M7 11V7a5 5 0 0 1 10 0v4" />
         </svg>
-        <span style={{ fontFamily: UI, fontSize: '0.72rem', color: 'rgba(43,35,32,0.5)', lineHeight: 1.6 }}>
+        <span className="leading-[1.6]" style={{ fontFamily: UI, fontSize: '0.72rem', color: 'rgba(43,35,32,0.5)' }}>
           Payments processed securely via Paystack / Flutterwave — we never store your full card details.
         </span>
       </div>
@@ -354,29 +321,23 @@ function AddressCard({ addr, onEdit, onDelete, onSetDefault }: {
   addr: Address; onEdit: () => void; onDelete: () => void; onSetDefault: () => void;
 }) {
   return (
-    <div style={{
-      backgroundColor: '#fff', borderRadius: '8px', padding: '1.375rem',
-      borderWidth: '1px', borderStyle: 'solid', borderColor: 'rgba(43,35,32,0.11)',
-      boxShadow: '0 1px 8px rgba(43,35,32,0.05)',
-      display: 'flex', flexDirection: 'column',
-    }}>
+    <div className="rounded-lg p-[1.375rem] flex flex-col bg-white border border-solid border-[rgba(43,35,32,0.11)] shadow-[0_1px_8px_rgba(43,35,32,0.05)]">
       {/* Default badge — same height whether visible or not */}
-      <div style={{ height: '22px', marginBottom: '0.75rem', display: 'flex', alignItems: 'center' }}>
+      <div className="h-[22px] mb-3 flex items-center">
         {addr.isDefault && (
-          <span style={{
-            ...label, fontSize: '0.58rem', letterSpacing: '0.12em',
+          <span className="inline-block py-[2px] px-2 rounded-[3px] tracking-[0.12em]" style={{
+            ...label, fontSize: '0.58rem',
             backgroundColor: C.gold, color: C.charcoal,
-            padding: '2px 8px', borderRadius: '3px', display: 'inline-block',
           }}>
             Default
           </span>
         )}
       </div>
 
-      <div style={{ fontFamily: UI, fontSize: '0.875rem', fontWeight: 600, color: C.charcoal, marginBottom: '0.4rem' }}>
+      <div className="mb-[0.4rem] font-semibold" style={{ fontFamily: UI, fontSize: '0.875rem', color: C.charcoal }}>
         {addr.name}
       </div>
-      <div style={{ fontFamily: UI, fontSize: '0.8rem', color: 'rgba(43,35,32,0.6)', lineHeight: 1.72, flex: 1 }}>
+      <div className="flex-1 leading-[1.72]" style={{ fontFamily: UI, fontSize: '0.8rem', color: 'rgba(43,35,32,0.6)' }}>
         {addr.line1}
         {addr.line2 && <><br />{addr.line2}</>}
         <br />{addr.city}, {addr.state} {addr.postal}
@@ -385,11 +346,7 @@ function AddressCard({ addr, onEdit, onDelete, onSetDefault }: {
       </div>
 
       {/* Actions */}
-      <div style={{
-        display: 'flex', alignItems: 'center', gap: '0.875rem',
-        marginTop: '1.125rem', paddingTop: '0.875rem',
-        borderTop: `1px solid rgba(43,35,32,0.07)`,
-      }}>
+      <div className="flex items-center gap-[0.875rem] mt-[1.125rem] pt-[0.875rem] border-t border-solid border-[rgba(43,35,32,0.07)]">
         <TextBtn color={C.indigo} onClick={onEdit}>Edit</TextBtn>
         {!addr.isDefault && (
           <>
@@ -411,35 +368,28 @@ function PaymentCard({ pay, onEdit, onRemove, onSetDefault }: {
   pay: Payment; onEdit: () => void; onRemove: () => void; onSetDefault: () => void;
 }) {
   return (
-    <div style={{
-      backgroundColor: '#fff', borderRadius: '8px', padding: '1.25rem 1.5rem',
-      borderWidth: '1px', borderStyle: 'solid', borderColor: 'rgba(43,35,32,0.11)',
-      boxShadow: '0 1px 8px rgba(43,35,32,0.05)',
-      display: 'flex', alignItems: 'center', gap: '1rem',
-    }}>
+    <div className="rounded-lg py-5 px-6 flex items-center gap-4 bg-white border border-solid border-[rgba(43,35,32,0.11)] shadow-[0_1px_8px_rgba(43,35,32,0.05)]">
       {pay.brand === 'visa' ? <VisaIcon /> : <MastercardIcon />}
 
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ fontFamily: UI, fontSize: '0.875rem', fontWeight: 600, color: C.charcoal, letterSpacing: '0.04em' }}>
+      <div className="flex-1 min-w-0">
+        <div className="font-semibold tracking-[0.04em]" style={{ fontFamily: UI, fontSize: '0.875rem', color: C.charcoal }}>
           •••• •••• •••• {pay.last4}
         </div>
-        <div style={{ fontFamily: UI, fontSize: '0.75rem', color: 'rgba(43,35,32,0.48)', marginTop: '3px' }}>
+        <div className="mt-[3px]" style={{ fontFamily: UI, fontSize: '0.75rem', color: 'rgba(43,35,32,0.48)' }}>
           Expires {pay.expiry}
         </div>
       </div>
 
       {pay.isDefault && (
-        <span style={{
-          ...label, fontSize: '0.58rem', letterSpacing: '0.12em',
-          backgroundColor: 'rgba(212,169,78,0.12)', color: 'rgba(43,35,32,0.7)',
-          borderWidth: '1px', borderStyle: 'solid', borderColor: 'rgba(212,169,78,0.45)',
-          padding: '2px 8px', borderRadius: '3px', flexShrink: 0,
+        <span className="shrink-0 py-[2px] px-2 rounded-[3px] tracking-[0.12em] bg-[rgba(212,169,78,0.12)] border border-solid border-[rgba(212,169,78,0.45)]" style={{
+          ...label, fontSize: '0.58rem',
+          color: 'rgba(43,35,32,0.7)',
         }}>
           Default
         </span>
       )}
 
-      <div style={{ display: 'flex', gap: '0.875rem', flexShrink: 0 }}>
+      <div className="flex gap-[0.875rem] shrink-0">
         <TextBtn color={C.indigo} onClick={onEdit}>Edit</TextBtn>
         {!pay.isDefault && (
           <TextBtn color="rgba(43,35,32,0.42)" hoverColor={C.charcoal} onClick={onSetDefault}>
@@ -462,25 +412,19 @@ function AddNewCard({ text, onClick }: { text: string; onClick: () => void }) {
       onClick={onClick}
       onMouseEnter={() => setHov(true)}
       onMouseLeave={() => setHov(false)}
+      className="flex flex-col items-center justify-center gap-[0.6rem] py-11 px-4 w-full rounded-lg cursor-pointer border-[1.5px] border-dashed transition-colors duration-150"
       style={{
-        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-        gap: '0.6rem', padding: '2.75rem 1rem', width: '100%',
         backgroundColor: hov ? 'rgba(43,35,32,0.03)' : 'transparent',
-        borderWidth: '1.5px', borderStyle: 'dashed',
         borderColor: hov ? 'rgba(43,35,32,0.5)' : 'rgba(43,35,32,0.25)',
-        borderRadius: '8px', cursor: 'pointer',
-        transition: 'border-color 0.18s, background 0.18s',
       }}
     >
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
         stroke={hov ? C.charcoal : 'rgba(43,35,32,0.32)'} strokeWidth="1.8" strokeLinecap="round">
         <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
       </svg>
-      <span style={{
-        fontFamily: UI, fontSize: '0.72rem', fontWeight: 600,
-        letterSpacing: '0.09em', textTransform: 'uppercase',
+      <span className="uppercase font-semibold tracking-[0.09em] transition-colors duration-150" style={{
+        fontFamily: UI, fontSize: '0.72rem',
         color: hov ? C.charcoal : 'rgba(43,35,32,0.4)',
-        transition: 'color 0.18s',
       }}>
         {text}
       </span>
@@ -495,11 +439,10 @@ function TextBtn({ color, hoverColor, onClick, right, children }: {
   return (
     <button
       onClick={onClick}
+      className={`p-0 cursor-pointer bg-none border-none font-semibold transition-colors duration-150 ${right ? 'ml-auto' : ''}`}
       style={{
-        background: 'none', border: 'none', cursor: 'pointer', padding: 0,
-        fontFamily: UI, fontSize: '0.77rem', fontWeight: 600,
-        color, transition: 'color 0.15s',
-        marginLeft: right ? 'auto' : undefined,
+        fontFamily: UI, fontSize: '0.77rem',
+        color,
       }}
       onMouseEnter={e => { if (hoverColor) e.currentTarget.style.color = hoverColor; }}
       onMouseLeave={e => { if (hoverColor) e.currentTarget.style.color = color; }}
@@ -512,19 +455,12 @@ function TextBtn({ color, hoverColor, onClick, right, children }: {
 /* ─── Trust note (payment tab) ───────────────────────────────── */
 function TrustNote() {
   return (
-    <div style={{
-      display: 'flex', alignItems: 'flex-start', gap: '0.625rem',
-      padding: '0.875rem 1.125rem', marginTop: '0.5rem',
-      backgroundColor: 'rgba(59,138,147,0.055)',
-      borderWidth: '1px', borderStyle: 'solid', borderColor: 'rgba(59,138,147,0.16)',
-      borderRadius: '6px',
-    }}>
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={C.teal}
-        strokeWidth="2.2" strokeLinecap="round" style={{ flexShrink: 0, marginTop: '2px' }}>
+    <div className="flex items-start gap-[0.625rem] py-[0.875rem] px-[1.125rem] mt-2 rounded-[6px] bg-[rgba(59,138,147,0.055)] border border-solid border-[rgba(59,138,147,0.16)]">
+      <svg className="shrink-0 mt-[2px]" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={C.teal} strokeWidth="2.2" strokeLinecap="round">
         <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
         <path d="M7 11V7a5 5 0 0 1 10 0v4" />
       </svg>
-      <span style={{ fontFamily: UI, fontSize: '0.74rem', color: 'rgba(43,35,32,0.52)', lineHeight: 1.65 }}>
+      <span className="leading-[1.65]" style={{ fontFamily: UI, fontSize: '0.74rem', color: 'rgba(43,35,32,0.52)' }}>
         Payments processed securely via Paystack / Flutterwave — we never store your full card details.
       </span>
     </div>
@@ -603,32 +539,25 @@ export default function AddressesPayment() {
       `}</style>
 
       {/* Page title */}
-      <div style={{ marginBottom: '1.375rem' }}>
-        <h1 style={{
-          fontFamily: DISPLAY, fontSize: '2rem', fontWeight: 500,
-          color: C.charcoal, letterSpacing: '-0.01em', lineHeight: 1.1,
+      <div className="mb-[1.375rem]">
+        <h1 className="font-medium tracking-[-0.01em] leading-[1.1]" style={{
+          fontFamily: DISPLAY, fontSize: '2rem',
+          color: C.charcoal,
         }}>
           Addresses &amp; Payment Methods
         </h1>
       </div>
 
       {/* Sub-tabs */}
-      <div style={{
-        display: 'flex', borderBottom: `1px solid rgba(43,35,32,0.12)`,
-        marginBottom: '2rem',
-      }}>
+      <div className="flex mb-8 border-b border-solid border-[rgba(43,35,32,0.12)]">
         {(['addresses', 'payment'] as const).map(tab => (
           <button
             key={tab}
             onClick={() => navigate(tab === 'addresses' ? '/account/addresses' : '/account/payment')}
-            className={`ap-tab${activeTab === tab ? ' active' : ''}`}
+            className={`ap-tab${activeTab === tab ? ' active font-bold' : ' font-medium'} py-[0.6rem] px-[1.375rem] pb-[0.85rem] cursor-pointer uppercase tracking-[0.11em] bg-none border-none transition-colors duration-150`}
             style={{
-              fontFamily: UI, fontSize: '0.7rem', fontWeight: activeTab === tab ? 700 : 500,
-              letterSpacing: '0.11em', textTransform: 'uppercase',
+              fontFamily: UI, fontSize: '0.7rem',
               color: activeTab === tab ? C.charcoal : 'rgba(43,35,32,0.42)',
-              background: 'none', border: 'none', cursor: 'pointer',
-              padding: '0.6rem 1.375rem 0.85rem',
-              transition: 'color 0.15s',
             }}
           >
             {tab === 'addresses' ? 'Addresses' : 'Payment Methods'}
@@ -654,7 +583,7 @@ export default function AddressesPayment() {
 
       {/* ── Payment Methods tab ─────────────────────────────────── */}
       {activeTab === 'payment' && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.875rem' }}>
+        <div className="flex flex-col gap-[0.875rem]">
           {payments.map(pay => (
             <PaymentCard
               key={pay.id}

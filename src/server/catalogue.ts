@@ -20,9 +20,12 @@ export type CatalogueProduct = {
   collectionName: string | null;
   tag: 'NEW' | 'SOLD OUT' | 'MADE TO ORDER';
   priceCad: number;
+  /** The first image — the card thumbnail and cart snapshot. */
   imageUrl: string;
-  color: string;
-  sizes: string[];
+  /** Every image, with the colour it belongs to (null = shown for all colours). */
+  images: { url: string; color: string | null }[];
+  colors: string[];
+  variants: { size: string; color: string; inStock: boolean }[];
   inStock: boolean;
 };
 
@@ -55,12 +58,11 @@ const productSelect = {
   slug: true,
   title: true,
   tag: true,
-  color: true,
   inStock: true,
   priceCad: true,
   status: true,
-  images: { select: { url: true }, orderBy: { position: 'asc' }, take: 1 },
-  variants: { select: { size: true, stock: true }, orderBy: { id: 'asc' } },
+  images: { select: { url: true, color: true }, orderBy: { position: 'asc' } },
+  variants: { select: { size: true, color: true, stock: true }, orderBy: { id: 'asc' } },
   category: {
     select: { name: true, parent: { select: { slug: true, name: true } } },
   },
@@ -71,12 +73,11 @@ type ProductRow = {
   slug: string;
   title: string;
   tag: keyof typeof TAG_LABELS;
-  color: string;
   inStock: boolean;
   priceCad: unknown;
   status: 'DRAFT' | 'PUBLISHED';
-  images: { url: string }[];
-  variants: { size: string; stock: number }[];
+  images: { url: string; color: string | null }[];
+  variants: { size: string; color: string; stock: number }[];
   category: { name: string; parent: { slug: string; name: string } | null };
 };
 
@@ -92,8 +93,9 @@ function toCatalogueProduct(row: ProductRow): CatalogueProduct {
     // Prisma returns Decimal; the views want a plain number.
     priceCad: Number(row.priceCad),
     imageUrl: row.images[0]?.url ?? PLACEHOLDER_IMAGE,
-    color: row.color,
-    sizes: row.variants.map(v => v.size),
+    images: row.images.map(image => ({ url: image.url, color: image.color })),
+    colors: [...new Set(row.variants.map(v => v.color))].sort(),
+    variants: row.variants.map(v => ({ size: v.size, color: v.color, inStock: v.stock > 0 })),
     inStock: row.inStock,
   };
 }
@@ -187,7 +189,7 @@ export const listCollections = unstable_cache(
 
 /** Colours present in a set of products, so the filter never offers a dead option. */
 export function colorsOf(products: CatalogueProduct[]): string[] {
-  return [...new Set(products.map(p => p.color))].sort();
+  return [...new Set(products.flatMap(p => p.colors))].sort();
 }
 
 /**
@@ -202,15 +204,15 @@ export type ProductForEdit = {
   title: string;
   description: string;
   categoryId: string;
-  color: string;
   priceCadCents: number;
   productionDays: string;
   tag: 'NEW' | 'MADE_TO_ORDER' | 'SOLD_OUT' | null;
   status: 'DRAFT' | 'PUBLISHED';
   metaTitle: string;
   metaDescription: string;
-  imageUrls: string[];
-  variants: { size: string; stock: number }[];
+  /** Each image and the colour it is tied to; "" means shown for all colours. */
+  images: { url: string; color: string }[];
+  variants: { size: string; color: string; stock: number }[];
 };
 
 /** A leaf category, grouped under its collection for the form's picker. */
@@ -225,11 +227,11 @@ export async function getProductForEdit(id: string): Promise<ProductForEdit | nu
     prisma.product.findUnique({
       where: { id },
       select: {
-        id: true, title: true, description: true, categoryId: true, color: true,
+        id: true, title: true, description: true, categoryId: true,
         priceCad: true, productionDays: true, tag: true, status: true,
         metaTitle: true, metaDescription: true,
-        images: { select: { url: true }, orderBy: { position: 'asc' } },
-        variants: { select: { size: true, stock: true }, orderBy: { size: 'asc' } },
+        images: { select: { url: true, color: true }, orderBy: { position: 'asc' } },
+        variants: { select: { size: true, color: true, stock: true }, orderBy: { size: 'asc' } },
       },
     })
   );
@@ -241,15 +243,14 @@ export async function getProductForEdit(id: string): Promise<ProductForEdit | nu
     title: row.title,
     description: row.description ?? '',
     categoryId: row.categoryId,
-    color: row.color,
     priceCadCents: Math.round(Number(row.priceCad) * 100),
     productionDays: row.productionDays ?? '',
     tag: row.tag,
     status: row.status,
     metaTitle: row.metaTitle ?? '',
     metaDescription: row.metaDescription ?? '',
-    imageUrls: row.images.map(image => image.url),
-    variants: row.variants.map(variant => ({ size: variant.size, stock: variant.stock })),
+    images: row.images.map(image => ({ url: image.url, color: image.color ?? '' })),
+    variants: row.variants.map(variant => ({ size: variant.size, color: variant.color, stock: variant.stock })),
   };
 }
 
@@ -278,7 +279,7 @@ export async function listCategoryOptions(): Promise<CategoryOption[]> {
 /** Colours already in the catalogue, so the form can suggest rather than dictate. */
 export async function listKnownColors(): Promise<string[]> {
   const rows = await withDbRetry('list known colours', () =>
-    prisma.product.findMany({ distinct: ['color'], select: { color: true }, orderBy: { color: 'asc' } })
+    prisma.productVariant.findMany({ distinct: ['color'], select: { color: true }, orderBy: { color: 'asc' } })
   );
   return rows.map(row => row.color);
 }

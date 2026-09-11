@@ -175,18 +175,14 @@ function fmtCad(n: number) {
 function RefSwatch({ bg, size = 56 }: { bg: string; size?: number }) {
   return (
     <div
+      className="shrink-0 overflow-hidden relative rounded-[6px] border border-solid border-[rgba(43,35,32,0.12)]"
       style={{
         width: size,
         height: size,
-        borderRadius: 6,
         backgroundColor: bg,
-        border: "1px solid rgba(43,35,32,0.12)",
-        flexShrink: 0,
-        overflow: "hidden",
-        position: "relative",
       }}
     >
-      <svg width={size} height={size} style={{ position: "absolute", inset: 0, opacity: 0.12 }}>
+      <svg width={size} height={size} className="absolute inset-0" style={{ opacity: 0.12 }}>
         <pattern id={`h-${bg.replace("#", "")}`} width="6" height="6" patternUnits="userSpaceOnUse">
           <line x1="0" y1="6" x2="6" y2="0" stroke="#fff" strokeWidth="0.8" />
         </pattern>
@@ -202,29 +198,20 @@ function StatusBadge({ status }: { status: RequestStatus }) {
   const s = STATUS_CFG[status];
   return (
     <span
+      className="inline-flex items-center gap-[0.3rem] shrink-0 whitespace-nowrap rounded-full py-[0.25rem] px-[0.7rem] border border-solid"
       style={{
         ...label,
         fontSize: "0.6rem",
         letterSpacing: "0.09em",
-        padding: "0.25rem 0.7rem",
-        borderRadius: 100,
-        whiteSpace: "nowrap",
         backgroundColor: s.bg,
         color: s.color,
-        border: `1px solid ${s.border}`,
-        display: "inline-flex",
-        alignItems: "center",
-        gap: "0.3rem",
-        flexShrink: 0,
+        borderColor: s.border,
       }}
     >
       <span
+        className="w-[5px] h-[5px] rounded-full shrink-0"
         style={{
-          width: 5,
-          height: 5,
-          borderRadius: "50%",
           backgroundColor: s.color,
-          flexShrink: 0,
         }}
       />
       {s.label}
@@ -238,7 +225,7 @@ function ProgressStepper({ status }: { status: RequestStatus }) {
   const currentIdx = STATUS_ORDER.indexOf(status);
 
   return (
-    <div style={{ display: "flex", alignItems: "flex-start", gap: 0, marginTop: "0.25rem", overflowX: "auto", paddingBottom: "0.25rem" }}>
+    <div className="flex items-start gap-0 mt-[0.25rem] overflow-x-auto pb-[0.25rem]">
       {STEPPER_STEPS.map((step, i) => {
         const isDone = i < currentIdx;
         const isActive = i === currentIdx;
@@ -247,26 +234,17 @@ function ProgressStepper({ status }: { status: RequestStatus }) {
         return (
           <div
             key={step.key}
+            className="flex items-start min-w-[72px]"
             style={{
-              display: "flex",
-              alignItems: "flex-start",
               flex: i < STEPPER_STEPS.length - 1 ? 1 : 0,
-              minWidth: 72,
             }}
           >
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "0.4rem", flexShrink: 0 }}>
+            <div className="flex flex-col items-center gap-[0.4rem] shrink-0">
               <div
+                className="w-[18px] h-[18px] rounded-full flex items-center justify-center shrink-0 transition-colors duration-200"
                 style={{
-                  width: 18,
-                  height: 18,
-                  borderRadius: "50%",
                   backgroundColor: dotColor,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  flexShrink: 0,
                   boxShadow: isActive ? `0 0 0 3px rgba(212,169,78,0.22)` : "none",
-                  transition: "background-color 0.2s",
                 }}
               >
                 {isDone && (
@@ -275,18 +253,15 @@ function ProgressStepper({ status }: { status: RequestStatus }) {
                   </svg>
                 )}
                 {isActive && (
-                  <div style={{ width: 6, height: 6, borderRadius: "50%", backgroundColor: C.charcoal }} />
+                  <div className="w-[6px] h-[6px] rounded-full" style={{ backgroundColor: C.charcoal }} />
                 )}
               </div>
               <div
+                className={`text-center whitespace-nowrap leading-[1.3] ${isActive ? 'font-semibold' : ''}`}
                 style={{
                   fontFamily: UI,
                   fontSize: "0.63rem",
                   color: isDone || isActive ? C.charcoal : "rgba(43,35,32,0.35)",
-                  fontWeight: isActive ? 600 : 400,
-                  textAlign: "center",
-                  lineHeight: 1.3,
-                  whiteSpace: "nowrap",
                 }}
               >
                 {step.label}
@@ -294,13 +269,9 @@ function ProgressStepper({ status }: { status: RequestStatus }) {
             </div>
             {i < STEPPER_STEPS.length - 1 && (
               <div
+                className="flex-1 h-[2px] mt-2 min-w-[16px] transition-colors duration-200"
                 style={{
-                  flex: 1,
-                  height: 2,
                   backgroundColor: lineColor,
-                  marginTop: 8,
-                  minWidth: 16,
-                  transition: "background-color 0.2s",
                 }}
               />
             )}
@@ -317,19 +288,16 @@ function Field({ lbl, val }: { lbl: string; val: string }) {
   return (
     <div>
       <div
+        className="mb-[3px] uppercase font-medium tracking-[0.1em]"
         style={{
           fontSize: "0.6rem",
-          letterSpacing: "0.1em",
-          textTransform: "uppercase",
           color: "rgba(43,35,32,0.38)",
-          fontWeight: 500,
-          marginBottom: "3px",
           fontFamily: UI,
         }}
       >
         {lbl}
       </div>
-      <div style={{ fontSize: "0.82rem", color: C.charcoal, lineHeight: 1.5, fontFamily: UI }}>
+      <div className="leading-[1.5]" style={{ fontSize: "0.82rem", color: C.charcoal, fontFamily: UI }}>
         {val}
       </div>
     </div>
@@ -339,14 +307,11 @@ function Field({ lbl, val }: { lbl: string; val: string }) {
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
     <div
+      className="uppercase font-medium mb-[0.75rem] tracking-[0.12em]"
       style={{
         fontSize: "0.6rem",
-        letterSpacing: "0.12em",
-        textTransform: "uppercase",
         color: "rgba(43,35,32,0.38)",
-        fontWeight: 500,
         fontFamily: UI,
-        marginBottom: "0.75rem",
       }}
     >
       {children}
@@ -369,18 +334,9 @@ function ExpandedDetail({
   const showDeclineBlock = req.status === "declined" && req.declineReason;
 
   return (
-    <div className="rg-split"
-      style={{
-        borderTop: "1px solid rgba(43,35,32,0.08)",
-        backgroundColor: "rgba(250,246,240,0.55)",
-        padding: "1.75rem 1.5rem",
-        display: "grid",
-        gridTemplateColumns: "1fr 280px",
-        gap: "2rem",
-      }}
-    >
+    <div className="rg-split grid grid-cols-[1fr_280px] gap-8 py-[1.75rem] px-6 border-t border-solid border-[rgba(43,35,32,0.08)] bg-[rgba(250,246,240,0.55)]">
       {/* LEFT column */}
-      <div style={{ display: "flex", flexDirection: "column", gap: "1.75rem" }}>
+      <div className="flex flex-col gap-[1.75rem]">
 
         {/* Progress stepper */}
         {showStepper && (
@@ -394,17 +350,9 @@ function ExpandedDetail({
         <div>
           <SectionLabel>Your Submitted Details</SectionLabel>
           <div
-            style={{
-              backgroundColor: "#fff",
-              border: "1px solid rgba(43,35,32,0.09)",
-              borderRadius: 8,
-              padding: "1.25rem",
-              display: "flex",
-              flexDirection: "column",
-              gap: "1rem",
-            }}
+            className="flex flex-col gap-4 p-5 rounded-lg bg-white border border-solid border-[rgba(43,35,32,0.09)]"
           >
-            <div className="rg-2" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.875rem" }}>
+            <div className="rg-2 grid grid-cols-[1fr_1fr] gap-[0.875rem]">
               <Field lbl="Occasion" val={req.occasion} />
               <Field lbl="Needed By" val={req.neededBy} />
               <Field lbl="Fabric Preference" val={req.fabricPreference} />
@@ -413,28 +361,21 @@ function ExpandedDetail({
             {req.notes && (
               <div>
                 <div
+                  className="uppercase font-medium mb-1 tracking-[0.1em]"
                   style={{
                     fontSize: "0.6rem",
-                    letterSpacing: "0.1em",
-                    textTransform: "uppercase",
                     color: "rgba(43,35,32,0.38)",
-                    fontWeight: 500,
-                    marginBottom: 4,
                     fontFamily: UI,
                   }}
                 >
                   Additional Notes
                 </div>
                 <div
+                  className="p-3 rounded-[6px] leading-[1.6] bg-[rgba(43,35,32,0.02)] border border-solid border-[rgba(43,35,32,0.06)]"
                   style={{
                     fontSize: "0.82rem",
                     color: C.charcoal,
-                    lineHeight: 1.6,
                     fontFamily: UI,
-                    backgroundColor: "rgba(43,35,32,0.02)",
-                    border: "1px solid rgba(43,35,32,0.06)",
-                    borderRadius: 6,
-                    padding: "0.75rem",
                   }}
                 >
                   {req.notes}
@@ -447,38 +388,25 @@ function ExpandedDetail({
         {/* Measurements */}
         <div>
           <SectionLabel>Your Measurements</SectionLabel>
-          <div className="rg-3"
-            style={{
-              backgroundColor: "#fff",
-              border: "1px solid rgba(43,35,32,0.09)",
-              borderRadius: 8,
-              padding: "1rem 1.25rem",
-              display: "grid",
-              gridTemplateColumns: "repeat(3, 1fr)",
-              gap: "0.75rem 1rem",
-            }}
-          >
+          <div className="rg-3 grid grid-cols-[repeat(3,1fr)] gap-y-[0.75rem] gap-x-4 py-4 px-5 rounded-lg bg-white border border-solid border-[rgba(43,35,32,0.09)]">
             {req.measurements.map((m) => (
               <div key={m.label}>
                 <div
+                  className="uppercase font-medium tracking-[0.1em]"
                   style={{
                     fontSize: "0.58rem",
-                    letterSpacing: "0.1em",
-                    textTransform: "uppercase",
                     color: "rgba(43,35,32,0.38)",
-                    fontWeight: 500,
                     fontFamily: UI,
                   }}
                 >
                   {m.label}
                 </div>
                 <div
+                  className="font-semibold mt-[1px]"
                   style={{
                     fontSize: "0.92rem",
-                    fontWeight: 600,
                     color: C.charcoal,
                     fontFamily: UI,
-                    marginTop: 1,
                   }}
                 >
                   {m.value}
@@ -492,9 +420,9 @@ function ExpandedDetail({
         {req.refImages.length > 0 && (
           <div>
             <SectionLabel>Style References Uploaded</SectionLabel>
-            <div style={{ display: "flex", gap: "0.625rem", flexWrap: "wrap" }}>
+            <div className="flex gap-[0.625rem] flex-wrap">
               {req.refImages.map((img, i) => (
-                <div key={i} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "0.35rem" }}>
+                <div key={i} className="flex flex-col items-center gap-[0.35rem]">
                   <RefSwatch bg={img.bg} size={72} />
                   <span style={{ fontSize: "0.62rem", color: "rgba(43,35,32,0.45)", fontFamily: UI }}>{img.label}</span>
                 </div>
@@ -505,74 +433,60 @@ function ExpandedDetail({
       </div>
 
       {/* RIGHT column */}
-      <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+      <div className="flex flex-col gap-5">
 
         {/* Quote card */}
         {showQuoteCard && req.quotedPriceCad && (
           <div
+            className="rounded-[10px] overflow-hidden bg-white border-[1.5px] border-solid"
             style={{
-              backgroundColor: "#fff",
-              border: `1.5px solid ${C.gold}`,
-              borderRadius: 10,
-              overflow: "hidden",
+              borderColor: C.gold,
             }}
           >
             <div
-              style={{
-                backgroundColor: "rgba(212,169,78,0.07)",
-                padding: "0.75rem 1rem",
-                borderBottom: "1px solid rgba(212,169,78,0.2)",
-              }}
+              className="py-3 px-4 bg-[rgba(212,169,78,0.07)] border-b border-solid border-[rgba(212,169,78,0.2)]"
             >
               <div
+                className="uppercase font-semibold tracking-[0.12em]"
                 style={{
                   fontSize: "0.62rem",
-                  letterSpacing: "0.12em",
-                  textTransform: "uppercase",
                   color: "#8A6818",
-                  fontWeight: 600,
                   fontFamily: UI,
                 }}
               >
                 Quote Received
               </div>
             </div>
-            <div style={{ padding: "1.125rem 1rem", display: "flex", flexDirection: "column", gap: "0.875rem" }}>
+            <div className="py-[1.125rem] px-4 flex flex-col gap-[0.875rem]">
               <div>
-                <div style={{ fontFamily: UI, fontSize: "0.6rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(43,35,32,0.38)", fontWeight: 500, marginBottom: 3 }}>
+                <div className="uppercase font-medium mb-[3px] tracking-[0.1em]" style={{ fontFamily: UI, fontSize: "0.6rem", color: "rgba(43,35,32,0.38)" }}>
                   Total Price
                 </div>
-                <div style={{ fontFamily: UI, fontSize: "1.5rem", fontWeight: 700, color: C.charcoal, letterSpacing: "-0.03em", lineHeight: 1 }}>
+                <div className="font-bold leading-none tracking-[-0.03em]" style={{ fontFamily: UI, fontSize: "1.5rem", color: C.charcoal }}>
                   {fmtCad(req.quotedPriceCad)}
-                </div>
-                <div style={{ fontFamily: UI, fontSize: "0.72rem", color: "rgba(43,35,32,0.42)", marginTop: 3 }}>
                 </div>
               </div>
               {req.estimatedCompletion && (
                 <div>
-                  <div style={{ fontFamily: UI, fontSize: "0.6rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(43,35,32,0.38)", fontWeight: 500, marginBottom: 3 }}>
+                  <div className="uppercase font-medium mb-[3px] tracking-[0.1em]" style={{ fontFamily: UI, fontSize: "0.6rem", color: "rgba(43,35,32,0.38)" }}>
                     Est. Completion
                   </div>
-                  <div style={{ fontFamily: UI, fontSize: "0.85rem", fontWeight: 500, color: C.charcoal }}>
+                  <div className="font-medium" style={{ fontFamily: UI, fontSize: "0.85rem", color: C.charcoal }}>
                     {req.estimatedCompletion}
                   </div>
                 </div>
               )}
               {req.storeNotes && (
                 <div>
-                  <div style={{ fontFamily: UI, fontSize: "0.6rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(43,35,32,0.38)", fontWeight: 500, marginBottom: 3 }}>
+                  <div className="uppercase font-medium mb-[3px] tracking-[0.1em]" style={{ fontFamily: UI, fontSize: "0.6rem", color: "rgba(43,35,32,0.38)" }}>
                     Message from the Store
                   </div>
                   <div
+                    className="py-[0.65rem] px-3 rounded-[6px] leading-[1.55] bg-[rgba(43,35,32,0.025)] border border-solid border-[rgba(43,35,32,0.06)]"
                     style={{
                       fontFamily: UI,
                       fontSize: "0.77rem",
                       color: "rgba(43,35,32,0.68)",
-                      lineHeight: 1.55,
-                      backgroundColor: "rgba(43,35,32,0.025)",
-                      border: "1px solid rgba(43,35,32,0.06)",
-                      borderRadius: 6,
-                      padding: "0.65rem 0.75rem",
                     }}
                   >
                     {req.storeNotes}
@@ -580,22 +494,15 @@ function ExpandedDetail({
                 </div>
               )}
 
-              <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem", paddingTop: "0.25rem" }}>
+              <div className="flex flex-col gap-2 pt-1">
                 <button
                   onClick={onApprove}
+                  className="font-bold cursor-pointer rounded-[6px] p-[0.65rem] tracking-[0.04em] border-none shadow-[0_2px_10px_rgba(212,169,78,0.38)] transition-all duration-150"
                   style={{
                     backgroundColor: C.gold,
                     color: C.charcoal,
-                    border: "none",
-                    borderRadius: 6,
-                    padding: "0.65rem",
                     fontFamily: UI,
                     fontSize: "0.8rem",
-                    fontWeight: 700,
-                    letterSpacing: "0.04em",
-                    cursor: "pointer",
-                    boxShadow: "0 2px 10px rgba(212,169,78,0.38)",
-                    transition: "box-shadow 0.15s, transform 0.1s",
                   }}
                   onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.boxShadow = "0 4px 18px rgba(212,169,78,0.52)"; (e.currentTarget as HTMLButtonElement).style.transform = "translateY(-1px)"; }}
                   onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.boxShadow = "0 2px 10px rgba(212,169,78,0.38)"; (e.currentTarget as HTMLButtonElement).style.transform = "none"; }}
@@ -603,17 +510,11 @@ function ExpandedDetail({
                   Approve &amp; Pay
                 </button>
                 <button
+                  className="font-medium cursor-pointer rounded-[6px] p-[0.6rem] bg-transparent border-[1.5px] border-solid border-[rgba(43,35,32,0.18)] transition-colors duration-150"
                   style={{
-                    backgroundColor: "transparent",
                     color: "rgba(43,35,32,0.55)",
-                    border: "1.5px solid rgba(43,35,32,0.18)",
-                    borderRadius: 6,
-                    padding: "0.6rem",
                     fontFamily: UI,
                     fontSize: "0.78rem",
-                    fontWeight: 500,
-                    cursor: "pointer",
-                    transition: "border-color 0.12s, color 0.12s",
                   }}
                   onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = C.maroon; (e.currentTarget as HTMLButtonElement).style.color = C.maroon; }}
                   onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(43,35,32,0.18)"; (e.currentTarget as HTMLButtonElement).style.color = "rgba(43,35,32,0.55)"; }}
@@ -628,28 +529,20 @@ function ExpandedDetail({
         {/* In production — summary tile */}
         {(req.status === "in-production" || req.status === "approved") && req.quotedPriceCad && (
           <div
-            style={{
-              backgroundColor: "#fff",
-              border: "1px solid rgba(43,35,32,0.09)",
-              borderRadius: 8,
-              padding: "1rem",
-              display: "flex",
-              flexDirection: "column",
-              gap: "0.625rem",
-            }}
+            className="flex flex-col gap-[0.625rem] p-4 rounded-lg bg-white border border-solid border-[rgba(43,35,32,0.09)]"
           >
-            <div style={{ fontFamily: UI, fontSize: "0.6rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(43,35,32,0.38)", fontWeight: 500 }}>Agreed Price</div>
-            <div style={{ fontFamily: UI, fontSize: "1.15rem", fontWeight: 700, color: C.charcoal, letterSpacing: "-0.02em" }}>{fmtCad(req.quotedPriceCad)}</div>
+            <div className="uppercase font-medium tracking-[0.1em]" style={{ fontFamily: UI, fontSize: "0.6rem", color: "rgba(43,35,32,0.38)" }}>Agreed Price</div>
+            <div className="font-bold tracking-[-0.02em]" style={{ fontFamily: UI, fontSize: "1.15rem", color: C.charcoal }}>{fmtCad(req.quotedPriceCad)}</div>
             {req.estimatedCompletion && (
               <>
-                <div style={{ fontFamily: UI, fontSize: "0.6rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(43,35,32,0.38)", fontWeight: 500, marginTop: 2 }}>Est. Completion</div>
-                <div style={{ fontFamily: UI, fontSize: "0.82rem", fontWeight: 500, color: C.charcoal }}>{req.estimatedCompletion}</div>
+                <div className="uppercase font-medium mt-[2px] tracking-[0.1em]" style={{ fontFamily: UI, fontSize: "0.6rem", color: "rgba(43,35,32,0.38)" }}>Est. Completion</div>
+                <div className="font-medium" style={{ fontFamily: UI, fontSize: "0.82rem", color: C.charcoal }}>{req.estimatedCompletion}</div>
               </>
             )}
             {req.storeNotes && (
               <>
-                <div style={{ fontFamily: UI, fontSize: "0.6rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(43,35,32,0.38)", fontWeight: 500, marginTop: 2 }}>Store Update</div>
-                <div style={{ fontFamily: UI, fontSize: "0.76rem", color: "rgba(43,35,32,0.65)", lineHeight: 1.5 }}>{req.storeNotes}</div>
+                <div className="uppercase font-medium mt-[2px] tracking-[0.1em]" style={{ fontFamily: UI, fontSize: "0.6rem", color: "rgba(43,35,32,0.38)" }}>Store Update</div>
+                <div className="leading-[1.5]" style={{ fontFamily: UI, fontSize: "0.76rem", color: "rgba(43,35,32,0.65)" }}>{req.storeNotes}</div>
               </>
             )}
           </div>
@@ -658,18 +551,10 @@ function ExpandedDetail({
         {/* Completed tile */}
         {req.status === "completed" && req.quotedPriceCad && (
           <div
-            style={{
-              backgroundColor: "rgba(40,120,60,0.05)",
-              border: "1px solid rgba(40,120,60,0.2)",
-              borderRadius: 8,
-              padding: "1rem",
-              display: "flex",
-              flexDirection: "column",
-              gap: "0.5rem",
-            }}
+            className="flex flex-col gap-2 p-4 rounded-lg bg-[rgba(40,120,60,0.05)] border border-solid border-[rgba(40,120,60,0.2)]"
           >
-            <div style={{ fontFamily: UI, fontSize: "0.7rem", fontWeight: 600, color: "#2A6E38" }}>Order complete ✓</div>
-            <div style={{ fontFamily: UI, fontSize: "0.78rem", color: "rgba(43,35,32,0.6)", lineHeight: 1.5 }}>
+            <div className="font-semibold" style={{ fontFamily: UI, fontSize: "0.7rem", color: "#2A6E38" }}>Order complete ✓</div>
+            <div className="leading-[1.5]" style={{ fontFamily: UI, fontSize: "0.78rem", color: "rgba(43,35,32,0.6)" }}>
               Total paid: {fmtCad(req.quotedPriceCad)}
             </div>
           </div>
@@ -678,17 +563,12 @@ function ExpandedDetail({
         {/* Decline reason */}
         {showDeclineBlock && (
           <div
-            style={{
-              backgroundColor: "rgba(122,46,56,0.04)",
-              border: "1px solid rgba(122,46,56,0.18)",
-              borderRadius: 8,
-              padding: "1rem",
-            }}
+            className="p-4 rounded-lg bg-[rgba(122,46,56,0.04)] border border-solid border-[rgba(122,46,56,0.18)]"
           >
-            <div style={{ fontFamily: UI, fontSize: "0.6rem", letterSpacing: "0.12em", textTransform: "uppercase", color: C.maroon, fontWeight: 600, marginBottom: 6 }}>
+            <div className="uppercase font-semibold mb-[6px] tracking-[0.12em]" style={{ fontFamily: UI, fontSize: "0.6rem", color: C.maroon }}>
               Why It Was Declined
             </div>
-            <div style={{ fontFamily: UI, fontSize: "0.78rem", color: "rgba(43,35,32,0.65)", lineHeight: 1.55 }}>
+            <div className="leading-[1.55]" style={{ fontFamily: UI, fontSize: "0.78rem", color: "rgba(43,35,32,0.65)" }}>
               {req.declineReason}
             </div>
           </div>
@@ -697,18 +577,11 @@ function ExpandedDetail({
         {/* Message button */}
         <Link
           to="/account/support"
+          className="inline-flex items-center gap-2 font-medium w-fit no-underline pb-[1px] border-b border-solid border-[rgba(46,74,158,0.25)]"
           style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: "0.5rem",
             fontFamily: UI,
             fontSize: "0.78rem",
-            fontWeight: 500,
             color: C.indigo,
-            textDecorationLine: "none",
-            borderBottom: "1px solid rgba(46,74,158,0.25)",
-            paddingBottom: 1,
-            width: "fit-content",
           }}
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
@@ -737,37 +610,24 @@ function RequestCard({
 
   return (
     <div
-      style={{
-        backgroundColor: "#fff",
-        borderRadius: 10,
-        border: "1px solid rgba(43,35,32,0.1)",
-        boxShadow: "0 1px 10px rgba(43,35,32,0.05)",
-        overflow: "hidden",
-        transition: "box-shadow 0.18s",
-      }}
+      className="rounded-[10px] overflow-hidden bg-white border border-solid border-[rgba(43,35,32,0.1)] shadow-[0_1px_10px_rgba(43,35,32,0.05)] transition-shadow duration-150"
       onMouseEnter={e => { (e.currentTarget as HTMLElement).style.boxShadow = "0 3px 16px rgba(43,35,32,0.09)"; }}
       onMouseLeave={e => { (e.currentTarget as HTMLElement).style.boxShadow = "0 1px 10px rgba(43,35,32,0.05)"; }}
     >
       {/* Card header */}
       <div
-        style={{
-          padding: "1.25rem 1.5rem",
-          display: "flex",
-          alignItems: "flex-start",
-          justifyContent: "space-between",
-          gap: "1rem",
-        }}
+        className="py-5 px-6 flex items-start justify-between gap-4"
       >
         {/* Left: thumbnail + info */}
-        <div style={{ display: "flex", alignItems: "flex-start", gap: "1rem", flex: 1, minWidth: 0 }}>
+        <div className="flex items-start gap-4 flex-1 min-w-0">
           {thumb && (
             <RefSwatch bg={thumb.bg} size={48} />
           )}
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontFamily: UI, fontSize: "0.95rem", fontWeight: 700, color: C.charcoal, lineHeight: 1.25, marginBottom: "0.2rem" }}>
+          <div className="flex-1 min-w-0">
+            <div className="font-bold leading-tight mb-[0.2rem]" style={{ fontFamily: UI, fontSize: "0.95rem", color: C.charcoal }}>
               {req.garmentType}
             </div>
-            <div style={{ fontFamily: UI, fontSize: "0.72rem", color: "rgba(43,35,32,0.44)", marginBottom: "0.5rem" }}>
+            <div className="mb-2" style={{ fontFamily: UI, fontSize: "0.72rem", color: "rgba(43,35,32,0.44)" }}>
               Submitted {req.submittedDate} · #{req.id}
             </div>
             <div style={{ fontFamily: UI, fontSize: "0.78rem", color: "rgba(43,35,32,0.58)" }}>
@@ -777,23 +637,16 @@ function RequestCard({
         </div>
 
         {/* Right: badge + action */}
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "0.75rem", flexShrink: 0 }}>
+        <div className="flex flex-col items-end gap-3 shrink-0">
           <StatusBadge status={req.status} />
           <button
             onClick={() => setExpanded(e => !e)}
+            className="font-semibold cursor-pointer whitespace-nowrap rounded-[5px] py-[0.45rem] px-[0.875rem] bg-transparent tracking-[0.04em] border-[1.5px] border-solid transition-colors duration-150"
             style={{
               fontFamily: UI,
               fontSize: "0.72rem",
-              fontWeight: 600,
-              letterSpacing: "0.04em",
               color: C.maroon,
-              backgroundColor: "transparent",
-              border: `1.5px solid ${C.maroon}`,
-              borderRadius: 5,
-              padding: "0.45rem 0.875rem",
-              cursor: "pointer",
-              transition: "background-color 0.12s, color 0.12s",
-              whiteSpace: "nowrap",
+              borderColor: C.maroon,
             }}
             onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.backgroundColor = "rgba(122,46,56,0.07)"; }}
             onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.backgroundColor = "transparent"; }}
@@ -806,33 +659,19 @@ function RequestCard({
       {/* Quote pending CTA strip (visible even when collapsed) */}
       {req.status === "quoted" && !expanded && (
         <div
-          style={{
-            borderTop: "1px solid rgba(212,169,78,0.25)",
-            backgroundColor: "rgba(212,169,78,0.05)",
-            padding: "0.75rem 1.5rem",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            gap: "1rem",
-          }}
+          className="py-3 px-6 flex items-center justify-between gap-4 border-t border-solid border-[rgba(212,169,78,0.25)] bg-[rgba(212,169,78,0.05)]"
         >
           <div style={{ fontFamily: UI, fontSize: "0.78rem", color: "#8A6818" }}>
             <strong>Quote received:</strong> {req.quotedPriceCad ? fmtCad(req.quotedPriceCad) : ""} — your approval is needed to begin production.
           </div>
           <button
             onClick={() => setExpanded(true)}
+            className="font-bold cursor-pointer whitespace-nowrap shrink-0 rounded-[5px] py-[0.45rem] px-[0.875rem] border-none"
             style={{
               backgroundColor: C.gold,
               color: C.charcoal,
-              border: "none",
-              borderRadius: 5,
-              padding: "0.45rem 0.875rem",
               fontFamily: UI,
               fontSize: "0.72rem",
-              fontWeight: 700,
-              cursor: "pointer",
-              whiteSpace: "nowrap",
-              flexShrink: 0,
             }}
           >
             Review &amp; Approve
@@ -853,45 +692,28 @@ function RequestCard({
 function EmptyState() {
   return (
     <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        padding: "5rem 2rem",
-        textAlign: "center",
-        backgroundColor: "#fff",
-        borderRadius: 10,
-        border: "1px solid rgba(43,35,32,0.09)",
-      }}
+      className="flex flex-col items-center justify-center py-20 px-8 text-center rounded-[10px] bg-white border border-solid border-[rgba(43,35,32,0.09)]"
     >
-      <div style={{ marginBottom: "1.25rem", opacity: 0.2 }}>
+      <div className="mb-5 opacity-20">
         <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke={C.charcoal} strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
           <path d="M12 20h9" />
           <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z" />
         </svg>
       </div>
-      <p style={{ fontFamily: DISPLAY, fontSize: "1.25rem", color: C.charcoal, fontWeight: 500, marginBottom: "0.5rem" }}>
+      <p className="font-medium mb-2" style={{ fontFamily: DISPLAY, fontSize: "1.25rem", color: C.charcoal }}>
         No custom orders yet
       </p>
-      <p style={{ fontFamily: UI, fontSize: "0.84rem", color: "rgba(43,35,32,0.5)", marginBottom: "1.75rem", maxWidth: 320, lineHeight: 1.65 }}>
+      <p className="mb-7 max-w-[320px] leading-relaxed" style={{ fontFamily: UI, fontSize: "0.84rem", color: "rgba(43,35,32,0.5)" }}>
         You haven&apos;t submitted a custom order yet. Start by describing what you&apos;d like made.
       </p>
       <Link
         to="/shop"
+        className="inline-block font-bold uppercase no-underline rounded-[5px] py-[0.8rem] px-7 tracking-[0.1em] shadow-[0_2px_12px_rgba(212,169,78,0.35)]"
         style={{
-          display: "inline-block",
           fontFamily: UI,
           fontSize: "0.75rem",
-          fontWeight: 700,
-          letterSpacing: "0.1em",
-          textTransform: "uppercase",
           color: C.charcoal,
           backgroundColor: C.gold,
-          textDecorationLine: "none",
-          borderRadius: 5,
-          padding: "0.8rem 1.75rem",
-          boxShadow: "0 2px 12px rgba(212,169,78,0.35)",
         }}
       >
         Start a Custom Order
@@ -943,54 +765,32 @@ export default function CustomOrders() {
     <AccountShell>
       {/* Page heading row */}
       <div
-        style={{
-          display: "flex",
-          alignItems: "flex-end",
-          justifyContent: "space-between",
-          gap: "1rem",
-          marginBottom: "2rem",
-          flexWrap: "wrap",
-        }}
+        className="flex items-end justify-between gap-4 mb-8 flex-wrap"
       >
         <div>
           <h1
+            className="font-medium leading-[1.1] m-0 mb-[0.35rem] tracking-[-0.015em]"
             style={{
               fontFamily: DISPLAY,
               fontSize: "2rem",
-              fontWeight: 500,
               color: C.charcoal,
-              letterSpacing: "-0.015em",
-              lineHeight: 1.1,
-              margin: 0,
-              marginBottom: "0.35rem",
             }}
           >
             My Custom Orders
           </h1>
-          <p style={{ fontFamily: UI, fontSize: "0.84rem", color: "rgba(43,35,32,0.48)", margin: 0, lineHeight: 1.5 }}>
+          <p className="m-0 leading-relaxed" style={{ fontFamily: UI, fontSize: "0.84rem", color: "rgba(43,35,32,0.48)" }}>
             Track your bespoke garment requests from submission through to delivery.
           </p>
         </div>
 
         <Link
           to="/shop"
+          className="inline-flex items-center gap-[0.4rem] font-bold uppercase no-underline rounded-[5px] py-[0.7rem] px-5 shrink-0 tracking-[0.08em] shadow-[0_2px_10px_rgba(212,169,78,0.35)] transition-all duration-150"
           style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: "0.4rem",
             fontFamily: UI,
             fontSize: "0.75rem",
-            fontWeight: 700,
-            letterSpacing: "0.08em",
-            textTransform: "uppercase",
             color: C.charcoal,
             backgroundColor: C.gold,
-            textDecorationLine: "none",
-            borderRadius: 5,
-            padding: "0.7rem 1.25rem",
-            boxShadow: "0 2px 10px rgba(212,169,78,0.35)",
-            flexShrink: 0,
-            transition: "box-shadow 0.15s, transform 0.1s",
           }}
           onMouseEnter={e => { const el = e.currentTarget as HTMLAnchorElement; el.style.boxShadow = "0 4px 18px rgba(212,169,78,0.5)"; el.style.transform = "translateY(-1px)"; }}
           onMouseLeave={e => { const el = e.currentTarget as HTMLAnchorElement; el.style.boxShadow = "0 2px 10px rgba(212,169,78,0.35)"; el.style.transform = "none"; }}
@@ -1006,7 +806,7 @@ export default function CustomOrders() {
       {hasRequests ? (
         <>
           {/* Filter tabs */}
-          <div style={{ display: "flex", gap: 0, borderBottom: "1px solid rgba(43,35,32,0.12)", marginBottom: "1.5rem" }}>
+          <div className="flex gap-0 mb-6 border-b border-solid border-[rgba(43,35,32,0.12)]">
             {FILTERS.map(f => {
               const isActive = activeFilter === f.key;
               const count = counts[f.key];
@@ -1014,37 +814,23 @@ export default function CustomOrders() {
                 <button
                   key={f.key}
                   onClick={() => setActiveFilter(f.key)}
+                  className={`bg-none cursor-pointer uppercase flex items-center gap-[0.375rem] py-3 px-[1.1rem] -mb-[1px] border-none border-b-2 border-solid tracking-[0.1em] transition-colors duration-150 ${isActive ? 'font-bold border-gold' : 'font-medium border-transparent'}`}
                   style={{
-                    background: "none",
-                    border: "none",
-                    cursor: "pointer",
                     fontFamily: UI,
                     fontSize: "0.72rem",
-                    fontWeight: isActive ? 700 : 500,
-                    letterSpacing: "0.1em",
-                    textTransform: "uppercase",
                     color: isActive ? C.charcoal : "rgba(43,35,32,0.45)",
-                    padding: "0.75rem 1.1rem",
-                    borderBottom: isActive ? `2px solid ${C.gold}` : "2px solid transparent",
-                    marginBottom: "-1px",
-                    transition: "color 0.15s, border-color 0.15s",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "0.375rem",
+                    borderColor: isActive ? C.gold : "transparent",
                   }}
                 >
                   {f.label}
                   {count > 0 && (
                     <span
+                      className="font-bold rounded-[10px] py-[1px] px-[6px] leading-[1.6]"
                       style={{
                         fontFamily: UI,
                         fontSize: "0.58rem",
-                        fontWeight: 700,
                         backgroundColor: isActive ? C.gold : "rgba(43,35,32,0.1)",
                         color: isActive ? C.charcoal : "rgba(43,35,32,0.5)",
-                        borderRadius: 10,
-                        padding: "1px 6px",
-                        lineHeight: 1.6,
                       }}
                     >
                       {count}
@@ -1058,20 +844,14 @@ export default function CustomOrders() {
           {/* Request list or filter-empty state */}
           {filtered.length === 0 ? (
             <div
-              style={{
-                padding: "3.5rem 2rem",
-                textAlign: "center",
-                backgroundColor: "#fff",
-                borderRadius: 10,
-                border: "1px solid rgba(43,35,32,0.09)",
-              }}
+              className="py-14 px-8 text-center rounded-[10px] bg-white border border-solid border-[rgba(43,35,32,0.09)]"
             >
-              <p style={{ fontFamily: UI, fontSize: "0.88rem", color: "rgba(43,35,32,0.48)", margin: 0 }}>
+              <p className="m-0" style={{ fontFamily: UI, fontSize: "0.88rem", color: "rgba(43,35,32,0.48)" }}>
                 No {activeFilter === "all" ? "" : activeFilter} requests found.
               </p>
             </div>
           ) : (
-            <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+            <div className="flex flex-col gap-4">
               {filtered.map(req => (
                 <RequestCard key={req.id} req={req} onApprove={handleApprove} />
               ))}

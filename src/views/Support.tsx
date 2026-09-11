@@ -170,32 +170,23 @@ export default function Support() {
     <AccountShell>
 
       {/* ── Page header ──────────────────────────────────── */}
-      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '1.75rem', gap: '1rem', flexWrap: 'wrap' }}>
+      <div className="flex items-start justify-between mb-[1.75rem] gap-4 flex-wrap">
         <div>
-          <h1 style={{ fontFamily: DISPLAY, fontSize: '2rem', fontWeight: 500, color: C.charcoal, letterSpacing: '-0.01em', lineHeight: 1.1, marginBottom: '0.3rem' }}>
+          <h1 className="mb-[0.3rem] font-medium tracking-[-0.01em] leading-[1.1]" style={{ fontFamily: DISPLAY, fontSize: '2rem', color: C.charcoal }}>
             Support Inbox
           </h1>
-          <p style={{ fontFamily: UI, fontSize: '0.8rem', color: 'rgba(43,35,32,0.45)', letterSpacing: '0.01em' }}>
+          <p className="tracking-[0.01em]" style={{ fontFamily: UI, fontSize: '0.8rem', color: 'rgba(43,35,32,0.45)' }}>
             Direct messages with our customer care team
           </p>
         </div>
         <button
           onClick={() => setShowModal(true)}
+          className="flex items-center gap-[0.4rem] py-[0.6rem] px-[1.1rem] shrink-0 whitespace-nowrap cursor-pointer rounded-[6px] border-none transition-opacity duration-150"
           style={{
             ...label,
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.4rem',
             backgroundColor: C.gold,
             color: C.charcoal,
-            border: 'none',
-            borderRadius: '6px',
-            padding: '0.6rem 1.1rem',
-            cursor: 'pointer',
-            whiteSpace: 'nowrap',
-            flexShrink: 0,
             fontSize: '0.72rem',
-            transition: 'opacity 0.15s',
           }}
           onMouseEnter={e => (e.currentTarget.style.opacity = '0.82')}
           onMouseLeave={e => (e.currentTarget.style.opacity = '1')}
@@ -209,21 +200,22 @@ export default function Support() {
 
       {/* ── Empty state ──────────────────────────────────── */}
       {conversations.length === 0 ? (
-        <div style={{ backgroundColor: '#fff', borderRadius: '10px', border: `1px solid rgba(43,35,32,0.09)`, padding: '5rem 2rem', textAlign: 'center' }}>
-          <div style={{ color: 'rgba(43,35,32,0.15)', marginBottom: '1.25rem' }}>
+        <div className="py-20 px-8 text-center rounded-[10px] bg-white border border-solid border-[rgba(43,35,32,0.09)]">
+          <div className="mb-5 text-[rgba(43,35,32,0.15)]">
             <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round">
               <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
             </svg>
           </div>
-          <p style={{ fontFamily: DISPLAY, fontSize: '1.3rem', fontWeight: 500, color: C.charcoal, marginBottom: '0.5rem' }}>
+          <p className="mb-2 font-medium" style={{ fontFamily: DISPLAY, fontSize: '1.3rem', color: C.charcoal }}>
             No messages yet
           </p>
-          <p style={{ fontFamily: UI, fontSize: '0.875rem', color: 'rgba(43,35,32,0.48)', lineHeight: 1.65, marginBottom: '1.75rem' }}>
+          <p className="mb-7 leading-[1.65]" style={{ fontFamily: UI, fontSize: '0.875rem', color: 'rgba(43,35,32,0.48)' }}>
             Reach out if you need help with anything — we're here.
           </p>
           <button
             onClick={() => setShowModal(true)}
-            style={{ ...label, backgroundColor: C.gold, color: C.charcoal, border: 'none', borderRadius: '6px', padding: '0.65rem 1.5rem', cursor: 'pointer', fontSize: '0.72rem' }}
+            className="py-[0.65rem] px-6 cursor-pointer rounded-[6px] border-none"
+            style={{ ...label, backgroundColor: C.gold, color: C.charcoal, fontSize: '0.72rem' }}
           >
             New Message
           </button>
@@ -231,55 +223,37 @@ export default function Support() {
 
       ) : (
         /* ── Two-panel layout ─────────────────────────────── */
-        <div className="rg-split" style={{
-          display: 'grid',
-          gridTemplateColumns: '300px 1fr',
-          border: `1px solid rgba(43,35,32,0.09)`,
-          borderRadius: '10px',
-          overflow: 'hidden',
-          backgroundColor: '#fff',
-          height: 'calc(100vh - 272px)',
-          minHeight: '520px',
-        }}>
-
+        <div className="rg-split h-[calc(100vh-272px)] min-h-[520px] rounded-[10px] overflow-hidden grid grid-cols-[300px_1fr] border border-solid border-[rgba(43,35,32,0.09)] bg-white">
           {/* ── Conversation list ──────────────────── */}
-          <div style={{ borderRight: `1px solid rgba(43,35,32,0.09)`, overflowY: 'auto', display: 'flex', flexDirection: 'column' }}>
+          <div className="flex flex-col overflow-y-auto border-r border-solid border-[rgba(43,35,32,0.09)]">
             {conversations.map(conv => {
               const isActive = conv.id === activeId;
               return (
                 <button
                   key={conv.id}
                   onClick={() => selectConversation(conv.id)}
+                  className="w-full text-left py-[0.9rem] px-4 shrink-0 cursor-pointer border-r-0 border-t-0 border-b border-solid border-b-[rgba(43,35,32,0.07)] transition-colors duration-150"
                   style={{
-                    width: '100%',
-                    textAlign: 'left',
-                    padding: '0.9rem 1rem',
                     background: isActive ? 'rgba(122,46,56,0.05)' : 'transparent',
                     borderLeft: isActive ? `3px solid ${C.maroon}` : '3px solid transparent',
-                    borderRight: 'none',
-                    borderTop: 'none',
-                    borderBottom: `1px solid rgba(43,35,32,0.07)`,
-                    cursor: 'pointer',
-                    transition: 'background 0.12s',
-                    flexShrink: 0,
                   }}
                   onMouseEnter={e => { if (!isActive) e.currentTarget.style.background = 'rgba(43,35,32,0.025)'; }}
                   onMouseLeave={e => { if (!isActive) e.currentTarget.style.background = 'transparent'; }}
                 >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '0.5rem', marginBottom: '0.22rem' }}>
-                    <span style={{ fontFamily: UI, fontSize: '0.81rem', fontWeight: conv.unread ? 600 : 500, color: C.charcoal, lineHeight: 1.3, flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  <div className="flex justify-between items-center gap-2 mb-[0.22rem]">
+                    <span className={`flex-1 overflow-hidden text-ellipsis whitespace-nowrap leading-[1.3] ${conv.unread ? 'font-semibold' : 'font-medium'}`} style={{ fontFamily: UI, fontSize: '0.81rem', color: C.charcoal }}>
                       {conv.subject}
                     </span>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', flexShrink: 0 }}>
+                    <div className="flex items-center gap-[0.35rem] shrink-0">
                       {conv.unread && (
-                        <div style={{ width: '7px', height: '7px', borderRadius: '50%', backgroundColor: C.gold, flexShrink: 0 }} />
+                        <div className="w-[7px] h-[7px] shrink-0 rounded-full" style={{ backgroundColor: C.gold }} />
                       )}
-                      <span style={{ fontFamily: UI, fontSize: '0.68rem', color: 'rgba(43,35,32,0.36)', whiteSpace: 'nowrap' }}>
+                      <span className="whitespace-nowrap" style={{ fontFamily: UI, fontSize: '0.68rem', color: 'rgba(43,35,32,0.36)' }}>
                         {conv.date}
                       </span>
                     </div>
                   </div>
-                  <div style={{ fontFamily: UI, fontSize: '0.76rem', color: 'rgba(43,35,32,0.44)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  <div className="overflow-hidden text-ellipsis whitespace-nowrap" style={{ fontFamily: UI, fontSize: '0.76rem', color: 'rgba(43,35,32,0.44)' }}>
                     {conv.preview}
                   </div>
                 </button>
@@ -289,39 +263,22 @@ export default function Support() {
 
           {/* ── Message thread ─────────────────────── */}
           {active && (
-            <div style={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0 }}>
+            <div className="flex flex-col h-full min-h-0">
 
               {/* Thread header */}
-              <div style={{
-                padding: '0.875rem 1.25rem',
-                borderBottom: `1px solid rgba(43,35,32,0.09)`,
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.75rem',
-                flexShrink: 0,
-                backgroundColor: '#fff',
-              }}>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontFamily: UI, fontSize: '0.875rem', fontWeight: 600, color: C.charcoal, marginBottom: active.order ? '0.25rem' : 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              <div className="flex items-center gap-3 py-[0.875rem] px-5 shrink-0 border-b border-solid border-[rgba(43,35,32,0.09)] bg-white">
+                <div className="flex-1 min-w-0">
+                  <div className={`overflow-hidden text-ellipsis whitespace-nowrap font-semibold ${active.order ? 'mb-1' : ''}`} style={{ fontFamily: UI, fontSize: '0.875rem', color: C.charcoal }}>
                     {active.subject}
                   </div>
                   {active.order && (
                     <Link
                       to="/account/orders"
+                      className="inline-flex items-center gap-[0.28rem] py-[0.18rem] px-2 rounded-[4px] no-underline font-medium tracking-[0.04em] border border-solid border-[rgba(46,74,158,0.14)] bg-[rgba(46,74,158,0.06)]"
                       style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '0.28rem',
                         fontFamily: UI,
                         fontSize: '0.69rem',
-                        fontWeight: 500,
-                        letterSpacing: '0.04em',
                         color: C.indigo,
-                        textDecorationLine: 'none',
-                        backgroundColor: 'rgba(46,74,158,0.06)',
-                        borderRadius: '4px',
-                        padding: '0.18rem 0.5rem',
-                        border: `1px solid rgba(46,74,158,0.14)`,
                       }}
                     >
                       <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -335,47 +292,31 @@ export default function Support() {
               </div>
 
               {/* Messages */}
-              <div style={{ flex: 1, overflowY: 'auto', padding: '1.5rem 1.25rem', display: 'flex', flexDirection: 'column', gap: '1.1rem', minHeight: 0 }}>
+              <div className="flex-1 overflow-y-auto py-6 px-5 flex flex-col gap-[1.1rem] min-h-0">
                 {active.messages.map(msg => (
                   <div
                     key={msg.id}
-                    style={{
-                      display: 'flex',
-                      flexDirection: msg.sender === 'buyer' ? 'row-reverse' : 'row',
-                      alignItems: 'flex-end',
-                      gap: '0.5rem',
-                    }}
+                    className={`flex items-end gap-2 ${msg.sender === 'buyer' ? 'flex-row-reverse' : 'flex-row'}`}
                   >
                     {/* Support avatar */}
                     {msg.sender === 'support' && (
-                      <div style={{
-                        width: '28px',
-                        height: '28px',
-                        borderRadius: '50%',
+                      <div className="w-7 h-7 rounded-full shrink-0 flex items-center justify-center mb-[18px]" style={{
                         backgroundColor: C.teal,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        flexShrink: 0,
-                        marginBottom: '18px',
                       }}>
-                        <span style={{ fontFamily: DISPLAY, fontSize: '0.58rem', color: '#fff', fontWeight: 600, letterSpacing: '0.02em' }}>FT</span>
+                        <span className="font-semibold tracking-[0.02em]" style={{ fontFamily: DISPLAY, fontSize: '0.58rem', color: '#fff' }}>FT</span>
                       </div>
                     )}
 
-                    <div style={{ maxWidth: '68%', display: 'flex', flexDirection: 'column', alignItems: msg.sender === 'buyer' ? 'flex-end' : 'flex-start' }}>
-                      <div style={{
-                        padding: '0.7rem 1rem',
-                        borderRadius: msg.sender === 'buyer' ? '14px 14px 4px 14px' : '14px 14px 14px 4px',
+                    <div className={`max-w-[68%] flex flex-col ${msg.sender === 'buyer' ? 'items-end' : 'items-start'}`}>
+                      <div className={`py-[0.7rem] px-4 leading-[1.58] ${msg.sender === 'buyer' ? 'rounded-[14px_14px_4px_14px]' : 'rounded-[14px_14px_14px_4px]'}`} style={{
                         backgroundColor: msg.sender === 'buyer' ? C.maroon : 'rgba(43,35,32,0.055)',
                         color: msg.sender === 'buyer' ? C.cream : C.charcoal,
                         fontFamily: UI,
                         fontSize: '0.845rem',
-                        lineHeight: 1.58,
                       }}>
                         {msg.text}
                       </div>
-                      <span style={{ fontFamily: UI, fontSize: '0.67rem', color: 'rgba(43,35,32,0.36)', marginTop: '0.3rem' }}>
+                      <span className="mt-[0.3rem]" style={{ fontFamily: UI, fontSize: '0.67rem', color: 'rgba(43,35,32,0.36)' }}>
                         {msg.timestamp}
                       </span>
                     </div>
@@ -385,29 +326,13 @@ export default function Support() {
               </div>
 
               {/* Composer */}
-              <div style={{
-                padding: '0.875rem 1.25rem',
-                borderTop: `1px solid rgba(43,35,32,0.09)`,
-                display: 'flex',
-                gap: '0.5rem',
-                alignItems: 'flex-end',
-                flexShrink: 0,
-                backgroundColor: '#fff',
-              }}>
+              <div className="flex items-end gap-2 py-[0.875rem] px-5 shrink-0 border-t border-solid border-[rgba(43,35,32,0.09)] bg-white">
                 <button
                   title="Attach file"
+                  className="flex items-center justify-center shrink-0 p-2 rounded-lg cursor-pointer bg-none border border-solid transition-colors duration-150"
                   style={{
-                    background: 'none',
-                    border: `1px solid rgba(43,35,32,0.14)`,
-                    borderRadius: '8px',
-                    padding: '0.5rem',
-                    cursor: 'pointer',
+                    borderColor: 'rgba(43,35,32,0.14)',
                     color: 'rgba(43,35,32,0.38)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    flexShrink: 0,
-                    transition: 'color 0.12s, border-color 0.12s',
                   }}
                   onMouseEnter={e => { e.currentTarget.style.color = C.charcoal; e.currentTarget.style.borderColor = 'rgba(43,35,32,0.3)'; }}
                   onMouseLeave={e => { e.currentTarget.style.color = 'rgba(43,35,32,0.38)'; e.currentTarget.style.borderColor = 'rgba(43,35,32,0.14)'; }}
@@ -422,40 +347,23 @@ export default function Support() {
                   onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
                   placeholder="Type a message… (Enter to send, Shift+Enter for new line)"
                   rows={1}
+                  className="flex-1 py-[0.52rem] px-3 rounded-lg overflow-y-hidden outline-none resize-none border border-solid border-[rgba(43,35,32,0.14)] bg-[rgba(43,35,32,0.02)] leading-[1.5] transition-colors duration-150"
                   style={{
-                    flex: 1,
-                    resize: 'none',
-                    border: `1px solid rgba(43,35,32,0.14)`,
-                    borderRadius: '8px',
-                    padding: '0.52rem 0.75rem',
                     fontFamily: UI,
                     fontSize: '0.845rem',
                     color: C.charcoal,
-                    backgroundColor: 'rgba(43,35,32,0.02)',
-                    outline: 'none',
-                    lineHeight: 1.5,
-                    overflowY: 'hidden',
-                    transition: 'border-color 0.12s',
                   }}
                   onFocus={e => (e.target.style.borderColor = C.gold)}
                   onBlur={e => (e.target.style.borderColor = 'rgba(43,35,32,0.14)')}
                 />
                 <button
                   onClick={sendMessage}
+                  className={`flex items-center gap-[0.35rem] shrink-0 py-[0.52rem] px-4 rounded-lg border-none transition-all duration-150 ${draft.trim() ? 'cursor-pointer' : 'cursor-default'}`}
                   style={{
                     ...label,
                     backgroundColor: draft.trim() ? C.gold : 'rgba(43,35,32,0.08)',
                     color: draft.trim() ? C.charcoal : 'rgba(43,35,32,0.32)',
-                    border: 'none',
-                    borderRadius: '8px',
-                    padding: '0.52rem 1rem',
-                    cursor: draft.trim() ? 'pointer' : 'default',
                     fontSize: '0.72rem',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.35rem',
-                    flexShrink: 0,
-                    transition: 'all 0.12s',
                   }}
                 >
                   Send
@@ -472,34 +380,19 @@ export default function Support() {
       {/* ── New Message modal ────────────────────────────── */}
       {showModal && (
         <div
-          style={{
-            position: 'fixed',
-            inset: 0,
-            backgroundColor: 'rgba(43,35,32,0.38)',
-            zIndex: 50,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: '1rem',
-          }}
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[rgba(43,35,32,0.38)]"
           onClick={e => { if (e.target === e.currentTarget) setShowModal(false); }}
         >
-          <div style={{
-            backgroundColor: '#fff',
-            borderRadius: '12px',
-            width: '100%',
-            maxWidth: '520px',
-            padding: '2rem',
-            boxShadow: '0 24px 64px rgba(43,35,32,0.16)',
-          }}>
+          <div className="w-full max-w-[520px] p-8 rounded-[12px] bg-white shadow-[0_24px_64px_rgba(43,35,32,0.16)]">
             {/* Modal header */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-              <h2 style={{ fontFamily: DISPLAY, fontSize: '1.4rem', fontWeight: 500, color: C.charcoal, letterSpacing: '-0.01em' }}>
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="font-medium tracking-[-0.01em]" style={{ fontFamily: DISPLAY, fontSize: '1.4rem', color: C.charcoal }}>
                 New Message
               </h2>
               <button
                 onClick={() => setShowModal(false)}
-                style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(43,35,32,0.35)', padding: '0.25rem', lineHeight: 0, transition: 'color 0.12s' }}
+                className="p-1 cursor-pointer bg-none border-none leading-none transition-colors duration-150"
+                style={{ color: 'rgba(43,35,32,0.35)' }}
                 onMouseEnter={e => (e.currentTarget.style.color = C.charcoal)}
                 onMouseLeave={e => (e.currentTarget.style.color = 'rgba(43,35,32,0.35)')}
               >
@@ -509,27 +402,21 @@ export default function Support() {
               </button>
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.1rem' }}>
+            <div className="flex flex-col gap-[1.1rem]">
               {/* Subject */}
               <div>
-                <label style={{ ...label, display: 'block', marginBottom: '0.4rem', color: 'rgba(43,35,32,0.5)', fontSize: '0.66rem' }}>
+                <label className="block mb-[0.4rem]" style={{ ...label, color: 'rgba(43,35,32,0.5)', fontSize: '0.66rem' }}>
                   Subject
                 </label>
                 <input
                   value={modalSubject}
                   onChange={e => setModalSubject(e.target.value)}
                   placeholder="What can we help you with?"
+                  className="w-full py-[0.65rem] px-[0.875rem] rounded-lg box-border outline-none border border-solid border-[rgba(43,35,32,0.15)] transition-colors duration-150"
                   style={{
-                    width: '100%',
-                    border: `1px solid rgba(43,35,32,0.15)`,
-                    borderRadius: '8px',
-                    padding: '0.65rem 0.875rem',
                     fontFamily: UI,
                     fontSize: '0.875rem',
                     color: C.charcoal,
-                    outline: 'none',
-                    boxSizing: 'border-box',
-                    transition: 'border-color 0.12s',
                   }}
                   onFocus={e => (e.target.style.borderColor = C.gold)}
                   onBlur={e => (e.target.style.borderColor = 'rgba(43,35,32,0.15)')}
@@ -538,32 +425,24 @@ export default function Support() {
 
               {/* Related order */}
               <div>
-                <label style={{ ...label, display: 'block', marginBottom: '0.4rem', color: 'rgba(43,35,32,0.5)', fontSize: '0.66rem' }}>
+                <label className="block mb-[0.4rem]" style={{ ...label, color: 'rgba(43,35,32,0.5)', fontSize: '0.66rem' }}>
                   Related Order (optional)
                 </label>
-                <div style={{ position: 'relative' }}>
+                <div className="relative">
                   <select
                     value={modalOrder}
                     onChange={e => setModalOrder(e.target.value)}
+                    className="w-full py-[0.65rem] pl-[0.875rem] pr-8 rounded-lg outline-none appearance-none cursor-pointer box-border border border-solid border-[rgba(43,35,32,0.15)] bg-white"
                     style={{
-                      width: '100%',
-                      border: `1px solid rgba(43,35,32,0.15)`,
-                      borderRadius: '8px',
-                      padding: '0.65rem 2rem 0.65rem 0.875rem',
                       fontFamily: UI,
                       fontSize: '0.875rem',
                       color: modalOrder ? C.charcoal : 'rgba(43,35,32,0.38)',
-                      backgroundColor: '#fff',
-                      outline: 'none',
-                      appearance: 'none',
-                      cursor: 'pointer',
-                      boxSizing: 'border-box',
                     }}
                   >
                     <option value="">Select an order…</option>
                     {ORDERS.map(o => <option key={o} value={o}>{o}</option>)}
                   </select>
-                  <svg style={{ position: 'absolute', right: '0.75rem', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: 'rgba(43,35,32,0.38)' }} width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <svg className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: 'rgba(43,35,32,0.38)' }} width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <polyline points="6 9 12 15 18 9" />
                   </svg>
                 </div>
@@ -571,7 +450,7 @@ export default function Support() {
 
               {/* Message */}
               <div>
-                <label style={{ ...label, display: 'block', marginBottom: '0.4rem', color: 'rgba(43,35,32,0.5)', fontSize: '0.66rem' }}>
+                <label className="block mb-[0.4rem]" style={{ ...label, color: 'rgba(43,35,32,0.5)', fontSize: '0.66rem' }}>
                   Message
                 </label>
                 <textarea
@@ -579,19 +458,11 @@ export default function Support() {
                   onChange={e => setModalBody(e.target.value)}
                   placeholder="Describe your question or issue…"
                   rows={5}
+                  className="w-full py-[0.65rem] px-[0.875rem] rounded-lg box-border outline-none resize-y leading-[1.6] border border-solid border-[rgba(43,35,32,0.15)] transition-colors duration-150"
                   style={{
-                    width: '100%',
-                    border: `1px solid rgba(43,35,32,0.15)`,
-                    borderRadius: '8px',
-                    padding: '0.65rem 0.875rem',
                     fontFamily: UI,
                     fontSize: '0.875rem',
                     color: C.charcoal,
-                    resize: 'vertical',
-                    outline: 'none',
-                    lineHeight: 1.6,
-                    boxSizing: 'border-box',
-                    transition: 'border-color 0.12s',
                   }}
                   onFocus={e => (e.target.style.borderColor = C.gold)}
                   onBlur={e => (e.target.style.borderColor = 'rgba(43,35,32,0.15)')}
@@ -600,17 +471,12 @@ export default function Support() {
 
               <button
                 onClick={sendNewMessage}
+                className="w-full py-3 px-6 rounded-lg cursor-pointer border-none transition-opacity duration-150"
                 style={{
                   ...label,
                   backgroundColor: C.gold,
                   color: C.charcoal,
-                  border: 'none',
-                  borderRadius: '8px',
-                  padding: '0.75rem 1.5rem',
-                  cursor: 'pointer',
                   fontSize: '0.72rem',
-                  width: '100%',
-                  transition: 'opacity 0.15s',
                 }}
                 onMouseEnter={e => (e.currentTarget.style.opacity = '0.85')}
                 onMouseLeave={e => (e.currentTarget.style.opacity = '1')}

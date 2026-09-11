@@ -99,8 +99,8 @@ function FieldLabel({ children }: { children: React.ReactNode }) {
 
 // ── Variant row ───────────────────────────────────────────────────────────────
 
-/** A size and how many of it. Colour is a product-level field — see the schema. */
-type Variant = { id: string; size: string; stock: string };
+/** A size, colour, and stock count. */
+type Variant = { id: string; size: string; color: string; stock: string };
 
 function VariantRow({ v, onChange, onRemove }: {
   v: Variant;
@@ -114,7 +114,15 @@ function VariantRow({ v, onChange, onRemove }: {
         placeholder="Size"
         value={v.size}
         onChange={e => onChange({ ...v, size: e.target.value })}
-        className={`${INPUT_CLS} w-[120px] shrink-0`}
+        className={`${INPUT_CLS} w-[90px] shrink-0`}
+        style={inputBase}
+      />
+      <input
+        placeholder="Colour"
+        list="known-colours"
+        value={v.color}
+        onChange={e => onChange({ ...v, color: e.target.value })}
+        className={`${INPUT_CLS} w-[100px] shrink-0`}
         style={inputBase}
       />
       <input
@@ -141,9 +149,20 @@ function VariantRow({ v, onChange, onRemove }: {
 
 // ── Image slot ────────────────────────────────────────────────────────────────
 
-type ImageEntry = { id: string; url: string };
+type ImageEntry = { id: string; url: string; color: string };
 
-function ImageSlot({ img, isMain, onRemove }: { img: ImageEntry; isMain: boolean; onRemove: () => void }) {
+function ImageSlot({ img, isMain, colors, onColorChange, onRemove }: {
+  img: ImageEntry;
+  isMain: boolean;
+  /** The product's variant colours, for tying this photo to one. */
+  colors: string[];
+  onColorChange: (color: string) => void;
+  onRemove: () => void;
+}) {
+  // A colour set on the image but no longer among the variants still needs an
+  // option, or the select would fall blank and silently lose the tie.
+  const options = img.color && !colors.includes(img.color) ? [...colors, img.color] : colors;
+
   return (
     <div className="relative">
       <img
@@ -175,6 +194,17 @@ function ImageSlot({ img, isMain, onRemove }: { img: ImageEntry; isMain: boolean
       >
         <XIcon size={9} />
       </button>
+      {/* Which colour this photo shows. "All colours" is a general image. */}
+      <select
+        value={img.color}
+        onChange={e => onColorChange(e.target.value)}
+        aria-label="Colour this image shows"
+        className="block box-border w-full rounded-[5px] mt-1 pl-1.5 pr-4 py-1 cursor-pointer"
+        style={{ fontFamily: UI, fontSize: "0.62rem", color: C.charcoal, backgroundColor: "#fff", border: "1px solid rgba(43,35,32,0.14)", outline: "none" }}
+      >
+        <option value="">All colours</option>
+        {options.map(c => <option key={c} value={c}>{c}</option>)}
+      </select>
     </div>
   );
 }
@@ -211,8 +241,6 @@ export default function ConsoleProductForm({ product, categories, knownColors }:
   const [name, setName] = useState(product?.title ?? "");
   const [description, setDescription] = useState(product?.description ?? "");
   const [categoryId, setCategoryId] = useState(product?.categoryId ?? "");
-  const [color, setColor] = useState(product?.color ?? "");
-  // Kept as the typed string so the field can be empty; parsed on save.
   const [priceCad, setPriceCad] = useState(product ? (product.priceCadCents / 100).toFixed(2) : "");
   const [productionDays, setProductionDays] = useState(product?.productionDays ?? "");
   const [tag, setTag] = useState<string>(product?.tag ?? "");
@@ -223,12 +251,12 @@ export default function ConsoleProductForm({ product, categories, knownColors }:
 
   const [variants, setVariants] = useState<Variant[]>(
     product && product.variants.length > 0
-      ? product.variants.map((v, i) => ({ id: `v${i}`, size: v.size, stock: String(v.stock) }))
-      : [{ id: "v0", size: "", stock: "" }]
+      ? product.variants.map((v, i) => ({ id: `v${i}`, size: v.size, color: v.color, stock: String(v.stock) }))
+      : [{ id: "v0", size: "", color: "", stock: "" }]
   );
 
   const [images, setImages] = useState<ImageEntry[]>(
-    (product?.imageUrls ?? []).map((url, i) => ({ id: `i${i}`, url }))
+    (product?.images ?? []).map((img, i) => ({ id: `i${i}`, url: img.url, color: img.color }))
   );
   const [imageDraft, setImageDraft] = useState("");
 
@@ -237,7 +265,7 @@ export default function ConsoleProductForm({ product, categories, knownColors }:
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
 
   function addVariant() {
-    setVariants(vs => [...vs, { id: `v${Date.now()}`, size: "", stock: "" }]);
+    setVariants(vs => [...vs, { id: `v${Date.now()}`, size: "", color: "", stock: "" }]);
   }
   function removeVariant(vid: string) {
     setVariants(vs => (vs.length > 1 ? vs.filter(v => v.id !== vid) : vs));
@@ -249,12 +277,19 @@ export default function ConsoleProductForm({ product, categories, knownColors }:
   function addImage() {
     const url = imageDraft.trim();
     if (!url) return;
-    setImages(imgs => [...imgs, { id: `i${Date.now()}`, url }]);
+    // New photos are general until the owner ties them to a colour.
+    setImages(imgs => [...imgs, { id: `i${Date.now()}`, url, color: "" }]);
     setImageDraft("");
   }
   function removeImage(iid: string) {
     setImages(imgs => imgs.filter(i => i.id !== iid));
   }
+  function setImageColor(iid: string, color: string) {
+    setImages(imgs => imgs.map(i => (i.id === iid ? { ...i, color } : i)));
+  }
+
+  // The colours the images can be tied to — whatever the variants currently name.
+  const variantColors = [...new Set(variants.map(v => v.color.trim()).filter(Boolean))];
 
   async function save(status: "PUBLISHED" | "DRAFT") {
     setSaving(true);
@@ -266,7 +301,6 @@ export default function ConsoleProductForm({ product, categories, knownColors }:
       title: name,
       description,
       categoryId,
-      color,
       // Prices are typed in dollars and stored in cents; round once, here.
       priceCadCents: Math.round((Number(priceCad) || 0) * 100),
       productionDays,
@@ -274,11 +308,11 @@ export default function ConsoleProductForm({ product, categories, knownColors }:
       status,
       metaTitle,
       metaDescription: metaDesc,
-      imageUrls: images.map(i => i.url),
+      images: images.map(i => ({ url: i.url, color: i.color })),
       variants: variants
         // A blank trailing row is how people leave a form, not an error.
-        .filter(v => v.size.trim() !== "")
-        .map(v => ({ size: v.size.trim(), stock: Number(v.stock) || 0 })),
+        .filter(v => v.size.trim() !== "" || v.color.trim() !== "")
+        .map(v => ({ size: v.size.trim(), color: v.color.trim(), stock: Number(v.stock) || 0 })),
     });
 
     if (!result.ok) {
@@ -368,24 +402,6 @@ export default function ConsoleProductForm({ product, categories, knownColors }:
               </span>
             </div>
 
-            <FieldLabel>Colour</FieldLabel>
-            <input
-              type="text"
-              list="known-colours"
-              placeholder="e.g. Burgundy"
-              value={color}
-              onChange={e => setColor(e.target.value)}
-              className={`${INPUT_CLS} w-full ${firstError('color') ? "mb-1" : "mb-4"}`}
-              style={inputBase}
-            />
-            {/* Suggests what the catalogue already uses without forbidding a new one. */}
-            <datalist id="known-colours">
-              {knownColors.map(c => <option key={c} value={c} />)}
-            </datalist>
-            {firstError('color') && (
-              <p className="mb-4" style={{ fontSize: "0.68rem", color: C.maroon }}>{firstError('color')}</p>
-            )}
-
             <FieldLabel>Production Time (working days)</FieldLabel>
             <div className="flex items-center gap-3">
               <input
@@ -427,12 +443,15 @@ export default function ConsoleProductForm({ product, categories, knownColors }:
           {/* Variants */}
           <FormCard title="Variants">
             <div className="flex gap-2 mb-3 pl-[22px]">
-              {[["80px", "Size"], ["1", "Colour"], ["72px", "Stock"]].map(([w, h]) => (
+              {[["80px", "Size"], ["90px", "Colour"], ["72px", "Stock"]].map(([w, h]) => (
                 <span key={h} style={{ flex: w === "1" ? 1 : `0 0 ${w}`, fontSize: "0.63rem", letterSpacing: "0.09em", textTransform: "uppercase", color: "rgba(43,35,32,0.38)", fontWeight: 500 }}>
                   {h}
                 </span>
               ))}
             </div>
+            <datalist id="known-colours">
+              {knownColors.map(c => <option key={c} value={c} />)}
+            </datalist>
             {variants.map(v => (
               <VariantRow
                 key={v.id}
@@ -596,7 +615,14 @@ export default function ConsoleProductForm({ product, categories, knownColors }:
           <FormCard title="Images">
             <div className="rg-2 grid grid-cols-2 gap-2 mb-3">
               {images.map((img, i) => (
-                <ImageSlot key={img.id} img={img} isMain={i === 0} onRemove={() => removeImage(img.id)} />
+                <ImageSlot
+                  key={img.id}
+                  img={img}
+                  isMain={i === 0}
+                  colors={variantColors}
+                  onColorChange={color => setImageColor(img.id, color)}
+                  onRemove={() => removeImage(img.id)}
+                />
               ))}
             </div>
             <div className="flex gap-[0.4rem] mb-2">
@@ -626,8 +652,8 @@ export default function ConsoleProductForm({ product, categories, knownColors }:
                 <UploadIcon size={15} />
               </button>
             </div>
-            {firstError('imageUrls') && (
-              <p className="mb-[0.4rem]" style={{ fontSize: "0.68rem", color: C.maroon }}>{firstError('imageUrls')}</p>
+            {firstError('images') && (
+              <p className="mb-[0.4rem]" style={{ fontSize: "0.68rem", color: C.maroon }}>{firstError('images')}</p>
             )}
             <p style={{ fontSize: "0.63rem", color: "rgba(43,35,32,0.38)", lineHeight: 1.5 }}>
               The first image is the main photo. Uploads need blob storage, which

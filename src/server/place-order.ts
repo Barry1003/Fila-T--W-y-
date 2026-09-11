@@ -146,7 +146,7 @@ export async function placeOrder(raw: unknown): Promise<PlaceOrderResult> {
           title: true,
           status: true,
           priceCad: true,
-          variants: { select: { id: true, size: true, stock: true } },
+          variants: { select: { id: true, size: true, color: true, stock: true } },
         },
       });
 
@@ -160,15 +160,15 @@ export async function placeOrder(raw: unknown): Promise<PlaceOrderResult> {
           throw new OrderProblem('One of the pieces in your cart is no longer available. Please remove it and try again.');
         }
 
-        const variant = product.variants.find(v => v.size === line.size);
+        const variant = product.variants.find(v => v.size === line.size && v.color === line.color);
         if (!variant) {
-          throw new OrderProblem(`${product.title} is no longer made in size ${line.size}.`);
+          throw new OrderProblem(`${product.title} is no longer made in size ${line.size} (${line.color}).`);
         }
         if (variant.stock < line.quantity) {
           throw new OrderProblem(
             variant.stock === 0
-              ? `${product.title} (${line.size}) has just sold out.`
-              : `Only ${variant.stock} left of ${product.title} in size ${line.size}.`,
+              ? `${product.title} (${line.size}, ${line.color}) has just sold out.`
+              : `Only ${variant.stock} left of ${product.title} in size ${line.size} (${line.color}).`,
           );
         }
 
@@ -176,7 +176,7 @@ export async function placeOrder(raw: unknown): Promise<PlaceOrderResult> {
           productId: product.id,
           variantId: variant.id,
           name: product.title,
-          variant: line.size,
+          variant: `${line.size} / ${line.color}`,
           quantity: line.quantity,
           unitPriceCents: decimalToCents(product.priceCad),
         };

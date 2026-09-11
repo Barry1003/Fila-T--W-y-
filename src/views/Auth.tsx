@@ -8,8 +8,6 @@ import { C, DISPLAY, UI, label } from '../tokens';
 
 /* ─── Field styles ─────────────────────────────────────────── */
 const fieldBase: React.CSSProperties = {
-  width: '100%',
-  padding: '0.7rem 0.9rem',
   fontFamily: UI,
   fontSize: '0.875rem',
   color: C.charcoal,
@@ -17,10 +15,8 @@ const fieldBase: React.CSSProperties = {
   borderWidth: '1.5px',
   borderStyle: 'solid',
   borderColor: 'rgba(43,35,32,0.22)',
-  borderRadius: '5px',
   outline: 'none',
   transition: 'border-color 0.15s, box-shadow 0.15s',
-  boxSizing: 'border-box',
 };
 
 const fieldError: React.CSSProperties = {
@@ -47,6 +43,7 @@ function FocusInput({
       onChange={onChange} onBlur={() => { setFocused(false); onBlur?.(); }}
       onFocus={() => setFocused(true)} style={style}
       autoComplete={autoComplete} readOnly={readOnly}
+      className="w-full py-[0.7rem] px-[0.9rem] rounded-[5px] box-border"
     />
   );
 }
@@ -58,10 +55,11 @@ function FocusSelect({ value, onChange, children }: { value: string; onChange: (
     <select
       value={value} onChange={onChange}
       onFocus={() => setFocused(true)} onBlur={() => setFocused(false)}
+      className="w-full py-[0.7rem] px-[0.9rem] pr-10 rounded-[5px] box-border cursor-pointer appearance-none"
       style={{
         ...fieldBase,
         ...(focused ? { borderColor: C.gold, boxShadow: `0 0 0 3px rgba(212,169,78,0.18)` } : {}),
-        cursor: 'pointer', appearance: 'none', backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%232B2320' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.875rem center', paddingRight: '2.5rem',
+        backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%232B2320' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.875rem center',
       }}
     >
       {children}
@@ -71,7 +69,7 @@ function FocusSelect({ value, onChange, children }: { value: string; onChange: (
 
 /* ─── FieldError ───────────────────────────────────────────── */
 function FieldError({ msg }: { msg?: string }) {
-  return <p style={{ fontFamily: UI, fontSize: '0.72rem', color: '#b94a48', marginTop: '0.3rem', letterSpacing: '0.01em' }}>{msg}</p>;
+  return <p className="mt-[0.3rem] text-[#b94a48] tracking-[0.01em]" style={{ fontFamily: UI, fontSize: '0.72rem' }}>{msg}</p>;
 }
 
 /* ─── PasswordInput ────────────────────────────────────────── */
@@ -84,19 +82,20 @@ function PasswordInput({ value, onChange, onBlur, error, placeholder, autoComple
   const style: React.CSSProperties = {
     ...(error ? fieldError : fieldBase),
     ...(focused ? { borderColor: C.gold, boxShadow: `0 0 0 3px rgba(212,169,78,0.18)` } : {}),
-    paddingRight: '2.75rem',
   };
   return (
-    <div style={{ position: 'relative' }}>
+    <div className="relative">
       <input
         type={show ? 'text' : 'password'} placeholder={placeholder ?? 'Password'}
         value={value} onChange={onChange}
         onFocus={() => setFocused(true)} onBlur={() => { setFocused(false); onBlur?.(); }}
         style={style} autoComplete={autoComplete}
+        className="w-full py-[0.7rem] pl-[0.9rem] pr-[2.75rem] rounded-[5px] box-border"
       />
       <button
         type="button" onClick={() => setShow(s => !s)}
-        style={{ position: 'absolute', right: '0.75rem', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', padding: '2px', lineHeight: 0, color: 'rgba(43,35,32,0.45)' }}
+        className="absolute right-3 top-1/2 -translate-y-1/2 p-[2px] cursor-pointer bg-none border-none leading-none"
+        style={{ color: 'rgba(43,35,32,0.45)' }}
         aria-label={show ? 'Hide password' : 'Show password'}
       >
         {show ? (
@@ -135,18 +134,11 @@ function GoldButton({ children, onClick, disabled }: { children: React.ReactNode
   return (
     <button
       type="submit" onClick={onClick} disabled={disabled}
-      className="auth-gold-btn"
+      className={`auth-gold-btn w-full py-4 px-8 rounded-[5px] overflow-hidden uppercase font-bold tracking-[0.14em] border-none transition-all duration-200 ${disabled ? 'cursor-wait opacity-70' : 'cursor-pointer opacity-100'}`}
       style={{
-        width: '100%', padding: '1rem 2rem',
         backgroundColor: C.gold, color: C.charcoal,
-        fontFamily: UI, fontWeight: 700, fontSize: '0.82rem',
-        letterSpacing: '0.14em', textTransform: 'uppercase',
-        border: 'none', borderRadius: '5px',
-        cursor: disabled ? 'wait' : 'pointer',
-        opacity: disabled ? 0.7 : 1,
+        fontFamily: UI, fontSize: '0.82rem',
         boxShadow: `0 2px 14px rgba(212,169,78,0.35)`,
-        transition: 'box-shadow 0.2s, transform 0.15s',
-        position: 'relative', overflow: 'hidden',
       }}
     >
       {children}
@@ -159,15 +151,10 @@ function GoogleButton({ label: lbl }: { label: string }) {
   return (
     <button
       type="button"
+      className="w-full py-[0.85rem] px-8 rounded-[5px] cursor-pointer flex items-center justify-center gap-[0.6rem] font-semibold tracking-[0.06em] bg-transparent border-[1.5px] border-solid border-[rgba(43,35,32,0.28)] transition-colors duration-150"
       style={{
-        width: '100%', padding: '0.85rem 2rem',
-        backgroundColor: 'transparent', color: C.charcoal,
-        fontFamily: UI, fontWeight: 600, fontSize: '0.82rem',
-        letterSpacing: '0.06em',
-        borderWidth: '1.5px', borderStyle: 'solid', borderColor: 'rgba(43,35,32,0.28)',
-        borderRadius: '5px', cursor: 'pointer',
-        transition: 'border-color 0.15s, background 0.15s',
-        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.6rem',
+        color: C.charcoal,
+        fontFamily: UI, fontSize: '0.82rem',
       }}
       onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = C.gold; (e.currentTarget as HTMLButtonElement).style.background = 'rgba(212,169,78,0.05)'; }}
       onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(43,35,32,0.28)'; (e.currentTarget as HTMLButtonElement).style.background = 'transparent'; }}
@@ -190,9 +177,9 @@ function FormBanner({ tone, children }: { tone: 'error' | 'info'; children: Reac
   return (
     <div
       role={error ? 'alert' : 'status'}
+      className="py-[0.7rem] px-[0.85rem] rounded-[6px] leading-[1.5]"
       style={{
-        fontFamily: UI, fontSize: '0.8rem', lineHeight: 1.5,
-        padding: '0.7rem 0.85rem', borderRadius: 6,
+        fontFamily: UI, fontSize: '0.8rem',
         color: error ? C.maroon : C.charcoal,
         backgroundColor: error ? 'rgba(122,46,56,0.07)' : 'rgba(59,138,147,0.09)',
         border: `1px solid ${error ? 'rgba(122,46,56,0.25)' : 'rgba(59,138,147,0.3)'}`,
@@ -206,10 +193,10 @@ function FormBanner({ tone, children }: { tone: 'error' | 'info'; children: Reac
 /* ─── Divider ───────────────────────────────────────────────── */
 function OrDivider() {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', margin: '1.5rem 0' }}>
-      <div style={{ flex: 1, height: '1px', backgroundColor: 'rgba(43,35,32,0.14)' }} />
-      <span style={{ fontFamily: UI, fontSize: '0.72rem', color: 'rgba(43,35,32,0.42)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>or</span>
-      <div style={{ flex: 1, height: '1px', backgroundColor: 'rgba(43,35,32,0.14)' }} />
+    <div className="flex items-center gap-4 my-6">
+      <div className="flex-1 h-px bg-[rgba(43,35,32,0.14)]" />
+      <span className="uppercase tracking-[0.08em]" style={{ fontFamily: UI, fontSize: '0.72rem', color: 'rgba(43,35,32,0.42)' }}>or</span>
+      <div className="flex-1 h-px bg-[rgba(43,35,32,0.14)]" />
     </div>
   );
 }
@@ -259,7 +246,7 @@ function SignInForm({ switchTab }: { switchTab: () => void }) {
   }
 
   return (
-    <form onSubmit={handleSubmit} noValidate style={{ display: 'flex', flexDirection: 'column', gap: '1.1rem' }}>
+    <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-[1.1rem]">
       {serverError && <FormBanner tone="error">{serverError}</FormBanner>}
       {resetSent && (
         <FormBanner tone="info">
@@ -269,7 +256,7 @@ function SignInForm({ switchTab }: { switchTab: () => void }) {
 
       {/* Email */}
       <div>
-        <label style={{ ...label, fontSize: '0.65rem', color: C.charcoal, display: 'block', marginBottom: '0.4rem' }}>
+        <label className="block mb-[0.4rem]" style={{ ...label, fontSize: '0.65rem', color: C.charcoal }}>
           Email Address
         </label>
         <FocusInput
@@ -282,12 +269,13 @@ function SignInForm({ switchTab }: { switchTab: () => void }) {
 
       {/* Password */}
       <div>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '0.4rem' }}>
+        <div className="flex justify-between items-baseline mb-[0.4rem]">
           <label style={{ ...label, fontSize: '0.65rem', color: C.charcoal }}>Password</label>
           <button
             type="button"
             onClick={handleForgotPassword}
-            style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', fontFamily: UI, fontSize: '0.72rem', color: C.indigo, letterSpacing: '0.01em' }}
+            className="p-0 bg-transparent border-none cursor-pointer tracking-[0.01em]"
+            style={{ fontFamily: UI, fontSize: '0.72rem', color: C.indigo }}
           >
             Forgot password?
           </button>
@@ -299,7 +287,7 @@ function SignInForm({ switchTab }: { switchTab: () => void }) {
         {submitted && errors.password && <FieldError msg={errors.password} />}
       </div>
 
-      <div style={{ marginTop: '0.4rem' }}>
+      <div className="mt-[0.4rem]">
         <GoldButton disabled={pending}>{pending ? 'Signing in…' : 'Sign In'}</GoldButton>
       </div>
 
@@ -307,9 +295,9 @@ function SignInForm({ switchTab }: { switchTab: () => void }) {
 
       <GoogleButton label="Continue with Google" />
 
-      <p style={{ fontFamily: UI, fontSize: '0.8rem', color: 'rgba(43,35,32,0.6)', textAlign: 'center', marginTop: '0.5rem', letterSpacing: '0.01em' }}>
+      <p className="text-center mt-2 tracking-[0.01em]" style={{ fontFamily: UI, fontSize: '0.8rem', color: 'rgba(43,35,32,0.6)' }}>
         {"Don't have an account? "}
-        <button type="button" onClick={switchTab} style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: UI, fontSize: '0.8rem', color: C.gold, fontWeight: 600, padding: 0, textDecorationLine: 'underline', textDecorationColor: 'rgba(212,169,78,0.4)' }}>
+        <button type="button" onClick={switchTab} className="p-0 bg-transparent border-none cursor-pointer underline font-semibold decoration-[rgba(212,169,78,0.4)]" style={{ fontFamily: UI, fontSize: '0.8rem', color: C.gold }}>
           Create one
         </button>
       </p>
@@ -362,12 +350,12 @@ function RegisterForm({ switchTab }: { switchTab: () => void }) {
   }
 
   return (
-    <form onSubmit={handleSubmit} noValidate style={{ display: 'flex', flexDirection: 'column', gap: '1.1rem' }}>
+    <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-[1.1rem]">
       {serverError && <FormBanner tone="error">{serverError}</FormBanner>}
 
       {/* Full Name */}
       <div>
-        <label style={{ ...label, fontSize: '0.65rem', color: C.charcoal, display: 'block', marginBottom: '0.4rem' }}>Full Name</label>
+        <label className="block mb-[0.4rem]" style={{ ...label, fontSize: '0.65rem', color: C.charcoal }}>Full Name</label>
         <FocusInput
           placeholder="Adunola Okonkwo"
           value={name} onChange={e => setName(e.target.value)}
@@ -378,7 +366,7 @@ function RegisterForm({ switchTab }: { switchTab: () => void }) {
 
       {/* Email */}
       <div>
-        <label style={{ ...label, fontSize: '0.65rem', color: C.charcoal, display: 'block', marginBottom: '0.4rem' }}>Email Address</label>
+        <label className="block mb-[0.4rem]" style={{ ...label, fontSize: '0.65rem', color: C.charcoal }}>Email Address</label>
         <FocusInput
           type="email" placeholder="adunola@example.com"
           value={email} onChange={e => setEmail(e.target.value)}
@@ -389,8 +377,8 @@ function RegisterForm({ switchTab }: { switchTab: () => void }) {
 
       {/* Phone */}
       <div>
-        <label style={{ ...label, fontSize: '0.65rem', color: C.charcoal, display: 'block', marginBottom: '0.4rem' }}>Phone Number</label>
-        <div className="rg-split" style={{ display: 'grid', gridTemplateColumns: '130px 1fr', gap: '0.5rem' }}>
+        <label className="block mb-[0.4rem]" style={{ ...label, fontSize: '0.65rem', color: C.charcoal }}>Phone Number</label>
+        <div className="rg-split grid grid-cols-[130px_1fr] gap-2">
           <FocusSelect value={phoneCode} onChange={e => setPhoneCode(e.target.value)}>
             {PHONE_CODES.map(p => (
               <option key={p.code} value={p.code}>{p.label}</option>
@@ -407,7 +395,7 @@ function RegisterForm({ switchTab }: { switchTab: () => void }) {
 
       {/* Password */}
       <div>
-        <label style={{ ...label, fontSize: '0.65rem', color: C.charcoal, display: 'block', marginBottom: '0.4rem' }}>Password</label>
+        <label className="block mb-[0.4rem]" style={{ ...label, fontSize: '0.65rem', color: C.charcoal }}>Password</label>
         <PasswordInput
           value={password} onChange={e => setPassword(e.target.value)}
           error={submitted && !!errors.password}
@@ -418,7 +406,7 @@ function RegisterForm({ switchTab }: { switchTab: () => void }) {
 
       {/* Confirm password */}
       <div>
-        <label style={{ ...label, fontSize: '0.65rem', color: C.charcoal, display: 'block', marginBottom: '0.4rem' }}>Confirm Password</label>
+        <label className="block mb-[0.4rem]" style={{ ...label, fontSize: '0.65rem', color: C.charcoal }}>Confirm Password</label>
         <PasswordInput
           value={confirm} onChange={e => setConfirm(e.target.value)}
           error={submitted && !!errors.confirm}
@@ -429,22 +417,22 @@ function RegisterForm({ switchTab }: { switchTab: () => void }) {
 
       {/* Terms checkbox */}
       <div>
-        <label style={{ display: 'flex', alignItems: 'flex-start', gap: '0.65rem', cursor: 'pointer' }}>
+        <label className="flex items-start gap-[0.65rem] cursor-pointer">
           <input
             type="checkbox" checked={agreed} onChange={e => setAgreed(e.target.checked)}
-            style={{ marginTop: '2px', accentColor: C.gold, flexShrink: 0, width: '15px', height: '15px' }}
+            className="shrink-0 w-[15px] h-[15px] mt-[2px]" style={{ accentColor: C.gold }}
           />
-          <span style={{ fontFamily: UI, fontSize: '0.78rem', color: 'rgba(43,35,32,0.7)', lineHeight: 1.5 }}>
+          <span className="leading-[1.5]" style={{ fontFamily: UI, fontSize: '0.78rem', color: 'rgba(43,35,32,0.7)' }}>
             I agree to the{' '}
-            <a href="#" style={{ color: C.indigo, textDecorationLine: 'none', borderBottom: `1px solid rgba(46,74,158,0.3)` }}>Terms of Service</a>
+            <a href="#" className="no-underline border-b border-solid border-[rgba(46,74,158,0.3)]" style={{ color: C.indigo }}>Terms of Service</a>
             {' '}and{' '}
-            <a href="#" style={{ color: C.indigo, textDecorationLine: 'none', borderBottom: `1px solid rgba(46,74,158,0.3)` }}>Privacy Policy</a>
+            <a href="#" className="no-underline border-b border-solid border-[rgba(46,74,158,0.3)]" style={{ color: C.indigo }}>Privacy Policy</a>
           </span>
         </label>
         {submitted && errors.agreed && <FieldError msg={errors.agreed} />}
       </div>
 
-      <div style={{ marginTop: '0.2rem' }}>
+      <div className="mt-[0.2rem]">
         <GoldButton disabled={pending}>{pending ? 'Creating account…' : 'Create Account'}</GoldButton>
       </div>
 
@@ -452,9 +440,9 @@ function RegisterForm({ switchTab }: { switchTab: () => void }) {
 
       <GoogleButton label="Sign up with Google" />
 
-      <p style={{ fontFamily: UI, fontSize: '0.8rem', color: 'rgba(43,35,32,0.6)', textAlign: 'center', marginTop: '0.5rem', letterSpacing: '0.01em' }}>
+      <p className="text-center mt-2 tracking-[0.01em]" style={{ fontFamily: UI, fontSize: '0.8rem', color: 'rgba(43,35,32,0.6)' }}>
         Already have an account?{' '}
-        <button type="button" onClick={switchTab} style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: UI, fontSize: '0.8rem', color: C.gold, fontWeight: 600, padding: 0, textDecorationLine: 'underline', textDecorationColor: 'rgba(212,169,78,0.4)' }}>
+        <button type="button" onClick={switchTab} className="p-0 bg-transparent border-none cursor-pointer underline font-semibold decoration-[rgba(212,169,78,0.4)]" style={{ fontFamily: UI, fontSize: '0.8rem', color: C.gold }}>
           Sign in
         </button>
       </p>
@@ -469,7 +457,7 @@ export default function Auth() {
   const switchToSignin = useCallback(() => setTab('signin'), []);
 
   return (
-    <div style={{ backgroundColor: C.cream, minHeight: '100vh', fontFamily: UI, color: C.charcoal }}>
+    <div className="min-h-screen" style={{ backgroundColor: C.cream, fontFamily: UI, color: C.charcoal }}>
       <style>{`
         .auth-gold-btn { position: relative; overflow: hidden; }
         .auth-gold-btn::after {
@@ -507,19 +495,20 @@ export default function Auth() {
       `}</style>
 
       {/* ── Header ─────────────────────────────────────────────── */}
-      <header style={{ backgroundColor: C.maroon, borderBottom: `1px solid rgba(212,169,78,0.22)` }}>
-        <div style={{ maxWidth: '1240px', margin: '0 auto', padding: '0 2rem', height: '64px', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
-          <Link to="/" style={{ textDecorationLine: 'none', textAlign: 'center' }}>
-            <div style={{ fontFamily: DISPLAY, fontSize: '1.25rem', color: C.cream, fontWeight: 500, letterSpacing: '-0.01em', lineHeight: 1.05 }}>
+      <header className="border-b border-solid border-[rgba(212,169,78,0.22)]" style={{ backgroundColor: C.maroon }}>
+        <div className="max-w-[1240px] mx-auto px-8 h-16 flex items-center justify-center relative">
+          <Link to="/" className="text-center no-underline">
+            <div className="font-medium tracking-[-0.01em] leading-[1.05]" style={{ fontFamily: DISPLAY, fontSize: '1.25rem', color: C.cream }}>
               AdeClassics
             </div>
-            <div style={{ fontFamily: UI, fontSize: '0.525rem', color: C.gold, letterSpacing: '0.16em', textTransform: 'uppercase', marginTop: '2px' }}>
+            <div className="mt-[2px] uppercase tracking-[0.16em]" style={{ fontFamily: UI, fontSize: '0.525rem', color: C.gold }}>
               Timeless Elegance
             </div>
           </Link>
           <Link
             to="/shop"
-            style={{ position: 'absolute', left: '2rem', fontFamily: UI, fontSize: '0.68rem', color: C.cream, textDecorationLine: 'none', letterSpacing: '0.06em', opacity: 0.7, display: 'flex', alignItems: 'center', gap: '0.35rem' }}
+            className="absolute left-8 flex items-center gap-[0.35rem] no-underline tracking-[0.06em] opacity-70"
+            style={{ fontFamily: UI, fontSize: '0.68rem', color: C.cream }}
           >
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <polyline points="15 18 9 12 15 6" />
@@ -533,45 +522,44 @@ export default function Auth() {
       <div className="auth-split">
 
         {/* Left — editorial photo */}
-        <div className="auth-photo-col" style={{ position: 'relative', overflow: 'hidden', backgroundColor: C.charcoal }}>
+        <div className="auth-photo-col relative overflow-hidden" style={{ backgroundColor: C.charcoal }}>
           <img
             src="https://images.unsplash.com/photo-1687952622898-4e9514a710d5?w=900&h=1200&fit=crop&crop=faces,top&auto=format"
             alt="Man wearing a red filà cap"
-            style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top', display: 'block', opacity: 0.9 }}
+            className="w-full h-full object-cover object-top block" style={{ opacity: 0.9 }}
           />
           {/* Gradient overlay */}
-          <div style={{
-            position: 'absolute', inset: 0,
+          <div className="absolute inset-0" style={{
             background: `linear-gradient(to top, rgba(43,35,32,0.72) 0%, rgba(43,35,32,0.08) 50%, transparent 100%)`,
           }} />
           {/* Caption */}
-          <div style={{ position: 'absolute', bottom: '2.5rem', left: '2.5rem', right: '2.5rem' }}>
-            <p style={{ fontFamily: DISPLAY, fontSize: '1.6rem', color: '#fff', lineHeight: 1.25, fontWeight: 500, marginBottom: '0.6rem', textShadow: '0 1px 8px rgba(0,0,0,0.3)' }}>
+          <div className="absolute bottom-10 left-10 right-10">
+            <p className="mb-[0.6rem] font-medium leading-[1.25] shadow-[0_1px_8px_rgba(0,0,0,0.3)]" style={{ fontFamily: DISPLAY, fontSize: '1.6rem', color: '#fff', textShadow: '0 1px 8px rgba(0,0,0,0.3)' }}>
               Crafted with care.<br />Worn with pride.
             </p>
-            <p style={{ fontFamily: UI, fontSize: '0.78rem', color: 'rgba(255,255,255,0.65)', letterSpacing: '0.04em', lineHeight: 1.6 }}>
+            <p className="tracking-[0.04em] leading-[1.6]" style={{ fontFamily: UI, fontSize: '0.78rem', color: 'rgba(255,255,255,0.65)' }}>
               Every filà, gele, and kaftan made by hand for you.
             </p>
           </div>
           {/* Gold accent line */}
-          <div style={{ position: 'absolute', top: 0, left: 0, width: '3px', height: '100%', background: `linear-gradient(to bottom, ${C.gold}, transparent)` }} />
+          <div className="absolute top-0 left-0 w-[3px] h-full" style={{ background: `linear-gradient(to bottom, ${C.gold}, transparent)` }} />
         </div>
 
         {/* Right — form panel */}
-        <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '3rem 2.5rem', maxWidth: '520px', margin: '0 auto', width: '100%', boxSizing: 'border-box' }}>
+        <div className="flex flex-col justify-center py-12 px-10 max-w-[520px] mx-auto w-full box-border">
 
           {/* Eyebrow */}
-          <p style={{ ...label, fontSize: '0.6rem', color: C.gold, letterSpacing: '0.2em', marginBottom: '0.6rem' }}>
+          <p className="mb-[0.6rem] tracking-[0.2em]" style={{ ...label, fontSize: '0.6rem', color: C.gold }}>
             Welcome to AdeClassics
           </p>
 
           {/* Headline */}
-          <h1 style={{ fontFamily: DISPLAY, fontSize: '2rem', fontWeight: 500, color: C.charcoal, lineHeight: 1.1, letterSpacing: '-0.01em', marginBottom: '1.75rem' }}>
+          <h1 className="mb-7 font-medium leading-[1.1] tracking-[-0.01em]" style={{ fontFamily: DISPLAY, fontSize: '2rem', color: C.charcoal }}>
             {tab === 'signin' ? 'Sign In' : 'Create Your Account'}
           </h1>
 
           {/* Tab toggle */}
-          <div style={{ display: 'flex', gap: '2rem', borderBottom: `1px solid rgba(43,35,32,0.14)`, marginBottom: '2rem' }}>
+          <div className="flex gap-8 mb-8 border-b border-solid border-[rgba(43,35,32,0.14)]">
             <button
               type="button"
               className={`auth-tab-btn ${tab === 'signin' ? 'active' : 'inactive'}`}
@@ -597,14 +585,14 @@ export default function Auth() {
       </div>
 
       {/* ── Footer ─────────────────────────────────────────────── */}
-      <footer style={{ borderTop: `1px solid rgba(43,35,32,0.1)`, padding: '1.1rem 2rem' }}>
-        <div style={{ maxWidth: '1240px', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.75rem' }}>
-          <span style={{ fontFamily: UI, fontSize: '0.68rem', color: 'rgba(43,35,32,0.42)', letterSpacing: '0.04em' }}>
+      <footer className="py-[1.1rem] px-8 border-t border-solid border-[rgba(43,35,32,0.1)]">
+        <div className="max-w-[1240px] mx-auto flex items-center justify-between flex-wrap gap-3">
+          <span className="tracking-[0.04em]" style={{ fontFamily: UI, fontSize: '0.68rem', color: 'rgba(43,35,32,0.42)' }}>
             © 2026 AdeClassics Ltd. All rights reserved.
           </span>
-          <div style={{ display: 'flex', gap: '1.5rem' }}>
+          <div className="flex gap-6">
             {['Privacy Policy', 'Terms of Service', 'Returns'].map(l => (
-              <a key={l} href="#" style={{ fontFamily: UI, fontSize: '0.68rem', color: 'rgba(43,35,32,0.5)', textDecorationLine: 'none', letterSpacing: '0.04em', transition: 'color 0.15s' }}
+              <a key={l} href="#" className="no-underline tracking-[0.04em] transition-colors duration-150" style={{ fontFamily: UI, fontSize: '0.68rem', color: 'rgba(43,35,32,0.5)' }}
                 onMouseEnter={e => (e.currentTarget.style.color = C.indigo)}
                 onMouseLeave={e => (e.currentTarget.style.color = 'rgba(43,35,32,0.5)')}
               >

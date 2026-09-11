@@ -11,7 +11,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 
   return {
     title: `${product.title} — AdeClassics`,
-    description: `${product.title} in ${product.color}. Handcrafted, CAD $${product.priceCad}.`,
+    description: `${product.title}${product.colors.length ? ` in ${product.colors.join(', ')}` : ''}. Handcrafted, CAD $${product.priceCad}.`,
   };
 }
 

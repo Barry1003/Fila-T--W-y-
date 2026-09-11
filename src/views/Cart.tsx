@@ -179,7 +179,7 @@ export default function Cart() {
             {lines.map((item, idx) => {
               const lineTotalCents = item.unitPriceCents * item.quantity;
               return (
-                <div key={`${item.productId}:${item.size}`}>
+                <div key={`${item.productId}:${item.size}:${item.color}`}>
                   <div
                     className="grid gap-4 items-start py-[1.875rem] relative"
                     style={{ gridTemplateColumns: '88px 1fr auto auto' }}
@@ -214,7 +214,7 @@ export default function Cart() {
                     {/* Qty stepper */}
                     <div className="flex items-center h-[38px] mt-[2px]" style={{ border: `1px solid rgba(43,35,32,0.18)` }}>
                       <button
-                        onClick={() => setQuantity(item.productId, item.size, item.quantity - 1)}
+                        onClick={() => setQuantity(item.productId, item.size, item.color, item.quantity - 1)}
                         className="w-[34px] h-full flex items-center justify-center cursor-pointer"
                         style={{ background: 'none', border: 'none', color: C.charcoal, fontSize: '1.1rem', lineHeight: 1 }}
                         aria-label="Decrease quantity"
@@ -225,7 +225,7 @@ export default function Cart() {
                         {item.quantity}
                       </span>
                       <button
-                        onClick={() => setQuantity(item.productId, item.size, item.quantity + 1)}
+                        onClick={() => setQuantity(item.productId, item.size, item.color, item.quantity + 1)}
                         className="w-[34px] h-full flex items-center justify-center cursor-pointer"
                         style={{ background: 'none', border: 'none', color: C.charcoal, fontSize: '1.1rem', lineHeight: 1 }}
                         aria-label="Increase quantity"
@@ -237,7 +237,7 @@ export default function Cart() {
                     {/* Line total + remove */}
                     <div className="text-right pt-[2px]">
                       <button
-                        onClick={() => remove(item.productId, item.size)}
+                        onClick={() => remove(item.productId, item.size, item.color)}
                         className="flex ml-auto cursor-pointer mb-1.5 p-0"
                         style={{ background: 'none', border: 'none', color: 'rgba(43,35,32,0.3)', lineHeight: 0 }}
                         aria-label={`Remove ${item.title}`}

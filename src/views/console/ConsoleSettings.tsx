@@ -20,17 +20,16 @@ function SectionCard({
   children: React.ReactNode;
   style?: React.CSSProperties;
 }) {
-  return <div style={{ ...CARD, padding: "1.5rem", ...style }}>{children}</div>;
+  return <div className="p-6" style={{ ...CARD, ...style }}>{children}</div>;
 }
 
 function FieldLabel({ children }: { children: React.ReactNode }) {
   return (
     <label
+      className="block mb-[0.4rem]"
       style={{
         ...label,
-        display: "block",
         color: "rgba(43,35,32,0.5)",
-        marginBottom: "0.4rem",
       }}
     >
       {children}
@@ -39,17 +38,11 @@ function FieldLabel({ children }: { children: React.ReactNode }) {
 }
 
 const inputStyle: React.CSSProperties = {
-  width: "100%",
-  padding: "0.55rem 0.75rem",
   border: "1px solid rgba(43,35,32,0.15)",
-  borderRadius: 6,
   fontFamily: UI,
   fontSize: "0.82rem",
   color: C.charcoal,
   backgroundColor: "#fff",
-  outline: "none",
-  boxSizing: "border-box",
-  transition: "border-color 0.12s",
 };
 
 function Input({
@@ -71,7 +64,7 @@ function Input({
       onChange={(e) => onChange(e.target.value)}
       placeholder={placeholder}
       onFocus={() => setFocused(true)}
-      onBlur={() => setFocused(false)}
+      className="w-full px-3 py-[0.55rem] rounded-md outline-none box-border transition-colors duration-120"
       style={{
         ...inputStyle,
         borderColor: focused ? C.gold : "rgba(43,35,32,0.15)",
@@ -99,11 +92,9 @@ function Textarea({
       rows={rows}
       placeholder={placeholder}
       onFocus={() => setFocused(true)}
-      onBlur={() => setFocused(false)}
+      className="w-full px-3 py-[0.55rem] rounded-md outline-none resize-y box-border transition-colors duration-120 leading-relaxed"
       style={{
         ...inputStyle,
-        resize: "vertical",
-        lineHeight: 1.6,
         borderColor: focused ? C.gold : "rgba(43,35,32,0.15)",
       }}
     />
@@ -119,18 +110,13 @@ function SaveButton({ label: lbl = "Save Changes" }: { label?: string }) {
   return (
     <button
       onClick={handle}
+      className="border-none rounded-md px-6 py-[0.55rem] font-semibold cursor-pointer transition-colors duration-[180ms]"
       style={{
         backgroundColor: saved ? C.teal : C.gold,
         color: saved ? "#fff" : C.charcoal,
-        border: "none",
-        borderRadius: 6,
-        padding: "0.55rem 1.5rem",
         fontFamily: UI,
         fontSize: "0.8rem",
-        fontWeight: 600,
-        cursor: "pointer",
         letterSpacing: "0.02em",
-        transition: "background-color 0.18s, color 0.18s",
       }}
     >
       {saved ? "Saved ✓" : lbl}
@@ -169,20 +155,13 @@ function Dropzone({
         }}
         onDragLeave={() => setDragging(false)}
         onDrop={handleDrop}
+        className="rounded-lg flex flex-col items-center justify-center gap-[0.35rem] cursor-pointer transition-colors duration-150"
         style={{
           border: `2px dashed ${dragging ? C.gold : "rgba(43,35,32,0.18)"}`,
-          borderRadius: 8,
           backgroundColor: dragging
             ? "rgba(212,169,78,0.05)"
             : "rgba(43,35,32,0.02)",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: "0.35rem",
           height: wide ? 100 : 80,
-          cursor: "pointer",
-          transition: "border-color 0.14s, background-color 0.14s",
         }}
       >
         {file ? (
@@ -241,30 +220,15 @@ function Toggle({
       role="switch"
       aria-checked={checked}
       onClick={() => onChange(!checked)}
+      className="w-9 h-5 rounded-full border-none cursor-pointer relative shrink-0 transition-colors duration-150 p-0"
       style={{
-        width: 36,
-        height: 20,
-        borderRadius: 100,
         backgroundColor: checked ? C.teal : "rgba(43,35,32,0.18)",
-        border: "none",
-        cursor: "pointer",
-        position: "relative",
-        flexShrink: 0,
-        transition: "background-color 0.15s",
-        padding: 0,
       }}
     >
       <span
+        className="absolute top-[2px] w-4 h-4 rounded-full bg-white transition-all duration-150 shadow-[0_1px_3px_rgba(0,0,0,0.2)]"
         style={{
-          position: "absolute",
-          top: 2,
           left: checked ? 18 : 2,
-          width: 16,
-          height: 16,
-          borderRadius: "50%",
-          backgroundColor: "#fff",
-          transition: "left 0.15s",
-          boxShadow: "0 1px 3px rgba(0,0,0,0.2)",
         }}
       />
     </button>
@@ -286,26 +250,19 @@ function TabStoreProfile() {
   const [address, setAddress] = useState("12 Bode Thomas Street, Surulere, Lagos, Nigeria");
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+    <div className="flex flex-col gap-5">
       {/* Image uploads */}
       <SectionCard>
         <div
+          className="font-semibold mb-5"
           style={{
             fontSize: "0.78rem",
-            fontWeight: 600,
             color: C.charcoal,
-            marginBottom: "1.25rem",
           }}
         >
           Brand Images
         </div>
-        <div className="rg-split"
-          style={{
-            display: "grid",
-            gridTemplateColumns: "160px 1fr",
-            gap: "1.25rem",
-          }}
-        >
+        <div className="rg-split">
           <Dropzone
             label="Store Logo"
             hint="PNG / SVG · 512×512px"
@@ -322,23 +279,16 @@ function TabStoreProfile() {
       {/* Store identity */}
       <SectionCard>
         <div
+          className="font-semibold mb-5"
           style={{
             fontSize: "0.78rem",
-            fontWeight: 600,
             color: C.charcoal,
-            marginBottom: "1.25rem",
           }}
         >
           Store Identity
         </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-          <div className="rg-2"
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1fr 1fr",
-              gap: "1rem",
-            }}
-          >
+        <div className="flex flex-col gap-4">
+          <div className="rg-2">
             <div>
               <FieldLabel>Store Name</FieldLabel>
               <Input value={name} onChange={setName} />
@@ -358,23 +308,16 @@ function TabStoreProfile() {
       {/* Contact */}
       <SectionCard>
         <div
+          className="font-semibold mb-5"
           style={{
             fontSize: "0.78rem",
-            fontWeight: 600,
             color: C.charcoal,
-            marginBottom: "1.25rem",
           }}
         >
           Contact Details
         </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-          <div className="rg-2"
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1fr 1fr",
-              gap: "1rem",
-            }}
-          >
+        <div className="flex flex-col gap-4">
+          <div className="rg-2">
             <div>
               <FieldLabel>Contact Email</FieldLabel>
               <Input value={email} onChange={setEmail} type="email" />
@@ -409,13 +352,11 @@ function SlideIconButton({
       disabled={disabled}
       aria-label={lbl}
       title={lbl}
+      className="w-[26px] h-[26px] inline-flex items-center justify-center rounded-[5px] bg-white leading-none cursor-pointer disabled:cursor-not-allowed disabled:opacity-[0.35]"
       style={{
-        width: 26, height: 26, display: "inline-flex", alignItems: "center", justifyContent: "center",
-        border: "1px solid rgba(43,35,32,0.15)", borderRadius: 5, background: "#fff",
+        border: "1px solid rgba(43,35,32,0.15)",
         color: danger ? C.maroon : "rgba(43,35,32,0.6)",
-        fontSize: "0.85rem", lineHeight: 1,
-        cursor: disabled ? "not-allowed" : "pointer",
-        opacity: disabled ? 0.35 : 1,
+        fontSize: "0.85rem",
       }}
     >
       {children}
@@ -463,8 +404,8 @@ function TabAboutContent({ initial }: { initial: AboutContent }) {
     set: (v: AboutContent['origin']) => void
   ) => (
     <SectionCard>
-      <div style={{ fontSize: "0.78rem", fontWeight: 600, color: C.charcoal, marginBottom: "1.25rem" }}>{title}</div>
-      <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+      <div className="font-semibold mb-5" style={{ fontSize: "0.78rem", color: C.charcoal }}>{title}</div>
+      <div className="flex flex-col gap-4">
         <div>
           <FieldLabel>Eyebrow Text</FieldLabel>
           <Input value={section.eyebrow} onChange={v => set({ ...section, eyebrow: v })} placeholder="e.g. Where We Began" />
@@ -489,10 +430,10 @@ function TabAboutContent({ initial }: { initial: AboutContent }) {
   );
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem", maxWidth: 720 }}>
+    <div className="flex flex-col gap-5 max-w-[720px]">
       <SectionCard>
-        <div style={{ fontSize: "0.78rem", fontWeight: 600, color: C.charcoal, marginBottom: "1.25rem" }}>Page Header</div>
-        <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+        <div className="font-semibold mb-5" style={{ fontSize: "0.78rem", color: C.charcoal }}>Page Header</div>
+        <div className="flex flex-col gap-4">
           <div>
             <FieldLabel>Eyebrow Text</FieldLabel>
             <Input value={heroEyebrow} onChange={setHeroEyebrow} placeholder="e.g. Our Story" />
@@ -512,26 +453,26 @@ function TabAboutContent({ initial }: { initial: AboutContent }) {
       {proseCard("How We Work", craft, setCraft)}
 
       <SectionCard>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "1.25rem" }}>
-          <div style={{ fontSize: "0.78rem", fontWeight: 600, color: C.charcoal }}>What We Stand For</div>
+        <div className="flex items-center justify-between mb-5">
+          <div className="font-semibold" style={{ fontSize: "0.78rem", color: C.charcoal }}>What We Stand For</div>
           <button
             onClick={() => setValues(v => (v.length < 6 ? [...v, { title: "", body: "" }] : v))}
             disabled={values.length >= 6}
+            className="bg-none rounded-[5px] px-[0.7rem] py-[0.3rem] cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
             style={{
-              background: "none", border: "1px dashed rgba(43,35,32,0.25)", borderRadius: 5,
-              padding: "0.3rem 0.7rem", fontFamily: UI, fontSize: "0.72rem",
-              color: "rgba(43,35,32,0.6)", cursor: values.length >= 6 ? "not-allowed" : "pointer",
-              opacity: values.length >= 6 ? 0.5 : 1,
+              border: "1px dashed rgba(43,35,32,0.25)",
+              fontFamily: UI, fontSize: "0.72rem",
+              color: "rgba(43,35,32,0.6)",
             }}
           >
-            + Add
+          + Add
           </button>
         </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+        <div className="flex flex-col gap-4">
           {values.map((v, i) => (
-            <div key={i} style={{ border: "1px solid rgba(43,35,32,0.12)", borderRadius: 8, padding: "1rem" }}>
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "0.75rem" }}>
-                <span style={{ fontSize: "0.7rem", fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(43,35,32,0.45)" }}>
+            <div key={i} className="rounded-lg p-4" style={{ border: "1px solid rgba(43,35,32,0.12)" }}>
+              <div className="flex items-center justify-between mb-[0.75rem]">
+                <span className="font-semibold uppercase tracking-[0.1em]" style={{ fontSize: "0.7rem", color: "rgba(43,35,32,0.45)" }}>
                   Value {i + 1}
                 </span>
                 <SlideIconButton
@@ -540,7 +481,7 @@ function TabAboutContent({ initial }: { initial: AboutContent }) {
                   onClick={() => setValues(list => list.filter((_, n) => n !== i))}
                 >×</SlideIconButton>
               </div>
-              <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+              <div className="flex flex-col gap-[0.75rem]">
                 <div>
                   <FieldLabel>Title</FieldLabel>
                   <Input value={v.title} onChange={val => setValues(list => list.map((x, n) => (n === i ? { ...x, title: val } : x)))} placeholder="e.g. Authentic Craft" />
@@ -561,8 +502,8 @@ function TabAboutContent({ initial }: { initial: AboutContent }) {
       </SectionCard>
 
       <SectionCard>
-        <div style={{ fontSize: "0.78rem", fontWeight: 600, color: C.charcoal, marginBottom: "1.25rem" }}>Founder Quote</div>
-        <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+        <div className="font-semibold mb-5" style={{ fontSize: "0.78rem", color: C.charcoal }}>Founder Quote</div>
+        <div className="flex flex-col gap-4">
           <div>
             <FieldLabel>Quote</FieldLabel>
             <Textarea value={quote.text} onChange={v => setQuote(q => ({ ...q, text: v }))} rows={4} placeholder="The quote…" />
@@ -574,15 +515,15 @@ function TabAboutContent({ initial }: { initial: AboutContent }) {
         </div>
       </SectionCard>
 
-      <div style={{ display: "flex", alignItems: "center", gap: "0.875rem", flexWrap: "wrap" }}>
+      <div className="flex items-center gap-[0.875rem] flex-wrap">
         <button
           onClick={save}
           disabled={saving}
+          className="border-none rounded-md px-6 py-[0.55rem] font-semibold cursor-pointer disabled:cursor-wait"
           style={{
             backgroundColor: saved ? C.teal : C.gold, color: saved ? "#fff" : C.charcoal,
-            border: "none", borderRadius: 6, padding: "0.55rem 1.5rem",
-            fontFamily: UI, fontSize: "0.8rem", fontWeight: 600,
-            cursor: saving ? "wait" : "pointer", opacity: saving ? 0.7 : 1,
+            fontFamily: UI, fontSize: "0.8rem",
+            opacity: saving ? 0.7 : 1,
           }}
         >
           {saving ? "Saving…" : saved ? "Saved — live on the site" : "Save Changes"}
@@ -661,15 +602,15 @@ function TabHomepageContent({ initial }: { initial: HomeContent }) {
   }
 
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "1fr 340px", gap: "1.25rem" }} className="settings-homepage-grid">
+    <div className="settings-homepage-grid">
       {/* Fields */}
-      <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+      <div className="flex flex-col gap-5">
         <SectionCard>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "1rem", marginBottom: "1.25rem", flexWrap: "wrap" }}>
-            <div style={{ fontSize: "0.78rem", fontWeight: 600, color: C.charcoal }}>
+          <div className="flex items-center justify-between gap-4 mb-5 flex-wrap">
+            <div className="font-semibold" style={{ fontSize: "0.78rem", color: C.charcoal }}>
               Hero Slideshow
             </div>
-            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "0.72rem", color: "rgba(43,35,32,0.55)" }}>
+            <div className="flex items-center gap-2" style={{ fontSize: "0.72rem", color: "rgba(43,35,32,0.55)" }}>
               <label htmlFor="hero-interval">Seconds per slide</label>
               <input
                 id="hero-interval"
@@ -687,27 +628,28 @@ function TabHomepageContent({ initial }: { initial: HomeContent }) {
             </div>
           </div>
 
-          <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+          <div className="flex flex-col gap-4">
             {slides.map((slide, i) => (
               <div
                 key={slide.id}
+                className="rounded-lg p-4"
                 style={{
-                  border: "1px solid rgba(43,35,32,0.12)", borderRadius: 8,
-                  padding: "1rem", backgroundColor: "rgba(43,35,32,0.015)",
+                  border: "1px solid rgba(43,35,32,0.12)",
+                  backgroundColor: "rgba(43,35,32,0.015)",
                 }}
               >
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "0.875rem" }}>
-                  <span style={{ fontSize: "0.7rem", fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(43,35,32,0.45)" }}>
+                <div className="flex items-center justify-between mb-[0.875rem]">
+                  <span className="font-semibold uppercase tracking-[0.1em]" style={{ fontSize: "0.7rem", color: "rgba(43,35,32,0.45)" }}>
                     Slide {i + 1}
                   </span>
-                  <div style={{ display: "flex", gap: "0.25rem" }}>
+                  <div className="flex gap-1">
                     <SlideIconButton label={`Move slide ${i + 1} up`} disabled={i === 0} onClick={() => moveSlide(slide.id, -1)}>↑</SlideIconButton>
                     <SlideIconButton label={`Move slide ${i + 1} down`} disabled={i === slides.length - 1} onClick={() => moveSlide(slide.id, 1)}>↓</SlideIconButton>
                     <SlideIconButton label={`Remove slide ${i + 1}`} disabled={slides.length === 1} danger onClick={() => removeSlide(slide.id)}>×</SlideIconButton>
                   </div>
                 </div>
 
-                <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+                <div className="flex flex-col gap-[0.75rem]">
                   <div>
                     <FieldLabel>Eyebrow Text</FieldLabel>
                     <Input value={slide.eyebrow} onChange={v => patchSlide(slide.id, { eyebrow: v })} placeholder="e.g. The cap line" />
@@ -719,7 +661,7 @@ function TabHomepageContent({ initial }: { initial: HomeContent }) {
                       Each new line becomes its own line on the hero.
                     </p>
                   </div>
-                  <div className="rg-2" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem" }}>
+                  <div className="rg-2">
                     <div>
                       <FieldLabel>Button Label</FieldLabel>
                       <Input value={slide.ctaLabel} onChange={v => patchSlide(slide.id, { ctaLabel: v })} placeholder="Shop the collection" />
@@ -741,13 +683,10 @@ function TabHomepageContent({ initial }: { initial: HomeContent }) {
           <button
             onClick={addSlide}
             disabled={slides.length >= 8}
+            className="mt-4 bg-none rounded-md px-4 py-[0.6rem] w-full cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
             style={{
-              marginTop: "1rem", background: "none",
-              border: "1px dashed rgba(43,35,32,0.25)", borderRadius: 6,
-              padding: "0.6rem 1rem", width: "100%",
+              border: "1px dashed rgba(43,35,32,0.25)",
               fontFamily: UI, fontSize: "0.78rem", color: "rgba(43,35,32,0.6)",
-              cursor: slides.length >= 8 ? "not-allowed" : "pointer",
-              opacity: slides.length >= 8 ? 0.5 : 1,
             }}
           >
             + Add slide
@@ -756,17 +695,16 @@ function TabHomepageContent({ initial }: { initial: HomeContent }) {
 
         <SectionCard>
           <div
+            className="font-semibold mb-5"
             style={{
               fontSize: "0.78rem",
-              fontWeight: 600,
               color: C.charcoal,
-              marginBottom: "1.25rem",
             }}
           >
             Promo Strip
           </div>
-          <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-            <label style={{ display: "flex", alignItems: "center", gap: "0.6rem", cursor: "pointer", fontSize: "0.8rem", color: C.charcoal }}>
+          <div className="flex flex-col gap-4">
+            <label className="flex items-center gap-[0.6rem] cursor-pointer" style={{ fontSize: "0.8rem", color: C.charcoal }}>
               <input
                 type="checkbox"
                 checked={promoEnabled}
@@ -788,16 +726,15 @@ function TabHomepageContent({ initial }: { initial: HomeContent }) {
 
         <SectionCard>
           <div
+            className="font-semibold mb-5"
             style={{
               fontSize: "0.78rem",
-              fontWeight: 600,
               color: C.charcoal,
-              marginBottom: "1.25rem",
             }}
           >
             Our Story Section
           </div>
-          <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+          <div className="flex flex-col gap-4">
             <div>
               <FieldLabel>Section Heading</FieldLabel>
               <Input value={storyHeading} onChange={setStoryHeading} placeholder="e.g. Yoruba craft, made for the world." />
@@ -821,17 +758,17 @@ function TabHomepageContent({ initial }: { initial: HomeContent }) {
           </div>
         </SectionCard>
 
-        <div style={{ display: "flex", alignItems: "center", gap: "0.875rem", flexWrap: "wrap" }}>
+        <div className="flex items-center gap-[0.875rem] flex-wrap">
           <button
             onClick={save}
             disabled={saving}
+            className="border-none rounded-md px-6 py-[0.55rem] font-semibold cursor-pointer disabled:cursor-wait transition-colors duration-[180ms]"
             style={{
               backgroundColor: saved ? C.teal : C.gold,
               color: saved ? "#fff" : C.charcoal,
-              border: "none", borderRadius: 6, padding: "0.55rem 1.5rem",
-              fontFamily: UI, fontSize: "0.8rem", fontWeight: 600,
-              cursor: saving ? "wait" : "pointer", opacity: saving ? 0.7 : 1,
-              letterSpacing: "0.02em", transition: "background-color 0.18s, color 0.18s",
+              fontFamily: UI, fontSize: "0.8rem",
+              opacity: saving ? 0.7 : 1,
+              letterSpacing: "0.02em",
             }}
           >
             {saving ? "Saving…" : saved ? "Saved — live on the site" : "Save Changes"}
@@ -843,77 +780,63 @@ function TabHomepageContent({ initial }: { initial: HomeContent }) {
       </div>
 
       {/* Live preview */}
-      <div style={{ position: "sticky", top: "1.25rem", alignSelf: "start" }}>
+      <div className="sticky top-5 self-start">
         <div
+          className="mb-2"
           style={{
             ...label,
             color: "rgba(43,35,32,0.4)",
-            marginBottom: "0.5rem",
           }}
         >
           Hero Preview
         </div>
         <div
-          style={{
-            ...CARD,
-            overflow: "hidden",
-            borderRadius: 10,
-          }}
+          className="overflow-hidden rounded-[10px]"
+          style={CARD}
         >
           <div
+            className="p-[1.75rem_1.25rem_1.5rem] relative overflow-hidden"
             style={{
               background: `linear-gradient(135deg, ${C.maroon} 0%, #4A1820 100%)`,
-              padding: "1.75rem 1.25rem 1.5rem",
-              position: "relative",
-              overflow: "hidden",
             }}
           >
             {/* Decorative texture */}
             <div
+              className="absolute inset-0 pointer-events-none"
               style={{
-                position: "absolute",
-                inset: 0,
                 backgroundImage:
                   "radial-gradient(circle at 80% 20%, rgba(212,169,78,0.15) 0%, transparent 60%)",
-                pointerEvents: "none",
               }}
             />
             <div
+              className="uppercase mb-2"
               style={{
                 fontFamily: UI,
                 fontSize: "0.6rem",
                 letterSpacing: "0.14em",
-                textTransform: "uppercase",
                 color: C.gold,
-                marginBottom: "0.5rem",
                 opacity: slides[0]?.eyebrow ? 1 : 0.3,
               }}
             >
               {slides[0]?.eyebrow || "Eyebrow text…"}
             </div>
             <div
+              className="font-medium whitespace-pre-line mb-[0.875rem] leading-tight"
               style={{
                 fontFamily: DISPLAY,
                 fontSize: "1.3rem",
-                fontWeight: 500,
                 color: C.cream,
-                lineHeight: 1.25,
-                whiteSpace: "pre-line",
-                marginBottom: "0.875rem",
                 opacity: slides[0]?.headline ? 1 : 0.3,
               }}
             >
               {slides[0]?.headline || "Hero headline…"}
             </div>
             <div
+              className="inline-block rounded px-[0.9rem] py-[0.35rem] font-semibold"
               style={{
-                display: "inline-block",
                 backgroundColor: C.gold,
                 color: C.charcoal,
-                padding: "0.35rem 0.9rem",
-                borderRadius: 4,
                 fontSize: "0.65rem",
-                fontWeight: 600,
                 fontFamily: UI,
                 letterSpacing: "0.04em",
               }}
@@ -924,16 +847,13 @@ function TabHomepageContent({ initial }: { initial: HomeContent }) {
 
           {/* Promo strip preview */}
           <div
+            className="px-4 py-[0.45rem] overflow-hidden whitespace-nowrap text-ellipsis"
             style={{
               backgroundColor: C.charcoal,
-              padding: "0.45rem 1rem",
               fontSize: "0.6rem",
               color: "rgba(250,246,240,0.75)",
               fontFamily: UI,
               letterSpacing: "0.04em",
-              overflow: "hidden",
-              whiteSpace: "nowrap",
-              textOverflow: "ellipsis",
               opacity: promo ? 1 : 0.4,
             }}
           >
@@ -941,31 +861,29 @@ function TabHomepageContent({ initial }: { initial: HomeContent }) {
           </div>
 
           {/* Story preview */}
-          <div style={{ padding: "1rem 1.25rem" }}>
+          <div className="p-[1rem_1.25rem]">
             <div
+              className="uppercase mb-[0.4rem]"
               style={{
                 fontSize: "0.6rem",
                 letterSpacing: "0.1em",
-                textTransform: "uppercase",
                 color: "rgba(43,35,32,0.4)",
                 fontFamily: UI,
-                marginBottom: "0.4rem",
               }}
             >
               Our Story
             </div>
             <p
+              className="m-0 overflow-hidden"
               style={{
                 fontSize: "0.72rem",
                 color: "rgba(43,35,32,0.7)",
                 lineHeight: 1.55,
                 fontFamily: UI,
-                margin: 0,
                 opacity: story ? 1 : 0.3,
                 display: "-webkit-box",
                 WebkitLineClamp: 4,
                 WebkitBoxOrient: "vertical",
-                overflow: "hidden",
               }}
             >
               {story || "Your story text will appear here…"}
@@ -973,12 +891,11 @@ function TabHomepageContent({ initial }: { initial: HomeContent }) {
           </div>
         </div>
         <div
+          className="mt-2 text-center"
           style={{
             fontSize: "0.65rem",
             color: "rgba(43,35,32,0.35)",
             fontFamily: UI,
-            marginTop: "0.5rem",
-            textAlign: "center",
           }}
         >
           Updates as you type
@@ -1043,26 +960,21 @@ function TabShipping() {
   );
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+    <div className="flex flex-col gap-5">
       <div
-        style={{
-          ...CARD,
-          overflow: "hidden",
-        }}
+        className="overflow-hidden"
+        style={CARD}
       >
         <div
+          className="flex items-center justify-between p-[1rem_1.25rem_0.875rem]"
           style={{
-            padding: "1rem 1.25rem 0.875rem",
             borderBottom: "1px solid rgba(43,35,32,0.06)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
           }}
         >
           <span
+            className="font-semibold"
             style={{
               fontSize: "0.8rem",
-              fontWeight: 600,
               color: C.charcoal,
               fontFamily: UI,
             }}
@@ -1071,9 +983,9 @@ function TabShipping() {
           </span>
         </div>
 
-        <div style={{ overflowX: "auto" }}>
+        <div className="overflow-x-auto">
           <div className="table-scroll">
-            <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 560 }}>
+            <table className="w-full border-collapse min-w-[560px]">
               <thead>
                 <tr>
                   {colHead("Region")}
@@ -1139,24 +1051,18 @@ function TabShipping() {
           </div>
         </div>
 
-        <div style={{ padding: "1rem 1.25rem" }}>
+        <div className="p-[1rem_1.25rem]">
           <button
             onClick={addRegion}
+            className="bg-none rounded-md px-4 py-[0.45rem] cursor-pointer flex items-center gap-[0.4rem]"
             style={{
-              background: "none",
               border: `1px dashed rgba(43,35,32,0.22)`,
-              borderRadius: 6,
-              padding: "0.45rem 1rem",
               fontFamily: UI,
               fontSize: "0.78rem",
               color: "rgba(43,35,32,0.55)",
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              gap: "0.4rem",
             }}
           >
-            <span style={{ fontSize: "1.1rem", lineHeight: 1 }}>+</span> Add Region
+            <span className="leading-none" style={{ fontSize: "1.1rem" }}>+</span> Add Region
           </button>
         </div>
       </div>
@@ -1173,16 +1079,12 @@ function TabShipping() {
 function ConnectedBadge() {
   return (
     <span
+      className="inline-block px-[9px] py-[2px] rounded-full font-medium whitespace-nowrap"
       style={{
-        display: "inline-block",
-        padding: "2px 9px",
-        borderRadius: 100,
         fontSize: "0.68rem",
-        fontWeight: 500,
         backgroundColor: "rgba(59,138,147,0.12)",
         color: C.teal,
         fontFamily: UI,
-        whiteSpace: "nowrap",
       }}
     >
       Connected
@@ -1213,59 +1115,45 @@ function TabPayments() {
   ];
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+    <div className="flex flex-col gap-5">
       {/* Providers */}
       <SectionCard>
         <div
+          className="font-semibold mb-5"
           style={{
             fontSize: "0.78rem",
-            fontWeight: 600,
             color: C.charcoal,
-            marginBottom: "1.25rem",
           }}
         >
           Payment Providers
         </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+        <div className="flex flex-col gap-3">
           {providers.map((p) => (
             <div
               key={p.name}
+              className="flex items-center gap-4 p-[0.875rem_1rem] rounded-lg"
               style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "1rem",
-                padding: "0.875rem 1rem",
                 border: "1px solid rgba(43,35,32,0.08)",
-                borderRadius: 8,
                 backgroundColor: "rgba(43,35,32,0.015)",
               }}
             >
               <div
+                className="w-9 h-9 rounded-lg flex items-center justify-center font-bold text-white shrink-0"
                 style={{
-                  width: 36,
-                  height: 36,
-                  borderRadius: 8,
                   backgroundColor: p.logoColor,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
                   fontSize: "0.9rem",
-                  fontWeight: 700,
-                  color: "#fff",
-                  flexShrink: 0,
                   fontFamily: UI,
                 }}
               >
                 {p.logo}
               </div>
-              <div style={{ flex: 1 }}>
+              <div className="flex-1">
                 <div
+                  className="font-semibold mb-[2px]"
                   style={{
                     fontSize: "0.82rem",
-                    fontWeight: 600,
                     color: C.charcoal,
                     fontFamily: UI,
-                    marginBottom: "2px",
                   }}
                 >
                   {p.name}
@@ -1282,16 +1170,12 @@ function TabPayments() {
               </div>
               <ConnectedBadge />
               <button
+                className="bg-none rounded-[5px] px-[0.8rem] py-[0.35rem] cursor-pointer font-medium"
                 style={{
-                  background: "none",
                   border: "1px solid rgba(43,35,32,0.15)",
-                  borderRadius: 5,
-                  padding: "0.35rem 0.8rem",
                   fontSize: "0.73rem",
                   color: C.charcoal,
-                  cursor: "pointer",
                   fontFamily: UI,
-                  fontWeight: 500,
                 }}
               >
                 Manage
@@ -1304,17 +1188,12 @@ function TabPayments() {
       {/* Bank details */}
       <SectionCard>
         <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            marginBottom: "1.25rem",
-          }}
+          className="flex items-center justify-between mb-5"
         >
           <div
+            className="font-semibold"
             style={{
               fontSize: "0.78rem",
-              fontWeight: 600,
               color: C.charcoal,
             }}
           >
@@ -1322,15 +1201,11 @@ function TabPayments() {
           </div>
           <button
             onClick={() => setEditingBank(!editingBank)}
+            className="bg-none border-none cursor-pointer p-0 font-medium"
             style={{
-              background: "none",
-              border: "none",
-              cursor: "pointer",
               fontSize: "0.73rem",
               color: C.maroon,
               fontFamily: UI,
-              fontWeight: 500,
-              padding: 0,
             }}
           >
             {editingBank ? "Cancel" : "Edit"}
@@ -1339,15 +1214,9 @@ function TabPayments() {
 
         {editingBank ? (
           <div
-            style={{ display: "flex", flexDirection: "column", gap: "0.875rem" }}
+            className="flex flex-col gap-[0.875rem]"
           >
-            <div className="rg-2"
-              style={{
-                display: "grid",
-                gridTemplateColumns: "1fr 1fr",
-                gap: "0.875rem",
-              }}
-            >
+            <div className="rg-2">
               <div>
                 <FieldLabel>Bank Name</FieldLabel>
                 <Input value={bankName} onChange={setBankName} />
@@ -1364,15 +1233,11 @@ function TabPayments() {
             <div>
               <button
                 onClick={() => setEditingBank(false)}
+                className="border-none rounded-md px-5 py-2 font-semibold cursor-pointer"
                 style={{
                   backgroundColor: C.gold,
                   color: C.charcoal,
-                  border: "none",
-                  borderRadius: 6,
-                  padding: "0.5rem 1.25rem",
                   fontSize: "0.78rem",
-                  fontWeight: 600,
-                  cursor: "pointer",
                   fontFamily: UI,
                 }}
               >
@@ -1381,13 +1246,7 @@ function TabPayments() {
             </div>
           </div>
         ) : (
-          <div className="rg-3"
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(3, 1fr)",
-              gap: "0.75rem",
-            }}
-          >
+          <div className="rg-3">
             {[
               ["Bank", bankName],
               ["Account Number", acctNum],
@@ -1395,20 +1254,20 @@ function TabPayments() {
             ].map(([lbl, val]) => (
               <div key={lbl}>
                 <div
+                  className="mb-1"
                   style={{
                     ...label,
                     color: "rgba(43,35,32,0.4)",
-                    marginBottom: "0.25rem",
                   }}
                 >
                   {lbl}
                 </div>
                 <div
+                  className="font-medium"
                   style={{
                     fontSize: "0.82rem",
                     color: C.charcoal,
                     fontFamily: UI,
-                    fontWeight: 500,
                   }}
                 >
                   {val}
@@ -1422,16 +1281,15 @@ function TabPayments() {
       {/* Payout schedule */}
       <SectionCard>
         <div
+          className="font-semibold mb-5"
           style={{
             fontSize: "0.78rem",
-            fontWeight: 600,
             color: C.charcoal,
-            marginBottom: "1.25rem",
           }}
         >
           Payout Schedule
         </div>
-        <div style={{ maxWidth: 280 }}>
+        <div className="max-w-[280px]">
           <FieldLabel>Release Frequency</FieldLabel>
           <select
             value={schedule}
@@ -1475,15 +1333,14 @@ function TabPolicies() {
   const [policies, setPolicies] = useState({ ...POLICY_DEFAULTS });
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+    <div className="flex flex-col gap-5">
       {Object.keys(policies).map((key) => (
         <SectionCard key={key}>
           <div
+            className="font-semibold mb-[0.875rem]"
             style={{
               fontSize: "0.78rem",
-              fontWeight: 600,
               color: C.charcoal,
-              marginBottom: "0.875rem",
             }}
           >
             {key}
@@ -1549,15 +1406,15 @@ function TabNotifications() {
         }}
       >
         <div
+          className="p-[1rem_1.5rem_0.75rem]"
           style={{
-            padding: "1rem 1.5rem 0.75rem",
             borderBottom: "1px solid rgba(43,35,32,0.06)",
           }}
         >
           <div
+            className="font-semibold"
             style={{
               fontSize: "0.78rem",
-              fontWeight: 600,
               color: C.charcoal,
               fontFamily: UI,
             }}
@@ -1565,6 +1422,7 @@ function TabNotifications() {
             Owner Notification Preferences
           </div>
           <div
+            className="mt-[3px]"
             style={{
               fontSize: "0.7rem",
               color: "rgba(43,35,32,0.45)",
@@ -1578,10 +1436,9 @@ function TabNotifications() {
 
         {/* Header row */}
         <div
+          className="grid p-[0.5rem_1.5rem]"
           style={{
-            display: "grid",
             gridTemplateColumns: "1fr 90px 90px",
-            padding: "0.5rem 1.5rem",
             borderBottom: "1px solid rgba(43,35,32,0.06)",
           }}
         >
@@ -1603,11 +1460,9 @@ function TabNotifications() {
         {rows.map((r, i) => (
           <div
             key={r.label}
+            className="grid items-center p-[0.875rem_1.5rem]"
             style={{
-              display: "grid",
               gridTemplateColumns: "1fr 90px 90px",
-              alignItems: "center",
-              padding: "0.875rem 1.5rem",
               borderBottom:
                 i < rows.length - 1
                   ? "1px solid rgba(43,35,32,0.05)"
@@ -1618,12 +1473,11 @@ function TabNotifications() {
           >
             <div>
               <div
+                className="font-medium mb-[2px]"
                 style={{
                   fontSize: "0.8rem",
-                  fontWeight: 500,
                   color: C.charcoal,
                   fontFamily: UI,
-                  marginBottom: "2px",
                 }}
               >
                 {r.label}
@@ -1638,10 +1492,10 @@ function TabNotifications() {
                 {r.desc}
               </div>
             </div>
-            <div style={{ display: "flex", justifyContent: "center" }}>
+            <div className="flex justify-center">
               <Toggle checked={r.email} onChange={() => toggle(i, "email")} />
             </div>
-            <div style={{ display: "flex", justifyContent: "center" }}>
+            <div className="flex justify-center">
               <Toggle checked={r.push} onChange={() => toggle(i, "push")} />
             </div>
           </div>
@@ -1671,19 +1525,14 @@ export default function ConsoleSettings({ homeContent, aboutContent }: { homeCon
   const [activeTab, setActiveTab] = useState<Tab>("Store Profile");
 
   return (
-    <div style={{ display: "flex", height: "100%", fontFamily: UI }}>
+    <div className="flex h-full" style={{ fontFamily: UI }}>
       {/* Left sub-nav */}
       <nav
         aria-label="Settings sections"
+        className="w-[192px] shrink-0 py-5 flex flex-col"
         style={{
-          width: 192,
-          flexShrink: 0,
           borderRight: "1px solid rgba(43,35,32,0.08)",
           backgroundColor: "rgba(43,35,32,0.025)",
-          paddingTop: "1.25rem",
-          paddingBottom: "1.25rem",
-          display: "flex",
-          flexDirection: "column",
         }}
       >
         {TABS.map((tab) => {
@@ -1692,21 +1541,14 @@ export default function ConsoleSettings({ homeContent, aboutContent }: { homeCon
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
+              className="bg-none border-none text-left px-5 py-[0.6rem] uppercase cursor-pointer leading-snug transition-colors duration-120"
               style={{
-                background: "none",
-                border: "none",
                 borderBottom: `2px solid ${active ? C.gold : "transparent"}`,
-                textAlign: "left",
-                padding: "0.6rem 1.25rem",
                 fontFamily: UI,
                 fontSize: "0.72rem",
                 letterSpacing: "0.06em",
-                textTransform: "uppercase",
                 fontWeight: active ? 600 : 400,
                 color: active ? C.charcoal : "rgba(43,35,32,0.5)",
-                cursor: "pointer",
-                transition: "color 0.12s, border-color 0.12s",
-                lineHeight: 1.4,
               }}
             >
               {tab}
@@ -1716,14 +1558,7 @@ export default function ConsoleSettings({ homeContent, aboutContent }: { homeCon
       </nav>
 
       {/* Content pane */}
-      <div
-        style={{
-          flex: 1,
-          overflowY: "auto",
-          padding: "1.75rem",
-          minWidth: 0,
-        }}
-      >
+      <div className="flex-1 overflow-y-auto p-7 min-w-0">
         {activeTab === "Store Profile" && <TabStoreProfile />}
         {activeTab === "Homepage Content" && <TabHomepageContent initial={homeContent} />}
         {activeTab === "About Page" && <TabAboutContent initial={aboutContent} />}

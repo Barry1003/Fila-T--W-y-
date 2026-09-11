@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from "react";
-import { C, UI, label } from "../../tokens";
+// import { C, UI, label } from "../../tokens";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -135,13 +135,13 @@ const STORE_STATS = {
 
 function Stars({ rating, size = 13 }: { rating: number; size?: number }) {
   return (
-    <span style={{ display: "inline-flex", gap: "2px", alignItems: "center" }}>
+    <span className="inline-flex gap-[2px] items-center">
       {[1, 2, 3, 4, 5].map(n => (
         <svg key={n} width={size} height={size} viewBox="0 0 24 24">
           <polygon
             points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
-            fill={n <= rating ? C.gold : "rgba(43,35,32,0.12)"}
-            stroke={n <= rating ? C.gold : "rgba(43,35,32,0.15)"}
+            fill={n <= rating ? "#D4A94E" : "rgba(43,35,32,0.12)"}
+            stroke={n <= rating ? "#D4A94E" : "rgba(43,35,32,0.15)"}
             strokeWidth="1"
           />
         </svg>
@@ -155,97 +155,40 @@ function Stars({ rating, size = 13 }: { rating: number; size?: number }) {
 function SummaryBlock({ filtered, needsResponse }: { filtered: boolean; needsResponse: boolean }) {
   const s = STORE_STATS;
   return (
-    <div
-      style={{
-        backgroundColor: "#fff",
-        borderRadius: 8,
-        border: "1px solid rgba(43,35,32,0.07)",
-        padding: "1.5rem",
-        display: "grid",
-        gridTemplateColumns: "auto 1fr auto",
-        gap: "2.5rem",
-        alignItems: "center",
-        marginBottom: "1.25rem",
-      }}
-    >
+    <div className="bg-white rounded-lg grid items-center p-6 gap-10 mb-5 border border-solid border-[#2b232012] grid-cols-[auto_1fr_auto]">
       {/* Big rating */}
-      <div style={{ textAlign: "center", paddingRight: "2rem", borderRight: "1px solid rgba(43,35,32,0.08)" }}>
-        <div
-          style={{
-            fontFamily: UI,
-            fontSize: "3rem",
-            fontWeight: 700,
-            color: C.charcoal,
-            letterSpacing: "-0.05em",
-            lineHeight: 1,
-            marginBottom: "0.4rem",
-          }}
-        >
+      <div className="text-center pr-8 border-r border-solid border-[rgba(43,35,32,0.08)]">
+        <div className="font-bold leading-none mb-[0.4rem] tracking-[-0.05em] font-sans text-[3rem] text-[#2B2320]">
           {s.average.toFixed(1)}
         </div>
         <Stars rating={Math.round(s.average)} size={15} />
-        <div
-          style={{
-            fontFamily: UI,
-            fontSize: "0.68rem",
-            color: "rgba(43,35,32,0.4)",
-            marginTop: "0.4rem",
-            letterSpacing: "0.02em",
-          }}
-        >
+        <div className="mt-[0.4rem] tracking-[0.02em] font-sans text-[0.68rem] text-[#2b232066]">
           {s.total} reviews
         </div>
       </div>
 
       {/* Breakdown bars */}
-      <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+      <div className="flex flex-col gap-2">
         {s.breakdown.map(row => (
-          <div key={row.stars} style={{ display: "flex", alignItems: "center", gap: "0.625rem" }}>
+          <div key={row.stars} className="flex items-center gap-[0.625rem]">
             <span
-              style={{
-                fontFamily: UI,
-                fontSize: "0.68rem",
-                color: "rgba(43,35,32,0.5)",
-                minWidth: 32,
-                textAlign: "right",
-                display: "flex",
-                alignItems: "center",
-                gap: "2px",
-                justifyContent: "flex-end",
-              }}
+              className="min-w-[32px] text-right flex items-center justify-end gap-[2px] font-sans text-[0.68rem] text-[#2b232080]"
             >
               {row.stars}
               <svg width="9" height="9" viewBox="0 0 24 24">
-                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" fill={C.gold} />
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" fill="#D4A94E" />
               </svg>
             </span>
-            <div
-              style={{
-                flex: 1,
-                height: 6,
-                backgroundColor: "rgba(43,35,32,0.08)",
-                borderRadius: 100,
-                overflow: "hidden",
-              }}
-            >
+            <div className="flex-1 h-[6px] rounded-full overflow-hidden bg-[#2b232014]">
               <div
+                className="h-full rounded-full transition-all duration-400 ease-in-out"
                 style={{
-                  height: "100%",
                   width: `${row.pct}%`,
-                  backgroundColor: row.stars >= 4 ? C.gold : row.stars === 3 ? "rgba(212,169,78,0.45)" : C.maroon,
-                  borderRadius: 100,
-                  transition: "width 0.4s ease",
+                  backgroundColor: row.stars >= 4 ? "#D4A94E" : row.stars === 3 ? "rgba(212,169,78,0.45)" : "#7A2E38",
                 }}
               />
             </div>
-            <span
-              style={{
-                fontFamily: UI,
-                fontSize: "0.65rem",
-                color: "rgba(43,35,32,0.38)",
-                minWidth: 28,
-              }}
-            >
+            <span className="min-w-[28px] font-sans text-[0.65rem] text-[#2b232060]">
               {row.count}
             </span>
           </div>
@@ -254,20 +197,16 @@ function SummaryBlock({ filtered, needsResponse }: { filtered: boolean; needsRes
 
       {/* Response rate */}
       <div
-        style={{
-          textAlign: "center",
-          paddingLeft: "2rem",
-          borderLeft: "1px solid rgba(43,35,32,0.08)",
-        }}
+        className="text-center pl-8 border-l border-solid border-[rgba(43,35,32,0.08)]"
       >
         {/* Ring SVG */}
-        <div style={{ position: "relative", display: "inline-block", marginBottom: "0.5rem" }}>
+        <div className="relative inline-block mb-2">
           <svg width="68" height="68" viewBox="0 0 68 68">
             <circle cx="34" cy="34" r="28" fill="none" stroke="rgba(43,35,32,0.08)" strokeWidth="7" />
             <circle
               cx="34" cy="34" r="28"
               fill="none"
-              stroke={C.teal}
+              stroke="#3B8A93"
               strokeWidth="7"
               strokeLinecap="round"
               strokeDasharray={`${2 * Math.PI * 28}`}
@@ -275,27 +214,14 @@ function SummaryBlock({ filtered, needsResponse }: { filtered: boolean; needsRes
               transform="rotate(-90 34 34)"
             />
           </svg>
-          <div
-            style={{
-              position: "absolute",
-              inset: 0,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontFamily: UI,
-              fontSize: "0.88rem",
-              fontWeight: 700,
-              color: C.charcoal,
-              letterSpacing: "-0.02em",
-            }}
-          >
+          <div className="absolute inset-0 flex items-center justify-center font-bold tracking-[-0.02em] font-sans text-[0.88rem] text-[#2B2320]">
             {s.responseRate}%
           </div>
         </div>
-        <div style={{ fontFamily: UI, fontSize: "0.65rem", letterSpacing: "0.08em", textTransform: "uppercase", color: "rgba(43,35,32,0.42)", fontWeight: 500, lineHeight: 1.4 }}>
+        <div className="uppercase font-medium leading-snug tracking-[0.08em] font-sans text-[0.65rem] text-[#2b23206b]">
           Response<br />Rate
         </div>
-        <div style={{ fontFamily: UI, fontSize: "0.65rem", color: "rgba(43,35,32,0.35)", marginTop: "0.35rem" }}>
+        <div className="mt-[0.35rem] font-sans text-[0.65rem] text-[#2b232059]">
           {s.responded} of {s.total}
         </div>
       </div>
@@ -323,94 +249,54 @@ function ReviewCard({ review, onReplyPosted }: {
     setTimeout(() => setPosted(false), 3000);
   }
 
-  const ratingColor = review.rating >= 4 ? C.teal : review.rating === 3 ? "#8A6818" : C.maroon;
+  const ratingColor = review.rating >= 4 ? "#3B8A93" : review.rating === 3 ? "#8A6818" : "#7A2E38";
 
   return (
-    <div
-      style={{
-        backgroundColor: "#fff",
-        borderRadius: 10,
-        border: `1px solid rgba(43,35,32,0.09)`,
-        boxShadow: "0 1px 8px rgba(43,35,32,0.04)",
-        overflow: "hidden",
-        transition: "box-shadow 0.18s",
-      }}
-      onMouseEnter={e => { (e.currentTarget as HTMLElement).style.boxShadow = "0 3px 14px rgba(43,35,32,0.08)"; }}
-      onMouseLeave={e => { (e.currentTarget as HTMLElement).style.boxShadow = "0 1px 8px rgba(43,35,32,0.04)"; }}
-    >
-      <div style={{ padding: "1.25rem 1.5rem" }}>
+    <div className="bg-white rounded-[10px] overflow-hidden transition-shadow duration-200 border border-solid border-[#2b232017] shadow-[0_1px_8px_rgba(43,35,32,0.04)] hover:shadow-[0_3px_14px_rgba(43,35,32,0.08)]">
+      <div className="p-[1.25rem_1.5rem]">
         {/* ── Top row: avatar + meta + rating badge + flag ── */}
-        <div style={{ display: "flex", alignItems: "flex-start", gap: "0.875rem", marginBottom: "0.875rem" }}>
+        <div className="flex items-start gap-[0.875rem] mb-[0.875rem]">
           {/* Avatar */}
-          <div
-            style={{
-              width: 36,
-              height: 36,
-              borderRadius: "50%",
-              backgroundColor: `${C.maroon}18`,
-              color: C.maroon,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontFamily: UI,
-              fontSize: "0.7rem",
-              fontWeight: 700,
-              letterSpacing: "0.04em",
-              flexShrink: 0,
-            }}
-          >
+          <div className="w-9 h-9 rounded-full flex items-center justify-center font-bold shrink-0 tracking-[0.04em] bg-[#7A2E3818] text-[#7A2E38] font-sans text-[0.7rem]">
             {review.customer.initials}
           </div>
 
           {/* Name + date + location */}
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", flexWrap: "wrap", marginBottom: "2px" }}>
-              <span style={{ fontFamily: UI, fontSize: "0.84rem", fontWeight: 600, color: C.charcoal }}>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 flex-wrap mb-[2px]">
+              <span className="font-semibold font-sans text-[0.84rem] text-[#2B2320]">
                 {review.customer.name}
               </span>
-              <span style={{ fontFamily: UI, fontSize: "0.68rem", color: "rgba(43,35,32,0.38)" }}>
+              <span className="font-sans text-[0.68rem] text-[#2b232060]">
                 · {review.customer.location}
               </span>
             </div>
-            <div style={{ display: "flex", alignItems: "center", gap: "0.625rem" }}>
+            <div className="flex items-center gap-[0.625rem]">
               <Stars rating={review.rating} size={12} />
               <span
-                style={{
-                  fontFamily: UI,
-                  fontSize: "0.65rem",
-                  fontWeight: 600,
-                  color: ratingColor,
-                }}
+                className="font-semibold font-sans text-[0.65rem]"
+                style={{ color: ratingColor }}
               >
                 {review.rating}.0
               </span>
-              <span style={{ fontFamily: UI, fontSize: "0.65rem", color: "rgba(43,35,32,0.35)" }}>
+              <span className="font-sans text-[0.65rem] text-[#2b232059]">
                 · {review.date}
               </span>
             </div>
           </div>
 
           {/* Flag + rating chip */}
-          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", flexShrink: 0 }}>
+          <div className="flex items-center gap-2 shrink-0">
             {review.flagged && (
               <div
                 title="Flagged for moderation review"
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "3px",
-                  padding: "3px 7px",
-                  borderRadius: 100,
-                  border: `1px solid rgba(122,46,56,0.28)`,
-                  backgroundColor: "rgba(122,46,56,0.06)",
-                  color: C.maroon,
-                }}
+                className="flex items-center gap-[3px] px-[7px] py-[3px] rounded-full border border-solid border-[#7a2e3847] bg-[#7a2e380f] text-[#7A2E38]"
               >
                 <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z" />
                   <line x1="4" y1="22" x2="4" y2="15" />
                 </svg>
-                <span style={{ fontFamily: UI, fontSize: "0.58rem", fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase" }}>
+                <span className="font-semibold uppercase tracking-[0.06em] font-sans text-[0.58rem]">
                   Flagged
                 </span>
               </div>
@@ -418,19 +304,7 @@ function ReviewCard({ review, onReplyPosted }: {
             {!review.flagged && (
               <button
                 title="Flag this review for moderation"
-                style={{
-                  background: "none",
-                  border: "none",
-                  cursor: "pointer",
-                  padding: "4px",
-                  color: "rgba(43,35,32,0.22)",
-                  display: "flex",
-                  alignItems: "center",
-                  borderRadius: 4,
-                  transition: "color 0.12s",
-                }}
-                onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.color = C.maroon; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.color = "rgba(43,35,32,0.22)"; }}
+                className="bg-transparent border-none cursor-pointer p-1 flex items-center rounded transition-colors duration-100 text-[#2b232038] hover:text-[#7A2E38]"
               >
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z" />
@@ -442,29 +316,13 @@ function ReviewCard({ review, onReplyPosted }: {
         </div>
 
         {/* ── Product link ── */}
-        <div
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: "0.5rem",
-            padding: "0.375rem 0.625rem",
-            borderRadius: 5,
-            backgroundColor: "rgba(43,35,32,0.03)",
-            border: "1px solid rgba(43,35,32,0.07)",
-            marginBottom: "0.875rem",
-            cursor: "pointer",
-            textDecorationLine: "none",
-            transition: "background-color 0.12s",
-          }}
-          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.backgroundColor = "rgba(43,35,32,0.06)"; }}
-          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.backgroundColor = "rgba(43,35,32,0.03)"; }}
-        >
+        <div className="inline-flex items-center gap-2 px-[0.625rem] py-[0.375rem] rounded-[5px] cursor-pointer no-underline mb-[0.875rem] transition-colors duration-100 bg-[#2b232008] border border-solid border-[#2b232012] hover:bg-[#2b23200f]">
           <img
             src={`https://images.unsplash.com/${review.product.img}?w=40&h=40&fit=crop&auto=format`}
             alt=""
-            style={{ width: 24, height: 24, borderRadius: 3, objectFit: "cover", flexShrink: 0, backgroundColor: "rgba(43,35,32,0.08)" }}
+            className="w-6 h-6 rounded-[3px] object-cover shrink-0 bg-[#2b232014]"
           />
-          <span style={{ fontFamily: UI, fontSize: "0.72rem", fontWeight: 500, color: C.charcoal }}>
+          <span className="font-medium font-sans text-[0.72rem] text-[#2B2320]">
             {review.product.name}
           </span>
           <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="rgba(43,35,32,0.35)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -474,38 +332,22 @@ function ReviewCard({ review, onReplyPosted }: {
         </div>
 
         {/* ── Review text ── */}
-        <p
-          style={{
-            fontFamily: UI,
-            fontSize: "0.83rem",
-            color: "rgba(43,35,32,0.75)",
-            lineHeight: 1.65,
-            margin: 0,
-            marginBottom: review.photos.length > 0 || review.reply || !review.reply ? "0.875rem" : 0,
-          }}
-        >
+        <p className="m-0 leading-relaxed font-sans text-[0.83rem] text-[#2b2320bf] mb-[0.875rem]">
           {review.text}
         </p>
 
         {/* ── Customer photos ── */}
         {review.photos.length > 0 && (
-          <div style={{ display: "flex", gap: "0.5rem", marginBottom: "0.875rem" }}>
+          <div className="flex gap-2 mb-[0.875rem]">
             {review.photos.map((bg, i) => (
               <div
                 key={i}
+                className="w-[52px] h-[52px] rounded-md overflow-hidden relative cursor-pointer shrink-0 border border-solid border-[rgba(43,35,32,0.12)]"
                 style={{
-                  width: 52,
-                  height: 52,
-                  borderRadius: 6,
                   backgroundColor: bg,
-                  border: "1px solid rgba(43,35,32,0.12)",
-                  overflow: "hidden",
-                  position: "relative",
-                  cursor: "pointer",
-                  flexShrink: 0,
                 }}
               >
-                <svg width="52" height="52" style={{ position: "absolute", inset: 0, opacity: 0.12 }}>
+                <svg width="52" height="52" className="absolute inset-0 opacity-[0.12]">
                   <pattern id={`hatch-rv-${review.id}-${i}`} width="6" height="6" patternUnits="userSpaceOnUse">
                     <line x1="0" y1="6" x2="6" y2="0" stroke="#fff" strokeWidth="0.8" />
                   </pattern>
@@ -513,15 +355,7 @@ function ReviewCard({ review, onReplyPosted }: {
                 </svg>
               </div>
             ))}
-            <span
-              style={{
-                alignSelf: "center",
-                fontFamily: UI,
-                fontSize: "0.68rem",
-                color: "rgba(43,35,32,0.4)",
-                marginLeft: "0.25rem",
-              }}
-            >
+            <span className="self-center ml-1 font-sans text-[0.68rem] text-[#2b232066]">
               {review.photos.length} customer photo{review.photos.length !== 1 ? "s" : ""}
             </span>
           </div>
@@ -530,42 +364,19 @@ function ReviewCard({ review, onReplyPosted }: {
         {/* ── Existing store reply ── */}
         {review.reply && (
           <div
-            style={{
-              marginLeft: "1.25rem",
-              borderLeft: `3px solid rgba(212,169,78,0.5)`,
-              backgroundColor: "rgba(212,169,78,0.05)",
-              borderRadius: "0 6px 6px 0",
-              padding: "0.875rem 1rem",
-              marginBottom: "0.125rem",
-            }}
+            className="ml-5 p-[0.875rem_1rem] mb-[0.125rem] border-l-[3px] border-solid border-[rgba(212,169,78,0.5)] bg-[rgba(212,169,78,0.05)] rounded-[0_6px_6px_0]"
           >
-            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.5rem" }}>
-              <span
-                style={{
-                  ...label,
-                  fontSize: "0.58rem",
-                  letterSpacing: "0.12em",
-                  color: "#8A6818",
-                  fontWeight: 600,
-                }}
-              >
+            <div className="flex items-center gap-2 mb-2">
+              <span className="font-semibold tracking-[0.12em] font-sans text-[0.58rem] text-[#8A6818] uppercase">
                 Store Reply
               </span>
               {review.repliedAt && (
-                <span style={{ fontFamily: UI, fontSize: "0.62rem", color: "rgba(43,35,32,0.35)" }}>
+                <span className="font-sans text-[0.62rem] text-[#2b232059]">
                   · {review.repliedAt}
                 </span>
               )}
             </div>
-            <p
-              style={{
-                fontFamily: UI,
-                fontSize: "0.81rem",
-                color: "rgba(43,35,32,0.72)",
-                lineHeight: 1.6,
-                margin: 0,
-              }}
-            >
+            <p className="m-0 leading-relaxed font-sans text-[0.81rem] text-[#2b2320b8]">
               {review.reply}
             </p>
           </div>
@@ -573,28 +384,16 @@ function ReviewCard({ review, onReplyPosted }: {
 
         {/* ── Reply posted feedback ── */}
         {posted && (
-          <div
-            style={{
-              marginLeft: "1.25rem",
-              backgroundColor: "rgba(59,138,147,0.08)",
-              border: "1px solid rgba(59,138,147,0.22)",
-              borderRadius: 6,
-              padding: "0.6rem 0.875rem",
-              fontFamily: UI,
-              fontSize: "0.75rem",
-              color: C.teal,
-              fontWeight: 500,
-            }}
-          >
+          <div className="ml-5 rounded-md p-[0.6rem_0.875rem] font-medium bg-[#3b8a9314] border border-solid border-[#3b8a9338] font-sans text-[0.75rem] text-[#3B8A93]">
             ✓ Your reply has been posted.
           </div>
         )}
 
         {/* ── Reply form / button ── */}
         {!review.reply && !posted && (
-          <div style={{ marginTop: "0.25rem" }}>
+          <div className="mt-1">
             {replyOpen ? (
-              <div style={{ marginLeft: "1.25rem" }}>
+              <div className="ml-5">
                 <textarea
                   value={replyText}
                   onChange={e => setReplyText(e.target.value)}
@@ -602,54 +401,19 @@ function ReviewCard({ review, onReplyPosted }: {
                   onBlur={() => setFocused(false)}
                   rows={3}
                   placeholder={`Reply to ${review.customer.name.split(" ")[0]}…`}
-                  style={{
-                    width: "100%",
-                    padding: "0.6rem 0.75rem",
-                    border: `1px solid ${focused ? C.gold : "rgba(43,35,32,0.15)"}`,
-                    borderRadius: 6,
-                    fontFamily: UI,
-                    fontSize: "0.81rem",
-                    color: C.charcoal,
-                    lineHeight: 1.6,
-                    resize: "vertical",
-                    outline: "none",
-                    boxSizing: "border-box",
-                    transition: "border-color 0.12s",
-                    backgroundColor: "#fff",
-                  }}
+                  className={`w-full p-[0.6rem_0.75rem] rounded-md outline-none resize-y box-border bg-white transition-colors duration-100 font-sans text-[0.81rem] text-[#2B2320] leading-[1.6] border border-solid ${focused ? 'border-[#D4A94E]' : 'border-[#2b232026]'}`}
                 />
-                <div style={{ display: "flex", gap: "0.5rem", marginTop: "0.5rem" }}>
+                <div className="flex gap-2 mt-2">
                   <button
                     onClick={handlePost}
                     disabled={!replyText.trim()}
-                    style={{
-                      backgroundColor: replyText.trim() ? C.gold : "rgba(43,35,32,0.1)",
-                      color: replyText.trim() ? C.charcoal : "rgba(43,35,32,0.35)",
-                      border: "none",
-                      borderRadius: 5,
-                      padding: "0.45rem 1rem",
-                      fontFamily: UI,
-                      fontSize: "0.75rem",
-                      fontWeight: 700,
-                      letterSpacing: "0.03em",
-                      cursor: replyText.trim() ? "pointer" : "not-allowed",
-                      transition: "background-color 0.12s",
-                    }}
+                    className={`border-none rounded-[5px] px-4 py-[0.45rem] font-bold transition-colors duration-100 tracking-[0.03em] font-sans text-[0.75rem] ${replyText.trim() ? 'bg-[#D4A94E] text-[#2B2320] cursor-pointer' : 'bg-[#2b23201a] text-[#2b232059] cursor-not-allowed'}`}
                   >
                     Post Reply
                   </button>
                   <button
                     onClick={() => { setReplyOpen(false); setReplyText(""); }}
-                    style={{
-                      backgroundColor: "transparent",
-                      color: "rgba(43,35,32,0.45)",
-                      border: "1px solid rgba(43,35,32,0.15)",
-                      borderRadius: 5,
-                      padding: "0.45rem 0.75rem",
-                      fontFamily: UI,
-                      fontSize: "0.73rem",
-                      cursor: "pointer",
-                    }}
+                    className="bg-transparent rounded-[5px] px-3 py-[0.45rem] cursor-pointer border border-solid border-[#2b232026] text-[#2b232073] font-sans text-[0.73rem]"
                   >
                     Cancel
                   </button>
@@ -658,23 +422,7 @@ function ReviewCard({ review, onReplyPosted }: {
             ) : (
               <button
                 onClick={() => setReplyOpen(true)}
-                style={{
-                  backgroundColor: "transparent",
-                  color: C.maroon,
-                  border: `1.5px solid ${C.maroon}`,
-                  borderRadius: 5,
-                  padding: "0.42rem 0.875rem",
-                  fontFamily: UI,
-                  fontSize: "0.73rem",
-                  fontWeight: 500,
-                  cursor: "pointer",
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: "0.35rem",
-                  transition: "background-color 0.12s",
-                }}
-                onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.backgroundColor = "rgba(122,46,56,0.06)"; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.backgroundColor = "transparent"; }}
+                className="bg-transparent rounded-[5px] px-[0.875rem] py-[0.42rem] font-medium cursor-pointer inline-flex items-center gap-[0.35rem] transition-colors duration-100 border-[1.5px] border-solid text-[#7A2E38] border-[#7A2E38] font-sans text-[0.73rem] hover:bg-[#7a2e380f]"
               >
                 <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
@@ -693,29 +441,16 @@ function ReviewCard({ review, onReplyPosted }: {
 
 function EmptyState({ label: msg }: { label: string }) {
   return (
-    <div
-      style={{
-        backgroundColor: "#fff",
-        borderRadius: 8,
-        border: "1px solid rgba(43,35,32,0.07)",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        padding: "4rem 2rem",
-        gap: "0.75rem",
-        textAlign: "center",
-      }}
-    >
-      <div style={{ opacity: 0.2, color: C.charcoal }}>
+    <div className="bg-white rounded-lg flex flex-col items-center justify-center p-[4rem_2rem] gap-3 text-center border border-solid border-[#2b232012]">
+      <div className="opacity-20 text-[#2B2320]">
         <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round">
           <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
         </svg>
       </div>
-      <p style={{ fontFamily: UI, fontSize: "0.9rem", fontWeight: 600, color: C.charcoal, margin: 0 }}>
+      <p className="font-semibold m-0 font-sans text-[0.9rem] text-[#2B2320]">
         {msg}
       </p>
-      <p style={{ fontFamily: UI, fontSize: "0.78rem", color: "rgba(43,35,32,0.42)", margin: 0 }}>
+      <p className="m-0 font-sans text-[0.78rem] text-[#2b23206b]">
         Try adjusting your filters.
       </p>
     </div>
@@ -731,21 +466,7 @@ export default function ConsoleReviews() {
   const [ratingFilter, setRatingFilter] = useState<RatingFilter>("all");
   const [needsResponse, setNeedsResponse] = useState(false);
 
-  const selectStyle: React.CSSProperties = {
-    fontFamily: UI,
-    fontSize: "0.77rem",
-    color: C.charcoal,
-    backgroundColor: "#fff",
-    border: "1px solid rgba(43,35,32,0.15)",
-    borderRadius: 6,
-    padding: "0.45rem 2rem 0.45rem 0.75rem",
-    appearance: "none",
-    backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='rgba(43,35,32,0.4)'/%3E%3C/svg%3E\")",
-    backgroundRepeat: "no-repeat",
-    backgroundPosition: "right 0.625rem center",
-    cursor: "pointer",
-    outline: "none",
-  };
+  const selectClassName = "font-sans text-[0.77rem] text-[#2B2320] bg-white border border-solid border-[#2b232026] rounded-[6px] py-[0.45rem] pr-[2rem] pl-[0.75rem] appearance-none bg-no-repeat bg-[right_0.625rem_center] cursor-pointer outline-none";
 
   const filtered = reviews.filter(r => {
     if (ratingFilter !== "all" && r.rating !== ratingFilter) return false;
@@ -766,29 +487,21 @@ export default function ConsoleReviews() {
   }
 
   return (
-    <div className="console-page" style={{ padding: "1.75rem", fontFamily: UI }}>
+    <div className="console-page p-7 font-sans">
 
       {/* ── Controls row ──────────────────────────────────── */}
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          gap: "0.75rem",
-          marginBottom: "1.25rem",
-          flexWrap: "wrap",
-        }}
-      >
-        <div style={{ fontFamily: UI, fontSize: "0.72rem", color: "rgba(43,35,32,0.42)", letterSpacing: "0.02em" }}>
-          Showing <strong style={{ color: C.charcoal }}>{filtered.length}</strong> of {reviews.length} reviews
+      <div className="flex items-center justify-between gap-3 flex-wrap mb-5">
+        <div className="tracking-[0.02em] font-sans text-[0.72rem] text-[#2b23206b]">
+          Showing <strong className="text-[#2B2320]">{filtered.length}</strong> of {reviews.length} reviews
         </div>
 
-        <div style={{ display: "flex", alignItems: "center", gap: "0.625rem" }}>
+        <div className="flex items-center gap-[0.625rem]">
           {/* Rating filter */}
           <select
             value={String(ratingFilter)}
             onChange={e => setRatingFilter(e.target.value === "all" ? "all" : Number(e.target.value) as RatingFilter)}
-            style={selectStyle}
+            className={selectClassName}
+            style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'10\' height=\'6\'%3E%3Cpath d=\'M0 0l5 6 5-6z\' fill=\'rgba(43,35,32,0.4)\'/%3E%3C/svg%3E")' }}
           >
             <option value="all">All Ratings</option>
             <option value="5">5 Star</option>
@@ -801,22 +514,7 @@ export default function ConsoleReviews() {
           {/* Needs response toggle */}
           <button
             onClick={() => setNeedsResponse(v => !v)}
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "0.4rem",
-              padding: "0.45rem 0.875rem",
-              borderRadius: 6,
-              border: `1.5px solid ${needsResponse ? C.maroon : "rgba(43,35,32,0.15)"}`,
-              backgroundColor: needsResponse ? "rgba(122,46,56,0.07)" : "#fff",
-              color: needsResponse ? C.maroon : "rgba(43,35,32,0.55)",
-              fontFamily: UI,
-              fontSize: "0.75rem",
-              fontWeight: needsResponse ? 600 : 400,
-              cursor: "pointer",
-              transition: "all 0.14s",
-              whiteSpace: "nowrap",
-            }}
+            className={`inline-flex items-center gap-[0.4rem] px-[0.875rem] py-[0.45rem] rounded-md cursor-pointer whitespace-nowrap transition-all duration-150 border-[1.5px] border-solid font-sans text-[0.75rem] ${needsResponse ? 'border-[#7A2E38] bg-[#7a2e3812] text-[#7A2E38] font-semibold' : 'border-[#2b232026] bg-white text-[#2b23208c] font-normal'}`}
           >
             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
@@ -824,19 +522,7 @@ export default function ConsoleReviews() {
             Needs Response
             {needsResponseCount > 0 && (
               <span
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  minWidth: 16,
-                  height: 16,
-                  borderRadius: 8,
-                  backgroundColor: needsResponse ? C.maroon : "rgba(43,35,32,0.12)",
-                  color: needsResponse ? "#fff" : "rgba(43,35,32,0.55)",
-                  fontSize: "0.58rem",
-                  fontWeight: 700,
-                  padding: "0 3px",
-                }}
+                className={`inline-flex items-center justify-center min-w-[16px] h-4 rounded-full font-bold px-[3px] text-[0.58rem] ${needsResponse ? 'bg-[#7A2E38] text-white' : 'bg-[#2b23201f] text-[#2b23208c]'}`}
               >
                 {needsResponseCount}
               </span>
@@ -862,7 +548,7 @@ export default function ConsoleReviews() {
           }
         />
       ) : (
-        <div style={{ display: "flex", flexDirection: "column", gap: "0.875rem" }}>
+        <div className="flex flex-col gap-[0.875rem]">
           {filtered.map(r => (
             <ReviewCard key={r.id} review={r} onReplyPosted={handleReplyPosted} />
           ))}

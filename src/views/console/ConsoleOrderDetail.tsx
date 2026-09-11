@@ -109,36 +109,33 @@ export default function ConsoleOrderDetail({ order: raw }: { order: OrderDetail 
   }
 
   return (
-    <div className="console-page" style={{ padding: "1.75rem", fontFamily: UI, minHeight: "100%" }}>
+    <div className="console-page p-7 min-h-full" style={{ fontFamily: UI }}>
 
       {/* ── Breadcrumb ────────────────────────────────────── */}
-      <div style={{ display: "flex", alignItems: "center", gap: "0.4rem", marginBottom: "1.25rem" }}>
+      <div className="flex items-center gap-[0.4rem] mb-5">
         <Link
           to="/console/orders"
-          style={{ fontSize: "0.78rem", color: "rgba(43,35,32,0.45)", textDecorationLine: "none" }}
+          className="no-underline transition-colors duration-150"
+          style={{ fontSize: "0.78rem", color: "rgba(43,35,32,0.45)" }}
           onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = C.charcoal}
           onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = "rgba(43,35,32,0.45)"}
         >
           Orders
         </Link>
         <span style={{ color: "rgba(43,35,32,0.28)", fontSize: "0.75rem" }}>/</span>
-        <span style={{ fontSize: "0.78rem", color: C.charcoal, fontWeight: 500 }}>{order.number}</span>
+        <span className="font-medium" style={{ fontSize: "0.78rem", color: C.charcoal }}>{order.number}</span>
       </div>
 
       {/* ── Order header ──────────────────────────────────── */}
-      <div style={{
-        display: "flex", alignItems: "flex-start", justifyContent: "space-between",
-        marginBottom: "1.5rem", gap: "1rem", flexWrap: "wrap",
-      }}>
+      <div className="flex items-start justify-between mb-6 gap-4 flex-wrap">
         <div>
-          <h1 style={{ fontSize: "1.35rem", fontWeight: 700, color: C.charcoal, letterSpacing: "-0.02em", margin: "0 0 0.375rem" }}>
+          <h1 className="font-bold m-[0_0_0.375rem] tracking-[-0.02em]" style={{ fontSize: "1.35rem", color: C.charcoal }}>
             {order.number}
           </h1>
-          <div style={{ display: "flex", alignItems: "center", gap: "0.625rem" }}>
+          <div className="flex items-center gap-[0.625rem]">
             <span style={{ fontSize: "0.75rem", color: "rgba(43,35,32,0.45)" }}>{order.placedAt}</span>
-            <span style={{
-              display: "inline-block", padding: "2px 9px", borderRadius: 100,
-              fontSize: "0.67rem", fontWeight: 500,
+            <span className="inline-block px-[9px] py-[2px] rounded-full font-medium" style={{
+              fontSize: "0.67rem",
               backgroundColor: fulfil.bg, color: fulfil.color,
             }}>
               {fulfil.label}
@@ -150,12 +147,11 @@ export default function ConsoleOrderDetail({ order: raw }: { order: OrderDetail 
         {nextStatus && (
           <button
             onClick={advanceStatus}
+            className="inline-flex items-center gap-[6px] border-none rounded-[7px] px-[1.125rem] py-[0.55rem] font-semibold cursor-pointer tracking-[0.01em]"
             style={{
-              display: "inline-flex", alignItems: "center", gap: "6px",
               backgroundColor: C.maroon, color: "#fff",
-              border: "none", borderRadius: 7, padding: "0.55rem 1.125rem",
-              fontSize: "0.8rem", fontWeight: 600, cursor: "pointer",
-              fontFamily: UI, letterSpacing: "0.01em",
+              fontSize: "0.8rem",
+              fontFamily: UI,
             }}
           >
             Mark as {FULFIL_STYLE[nextStatus].label}
@@ -164,27 +160,25 @@ export default function ConsoleOrderDetail({ order: raw }: { order: OrderDetail 
       </div>
 
       {/* ── Two-column grid ───────────────────────────────── */}
-      <div className="rg-split" style={{ display: "grid", gridTemplateColumns: "1fr 320px", gap: "1.25rem", alignItems: "start" }}>
+      <div className="rg-split items-start" style={{ display: "grid", gridTemplateColumns: "1fr 320px", gap: "1.25rem" }}>
 
         {/* ── LEFT ─────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+        <div className="flex flex-col gap-4">
 
           {/* Customer info */}
           <SectionCard title="Customer">
-            <div style={{ display: "flex", alignItems: "flex-start", gap: "1rem" }}>
-              <div style={{
-                width: 40, height: 40, borderRadius: "50%",
+            <div className="flex items-start gap-4">
+              <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 font-bold tracking-[0.03em]" style={{
                 backgroundColor: C.gold, color: C.charcoal,
-                display: "flex", alignItems: "center", justifyContent: "center",
-                fontSize: "0.8rem", fontWeight: 700, flexShrink: 0, letterSpacing: "0.03em",
+                fontSize: "0.8rem",
               }}>
                 {order.customerName.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase()}
               </div>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontSize: "0.9rem", fontWeight: 600, color: C.charcoal, marginBottom: "0.625rem" }}>
+              <div className="flex-1">
+                <div className="font-semibold mb-[0.625rem]" style={{ fontSize: "0.9rem", color: C.charcoal }}>
                   {order.customerName}
                 </div>
-                <div style={{ display: "flex", flexDirection: "column", gap: "0.375rem" }}>
+                <div className="flex flex-col gap-[0.375rem]">
                   <InfoRow icon={<MailIcon />}>{order.customerEmail}</InfoRow>
                   <InfoRow icon={<PhoneIcon />}>{order.customerPhone}</InfoRow>
                   <InfoRow icon={<MapPinIcon />}>{order.address}</InfoRow>
@@ -196,15 +190,14 @@ export default function ConsoleOrderDetail({ order: raw }: { order: OrderDetail 
           {/* Order items */}
           <SectionCard title="Items">
             <div className="table-scroll">
-              <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 520 }}>
+              <table className="w-full border-collapse min-w-[520px]">
                 <thead>
                   <tr>
                     {["Product", "Variant", "Qty", "Unit Price", "Line Total"].map(h => (
-                      <th key={h} style={{
-                        padding: "0 0 0.625rem",
+                      <th key={h} className="p-[0_0_0.625rem] font-medium uppercase tracking-[0.09em]" style={{
                         textAlign: h === "Qty" || h === "Unit Price" || h === "Line Total" ? "right" : "left",
-                        fontSize: "0.63rem", letterSpacing: "0.09em", textTransform: "uppercase",
-                        color: "rgba(43,35,32,0.38)", fontWeight: 500, fontFamily: UI,
+                        fontSize: "0.63rem",
+                        color: "rgba(43,35,32,0.38)", fontFamily: UI,
                       }}>{h}</th>
                     ))}
                   </tr>
@@ -213,25 +206,23 @@ export default function ConsoleOrderDetail({ order: raw }: { order: OrderDetail 
                   {order.items.map((item, i) => {
                     const lineCad = item.unitCad * item.qty;
                     return (
-                      <tr key={i} style={{ borderTop: "1px solid rgba(43,35,32,0.06)" }}>
-                        <td style={{ padding: "0.75rem 0" }}>
-                          <div style={{ display: "flex", alignItems: "center", gap: "0.625rem" }}>
-                            <div style={{
-                              width: 36, height: 36, borderRadius: 5, flexShrink: 0,
-                              backgroundColor: C.maroon, opacity: 0.75,
-                              display: "flex", alignItems: "center", justifyContent: "center",
+                      <tr key={i} className="border-t border-solid border-[rgba(43,35,32,0.06)]">
+                        <td className="py-3">
+                          <div className="flex items-center gap-[0.625rem]">
+                            <div className="w-9 h-9 rounded-[5px] shrink-0 flex items-center justify-center opacity-75" style={{
+                              backgroundColor: C.maroon,
                             }}>
-                              <span style={{ color: "#fff", fontSize: "0.55rem", fontWeight: 700 }}>IMG</span>
+                              <span className="font-bold text-white" style={{ fontSize: "0.55rem" }}>IMG</span>
                             </div>
-                            <span style={{ fontSize: "0.8rem", fontWeight: 600, color: C.charcoal }}>{item.name}</span>
+                            <span className="font-semibold" style={{ fontSize: "0.8rem", color: C.charcoal }}>{item.name}</span>
                           </div>
                         </td>
-                        <td style={{ padding: "0.75rem 0.5rem", fontSize: "0.75rem", color: "rgba(43,35,32,0.55)" }}>
+                        <td className="py-3 px-2" style={{ fontSize: "0.75rem", color: "rgba(43,35,32,0.55)" }}>
                           {item.variant}
                         </td>
-                        <td style={{ padding: "0.75rem 0", textAlign: "right", fontSize: "0.8rem", color: C.charcoal }}>{item.qty}</td>
-                        <td style={{ padding: "0.75rem 0", textAlign: "right", fontSize: "0.8rem", color: C.charcoal }}>CAD ${item.unitCad}</td>
-                        <td style={{ padding: "0.75rem 0", textAlign: "right", fontSize: "0.8rem", fontWeight: 600, color: C.charcoal }}>CAD ${lineCad}</td>
+                        <td className="py-3 text-right" style={{ fontSize: "0.8rem", color: C.charcoal }}>{item.qty}</td>
+                        <td className="py-3 text-right" style={{ fontSize: "0.8rem", color: C.charcoal }}>CAD ${item.unitCad}</td>
+                        <td className="py-3 text-right font-semibold" style={{ fontSize: "0.8rem", color: C.charcoal }}>CAD ${lineCad}</td>
                       </tr>
                     );
                   })}
@@ -242,10 +233,10 @@ export default function ConsoleOrderDetail({ order: raw }: { order: OrderDetail 
 
           {/* Internal notes */}
           <SectionCard title={
-            <div style={{ display: "flex", alignItems: "center", gap: "0.375rem" }}>
+            <div className="flex items-center gap-[0.375rem]">
               <LockIcon />
               <span>Internal Notes</span>
-              <span style={{ fontSize: "0.62rem", color: "rgba(43,35,32,0.35)", fontWeight: 400, letterSpacing: "0.03em", marginLeft: "0.25rem" }}>
+              <span className="font-normal ml-1 tracking-[0.03em]" style={{ fontSize: "0.62rem", color: "rgba(43,35,32,0.35)" }}>
                 (private — not sent to buyer)
               </span>
             </div>
@@ -255,21 +246,16 @@ export default function ConsoleOrderDetail({ order: raw }: { order: OrderDetail 
               value={notes}
               onChange={e => setNotes(e.target.value)}
               rows={4}
+              className="w-full rounded-md p-[0.625rem_0.75rem] outline-none box-border resize-y bg-[rgba(43,35,32,0.02)] border border-solid border-[rgba(43,35,32,0.12)]"
               style={{
                 fontFamily: UI, fontSize: "0.82rem", color: C.charcoal,
-                backgroundColor: "rgba(43,35,32,0.02)",
-                border: "1px solid rgba(43,35,32,0.12)", borderRadius: 6,
-                padding: "0.625rem 0.75rem", width: "100%",
-                outline: "none", resize: "vertical", lineHeight: 1.6,
-                boxSizing: "border-box",
+                lineHeight: 1.6,
               }}
             />
-            <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "0.625rem" }}>
-              <button style={{
-                fontFamily: UI, fontSize: "0.75rem", fontWeight: 500,
+            <div className="flex justify-end mt-[0.625rem]">
+              <button className="border-none rounded-md px-[0.875rem] py-[0.4rem] cursor-pointer font-medium" style={{
+                fontFamily: UI, fontSize: "0.75rem",
                 color: C.charcoal, backgroundColor: "rgba(43,35,32,0.06)",
-                border: "none", borderRadius: 6,
-                padding: "0.4rem 0.875rem", cursor: "pointer",
               }}>
                 Save Note
               </button>
@@ -278,31 +264,24 @@ export default function ConsoleOrderDetail({ order: raw }: { order: OrderDetail 
         </div>
 
         {/* ── RIGHT ────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: "1rem", position: "sticky", top: "1.5rem" }}>
+        <div className="flex flex-col gap-4 sticky top-6">
 
           {/* Payment summary */}
           <SectionCard title="Payment">
-            <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+            <div className="flex flex-col gap-2">
               <SummaryRow label="Subtotal" value={`CAD $${subtotal}`} />
               <SummaryRow label="Shipping" value={`CAD $${order.shippingCad}`} />
               {order.discountCad > 0 && (
                 <SummaryRow label="Discount" value={`−CAD $${order.discountCad}`} valueColor={C.teal} />
               )}
-              <div style={{ borderTop: "1px solid rgba(43,35,32,0.1)", paddingTop: "0.5rem", marginTop: "0.125rem" }}>
+              <div className="pt-2 mt-[0.125rem] border-t border-solid border-[rgba(43,35,32,0.1)]">
                 <SummaryRow label="Total" value={`CAD $${total}`} bold />
               </div>
             </div>
-            <div style={{
-              marginTop: "0.875rem", padding: "0.625rem 0.75rem",
-              backgroundColor: "rgba(59,138,147,0.07)", borderRadius: 6,
-              display: "flex", alignItems: "center", gap: "0.5rem",
-            }}>
-              <span style={{
-                width: 8, height: 8, borderRadius: "50%",
-                backgroundColor: C.teal, flexShrink: 0, display: "inline-block",
-              }} />
+            <div className="mt-[0.875rem] p-[0.625rem_0.75rem] rounded-md flex items-center gap-2 bg-[rgba(59,138,147,0.07)]">
+              <span className="w-2 h-2 rounded-full shrink-0 inline-block bg-[var(--color-teal)]" />
               <span style={{ fontSize: "0.72rem", color: "rgba(43,35,32,0.6)", lineHeight: 1.3 }}>
-                <strong style={{ color: C.charcoal, fontWeight: 600 }}>Paid</strong> via {order.paymentMethod}
+                <strong className="font-semibold" style={{ color: C.charcoal }}>Paid</strong> via {order.paymentMethod}
               </span>
             </div>
           </SectionCard>
@@ -310,20 +289,18 @@ export default function ConsoleOrderDetail({ order: raw }: { order: OrderDetail 
           {/* Fulfilment / tracking */}
           <SectionCard title="Fulfilment">
             <FieldLabel>Carrier</FieldLabel>
-            <div style={{ position: "relative", marginBottom: "0.75rem" }}>
+            <div className="relative mb-3">
               <select
                 value={carrier}
                 onChange={e => setCarrier(e.target.value)}
+                className="w-full bg-white rounded-md cursor-pointer outline-none appearance-none border border-solid border-[rgba(43,35,32,0.14)] py-[0.45rem] pl-[0.75rem] pr-[2rem]"
                 style={{
                   fontFamily: UI, fontSize: "0.78rem", color: C.charcoal,
-                  backgroundColor: "#fff", border: "1px solid rgba(43,35,32,0.14)",
-                  borderRadius: 6, padding: "0.45rem 2rem 0.45rem 0.75rem",
-                  appearance: "none", cursor: "pointer", outline: "none", width: "100%",
                 }}
               >
                 {CARRIERS.map(c => <option key={c}>{c}</option>)}
               </select>
-              <span style={{ position: "absolute", right: "0.5rem", top: "50%", transform: "translateY(-50%)", pointerEvents: "none", color: "rgba(43,35,32,0.4)", lineHeight: 0 }}>
+              <span className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none leading-none" style={{ color: "rgba(43,35,32,0.4)" }}>
                 <ChevronDown />
               </span>
             </div>
@@ -334,23 +311,20 @@ export default function ConsoleOrderDetail({ order: raw }: { order: OrderDetail 
               placeholder="e.g. JD000940012345678901"
               value={tracking}
               onChange={e => setTracking(e.target.value)}
+              className="w-full bg-white rounded-md px-3 py-2 outline-none box-border mb-3 border border-solid border-[rgba(43,35,32,0.14)]"
               style={{
                 fontFamily: UI, fontSize: "0.8rem", color: C.charcoal,
-                backgroundColor: "#fff", border: "1px solid rgba(43,35,32,0.14)",
-                borderRadius: 6, padding: "0.5rem 0.75rem", width: "100%",
-                outline: "none", boxSizing: "border-box", marginBottom: "0.75rem",
               }}
             />
 
             <button
               onClick={saveTracking}
+              className="w-full border-none rounded-[7px] px-4 py-[0.6rem] font-bold cursor-pointer transition-colors duration-200 flex items-center justify-center gap-[6px] tracking-[0.01em]"
               style={{
-                width: "100%", backgroundColor: saved ? C.teal : C.gold,
-                color: saved ? "#fff" : C.charcoal, border: "none", borderRadius: 7,
-                padding: "0.6rem 1rem", fontSize: "0.8rem", fontWeight: 700,
-                cursor: "pointer", fontFamily: UI, letterSpacing: "0.01em",
-                transition: "background-color 0.2s, color 0.2s",
-                display: "flex", alignItems: "center", justifyContent: "center", gap: "6px",
+                backgroundColor: saved ? C.teal : C.gold,
+                color: saved ? "#fff" : C.charcoal,
+                fontSize: "0.8rem",
+                fontFamily: UI,
               }}
             >
               <TruckIcon size={14} />
@@ -358,10 +332,8 @@ export default function ConsoleOrderDetail({ order: raw }: { order: OrderDetail 
             </button>
 
             {order.status === "shipped" && order.tracking && (
-              <div style={{
-                marginTop: "0.75rem", padding: "0.5rem 0.625rem",
-                backgroundColor: "rgba(212,169,78,0.08)", borderRadius: 5,
-                fontSize: "0.67rem", color: "#8A6818", lineHeight: 1.5,
+              <div className="mt-3 px-[0.625rem] py-2 rounded-[5px] leading-relaxed bg-[rgba(212,169,78,0.08)]" style={{
+                fontSize: "0.67rem", color: "#8A6818",
               }}>
                 Tracking: <strong>{order.tracking}</strong> via {order.carrier}
               </div>
@@ -371,14 +343,10 @@ export default function ConsoleOrderDetail({ order: raw }: { order: OrderDetail 
           {/* Message customer */}
           <Link
             to="/console/messages"
+            className="flex items-center justify-center gap-[7px] px-4 py-[0.6rem] rounded-[7px] bg-transparent font-medium no-underline transition-colors duration-150 tracking-[0.01em] border border-solid border-[rgba(43,35,32,0.16)]"
             style={{
-              display: "flex", alignItems: "center", justifyContent: "center",
-              gap: "7px", padding: "0.6rem 1rem", borderRadius: 7,
-              border: "1px solid rgba(43,35,32,0.16)",
-              backgroundColor: "transparent", color: C.charcoal,
-              fontSize: "0.78rem", fontWeight: 500, fontFamily: UI,
-              textDecorationLine: "none", letterSpacing: "0.01em",
-              transition: "background-color 0.15s",
+              color: C.charcoal,
+              fontSize: "0.78rem", fontFamily: UI,
             }}
             onMouseEnter={e => (e.currentTarget as HTMLElement).style.backgroundColor = "rgba(43,35,32,0.04)"}
             onMouseLeave={e => (e.currentTarget as HTMLElement).style.backgroundColor = "transparent"}
@@ -389,7 +357,8 @@ export default function ConsoleOrderDetail({ order: raw }: { order: OrderDetail 
           {/* Back */}
           <Link
             to="/console/orders"
-            style={{ display: "block", textAlign: "center", fontSize: "0.72rem", color: "rgba(43,35,32,0.38)", textDecorationLine: "none", padding: "0.25rem" }}
+            className="block text-center no-underline p-1"
+            style={{ fontSize: "0.72rem", color: "rgba(43,35,32,0.38)" }}
             onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = C.charcoal}
             onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = "rgba(43,35,32,0.38)"}
           >
@@ -405,13 +374,11 @@ export default function ConsoleOrderDetail({ order: raw }: { order: OrderDetail 
 
 function SectionCard({ title, children }: { title?: React.ReactNode; children: React.ReactNode }) {
   return (
-    <div style={{ backgroundColor: "#fff", borderRadius: 8, border: "1px solid rgba(43,35,32,0.07)", padding: "1.25rem" }}>
+    <div className="bg-white rounded-lg p-5" style={{ border: "1px solid rgba(43,35,32,0.07)" }}>
       {title && (
-        <h2 style={{
-          fontFamily: UI, fontSize: "0.82rem", fontWeight: 600,
-          color: C.charcoal, margin: "0 0 1rem",
-          paddingBottom: "0.75rem", borderBottom: "1px solid rgba(43,35,32,0.06)",
-          letterSpacing: "-0.01em", display: "flex", alignItems: "center",
+        <h2 className="font-semibold m-[0_0_1rem] pb-3 flex items-center tracking-[-0.01em] border-b border-solid border-[rgba(43,35,32,0.06)]" style={{
+          fontFamily: UI, fontSize: "0.82rem",
+          color: C.charcoal,
         }}>
           {title}
         </h2>
@@ -423,16 +390,16 @@ function SectionCard({ title, children }: { title?: React.ReactNode; children: R
 
 function InfoRow({ icon, children }: { icon: React.ReactNode; children: React.ReactNode }) {
   return (
-    <div style={{ display: "flex", alignItems: "flex-start", gap: "0.5rem" }}>
-      <span style={{ color: "rgba(43,35,32,0.35)", flexShrink: 0, marginTop: "1px", lineHeight: 0 }}>{icon}</span>
-      <span style={{ fontSize: "0.78rem", color: "rgba(43,35,32,0.7)", lineHeight: 1.4 }}>{children}</span>
+    <div className="flex items-start gap-2">
+      <span className="shrink-0 mt-[1px] leading-none" style={{ color: "rgba(43,35,32,0.35)" }}>{icon}</span>
+      <span className="leading-relaxed" style={{ fontSize: "0.78rem", color: "rgba(43,35,32,0.7)" }}>{children}</span>
     </div>
   );
 }
 
 function SummaryRow({ label, value, bold = false, valueColor }: { label: string; value: string; bold?: boolean; valueColor?: string }) {
   return (
-    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+    <div className="flex justify-between items-baseline">
       <span style={{ fontSize: "0.77rem", color: "rgba(43,35,32,0.52)", fontFamily: UI }}>{label}</span>
       <span style={{ fontSize: bold ? "0.95rem" : "0.77rem", fontWeight: bold ? 700 : 400, color: valueColor ?? C.charcoal, fontFamily: UI }}>
         {value}
@@ -443,10 +410,10 @@ function SummaryRow({ label, value, bold = false, valueColor }: { label: string;
 
 function FieldLabel({ children }: { children: React.ReactNode }) {
   return (
-    <label style={{
-      display: "block", fontSize: "0.7rem", fontWeight: 500,
-      color: "rgba(43,35,32,0.55)", letterSpacing: "0.07em",
-      textTransform: "uppercase", marginBottom: "0.375rem", fontFamily: UI,
+    <label className="block font-medium uppercase mb-[0.375rem] tracking-[0.07em]" style={{
+      fontSize: "0.7rem",
+      color: "rgba(43,35,32,0.55)",
+      fontFamily: UI,
     }}>
       {children}
     </label>

@@ -157,7 +157,7 @@ function SalesChart() {
       viewBox={`0 0 ${W} ${H}`}
       width="100%"
       height={H}
-      style={{ display: "block", overflow: "visible" }}
+      className="block overflow-visible"
       aria-label="7-day sales chart"
     >
       {/* Grid lines */}
@@ -225,15 +225,11 @@ function StatusBadge({ status, type }: { status: string; type: string }) {
   const s = STATUS_STYLES[type] ?? STATUS_STYLES.production;
   return (
     <span
+      className="inline-block px-2 py-[2px] rounded-full font-medium whitespace-nowrap"
       style={{
-        display: "inline-block",
-        padding: "2px 8px",
-        borderRadius: 100,
         fontSize: "0.68rem",
-        fontWeight: 500,
         backgroundColor: s.bg,
         color: s.color,
-        whiteSpace: "nowrap",
         fontFamily: UI,
       }}
     >
@@ -246,17 +242,15 @@ function StatusBadge({ status, type }: { status: string; type: string }) {
 
 export default function ConsoleDashboard() {
   return (
-    <div className="console-page" style={{ padding: "1.75rem", fontFamily: UI }}>
+    <div className="console-page p-7" style={{ fontFamily: UI }}>
       {/* Greeting */}
-      <div style={{ marginBottom: "1.75rem" }}>
+      <div className="mb-7">
         <p
+          className="uppercase mb-1 tracking-[0.1em]"
           style={{
             fontFamily: UI,
             fontSize: "0.7rem",
-            letterSpacing: "0.1em",
-            textTransform: "uppercase",
             color: "rgba(43,35,32,0.4)",
-            marginBottom: "0.25rem",
           }}
         >
           {new Date().toLocaleDateString("en-GB", {
@@ -266,13 +260,11 @@ export default function ConsoleDashboard() {
           })}
         </p>
         <h1
+          className="font-semibold m-0 tracking-[-0.02em]"
           style={{
             fontFamily: UI,
             fontSize: "1.35rem",
-            fontWeight: 600,
             color: C.charcoal,
-            letterSpacing: "-0.02em",
-            margin: 0,
           }}
         >
           Welcome back, Adunola
@@ -280,71 +272,49 @@ export default function ConsoleDashboard() {
       </div>
 
       {/* ── Stat cards ─────────────────────────────────────── */}
-      <div className="console-stat-grid"
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(4, 1fr)",
-          gap: "1rem",
-          marginBottom: "1.25rem",
-        }}
-      >
+      <div className="console-stat-grid grid grid-cols-[repeat(4,1fr)] gap-4 mb-5">
         {STATS.map((s) => (
           <div
             key={s.label}
+            className="bg-white rounded-lg p-5 flex flex-col gap-1 border border-solid border-[rgba(43,35,32,0.07)]"
             style={{
-              backgroundColor: "#fff",
-              borderRadius: 8,
-              padding: "1.25rem",
-              border: "1px solid rgba(43,35,32,0.07)",
               borderTop: `3px solid ${s.accent}`,
-              display: "flex",
-              flexDirection: "column",
-              gap: "0.25rem",
             }}
           >
             <div
+              className="uppercase font-medium mb-[0.375rem] tracking-[0.1em]"
               style={{
                 fontSize: "0.63rem",
-                letterSpacing: "0.1em",
-                textTransform: "uppercase",
                 color: "rgba(43,35,32,0.45)",
-                fontWeight: 500,
-                marginBottom: "0.375rem",
               }}
             >
               {s.label}
             </div>
             <div
+              className="font-bold leading-none tracking-[-0.03em]"
               style={{
                 fontSize: "1.75rem",
-                fontWeight: 700,
                 color: C.charcoal,
-                letterSpacing: "-0.03em",
-                lineHeight: 1,
               }}
             >
               {s.value}
             </div>
             {s.sub && (
               <div
+                className="mt-[1px]"
                 style={{
                   fontSize: "0.75rem",
                   color: "rgba(43,35,32,0.38)",
-                  marginTop: "1px",
                 }}
               >
                 {s.sub}
               </div>
             )}
             <div
+              className="flex items-center gap-1 mt-2 font-medium"
               style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "4px",
-                marginTop: "0.5rem",
                 color: s.trendUp ? C.teal : C.maroon,
                 fontSize: "0.72rem",
-                fontWeight: 500,
               }}
             >
               {s.trendUp ? <TrendUpIcon /> : <TrendDownIcon />}
@@ -358,53 +328,28 @@ export default function ConsoleDashboard() {
       </div>
 
       {/* ── Lower grid: Orders + Activity ──────────────────── */}
-      <div className="console-lower-grid"
-        style={{
-          display: "grid",
-          gridTemplateColumns: "1fr 340px",
-          gap: "1rem",
-          marginBottom: "1rem",
-        }}
-      >
+      <div className="console-lower-grid grid grid-cols-[1fr_340px] gap-4 mb-4">
         {/* Orders needing action */}
         <div
-          style={{
-            backgroundColor: "#fff",
-            borderRadius: 8,
-            border: "1px solid rgba(43,35,32,0.07)",
-            overflow: "hidden",
-          }}
+          className="bg-white rounded-lg overflow-hidden border border-solid border-[rgba(43,35,32,0.07)]"
         >
           <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              padding: "1rem 1.25rem 0.875rem",
-              borderBottom: "1px solid rgba(43,35,32,0.06)",
-            }}
+            className="flex items-center justify-between p-[1rem_1.25rem_0.875rem] border-b border-solid border-[rgba(43,35,32,0.06)]"
           >
             <span
+              className="font-semibold"
               style={{
                 fontSize: "0.8rem",
-                fontWeight: 600,
                 color: C.charcoal,
               }}
             >
               Orders Needing Action
             </span>
             <span
+              className="inline-flex items-center justify-center w-5 h-5 rounded-full font-bold text-white"
               style={{
-                display: "inline-flex",
-                alignItems: "center",
-                justifyContent: "center",
-                width: 20,
-                height: 20,
-                borderRadius: "50%",
                 backgroundColor: C.maroon,
-                color: "#fff",
                 fontSize: "0.62rem",
-                fontWeight: 700,
               }}
             >
               {ORDERS.length}
@@ -412,21 +357,16 @@ export default function ConsoleDashboard() {
           </div>
 
           <div className="table-scroll">
-            <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 540 }}>
+            <table className="w-full border-collapse min-w-[540px]">
               <thead>
                 <tr>
                   {["Order", "Buyer", "Item", "Total", "Status", ""].map((h) => (
                     <th
                       key={h}
+                      className="p-[0.5rem_1.25rem] text-left uppercase font-medium tracking-[0.09em] border-b border-solid border-[rgba(43,35,32,0.06)]"
                       style={{
-                        padding: "0.5rem 1.25rem",
-                        textAlign: "left",
                         fontSize: "0.62rem",
-                        letterSpacing: "0.09em",
-                        textTransform: "uppercase",
                         color: "rgba(43,35,32,0.38)",
-                        fontWeight: 500,
-                        borderBottom: "1px solid rgba(43,35,32,0.06)",
                       }}
                     >
                       {h}
@@ -438,34 +378,29 @@ export default function ConsoleDashboard() {
                 {ORDERS.map((o, i) => (
                   <tr
                     key={o.id}
-                    style={{
-                      backgroundColor: i % 2 === 0 ? "transparent" : "rgba(43,35,32,0.018)",
-                    }}
+                    className={i % 2 === 0 ? "bg-transparent" : "bg-[rgba(43,35,32,0.018)]"}
                   >
                     <td
+                      className="p-[0.7rem_1.25rem] font-semibold whitespace-nowrap"
                       style={{
-                        padding: "0.7rem 1.25rem",
                         fontSize: "0.77rem",
-                        fontWeight: 600,
                         color: C.charcoal,
-                        whiteSpace: "nowrap",
                       }}
                     >
                       {o.id}
                     </td>
                     <td
+                      className="p-[0.7rem_1.25rem] whitespace-nowrap"
                       style={{
-                        padding: "0.7rem 1.25rem",
                         fontSize: "0.77rem",
                         color: C.charcoal,
-                        whiteSpace: "nowrap",
                       }}
                     >
                       {o.buyer}
                     </td>
                     <td
+                      className="p-[0.7rem_1.25rem]"
                       style={{
-                        padding: "0.7rem 1.25rem",
                         fontSize: "0.75rem",
                         color: "rgba(43,35,32,0.6)",
                       }}
@@ -473,32 +408,24 @@ export default function ConsoleDashboard() {
                       {o.item}
                     </td>
                     <td
+                      className="p-[0.7rem_1.25rem] font-semibold whitespace-nowrap"
                       style={{
-                        padding: "0.7rem 1.25rem",
                         fontSize: "0.77rem",
-                        fontWeight: 600,
                         color: C.charcoal,
-                        whiteSpace: "nowrap",
                       }}
                     >
                       {o.total}
                     </td>
-                    <td style={{ padding: "0.7rem 1.25rem" }}>
+                    <td className="p-[0.7rem_1.25rem]">
                       <StatusBadge status={o.status} type={o.statusType} />
                     </td>
-                    <td style={{ padding: "0.7rem 1.25rem" }}>
+                    <td className="p-[0.7rem_1.25rem]">
                       <button
+                        className="border-none rounded-[4px] p-[4px_12px] font-semibold cursor-pointer whitespace-nowrap tracking-[0.02em]"
                         style={{
                           backgroundColor: C.gold,
                           color: C.charcoal,
-                          border: "none",
-                          borderRadius: 4,
-                          padding: "4px 12px",
                           fontSize: "0.68rem",
-                          fontWeight: 600,
-                          cursor: "pointer",
-                          whiteSpace: "nowrap",
-                          letterSpacing: "0.02em",
                         }}
                       >
                         Fulfil
@@ -513,88 +440,59 @@ export default function ConsoleDashboard() {
 
         {/* Activity feed */}
         <div
-          style={{
-            backgroundColor: "#fff",
-            borderRadius: 8,
-            border: "1px solid rgba(43,35,32,0.07)",
-            overflow: "hidden",
-          }}
+          className="bg-white rounded-lg overflow-hidden border border-solid border-[rgba(43,35,32,0.07)]"
         >
           <div
-            style={{
-              padding: "1rem 1.25rem 0.875rem",
-              borderBottom: "1px solid rgba(43,35,32,0.06)",
-            }}
+            className="p-[1rem_1.25rem_0.875rem] border-b border-solid border-[rgba(43,35,32,0.06)]"
           >
             <span
+              className="font-semibold"
               style={{
                 fontSize: "0.8rem",
-                fontWeight: 600,
                 color: C.charcoal,
               }}
             >
               Recent Activity
             </span>
           </div>
-          <div style={{ padding: "0.5rem 0" }}>
+          <div className="py-2">
             {ACTIVITY.map((a, i) => (
               <div
                 key={i}
-                style={{
-                  display: "flex",
-                  gap: "0.75rem",
-                  padding: "0.75rem 1.25rem",
-                  alignItems: "flex-start",
-                  borderBottom:
-                    i < ACTIVITY.length - 1
-                      ? "1px solid rgba(43,35,32,0.05)"
-                      : "none",
-                }}
+                className={`flex gap-3 p-[0.75rem_1.25rem] items-start ${i < ACTIVITY.length - 1 ? 'border-b border-solid border-[rgba(43,35,32,0.05)]' : ''}`}
               >
                 <div
+                  className="w-[26px] h-[26px] rounded-full text-white flex items-center justify-center shrink-0 mt-[1px]"
                   style={{
-                    width: 26,
-                    height: 26,
-                    borderRadius: "50%",
                     backgroundColor: a.iconBg,
-                    color: "#fff",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    flexShrink: 0,
-                    marginTop: "1px",
                   }}
                 >
                   {a.icon}
                 </div>
-                <div style={{ flex: 1, minWidth: 0 }}>
+                <div className="flex-1 min-w-0">
                   <div
+                    className="font-medium leading-tight"
                     style={{
                       fontSize: "0.78rem",
-                      fontWeight: 500,
                       color: C.charcoal,
-                      lineHeight: 1.3,
                     }}
                   >
                     {a.text}
                   </div>
                   <div
+                    className="mt-[2px] overflow-hidden text-ellipsis whitespace-nowrap"
                     style={{
                       fontSize: "0.7rem",
                       color: "rgba(43,35,32,0.48)",
-                      marginTop: "2px",
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      whiteSpace: "nowrap",
                     }}
                   >
                     {a.sub}
                   </div>
                   <div
+                    className="mt-[3px]"
                     style={{
                       fontSize: "0.65rem",
                       color: "rgba(43,35,32,0.32)",
-                      marginTop: "3px",
                     }}
                   >
                     {a.time}
@@ -608,28 +506,17 @@ export default function ConsoleDashboard() {
 
       {/* ── Sales chart ────────────────────────────────────── */}
       <div
-        style={{
-          backgroundColor: "#fff",
-          borderRadius: 8,
-          border: "1px solid rgba(43,35,32,0.07)",
-          padding: "1.25rem",
-        }}
+        className="bg-white rounded-lg p-5 border border-solid border-[rgba(43,35,32,0.07)]"
       >
         <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            marginBottom: "1.25rem",
-          }}
+          className="flex items-center justify-between mb-5"
         >
           <div>
             <div
+              className="font-semibold mb-[2px]"
               style={{
                 fontSize: "0.8rem",
-                fontWeight: 600,
                 color: C.charcoal,
-                marginBottom: "2px",
               }}
             >
               Sales — Last 7 Days
@@ -645,30 +532,22 @@ export default function ConsoleDashboard() {
             </div>
           </div>
           <div
-            style={{
-              display: "flex",
-              alignItems: "baseline",
-              gap: "6px",
-            }}
+            className="flex items-baseline gap-[6px]"
           >
             <span
+              className="font-bold tracking-[-0.03em]"
               style={{
                 fontSize: "1.5rem",
-                fontWeight: 700,
                 color: C.charcoal,
-                letterSpacing: "-0.03em",
               }}
             >
               CAD $49,691
             </span>
             <span
+              className="font-medium flex items-center gap-[3px]"
               style={{
                 fontSize: "0.72rem",
                 color: C.teal,
-                fontWeight: 500,
-                display: "flex",
-                alignItems: "center",
-                gap: "3px",
               }}
             >
               <TrendUpIcon /> +11% vs prev week

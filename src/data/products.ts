@@ -8,30 +8,30 @@ export interface Product {
   cadNum: number;
   ngnNum: number;
   img: string;
-  color: string;
+  colors: string[];
   sizes: string[];
   inStock: boolean;
 }
 
 export const ALL_PRODUCTS: Product[] = [
-  { id:  1, category: 'Fila Gobi',         tag: 'NEW',           title: 'Gobi Filà Cap — Burgundy Velvet',    cadNum:  89, ngnNum:  44200, img: 'photo-1763823133159-c6f8ec380e33', color: 'Burgundy', sizes: ['S','M','L','XL'],             inStock: true  },
-  { id:  2, category: 'Abetiaja',         tag: 'NEW',           title: 'Classic Abetiaja — Cream Brocade',   cadNum:  95, ngnNum:  47150, img: 'photo-1647379380116-4af77a8632b0', color: 'Cream',    sizes: ['S','M','L'],                  inStock: true  },
-  { id:  3, category: 'Fila Gobi',         tag: 'MADE TO ORDER', title: 'Fìla Gòbì — Navy Aso-oke',          cadNum: 110, ngnNum:  54650, img: 'photo-1665646155658-bdcd66e854db', color: 'Navy',     sizes: ['S','M','L','XL'],             inStock: true  },
-  { id:  4, category: 'Gele',         tag: 'MADE TO ORDER', title: 'Aso-oke Gele — Ivory & Gold Set',   cadNum: 145, ngnNum:  71900, img: 'photo-1714124731489-7eb16af0ac91', color: 'Gold',     sizes: ['One Size'],                   inStock: true  },
-  { id:  5, category: 'Gele',         tag: 'NEW',           title: 'Damask Gele — Teal & Coral',        cadNum: 120, ngnNum:  59600, img: 'photo-1655215081879-0ac1f535b575', color: 'Teal',     sizes: ['One Size'],                   inStock: true  },
-  { id:  6, category: 'Ipele',        tag: 'NEW',           title: 'Ọjọ Ipele — Crimson Drape',         cadNum:  78, ngnNum:  38750, img: 'photo-1760086626077-55da1cb1ecb3', color: 'Crimson',  sizes: ['One Size'],                   inStock: true  },
-  { id:  7, category: 'Ipele',        tag: 'MADE TO ORDER', title: 'Adire Ipele — Indigo Tie-Dye',      cadNum:  92, ngnNum:  45700, img: 'photo-1542727284-f84ef8478587',   color: 'Indigo',   sizes: ['One Size'],                   inStock: true  },
-  { id:  8, category: 'Kaftan',       tag: 'MADE TO ORDER', title: 'Embroidered Agbada Kaftan',         cadNum: 310, ngnNum: 153950, img: 'photo-1765910083971-aa0e3688be46', color: 'Gold',     sizes: ['S','M','L','XL','2XL'],       inStock: true  },
-  { id:  9, category: 'Kaftan',       tag: 'NEW',           title: 'Aso-oke Senator Kaftan — Maroon',   cadNum: 245, ngnNum: 121750, img: 'photo-1661332306744-70f9ed1a7f40', color: 'Maroon',   sizes: ['S','M','L','XL'],             inStock: true  },
-  { id: 10, category: 'Kaftan',       tag: 'NEW',           title: 'Adire Boubou — Cream & Indigo',     cadNum: 195, ngnNum:  96850, img: 'photo-1758539197604-146e8bbf19dc', color: 'Cream',    sizes: ['M','L','XL'],                 inStock: true  },
-  { id: 11, category: 'Trousers',     tag: 'NEW',           title: 'Tailored Yoruba Trouser Set',       cadNum: 195, ngnNum:  96850, img: 'photo-1661332360810-28aa035f14db', color: 'Charcoal', sizes: ['28','30','32','34','36'],      inStock: true  },
-  { id: 12, category: 'Roundneck',    tag: 'SOLD OUT',      title: 'Adire Roundneck — Indigo',          cadNum: 125, ngnNum:  62000, img: 'photo-1632948056627-41482f69c38c', color: 'Indigo',   sizes: ['S','M','L','XL'],             inStock: false },
-  { id: 13, category: 'Roundneck',    tag: 'NEW',           title: 'Batik Roundneck — Rust & Cream',    cadNum: 110, ngnNum:  54650, img: 'photo-1666974931330-9b5bcc541347', color: 'Rust',     sizes: ['S','M','L','XL','2XL'],       inStock: true  },
-  { id: 14, category: 'Shoes',        tag: 'NEW',           title: 'Embossed Leather Oxford — Maroon',  cadNum: 220, ngnNum: 109300, img: 'photo-1646133512747-babfd708d662', color: 'Maroon',   sizes: ['40','41','42','43','44','45'], inStock: true  },
-  { id: 15, category: 'Pam Slippers', tag: 'NEW',           title: 'Hand-tooled Pam Slippers — Tan',   cadNum: 160, ngnNum:  79500, img: 'photo-1542727284-f84ef8478587',   color: 'Tan',      sizes: ['38','39','40','41','42','43'], inStock: true  },
-  { id: 16, category: 'Accessories',  tag: 'MADE TO ORDER', title: 'Adire Prayer Mat — Heritage Weave',cadNum:  55, ngnNum:  27300, img: 'photo-1664151100165-71ed5515adad', color: 'Multi',    sizes: ['One Size'],                   inStock: true  },
-  { id: 17, category: 'Accessories',  tag: 'NEW',           title: 'Beaded Yoruba Bracelet Set',        cadNum:  38, ngnNum:  18900, img: 'photo-1585353804485-d6dbf13142b2', color: 'Multi',    sizes: ['One Size'],                   inStock: true  },
-  { id: 18, category: 'Accessories',  tag: 'NEW',           title: 'Adire Clutch Bag — Blue & White',   cadNum:  72, ngnNum:  35750, img: 'photo-1666974931330-9b5bcc541347', color: 'Blue',     sizes: ['One Size'],                   inStock: true  },
+  { id:  1, category: 'Fila Gobi',         tag: 'NEW',           title: 'Gobi Filà Cap — Burgundy Velvet',    cadNum:  89, ngnNum:  44200, img: 'photo-1763823133159-c6f8ec380e33', colors: ['Burgundy'], sizes: ['S','M','L','XL'],             inStock: true  },
+  { id:  2, category: 'Abetiaja',         tag: 'NEW',           title: 'Classic Abetiaja — Cream Brocade',   cadNum:  95, ngnNum:  47150, img: 'photo-1647379380116-4af77a8632b0', colors: ['Cream'],    sizes: ['S','M','L'],                  inStock: true  },
+  { id:  3, category: 'Fila Gobi',         tag: 'MADE TO ORDER', title: 'Fìla Gòbì — Navy Aso-oke',          cadNum: 110, ngnNum:  54650, img: 'photo-1665646155658-bdcd66e854db', colors: ['Navy'],     sizes: ['S','M','L','XL'],             inStock: true  },
+  { id:  4, category: 'Gele',         tag: 'MADE TO ORDER', title: 'Aso-oke Gele — Ivory & Gold Set',   cadNum: 145, ngnNum:  71900, img: 'photo-1714124731489-7eb16af0ac91', colors: ['Gold'],     sizes: ['One Size'],                   inStock: true  },
+  { id:  5, category: 'Gele',         tag: 'NEW',           title: 'Damask Gele — Teal & Coral',        cadNum: 120, ngnNum:  59600, img: 'photo-1655215081879-0ac1f535b575', colors: ['Teal'],     sizes: ['One Size'],                   inStock: true  },
+  { id:  6, category: 'Ipele',        tag: 'NEW',           title: 'Ọjọ Ipele — Crimson Drape',         cadNum:  78, ngnNum:  38750, img: 'photo-1760086626077-55da1cb1ecb3', colors: ['Crimson'],  sizes: ['One Size'],                   inStock: true  },
+  { id:  7, category: 'Ipele',        tag: 'MADE TO ORDER', title: 'Adire Ipele — Indigo Tie-Dye',      cadNum:  92, ngnNum:  45700, img: 'photo-1542727284-f84ef8478587',   colors: ['Indigo'],   sizes: ['One Size'],                   inStock: true  },
+  { id:  8, category: 'Kaftan',       tag: 'MADE TO ORDER', title: 'Embroidered Agbada Kaftan',         cadNum: 310, ngnNum: 153950, img: 'photo-1765910083971-aa0e3688be46', colors: ['Gold'],     sizes: ['S','M','L','XL','2XL'],       inStock: true  },
+  { id:  9, category: 'Kaftan',       tag: 'NEW',           title: 'Aso-oke Senator Kaftan — Maroon',   cadNum: 245, ngnNum: 121750, img: 'photo-1661332306744-70f9ed1a7f40', colors: ['Maroon'],   sizes: ['S','M','L','XL'],             inStock: true  },
+  { id: 10, category: 'Kaftan',       tag: 'NEW',           title: 'Adire Boubou — Cream & Indigo',     cadNum: 195, ngnNum:  96850, img: 'photo-1758539197604-146e8bbf19dc', colors: ['Cream'],    sizes: ['M','L','XL'],                 inStock: true  },
+  { id: 11, category: 'Trousers',     tag: 'NEW',           title: 'Tailored Yoruba Trouser Set',       cadNum: 195, ngnNum:  96850, img: 'photo-1661332360810-28aa035f14db', colors: ['Charcoal'], sizes: ['28','30','32','34','36'],      inStock: true  },
+  { id: 12, category: 'Roundneck',    tag: 'SOLD OUT',      title: 'Adire Roundneck — Indigo',          cadNum: 125, ngnNum:  62000, img: 'photo-1632948056627-41482f69c38c', colors: ['Indigo'],   sizes: ['S','M','L','XL'],             inStock: false },
+  { id: 13, category: 'Roundneck',    tag: 'NEW',           title: 'Batik Roundneck — Rust & Cream',    cadNum: 110, ngnNum:  54650, img: 'photo-1666974931330-9b5bcc541347', colors: ['Rust'],     sizes: ['S','M','L','XL','2XL'],       inStock: true  },
+  { id: 14, category: 'Shoes',        tag: 'NEW',           title: 'Embossed Leather Oxford — Maroon',  cadNum: 220, ngnNum: 109300, img: 'photo-1646133512747-babfd708d662', colors: ['Maroon'],   sizes: ['40','41','42','43','44','45'], inStock: true  },
+  { id: 15, category: 'Pam Slippers', tag: 'NEW',           title: 'Hand-tooled Pam Slippers — Tan',   cadNum: 160, ngnNum:  79500, img: 'photo-1542727284-f84ef8478587',   colors: ['Tan'],      sizes: ['38','39','40','41','42','43'], inStock: true  },
+  { id: 16, category: 'Accessories',  tag: 'MADE TO ORDER', title: 'Adire Prayer Mat — Heritage Weave',cadNum:  55, ngnNum:  27300, img: 'photo-1664151100165-71ed5515adad', colors: ['Multi'],    sizes: ['One Size'],                   inStock: true  },
+  { id: 17, category: 'Accessories',  tag: 'NEW',           title: 'Beaded Yoruba Bracelet Set',        cadNum:  38, ngnNum:  18900, img: 'photo-1585353804485-d6dbf13142b2', colors: ['Multi'],    sizes: ['One Size'],                   inStock: true  },
+  { id: 18, category: 'Accessories',  tag: 'NEW',           title: 'Adire Clutch Bag — Blue & White',   cadNum:  72, ngnNum:  35750, img: 'photo-1666974931330-9b5bcc541347', colors: ['Blue'],     sizes: ['One Size'],                   inStock: true  },
 ];
 
 /**

@@ -212,8 +212,8 @@ function ProductCard({ p, view }: { p: CatalogueProduct; view: 'grid' | 'list' }
                   productId: p.id,
                   slug: p.slug,
                   title: p.title,
-                  size: p.sizes[0] ?? 'One Size',
-                  color: p.color,
+                  size: p.variants[0]?.size ?? 'One Size',
+                  color: p.colors[0] ?? '',
                   unitPriceCents: Math.round(p.priceCad * 100),
                   imageUrl: p.imageUrl,
                 });
@@ -260,12 +260,12 @@ function ShopContent({ products, collections, colors }: ShopProps) {
       // Match on title, category or colour so "gele", "indigo" and "kaftan"
       // all find something.
       r = r.filter(p =>
-        `${p.title} ${p.category} ${p.color}`.toLowerCase().includes(query)
+        `${p.title} ${p.category} ${p.colors.join(' ')}`.toLowerCase().includes(query)
       );
     }
     if (selectedCats.length)   r = r.filter(p => selectedCats.includes(p.category));
     r = r.filter(p => p.priceCad <= priceMax);
-    if (selectedColors.length) r = r.filter(p => selectedColors.includes(p.color));
+    if (selectedColors.length) r = r.filter(p => selectedColors.some(c => p.colors.includes(c)));
     if (availability.includes('In Stock') && !availability.includes('Made to Order'))
       r = r.filter(p => p.inStock && p.tag !== 'MADE TO ORDER');
     if (availability.includes('Made to Order') && !availability.includes('In Stock'))

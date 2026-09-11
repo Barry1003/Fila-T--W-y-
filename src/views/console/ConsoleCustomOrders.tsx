@@ -247,17 +247,12 @@ function StatusBadge({ status }: { status: RequestStatus }) {
   const s = STATUS_CFG[status];
   return (
     <span
+      className="inline-block px-[10px] py-[3px] rounded-full font-medium whitespace-nowrap tracking-[0.01em]"
       style={{
-        display: "inline-block",
-        padding: "3px 10px",
-        borderRadius: 100,
         fontSize: "0.68rem",
-        fontWeight: 500,
         backgroundColor: s.bg,
         color: s.color,
-        whiteSpace: "nowrap",
         fontFamily: UI,
-        letterSpacing: "0.01em",
       }}
     >
       {s.label}
@@ -270,18 +265,11 @@ function StatusBadge({ status }: { status: RequestStatus }) {
 function RefSwatch({ bg, size = 48 }: { bg: string; size?: number }) {
   return (
     <div
+      className="rounded-md shrink-0 flex items-center justify-center overflow-hidden relative border border-solid border-[rgba(43,35,32,0.12)]"
       style={{
         width: size,
         height: size,
-        borderRadius: 6,
         backgroundColor: bg,
-        border: "1px solid rgba(43,35,32,0.12)",
-        flexShrink: 0,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        overflow: "hidden",
-        position: "relative",
       }}
     >
       {/* Fabric-like cross-hatch overlay */}
@@ -300,26 +288,17 @@ function RefSwatch({ bg, size = 48 }: { bg: string; size?: number }) {
 function RequestCard({ req, onOpen }: { req: CustomRequest; onOpen: () => void }) {
   return (
     <div
-      style={{
-        backgroundColor: "#fff",
-        borderRadius: 10,
-        border: "1px solid rgba(43,35,32,0.08)",
-        padding: "1.25rem",
-        display: "flex",
-        flexDirection: "column",
-        gap: "0.875rem",
-        transition: "box-shadow 0.15s",
-      }}
+      className="bg-white rounded-[10px] p-5 flex flex-col gap-[0.875rem] transition-shadow duration-150 border border-solid border-[rgba(43,35,32,0.08)]"
       onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.boxShadow = "0 2px 12px rgba(43,35,32,0.08)"; }}
       onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.boxShadow = "none"; }}
     >
       {/* Top row: garment + date | status */}
-      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "0.75rem" }}>
+      <div className="flex items-start justify-between gap-3">
         <div>
-          <div style={{ fontSize: "0.95rem", fontWeight: 600, color: C.charcoal, lineHeight: 1.25 }}>
+          <div className="font-semibold leading-tight" style={{ fontSize: "0.95rem", color: C.charcoal }}>
             {req.garmentType}
           </div>
-          <div style={{ fontSize: "0.7rem", color: "rgba(43,35,32,0.42)", marginTop: "3px" }}>
+          <div className="mt-[3px]" style={{ fontSize: "0.7rem", color: "rgba(43,35,32,0.42)" }}>
             Submitted {req.submittedDate}
           </div>
         </div>
@@ -327,27 +306,22 @@ function RequestCard({ req, onOpen }: { req: CustomRequest; onOpen: () => void }
       </div>
 
       {/* Customer + occasion row */}
-      <div style={{ display: "flex", gap: "1.5rem", flexWrap: "wrap" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "5px", color: "rgba(43,35,32,0.55)", fontSize: "0.78rem" }}>
+      <div className="flex gap-6 flex-wrap">
+        <div className="flex items-center gap-[5px]" style={{ color: "rgba(43,35,32,0.55)", fontSize: "0.78rem" }}>
           <UserIcon size={13} />
-          <span style={{ fontWeight: 500, color: C.charcoal }}>{req.customer.name}</span>
+          <span className="font-medium" style={{ color: C.charcoal }}>{req.customer.name}</span>
           <span style={{ color: "rgba(43,35,32,0.35)" }}>· {req.customer.location}</span>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: "5px", color: "rgba(43,35,32,0.55)", fontSize: "0.78rem" }}>
+        <div className="flex items-center gap-[5px]" style={{ color: "rgba(43,35,32,0.55)", fontSize: "0.78rem" }}>
           <CalIcon size={13} />
           <span>{req.occasion}</span>
         </div>
         <div
+          className="inline-flex items-center gap-1 font-medium px-2 py-[2px] rounded"
           style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: "4px",
             backgroundColor: req.status === "declined" ? "rgba(122,46,56,0.06)" : "rgba(212,169,78,0.1)",
             color: req.status === "declined" ? C.maroon : "#8A6818",
             fontSize: "0.72rem",
-            fontWeight: 500,
-            padding: "2px 8px",
-            borderRadius: 4,
           }}
         >
           <CalIcon size={11} />
@@ -357,11 +331,11 @@ function RequestCard({ req, onOpen }: { req: CustomRequest; onOpen: () => void }
 
       {/* Reference image swatches */}
       {req.refImages.length > 0 && (
-        <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
+        <div className="flex gap-2 items-center">
           {req.refImages.map((img, i) => (
             <RefSwatch key={i} bg={img.bg} size={44} />
           ))}
-          <span style={{ fontSize: "0.7rem", color: "rgba(43,35,32,0.4)", marginLeft: 4 }}>
+          <span className="ml-1" style={{ fontSize: "0.7rem", color: "rgba(43,35,32,0.4)" }}>
             {req.refImages.length} style reference{req.refImages.length !== 1 ? "s" : ""}
           </span>
         </div>
@@ -370,24 +344,16 @@ function RequestCard({ req, onOpen }: { req: CustomRequest; onOpen: () => void }
       {/* Quote info (if quoted) */}
       {req.quotedPrice && (
         <div
-          style={{
-            backgroundColor: "rgba(43,35,32,0.025)",
-            border: "1px solid rgba(43,35,32,0.07)",
-            borderRadius: 6,
-            padding: "0.625rem 0.875rem",
-            display: "flex",
-            gap: "1.5rem",
-            alignItems: "center",
-          }}
+          className="rounded-md px-[0.875rem] py-[0.625rem] flex gap-6 items-center bg-[rgba(43,35,32,0.025)] border border-solid border-[rgba(43,35,32,0.07)]"
         >
           <div>
-            <div style={{ fontSize: "0.6rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(43,35,32,0.38)", fontWeight: 500 }}>Quoted</div>
-            <div style={{ fontSize: "1rem", fontWeight: 700, color: C.charcoal, letterSpacing: "-0.02em" }}>CAD ${req.quotedPrice.toLocaleString()}</div>
+            <div className="uppercase font-medium tracking-[0.1em]" style={{ fontSize: "0.6rem", color: "rgba(43,35,32,0.38)" }}>Quoted</div>
+            <div className="font-bold tracking-[-0.02em]" style={{ fontSize: "1rem", color: C.charcoal }}>CAD ${req.quotedPrice.toLocaleString()}</div>
           </div>
           {req.estimatedCompletion && (
             <div>
-              <div style={{ fontSize: "0.6rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(43,35,32,0.38)", fontWeight: 500 }}>Est. Completion</div>
-              <div style={{ fontSize: "0.82rem", fontWeight: 500, color: C.charcoal }}>{req.estimatedCompletion}</div>
+              <div className="uppercase font-medium tracking-[0.1em]" style={{ fontSize: "0.6rem", color: "rgba(43,35,32,0.38)" }}>Est. Completion</div>
+              <div className="font-medium" style={{ fontSize: "0.82rem", color: C.charcoal }}>{req.estimatedCompletion}</div>
             </div>
           )}
         </div>
@@ -396,34 +362,23 @@ function RequestCard({ req, onOpen }: { req: CustomRequest; onOpen: () => void }
       {/* Decline reason (if declined) */}
       {req.status === "declined" && req.declineReason && (
         <div
-          style={{
-            backgroundColor: "rgba(122,46,56,0.05)",
-            border: "1px solid rgba(122,46,56,0.12)",
-            borderRadius: 6,
-            padding: "0.625rem 0.875rem",
-          }}
+          className="rounded-md px-[0.875rem] py-[0.625rem] bg-[rgba(122,46,56,0.05)] border border-solid border-[rgba(122,46,56,0.12)]"
         >
-          <div style={{ fontSize: "0.6rem", letterSpacing: "0.1em", textTransform: "uppercase", color: C.maroon, fontWeight: 500, marginBottom: "3px" }}>Decline Reason</div>
-          <div style={{ fontSize: "0.77rem", color: "rgba(43,35,32,0.65)", lineHeight: 1.45 }}>{req.declineReason}</div>
+          <div className="uppercase font-medium mb-[3px] tracking-[0.1em]" style={{ fontSize: "0.6rem", color: C.maroon }}>Decline Reason</div>
+          <div className="leading-relaxed" style={{ fontSize: "0.77rem", color: "rgba(43,35,32,0.65)" }}>{req.declineReason}</div>
         </div>
       )}
 
       {/* Footer: View Details button */}
-      <div style={{ display: "flex", justifyContent: "flex-end", paddingTop: "0.125rem" }}>
+      <div className="flex justify-end pt-[0.125rem]">
         <button
           onClick={onOpen}
+          className="bg-transparent rounded-md px-4 py-[0.45rem] font-medium cursor-pointer transition-colors duration-150 tracking-[0.01em] border-[1.5px] border-solid"
           style={{
-            border: `1.5px solid ${C.maroon}`,
-            backgroundColor: "transparent",
+            borderColor: C.maroon,
             color: C.maroon,
-            borderRadius: 6,
-            padding: "0.45rem 1rem",
             fontSize: "0.78rem",
-            fontWeight: 500,
-            cursor: "pointer",
             fontFamily: UI,
-            letterSpacing: "0.01em",
-            transition: "background-color 0.12s, color 0.12s",
           }}
           onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = C.maroon; (e.currentTarget as HTMLElement).style.color = "#fff"; }}
           onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = "transparent"; (e.currentTarget as HTMLElement).style.color = C.maroon; }}
@@ -440,10 +395,10 @@ function RequestCard({ req, onOpen }: { req: CustomRequest; onOpen: () => void }
 function ReadField({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <div style={{ fontSize: "0.62rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(43,35,32,0.38)", fontWeight: 500, marginBottom: "3px" }}>
+      <div className="uppercase font-medium mb-[3px] tracking-[0.1em]" style={{ fontSize: "0.62rem", color: "rgba(43,35,32,0.38)" }}>
         {label}
       </div>
-      <div style={{ fontSize: "0.82rem", color: C.charcoal, lineHeight: 1.5 }}>{value}</div>
+      <div className="leading-relaxed" style={{ fontSize: "0.82rem", color: C.charcoal }}>{value}</div>
     </div>
   );
 }
@@ -485,74 +440,46 @@ function RequestDetailPanel({
       {/* Overlay */}
       <div
         onClick={onClose}
-        style={{ position: "fixed", inset: 0, zIndex: 200, backgroundColor: "rgba(43,35,32,0.38)" }}
+        className="fixed inset-0 z-[200] bg-[rgba(43,35,32,0.38)]"
       />
 
       {/* Panel */}
       <div
+        className="fixed top-0 right-0 bottom-0 z-[201] w-[580px] bg-white flex flex-col overflow-y-auto"
         style={{
-          position: "fixed",
-          top: 0,
-          right: 0,
-          bottom: 0,
-          zIndex: 201,
-          width: 580,
-          backgroundColor: "#fff",
-          display: "flex",
-          flexDirection: "column",
           fontFamily: UI,
-          overflowY: "auto",
         }}
       >
         {/* Header */}
         <div
-          style={{
-            padding: "1.25rem 1.5rem",
-            borderBottom: "1px solid rgba(43,35,32,0.08)",
-            display: "flex",
-            alignItems: "flex-start",
-            justifyContent: "space-between",
-            flexShrink: 0,
-            position: "sticky",
-            top: 0,
-            backgroundColor: "#fff",
-            zIndex: 1,
-          }}
+          className="flex items-start justify-between shrink-0 sticky top-0 bg-white z-[1] p-[1.25rem_1.5rem] border-b border-solid border-[rgba(43,35,32,0.08)]"
         >
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: "0.625rem", marginBottom: "4px" }}>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-[0.625rem] mb-1">
               <StatusBadge status={req.status} />
               <span style={{ fontSize: "0.7rem", color: "rgba(43,35,32,0.4)" }}>Submitted {req.submittedDate}</span>
             </div>
-            <h2 style={{ fontSize: "1.05rem", fontWeight: 600, color: C.charcoal, margin: 0, lineHeight: 1.25 }}>
+            <h2 className="font-semibold m-0 leading-tight" style={{ fontSize: "1.05rem", color: C.charcoal }}>
               {req.garmentType}
             </h2>
           </div>
           <button
             onClick={onClose}
             aria-label="Close"
-            style={{ background: "none", border: "none", cursor: "pointer", fontSize: "1.35rem", color: "rgba(43,35,32,0.4)", lineHeight: 1, padding: "0 0 0 12px", flexShrink: 0 }}
+            className="bg-none border-none cursor-pointer leading-none pl-3 shrink-0"
+            style={{ fontSize: "1.35rem", color: "rgba(43,35,32,0.4)" }}
           >
             ×
           </button>
         </div>
 
         {/* Body */}
-        <div style={{ padding: "1.5rem", display: "flex", flexDirection: "column", gap: "1.75rem", flex: 1 }}>
+        <div className="p-6 flex flex-col gap-7 flex-1">
 
           {/* ── Customer info */}
           <section>
             <SectionLabel>Customer</SectionLabel>
-            <div className="rg-2"
-              style={{
-                backgroundColor: "rgba(43,35,32,0.025)",
-                border: "1px solid rgba(43,35,32,0.07)",
-                borderRadius: 8,
-                padding: "1rem",
-                display: "grid",
-                gridTemplateColumns: "1fr 1fr",
-                gap: "0.875rem",
-              }}
+            <div className="rg-2 grid grid-cols-2 gap-[0.875rem] p-4 rounded-lg bg-[rgba(43,35,32,0.025)] border border-solid border-[rgba(43,35,32,0.07)]"
             >
               <ReadField label="Name" value={req.customer.name} />
               <ReadField label="Email" value={req.customer.email} />
@@ -564,35 +491,24 @@ function RequestDetailPanel({
           {/* ── Order context */}
           <section>
             <SectionLabel>Order Context</SectionLabel>
-            <div className="rg-2"
-              style={{
-                display: "grid",
-                gridTemplateColumns: "1fr 1fr",
-                gap: "0.875rem",
-                marginBottom: "0.875rem",
-              }}
-            >
+            <div className="rg-2 grid grid-cols-2 gap-[0.875rem] mb-[0.875rem]">
               <ReadField label="Occasion" value={req.occasion} />
               <ReadField label="Needed By" value={req.neededBy} />
             </div>
             <ReadField label="Fabric Preference" value={req.fabricPreference} />
-            <div style={{ marginTop: "0.875rem" }}>
+            <div className="mt-[0.875rem]">
               <ReadField label="Colour Preference" value={req.colorPreference} />
             </div>
             {req.additionalNotes && (
-              <div style={{ marginTop: "0.875rem" }}>
-                <div style={{ fontSize: "0.62rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(43,35,32,0.38)", fontWeight: 500, marginBottom: "4px" }}>
+              <div className="mt-[0.875rem]">
+                <div className="uppercase font-medium mb-1 tracking-[0.1em]" style={{ fontSize: "0.62rem", color: "rgba(43,35,32,0.38)" }}>
                   Additional Notes
                 </div>
                 <div
+                  className="rounded-md p-3 leading-relaxed bg-[rgba(43,35,32,0.025)] border border-solid border-[rgba(43,35,32,0.07)]"
                   style={{
                     fontSize: "0.82rem",
                     color: C.charcoal,
-                    lineHeight: 1.6,
-                    backgroundColor: "rgba(43,35,32,0.025)",
-                    border: "1px solid rgba(43,35,32,0.07)",
-                    borderRadius: 6,
-                    padding: "0.75rem",
                   }}
                 >
                   {req.additionalNotes}
@@ -604,23 +520,14 @@ function RequestDetailPanel({
           {/* ── Measurements */}
           <section>
             <SectionLabel>Measurements</SectionLabel>
-            <div className="rg-3"
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(3, 1fr)",
-                gap: "0.625rem 0.875rem",
-                backgroundColor: "rgba(43,35,32,0.025)",
-                border: "1px solid rgba(43,35,32,0.07)",
-                borderRadius: 8,
-                padding: "1rem",
-              }}
+            <div className="rg-3 grid grid-cols-3 gap-y-[0.625rem] gap-x-[0.875rem] p-4 rounded-lg bg-[rgba(43,35,32,0.025)] border border-solid border-[rgba(43,35,32,0.07)]"
             >
               {req.measurements.map((m) => (
                 <div key={m.label}>
-                  <div style={{ fontSize: "0.6rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(43,35,32,0.38)", fontWeight: 500 }}>
+                  <div className="uppercase font-medium tracking-[0.1em]" style={{ fontSize: "0.6rem", color: "rgba(43,35,32,0.38)" }}>
                     {m.label}
                   </div>
-                  <div style={{ fontSize: "0.9rem", fontWeight: 600, color: C.charcoal, marginTop: "1px" }}>{m.value}</div>
+                  <div className="font-semibold mt-[1px]" style={{ fontSize: "0.9rem", color: C.charcoal }}>{m.value}</div>
                 </div>
               ))}
             </div>
@@ -630,30 +537,21 @@ function RequestDetailPanel({
           {req.refImages.length > 0 && (
             <section>
               <SectionLabel>Style References</SectionLabel>
-              <div style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap" }}>
+              <div className="flex gap-3 flex-wrap">
                 {req.refImages.map((img, i) => (
-                  <div key={i} style={{ position: "relative" }}>
+                  <div key={i} className="relative">
                     <RefSwatch bg={img.bg} size={88} />
                     <button
                       onClick={() => setZoomedImg(i)}
                       aria-label={`Zoom ${img.label}`}
+                      className="absolute bottom-1 right-1 border-none rounded text-white leading-none p-[3px] cursor-pointer flex"
                       style={{
-                        position: "absolute",
-                        bottom: 4,
-                        right: 4,
                         background: "rgba(43,35,32,0.55)",
-                        border: "none",
-                        borderRadius: 4,
-                        color: "#fff",
-                        lineHeight: 0,
-                        padding: "3px",
-                        cursor: "pointer",
-                        display: "flex",
                       }}
                     >
                       <ZoomIcon size={11} />
                     </button>
-                    <div style={{ fontSize: "0.62rem", color: "rgba(43,35,32,0.45)", marginTop: "4px", textAlign: "center" }}>
+                    <div className="text-center mt-1" style={{ fontSize: "0.62rem", color: "rgba(43,35,32,0.45)" }}>
                       {img.label}
                     </div>
                   </div>
@@ -665,21 +563,16 @@ function RequestDetailPanel({
           {/* ── Quote section */}
           {canSendQuote && (
             <section
-              style={{
-                backgroundColor: "rgba(212,169,78,0.05)",
-                border: "1px solid rgba(212,169,78,0.2)",
-                borderRadius: 8,
-                padding: "1.25rem",
-              }}
+              className="rounded-lg p-5 bg-[rgba(212,169,78,0.05)] border border-solid border-[rgba(212,169,78,0.2)]"
             >
               <SectionLabel color="#8A6818">Quote</SectionLabel>
-              <div className="rg-2" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem", marginBottom: "0.875rem" }}>
+              <div className="rg-2 grid grid-cols-2 gap-3 mb-[0.875rem]">
                 <div>
-                  <label style={{ display: "block", fontSize: "0.78rem", fontWeight: 500, color: C.charcoal, marginBottom: "0.375rem" }}>
+                  <label className="block font-medium mb-[0.375rem]" style={{ fontSize: "0.78rem", color: C.charcoal }}>
                     Price (CAD $)
                   </label>
-                  <div style={{ position: "relative" }}>
-                    <span style={{ position: "absolute", left: "0.625rem", top: "50%", transform: "translateY(-50%)", fontSize: "0.82rem", color: "rgba(43,35,32,0.4)", pointerEvents: "none" }}>
+                  <div className="relative">
+                    <span className="absolute left-[0.625rem] top-1/2 -translate-y-1/2 pointer-events-none" style={{ fontSize: "0.82rem", color: "rgba(43,35,32,0.4)" }}>
                       CAD $
                     </span>
                     <input
@@ -687,47 +580,34 @@ function RequestDetailPanel({
                       value={quotePrice}
                       onChange={(e) => setQuotePrice(e.target.value)}
                       placeholder="0.00"
+                      className="w-full pl-6 pr-3 py-2 rounded-md font-semibold outline-none box-border bg-white border border-solid border-[rgba(43,35,32,0.18)]"
                       style={{
-                        width: "100%",
-                        padding: "0.5rem 0.75rem 0.5rem 1.5rem",
-                        border: "1px solid rgba(43,35,32,0.18)",
-                        borderRadius: 6,
                         fontSize: "0.88rem",
-                        fontWeight: 600,
                         fontFamily: UI,
                         color: C.charcoal,
-                        outline: "none",
-                        boxSizing: "border-box",
-                        backgroundColor: "#fff",
                       }}
                     />
                   </div>
                 </div>
                 <div>
-                  <label style={{ display: "block", fontSize: "0.78rem", fontWeight: 500, color: C.charcoal, marginBottom: "0.375rem" }}>
+                  <label className="block font-medium mb-[0.375rem]" style={{ fontSize: "0.78rem", color: C.charcoal }}>
                     Est. Completion Date
                   </label>
                   <input
                     type="date"
                     value={completionDate}
                     onChange={(e) => setCompletionDate(e.target.value)}
+                    className="w-full px-3 py-2 rounded-md outline-none box-border bg-white border border-solid border-[rgba(43,35,32,0.18)]"
                     style={{
-                      width: "100%",
-                      padding: "0.5rem 0.75rem",
-                      border: "1px solid rgba(43,35,32,0.18)",
-                      borderRadius: 6,
                       fontSize: "0.82rem",
                       fontFamily: UI,
                       color: C.charcoal,
-                      outline: "none",
-                      boxSizing: "border-box",
-                      backgroundColor: "#fff",
                     }}
                   />
                 </div>
               </div>
-              <div style={{ marginBottom: "1rem" }}>
-                <label style={{ display: "block", fontSize: "0.78rem", fontWeight: 500, color: C.charcoal, marginBottom: "0.375rem" }}>
+              <div className="mb-4">
+                <label className="block font-medium mb-[0.375rem]" style={{ fontSize: "0.78rem", color: C.charcoal }}>
                   Notes to Customer
                 </label>
                 <textarea
@@ -735,36 +615,22 @@ function RequestDetailPanel({
                   value={quoteNote}
                   onChange={(e) => setQuoteNote(e.target.value)}
                   placeholder="e.g. We'll begin sourcing your Aso-Oke fabric this week. Fitting can be arranged via video call..."
+                  className="w-full px-3 py-2 rounded-md outline-none resize-y box-border leading-relaxed bg-white border border-solid border-[rgba(43,35,32,0.18)]"
                   style={{
-                    width: "100%",
-                    padding: "0.5rem 0.75rem",
-                    border: "1px solid rgba(43,35,32,0.18)",
-                    borderRadius: 6,
                     fontSize: "0.82rem",
                     fontFamily: UI,
                     color: C.charcoal,
-                    outline: "none",
-                    resize: "vertical",
-                    boxSizing: "border-box",
-                    lineHeight: 1.55,
-                    backgroundColor: "#fff",
                   }}
                 />
               </div>
               <button
                 onClick={() => onStatusChange(req.id, "quoted")}
+                className="w-full border-none rounded-md p-[0.65rem] font-semibold cursor-pointer tracking-[0.01em]"
                 style={{
-                  width: "100%",
                   backgroundColor: C.gold,
                   color: C.charcoal,
-                  border: "none",
-                  borderRadius: 6,
-                  padding: "0.65rem",
                   fontSize: "0.85rem",
-                  fontWeight: 600,
-                  cursor: "pointer",
                   fontFamily: UI,
-                  letterSpacing: "0.01em",
                 }}
               >
                 Send Quote to Customer
@@ -776,22 +642,15 @@ function RequestDetailPanel({
           {canProgress && (
             <section>
               <SectionLabel>Update Status</SectionLabel>
-              <div style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap" }}>
+              <div className="flex gap-3 flex-wrap">
                 {nextAction && (
                   <button
                     onClick={() => onStatusChange(req.id, nextAction.next)}
+                    className="flex-1 border-none rounded-md px-4 py-[0.6rem] font-semibold cursor-pointer whitespace-nowrap text-white"
                     style={{
-                      flex: 1,
                       backgroundColor: C.teal,
-                      color: "#fff",
-                      border: "none",
-                      borderRadius: 6,
-                      padding: "0.6rem 1rem",
                       fontSize: "0.82rem",
-                      fontWeight: 600,
-                      cursor: "pointer",
                       fontFamily: UI,
-                      whiteSpace: "nowrap",
                     }}
                   >
                     {nextAction.label}
@@ -800,17 +659,11 @@ function RequestDetailPanel({
                 {req.status !== "completed" && (
                   <button
                     onClick={() => setShowDecline((v) => !v)}
+                    className="bg-transparent rounded-md px-4 py-[0.6rem] font-medium cursor-pointer whitespace-nowrap border-[1.5px] border-solid border-[rgba(122,46,56,0.3)]"
                     style={{
-                      backgroundColor: "transparent",
                       color: C.maroon,
-                      border: `1.5px solid rgba(122,46,56,0.3)`,
-                      borderRadius: 6,
-                      padding: "0.6rem 1rem",
                       fontSize: "0.82rem",
-                      fontWeight: 500,
-                      cursor: "pointer",
                       fontFamily: UI,
-                      whiteSpace: "nowrap",
                     }}
                   >
                     Decline Request
@@ -819,8 +672,8 @@ function RequestDetailPanel({
               </div>
 
               {showDecline && (
-                <div style={{ marginTop: "0.875rem" }}>
-                  <label style={{ display: "block", fontSize: "0.78rem", fontWeight: 500, color: C.charcoal, marginBottom: "0.375rem" }}>
+                <div className="mt-[0.875rem]">
+                  <label className="block font-medium mb-[0.375rem]" style={{ fontSize: "0.78rem", color: C.charcoal }}>
                     Reason (sent to customer)
                   </label>
                   <textarea
@@ -828,33 +681,19 @@ function RequestDetailPanel({
                     value={declineReason}
                     onChange={(e) => setDeclineReason(e.target.value)}
                     placeholder="e.g. We're unable to meet the requested timeline for this garment type..."
+                    className="w-full px-3 py-2 rounded-md outline-none resize-y box-border leading-relaxed bg-white border border-solid border-[rgba(122,46,56,0.25)]"
                     style={{
-                      width: "100%",
-                      padding: "0.5rem 0.75rem",
-                      border: "1px solid rgba(122,46,56,0.25)",
-                      borderRadius: 6,
                       fontSize: "0.82rem",
                       fontFamily: UI,
                       color: C.charcoal,
-                      outline: "none",
-                      resize: "vertical",
-                      boxSizing: "border-box",
-                      lineHeight: 1.55,
-                      backgroundColor: "#fff",
                     }}
                   />
                   <button
                     onClick={() => { onStatusChange(req.id, "declined"); setShowDecline(false); }}
+                    className="mt-2 border-none rounded-md px-5 py-[0.55rem] font-semibold cursor-pointer text-white"
                     style={{
-                      marginTop: "0.5rem",
                       backgroundColor: C.maroon,
-                      color: "#fff",
-                      border: "none",
-                      borderRadius: 6,
-                      padding: "0.55rem 1.25rem",
                       fontSize: "0.8rem",
-                      fontWeight: 600,
-                      cursor: "pointer",
                       fontFamily: UI,
                     }}
                   >
@@ -868,25 +707,17 @@ function RequestDetailPanel({
           {/* ── Message Customer */}
           <section>
             <button
+              className="inline-flex items-center gap-[6px] bg-transparent rounded-md px-4 py-[0.55rem] font-medium cursor-pointer border border-solid border-[rgba(43,35,32,0.18)]"
               style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "6px",
-                backgroundColor: "transparent",
                 color: C.charcoal,
-                border: "1px solid rgba(43,35,32,0.18)",
-                borderRadius: 6,
-                padding: "0.55rem 1rem",
                 fontSize: "0.8rem",
-                fontWeight: 500,
-                cursor: "pointer",
                 fontFamily: UI,
               }}
             >
               <ChatIcon />
               Message Customer
             </button>
-            <p style={{ fontSize: "0.7rem", color: "rgba(43,35,32,0.38)", margin: "6px 0 0" }}>
+            <p className="m-[6px_0_0]" style={{ fontSize: "0.7rem", color: "rgba(43,35,32,0.38)" }}>
               Opens a message thread with {req.customer.name} pre-filled with this request&apos;s context.
             </p>
           </section>
@@ -897,19 +728,11 @@ function RequestDetailPanel({
       {zoomedImg !== null && (
         <div
           onClick={() => setZoomedImg(null)}
-          style={{
-            position: "fixed",
-            inset: 0,
-            zIndex: 300,
-            backgroundColor: "rgba(43,35,32,0.7)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
+          className="fixed inset-0 z-[300] flex items-center justify-center bg-[rgba(43,35,32,0.7)]"
         >
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "0.75rem" }}>
+          <div className="flex flex-col items-center gap-3">
             <RefSwatch bg={req.refImages[zoomedImg].bg} size={240} />
-            <span style={{ color: C.cream, fontSize: "0.78rem", opacity: 0.7 }}>
+            <span className="opacity-70" style={{ color: C.cream, fontSize: "0.78rem" }}>
               {req.refImages[zoomedImg].label} — click anywhere to close
             </span>
           </div>
@@ -924,13 +747,10 @@ function RequestDetailPanel({
 function SectionLabel({ children, color = "rgba(43,35,32,0.38)" }: { children: React.ReactNode; color?: string }) {
   return (
     <div
+      className="uppercase font-medium mb-[0.625rem] tracking-[0.1em]"
       style={{
         fontSize: "0.62rem",
-        letterSpacing: "0.1em",
-        textTransform: "uppercase",
         color,
-        fontWeight: 500,
-        marginBottom: "0.625rem",
       }}
     >
       {children}
@@ -952,25 +772,14 @@ function EmptyState({ tab }: { tab: TabKey }) {
   };
   return (
     <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        padding: "4rem 2rem",
-        gap: "0.75rem",
-        textAlign: "center",
-      }}
+      className="flex flex-col items-center justify-center p-[4rem_2rem] gap-3 text-center"
     >
       <div
+        className="flex items-center justify-center rounded-full"
         style={{
           width: 52,
           height: 52,
-          borderRadius: "50%",
           backgroundColor: "rgba(43,35,32,0.05)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
           color: "rgba(43,35,32,0.2)",
         }}
       >
@@ -978,8 +787,8 @@ function EmptyState({ tab }: { tab: TabKey }) {
           <path d="M12 20h9" /><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
         </svg>
       </div>
-      <p style={{ fontSize: "0.9rem", fontWeight: 600, color: C.charcoal, margin: 0 }}>{msgs[tab]}</p>
-      <p style={{ fontSize: "0.78rem", color: "rgba(43,35,32,0.42)", margin: 0, maxWidth: 280 }}>
+      <p className="font-semibold m-0" style={{ fontSize: "0.9rem", color: C.charcoal }}>{msgs[tab]}</p>
+      <p className="m-0 max-w-[280px]" style={{ fontSize: "0.78rem", color: "rgba(43,35,32,0.42)" }}>
         Custom order requests from buyers will appear here.
       </p>
     </div>
@@ -1013,35 +822,27 @@ export default function ConsoleCustomOrders() {
   }
 
   return (
-    <div className="console-page" style={{ padding: "1.75rem", fontFamily: UI }}>
+    <div className="console-page p-7" style={{ fontFamily: UI }}>
       {/* Page header */}
-      <div style={{ marginBottom: "1.5rem" }}>
+      <div className="mb-6">
         <h1
+          className="font-semibold m-0 tracking-[-0.02em]"
           style={{
             fontFamily: UI,
             fontSize: "1.35rem",
-            fontWeight: 600,
             color: C.charcoal,
-            letterSpacing: "-0.02em",
-            margin: 0,
           }}
         >
           Custom Order Requests
         </h1>
-        <p style={{ fontFamily: UI, fontSize: "0.78rem", color: "rgba(43,35,32,0.45)", margin: "4px 0 0" }}>
+        <p className="m-[4px_0_0]" style={{ fontFamily: UI, fontSize: "0.78rem", color: "rgba(43,35,32,0.45)" }}>
           Review made-to-measure requests from buyers and manage quotes
         </p>
       </div>
 
       {/* Status tabs */}
       <div
-        style={{
-          display: "flex",
-          gap: 0,
-          borderBottom: "1px solid rgba(43,35,32,0.1)",
-          marginBottom: "1.25rem",
-          overflowX: "auto",
-        }}
+        className="flex gap-0 mb-5 overflow-x-auto border-b border-solid border-[rgba(43,35,32,0.1)]"
       >
         {TABS.map((t) => {
           const isActive = activeTab === t.key;
@@ -1050,38 +851,24 @@ export default function ConsoleCustomOrders() {
             <button
               key={t.key}
               onClick={() => setActiveTab(t.key)}
+              className="inline-flex items-center gap-[6px] bg-none cursor-pointer whitespace-nowrap transition-colors duration-150 border-none border-b-2 border-solid px-[0.875rem] py-[0.575rem] -mb-[1px]"
               style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "6px",
-                background: "none",
-                border: "none",
-                borderBottom: `2px solid ${isActive ? C.gold : "transparent"}`,
-                padding: "0.575rem 0.875rem",
-                marginBottom: "-1px",
+                borderColor: isActive ? C.gold : "transparent",
                 fontSize: "0.8rem",
                 fontWeight: isActive ? 600 : 400,
                 color: isActive ? C.charcoal : "rgba(43,35,32,0.48)",
-                cursor: "pointer",
                 fontFamily: UI,
-                whiteSpace: "nowrap",
-                transition: "color 0.12s",
               }}
             >
               {t.label}
               <span
+                className="inline-flex items-center justify-center rounded-full font-bold px-1"
                 style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  justifyContent: "center",
                   minWidth: 18,
                   height: 18,
-                  borderRadius: 9,
                   backgroundColor: isActive ? C.maroon : "rgba(43,35,32,0.08)",
                   color: isActive ? "#fff" : "rgba(43,35,32,0.5)",
                   fontSize: "0.6rem",
-                  fontWeight: 700,
-                  padding: "0 4px",
                 }}
               >
                 {count}
@@ -1093,11 +880,11 @@ export default function ConsoleCustomOrders() {
 
       {/* Cards or empty state */}
       {filtered.length === 0 ? (
-        <div style={{ backgroundColor: "#fff", borderRadius: 8, border: "1px solid rgba(43,35,32,0.07)" }}>
+        <div className="bg-white rounded-lg border border-solid border-[rgba(43,35,32,0.07)]">
           <EmptyState tab={activeTab} />
         </div>
       ) : (
-        <div style={{ display: "flex", flexDirection: "column", gap: "0.875rem" }}>
+        <div className="flex flex-col gap-[0.875rem]">
           {filtered.map((req) => (
             <RequestCard key={req.id} req={req} onOpen={() => setSelectedId(req.id)} />
           ))}

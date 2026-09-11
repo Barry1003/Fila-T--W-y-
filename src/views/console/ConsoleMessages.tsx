@@ -192,17 +192,13 @@ function CustomerAvatar({ name, size = 28 }: { name: string; size?: number }) {
   const textColor = [C.teal, "#2E4A9E", C.maroon, "#8A6818"][name.charCodeAt(0) % 4];
   return (
     <div
+      className="rounded-full flex items-center justify-center shrink-0 font-bold tracking-[0.02em]"
       style={{
         width: size, height: size,
-        borderRadius: "50%",
         backgroundColor: color,
         color: textColor,
-        display: "flex", alignItems: "center", justifyContent: "center",
         fontSize: `${size * 0.38}px`,
-        fontWeight: 700,
-        flexShrink: 0,
         fontFamily: UI,
-        letterSpacing: "0.02em",
       }}
     >
       {initial}
@@ -217,19 +213,12 @@ function TagChip({ tag, tagLabel }: { tag: ConvTag; tagLabel?: string }) {
   const isOrder = tag === "order";
   return (
     <span
+      className="inline-flex items-center gap-[3px] font-medium px-[6px] py-[1px] rounded whitespace-nowrap tracking-[0.01em] border border-solid"
       style={{
-        display: "inline-flex",
-        alignItems: "center",
-        gap: "3px",
         fontSize: "0.62rem",
-        fontWeight: 500,
-        padding: "1px 6px",
-        borderRadius: 4,
         backgroundColor: isOrder ? "rgba(46,74,158,0.08)" : "rgba(212,169,78,0.12)",
         color: isOrder ? "#2E4A9E" : "#8A6818",
-        border: `1px solid ${isOrder ? "rgba(46,74,158,0.14)" : "rgba(212,169,78,0.22)"}`,
-        whiteSpace: "nowrap",
-        letterSpacing: "0.01em",
+        borderColor: isOrder ? "rgba(46,74,158,0.14)" : "rgba(212,169,78,0.22)",
       }}
     >
       {isOrder ? <PackageIcon /> : <PenIcon />}
@@ -310,36 +299,29 @@ export default function ConsoleMessages() {
   const panelHeight = "calc(100vh - 200px)";
 
   return (
-    <div className="console-page" style={{ padding: "1.75rem", fontFamily: UI, display: "flex", flexDirection: "column", gap: "1rem" }}>
+    <div className="console-page p-7 flex flex-col gap-4" style={{ fontFamily: UI }}>
 
       {/* ── Header row ────────────────────────────────── */}
-      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
+      <div className="flex items-start justify-between">
         <div>
-          <h1 style={{ fontFamily: UI, fontSize: "1.35rem", fontWeight: 600, color: C.charcoal, letterSpacing: "-0.02em", margin: 0 }}>
+          <h1 className="font-semibold m-0 tracking-[-0.02em]" style={{ fontFamily: UI, fontSize: "1.35rem", color: C.charcoal }}>
             Messages
           </h1>
-          <p style={{ fontFamily: UI, fontSize: "0.78rem", color: "rgba(43,35,32,0.45)", margin: "4px 0 0" }}>
+          <p className="m-[4px_0_0]" style={{ fontFamily: UI, fontSize: "0.78rem", color: "rgba(43,35,32,0.45)" }}>
             Customer conversations and support threads
           </p>
         </div>
 
         {/* Filter dropdown */}
-        <div style={{ position: "relative", display: "inline-flex", alignItems: "center" }}>
+        <div className="relative inline-flex items-center">
           <select
             value={filter}
             onChange={(e) => setFilter(e.target.value as Filter)}
+            className="font-medium bg-white rounded-md cursor-pointer outline-none appearance-none border border-solid border-[rgba(43,35,32,0.16)] py-2 pl-[0.875rem] pr-9"
             style={{
               fontFamily: UI,
               fontSize: "0.8rem",
               color: C.charcoal,
-              backgroundColor: "#fff",
-              border: "1px solid rgba(43,35,32,0.16)",
-              borderRadius: 6,
-              padding: "0.5rem 2.25rem 0.5rem 0.875rem",
-              appearance: "none",
-              cursor: "pointer",
-              outline: "none",
-              fontWeight: 500,
             }}
           >
             {(["all", "unread", "order", "custom"] as Filter[]).map((f) => (
@@ -348,7 +330,7 @@ export default function ConsoleMessages() {
               </option>
             ))}
           </select>
-          <span style={{ position: "absolute", right: "0.625rem", pointerEvents: "none", color: "rgba(43,35,32,0.4)", lineHeight: 0 }}>
+          <span className="absolute right-[0.625rem] pointer-events-none leading-none" style={{ color: "rgba(43,35,32,0.4)" }}>
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
               <polyline points="6 9 12 15 18 9" />
             </svg>
@@ -357,31 +339,18 @@ export default function ConsoleMessages() {
       </div>
 
       {/* ── Two-panel layout ─────────────────────────── */}
-      <div className="rg-split console-messages"
+      <div className="rg-split console-messages bg-white rounded-[10px] overflow-hidden border border-solid border-[rgba(43,35,32,0.09)] min-h-[520px] grid grid-cols-[288px_1fr]"
         style={{
-          display: "grid",
-          gridTemplateColumns: "288px 1fr",
-          border: "1px solid rgba(43,35,32,0.09)",
-          borderRadius: 10,
-          overflow: "hidden",
-          backgroundColor: "#fff",
           height: panelHeight,
-          minHeight: 520,
         }}
       >
         {/* ── Left: conversation list ─────────────────── */}
-        <div
-          style={{
-            borderRight: "1px solid rgba(43,35,32,0.09)",
-            display: "flex",
-            flexDirection: "column",
-            overflow: "hidden",
-          }}
+        <div className="flex flex-col overflow-hidden border-r border-solid border-[rgba(43,35,32,0.09)]"
         >
           {/* Search */}
-          <div style={{ padding: "0.875rem", borderBottom: "1px solid rgba(43,35,32,0.07)", flexShrink: 0 }}>
-            <div style={{ position: "relative" }}>
-              <span style={{ position: "absolute", left: "0.625rem", top: "50%", transform: "translateY(-50%)", color: "rgba(43,35,32,0.32)", lineHeight: 0 }}>
+          <div className="p-[0.875rem] shrink-0 border-b border-solid border-[rgba(43,35,32,0.07)]">
+            <div className="relative">
+              <span className="absolute left-[0.625rem] top-1/2 -translate-y-1/2 leading-none" style={{ color: "rgba(43,35,32,0.32)" }}>
                 <SearchIcon />
               </span>
               <input
@@ -389,18 +358,11 @@ export default function ConsoleMessages() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search conversations..."
+                className="w-full rounded-md outline-none box-border transition-colors duration-150 py-[0.48rem] pr-[0.625rem] pl-[2rem] border border-solid border-[rgba(43,35,32,0.12)] bg-[rgba(43,35,32,0.025)]"
                 style={{
-                  width: "100%",
-                  padding: "0.48rem 0.625rem 0.48rem 2rem",
-                  border: "1px solid rgba(43,35,32,0.12)",
-                  borderRadius: 6,
                   fontSize: "0.78rem",
                   fontFamily: UI,
                   color: C.charcoal,
-                  backgroundColor: "rgba(43,35,32,0.025)",
-                  outline: "none",
-                  boxSizing: "border-box",
-                  transition: "border-color 0.12s",
                 }}
                 onFocus={(e) => (e.target.style.borderColor = C.gold)}
                 onBlur={(e) => (e.target.style.borderColor = "rgba(43,35,32,0.12)")}
@@ -409,10 +371,10 @@ export default function ConsoleMessages() {
           </div>
 
           {/* List */}
-          <div style={{ flex: 1, overflowY: "auto" }}>
+          <div className="flex-1 overflow-y-auto">
             {filtered.length === 0 ? (
-              <div style={{ padding: "2rem 1rem", textAlign: "center" }}>
-                <p style={{ fontSize: "0.82rem", color: "rgba(43,35,32,0.4)", margin: 0 }}>No conversations found</p>
+              <div className="p-[2rem_1rem] text-center">
+                <p className="m-0" style={{ fontSize: "0.82rem", color: "rgba(43,35,32,0.4)" }}>No conversations found</p>
               </div>
             ) : (
               filtered.map((conv) => {
@@ -421,51 +383,40 @@ export default function ConsoleMessages() {
                   <button
                     key={conv.id}
                     onClick={() => selectConv(conv.id)}
+                    className="w-full text-left p-[0.875rem_0.875rem_0.875rem_0] cursor-pointer flex gap-[0.625rem] items-start transition-colors duration-150 border-none border-b border-solid border-b-[rgba(43,35,32,0.06)] border-l-[3px]"
                     style={{
-                      width: "100%",
-                      textAlign: "left",
-                      padding: "0.875rem 0.875rem 0.875rem 0",
-                      paddingLeft: 0,
                       background: isActive ? "rgba(212,169,78,0.07)" : "transparent",
-                      borderLeft: `3px solid ${isActive ? C.gold : "transparent"}`,
-                      borderRight: "none",
-                      borderTop: "none",
-                      borderBottom: "1px solid rgba(43,35,32,0.06)",
-                      cursor: "pointer",
-                      transition: "background 0.12s",
-                      display: "flex",
-                      gap: "0.625rem",
-                      alignItems: "flex-start",
+                      borderLeftColor: isActive ? C.gold : "transparent",
                     }}
                     onMouseEnter={(e) => { if (!isActive) e.currentTarget.style.background = "rgba(43,35,32,0.025)"; }}
                     onMouseLeave={(e) => { if (!isActive) e.currentTarget.style.background = "transparent"; }}
                   >
-                    <div style={{ paddingLeft: "0.75rem" }}>
+                    <div className="pl-3">
                       <CustomerAvatar name={conv.customerName} size={32} />
                     </div>
 
-                    <div style={{ flex: 1, minWidth: 0, paddingRight: "0.75rem" }}>
+                    <div className="flex-1 min-w-0 pr-3">
                       {/* Name + timestamp row */}
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "0.25rem", marginBottom: "2px" }}>
-                        <span style={{ fontSize: "0.8rem", fontWeight: conv.unread ? 700 : 500, color: C.charcoal, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", flex: 1 }}>
+                      <div className="flex justify-between items-center gap-1 mb-[2px]">
+                        <span className="flex-1 whitespace-nowrap overflow-hidden text-ellipsis" style={{ fontSize: "0.8rem", fontWeight: conv.unread ? 700 : 500, color: C.charcoal }}>
                           {conv.customerName}
                         </span>
-                        <div style={{ display: "flex", alignItems: "center", gap: "5px", flexShrink: 0 }}>
+                        <div className="flex items-center gap-[5px] shrink-0">
                           {conv.unread && (
-                            <span style={{ width: 7, height: 7, borderRadius: "50%", backgroundColor: C.gold, display: "block", flexShrink: 0 }} />
+                            <span className="w-[7px] h-[7px] rounded-full block shrink-0" style={{ backgroundColor: C.gold }} />
                           )}
-                          <span style={{ fontSize: "0.65rem", color: "rgba(43,35,32,0.35)", whiteSpace: "nowrap" }}>{conv.date}</span>
+                          <span className="whitespace-nowrap" style={{ fontSize: "0.65rem", color: "rgba(43,35,32,0.35)" }}>{conv.date}</span>
                         </div>
                       </div>
 
                       {/* Subject */}
-                      <div style={{ fontSize: "0.75rem", fontWeight: conv.unread ? 600 : 400, color: conv.unread ? C.charcoal : "rgba(43,35,32,0.6)", marginBottom: "3px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                      <div className="mb-[3px] whitespace-nowrap overflow-hidden text-ellipsis" style={{ fontSize: "0.75rem", fontWeight: conv.unread ? 600 : 400, color: conv.unread ? C.charcoal : "rgba(43,35,32,0.6)" }}>
                         {conv.subject}
                       </div>
 
                       {/* Preview + tag row */}
-                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "0.375rem" }}>
-                        <span style={{ fontSize: "0.72rem", color: "rgba(43,35,32,0.42)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", flex: 1 }}>
+                      <div className="flex items-center justify-between gap-[0.375rem]">
+                        <span className="flex-1 whitespace-nowrap overflow-hidden text-ellipsis" style={{ fontSize: "0.72rem", color: "rgba(43,35,32,0.42)" }}>
                           {conv.preview}
                         </span>
                         {conv.tag && <TagChip tag={conv.tag} tagLabel={conv.tagLabel} />}
@@ -480,28 +431,20 @@ export default function ConsoleMessages() {
 
         {/* ── Right: message thread ───────────────────── */}
         {active ? (
-          <div style={{ display: "flex", flexDirection: "column", height: "100%", minHeight: 0 }}>
+          <div className="flex flex-col h-full min-h-0">
 
             {/* Thread header */}
             <div
-              style={{
-                padding: "0.875rem 1.25rem",
-                borderBottom: "1px solid rgba(43,35,32,0.09)",
-                display: "flex",
-                alignItems: "center",
-                gap: "0.75rem",
-                flexShrink: 0,
-                backgroundColor: "#fff",
-              }}
+              className="p-[0.875rem_1.25rem] flex items-center gap-3 shrink-0 bg-white border-b border-solid border-[rgba(43,35,32,0.09)]"
             >
               <CustomerAvatar name={active.customerName} size={34} />
 
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: "0.875rem", fontWeight: 600, color: C.charcoal, marginBottom: "3px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+              <div className="flex-1 min-w-0">
+                <div className="font-semibold mb-[3px] overflow-hidden text-ellipsis whitespace-nowrap" style={{ fontSize: "0.875rem", color: C.charcoal }}>
                   {active.customerName}
                 </div>
-                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", flexWrap: "wrap" }}>
-                  <span style={{ fontSize: "0.72rem", color: "rgba(43,35,32,0.45)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="overflow-hidden text-ellipsis whitespace-nowrap" style={{ fontSize: "0.72rem", color: "rgba(43,35,32,0.45)" }}>
                     {active.subject}
                   </span>
                   {active.tag && <TagChip tag={active.tag} tagLabel={active.tagLabel} />}
@@ -511,22 +454,13 @@ export default function ConsoleMessages() {
               {/* Resolved toggle */}
               <button
                 onClick={() => markResolved(active.id)}
+                className="inline-flex items-center gap-[5px] rounded-md px-[0.75rem] py-[0.38rem] font-medium cursor-pointer shrink-0 transition-all duration-150 whitespace-nowrap border-[1.5px] border-solid"
                 style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: "5px",
-                  border: active.resolved ? `1.5px solid ${C.teal}` : "1.5px solid rgba(43,35,32,0.18)",
+                  borderColor: active.resolved ? C.teal : "rgba(43,35,32,0.18)",
                   backgroundColor: active.resolved ? "rgba(59,138,147,0.08)" : "transparent",
                   color: active.resolved ? C.teal : "rgba(43,35,32,0.55)",
-                  borderRadius: 6,
-                  padding: "0.38rem 0.75rem",
                   fontSize: "0.74rem",
-                  fontWeight: 500,
-                  cursor: "pointer",
                   fontFamily: UI,
-                  flexShrink: 0,
-                  transition: "all 0.15s",
-                  whiteSpace: "nowrap",
                 }}
               >
                 <CheckIcon />
@@ -536,65 +470,46 @@ export default function ConsoleMessages() {
 
             {/* Messages area */}
             <div
-              style={{
-                flex: 1,
-                overflowY: "auto",
-                padding: "1.375rem 1.25rem",
-                display: "flex",
-                flexDirection: "column",
-                gap: "1.1rem",
-                minHeight: 0,
-                backgroundColor: "rgba(43,35,32,0.012)",
-              }}
+              className="flex-1 overflow-y-auto p-[1.375rem_1.25rem] flex flex-col gap-[1.1rem] min-h-0 bg-[rgba(43,35,32,0.012)]"
             >
               {active.messages.map((msg) => {
                 const isOwner = msg.sender === "owner";
                 return (
                   <div
                     key={msg.id}
+                    className="flex items-end gap-2"
                     style={{
-                      display: "flex",
                       flexDirection: isOwner ? "row-reverse" : "row",
-                      alignItems: "flex-end",
-                      gap: "0.5rem",
                     }}
                   >
                     {/* Avatars */}
                     {isOwner ? (
                       <div
+                        className="w-7 h-7 rounded-full flex items-center justify-center shrink-0 mb-[18px] font-bold tracking-[0.03em]"
                         style={{
-                          width: 28, height: 28,
-                          borderRadius: "50%",
                           backgroundColor: C.gold,
                           color: C.charcoal,
-                          display: "flex", alignItems: "center", justifyContent: "center",
                           fontSize: "0.55rem",
-                          fontWeight: 700,
-                          flexShrink: 0,
-                          marginBottom: 18,
-                          letterSpacing: "0.03em",
                         }}
                       >
                         AO
                       </div>
                     ) : (
-                      <div style={{ marginBottom: 18, flexShrink: 0 }}>
+                      <div className="mb-[18px] shrink-0">
                         <CustomerAvatar name={active.customerName} size={28} />
                       </div>
                     )}
 
                     {/* Bubble */}
                     <div
+                      className="max-w-[68%] flex flex-col"
                       style={{
-                        maxWidth: "68%",
-                        display: "flex",
-                        flexDirection: "column",
                         alignItems: isOwner ? "flex-end" : "flex-start",
                       }}
                     >
                       <div
+                        className="px-4 py-[0.7rem]"
                         style={{
-                          padding: "0.7rem 1rem",
                           borderRadius: isOwner ? "14px 14px 4px 14px" : "14px 14px 14px 4px",
                           backgroundColor: isOwner ? C.maroon : "rgba(43,35,32,0.06)",
                           color: isOwner ? C.cream : C.charcoal,
@@ -605,7 +520,7 @@ export default function ConsoleMessages() {
                       >
                         {msg.text}
                       </div>
-                      <span style={{ fontFamily: UI, fontSize: "0.67rem", color: "rgba(43,35,32,0.35)", marginTop: "0.3rem" }}>
+                      <span className="mt-[0.3rem]" style={{ fontFamily: UI, fontSize: "0.67rem", color: "rgba(43,35,32,0.35)" }}>
                         {msg.timestamp}
                       </span>
                     </div>
@@ -617,30 +532,17 @@ export default function ConsoleMessages() {
 
             {/* Quick-reply templates */}
             <div
-              style={{
-                padding: "0.625rem 1.25rem 0",
-                display: "flex",
-                gap: "0.4rem",
-                flexWrap: "wrap",
-                borderTop: "1px solid rgba(43,35,32,0.06)",
-                backgroundColor: "#fff",
-              }}
+              className="p-[0.625rem_1.25rem_0] flex gap-[0.4rem] flex-wrap bg-white border-t border-solid border-[rgba(43,35,32,0.06)]"
             >
               {QUICK_REPLIES.map((reply) => (
                 <button
                   key={reply}
                   onClick={() => setDraft((prev) => (prev ? prev + " " + reply : reply))}
+                  className="rounded-full px-[10px] py-[3px] cursor-pointer whitespace-nowrap transition-colors duration-150 bg-[rgba(43,35,32,0.04)] border border-solid border-[rgba(43,35,32,0.12)]"
                   style={{
-                    background: "rgba(43,35,32,0.04)",
-                    border: "1px solid rgba(43,35,32,0.12)",
-                    borderRadius: 100,
-                    padding: "3px 10px",
                     fontSize: "0.7rem",
                     color: "rgba(43,35,32,0.65)",
-                    cursor: "pointer",
                     fontFamily: UI,
-                    whiteSpace: "nowrap",
-                    transition: "background 0.12s, border-color 0.12s",
                   }}
                   onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(212,169,78,0.1)"; e.currentTarget.style.borderColor = "rgba(212,169,78,0.25)"; e.currentTarget.style.color = "#8A6818"; }}
                   onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(43,35,32,0.04)"; e.currentTarget.style.borderColor = "rgba(43,35,32,0.12)"; e.currentTarget.style.color = "rgba(43,35,32,0.65)"; }}
@@ -652,29 +554,13 @@ export default function ConsoleMessages() {
 
             {/* Composer */}
             <div
-              style={{
-                padding: "0.625rem 1.25rem 1rem",
-                display: "flex",
-                gap: "0.5rem",
-                alignItems: "flex-end",
-                flexShrink: 0,
-                backgroundColor: "#fff",
-              }}
+              className="p-[0.625rem_1.25rem_1rem] flex gap-2 items-end shrink-0 bg-white"
             >
               <button
                 title="Attach file"
+                className="bg-none rounded-lg p-2 cursor-pointer flex items-center justify-center shrink-0 transition-colors duration-150 border border-solid border-[rgba(43,35,32,0.14)]"
                 style={{
-                  background: "none",
-                  border: "1px solid rgba(43,35,32,0.14)",
-                  borderRadius: 8,
-                  padding: "0.5rem",
-                  cursor: "pointer",
                   color: "rgba(43,35,32,0.35)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  flexShrink: 0,
-                  transition: "color 0.12s, border-color 0.12s",
                 }}
                 onMouseEnter={(e) => { e.currentTarget.style.color = C.charcoal; e.currentTarget.style.borderColor = "rgba(43,35,32,0.3)"; }}
                 onMouseLeave={(e) => { e.currentTarget.style.color = "rgba(43,35,32,0.35)"; e.currentTarget.style.borderColor = "rgba(43,35,32,0.14)"; }}
@@ -688,20 +574,12 @@ export default function ConsoleMessages() {
                 onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
                 placeholder="Reply to customer… (Enter to send, Shift+Enter for new line)"
                 rows={1}
+                className="flex-1 resize-none rounded-lg p-[0.52rem_0.75rem] outline-none transition-colors duration-150 overflow-y-hidden box-border border border-solid border-[rgba(43,35,32,0.14)] bg-[rgba(43,35,32,0.02)]"
                 style={{
-                  flex: 1,
-                  resize: "none",
-                  border: "1px solid rgba(43,35,32,0.14)",
-                  borderRadius: 8,
-                  padding: "0.52rem 0.75rem",
                   fontFamily: UI,
                   fontSize: "0.845rem",
                   color: C.charcoal,
-                  backgroundColor: "rgba(43,35,32,0.02)",
-                  outline: "none",
                   lineHeight: 1.5,
-                  transition: "border-color 0.12s",
-                  overflowY: "hidden",
                 }}
                 onFocus={(e) => (e.target.style.borderColor = C.gold)}
                 onBlur={(e) => (e.target.style.borderColor = "rgba(43,35,32,0.14)")}
@@ -709,22 +587,13 @@ export default function ConsoleMessages() {
 
               <button
                 onClick={sendMessage}
+                className="border-none rounded-lg p-[0.52rem_1rem] font-semibold flex items-center gap-[0.35rem] shrink-0 transition-all duration-120 tracking-[0.01em]"
                 style={{
                   backgroundColor: draft.trim() ? C.gold : "rgba(43,35,32,0.08)",
                   color: draft.trim() ? C.charcoal : "rgba(43,35,32,0.3)",
-                  border: "none",
-                  borderRadius: 8,
-                  padding: "0.52rem 1rem",
                   cursor: draft.trim() ? "pointer" : "default",
                   fontSize: "0.78rem",
-                  fontWeight: 600,
                   fontFamily: UI,
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "0.35rem",
-                  flexShrink: 0,
-                  transition: "all 0.12s",
-                  letterSpacing: "0.01em",
                 }}
               >
                 Send
@@ -734,11 +603,11 @@ export default function ConsoleMessages() {
           </div>
         ) : (
           /* No conversation selected */
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: "0.75rem", color: "rgba(43,35,32,0.28)" }}>
+          <div className="flex items-center justify-center flex-col gap-3" style={{ color: "rgba(43,35,32,0.28)" }}>
             <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round">
               <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
             </svg>
-            <p style={{ fontFamily: UI, fontSize: "0.85rem", color: "rgba(43,35,32,0.38)", margin: 0 }}>
+            <p className="m-0" style={{ fontFamily: UI, fontSize: "0.85rem", color: "rgba(43,35,32,0.38)" }}>
               Select a conversation to view messages
             </p>
           </div>

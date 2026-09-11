@@ -140,17 +140,19 @@ async function main() {
         categoryId: categories.get(p.category)!,
         tag: p.tag === 'SOLD OUT' ? 'SOLD_OUT' : p.tag === 'MADE TO ORDER' ? 'MADE_TO_ORDER' : 'NEW',
         status: 'PUBLISHED',
-        color: p.color,
         inStock: p.inStock,
         priceCad: p.cadNum,
         priceNgn: p.ngnNum,
         images: { create: [{ url: imageUrl(p.img), alt: p.title, position: 0 }] },
         variants: {
-          create: p.sizes.map(size => ({
-            size,
-            sku: `${slugify(p.title).slice(0, 24)}-${slugify(size)}`,
-            stock: p.inStock ? 12 : 0,
-          })),
+          create: p.colors.flatMap(color =>
+            p.sizes.map(size => ({
+              size,
+              color,
+              sku: `${slugify(p.title).slice(0, 24)}-${slugify(color)}-${slugify(size)}`.slice(0, 40),
+              stock: p.inStock ? 12 : 0,
+            }))
+          ),
         },
       },
     });

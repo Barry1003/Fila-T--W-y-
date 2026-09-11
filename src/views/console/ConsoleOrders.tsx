@@ -106,10 +106,9 @@ const PER_PAGE = 8;
 
 function Badge({ bg, color, label }: { bg: string; color: string; label: string }) {
   return (
-    <span style={{
-      display: "inline-block", padding: "2px 9px", borderRadius: 100,
-      fontSize: "0.67rem", fontWeight: 500, backgroundColor: bg, color,
-      whiteSpace: "nowrap", fontFamily: UI, letterSpacing: "0.01em",
+    <span className="inline-block px-[9px] py-[2px] rounded-full font-medium whitespace-nowrap tracking-[0.01em]" style={{
+      fontSize: "0.67rem", backgroundColor: bg, color,
+      fontFamily: UI,
     }}>
       {label}
     </span>
@@ -120,20 +119,18 @@ function Badge({ bg, color, label }: { bg: string; color: string; label: string 
 
 function SelectField({ value, onChange, options }: { value: string; onChange: (v: string) => void; options: string[] }) {
   return (
-    <div style={{ position: "relative", display: "inline-flex", alignItems: "center" }}>
+    <div className="relative inline-flex items-center">
       <select
         value={value}
         onChange={e => onChange(e.target.value)}
+        className="bg-white rounded-md cursor-pointer outline-none appearance-none border border-solid border-[rgba(43,35,32,0.14)] py-[0.45rem] pl-[0.75rem] pr-[2rem]"
         style={{
           fontFamily: UI, fontSize: "0.78rem", color: C.charcoal,
-          backgroundColor: "#fff", border: "1px solid rgba(43,35,32,0.14)",
-          borderRadius: 6, padding: "0.45rem 2rem 0.45rem 0.75rem",
-          appearance: "none", cursor: "pointer", outline: "none",
         }}
       >
         {options.map(o => <option key={o}>{o}</option>)}
       </select>
-      <span style={{ position: "absolute", right: "0.5rem", pointerEvents: "none", color: "rgba(43,35,32,0.4)", lineHeight: 0 }}>
+      <span className="absolute right-2 pointer-events-none leading-none" style={{ color: "rgba(43,35,32,0.4)" }}>
         <ChevronDown />
       </span>
     </div>
@@ -175,25 +172,25 @@ export default function ConsoleOrders({ orders }: { orders: OrderListRow[] }) {
   }
 
   return (
-    <div className="console-page" style={{ padding: "1.75rem", fontFamily: UI, minHeight: "100%" }}>
+    <div className="console-page p-7 min-h-full" style={{ fontFamily: UI }}>
 
       {/* ── Top row ──────────────────────────────────────── */}
-      <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: "1.5rem" }}>
+      <div className="flex items-end justify-between mb-6">
         <div>
-          <p style={{ fontSize: "0.7rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(43,35,32,0.4)", marginBottom: "0.2rem" }}>
+          <p className="uppercase mb-[0.2rem] m-[0_0_0.2rem] tracking-[0.1em]" style={{ fontSize: "0.7rem", color: "rgba(43,35,32,0.4)" }}>
             {filtered.length} order{filtered.length !== 1 ? "s" : ""}
           </p>
-          <h1 style={{ fontSize: "1.35rem", fontWeight: 600, color: C.charcoal, letterSpacing: "-0.02em", margin: 0 }}>
+          <h1 className="font-semibold m-0 tracking-[-0.02em]" style={{ fontSize: "1.35rem", color: C.charcoal }}>
             Orders
           </h1>
         </div>
-        <button style={{
-          display: "inline-flex", alignItems: "center", gap: "6px",
-          backgroundColor: "transparent", color: C.charcoal,
-          border: "1px solid rgba(43,35,32,0.18)", borderRadius: 7,
-          padding: "0.5rem 1rem", fontSize: "0.78rem", fontWeight: 500,
-          cursor: "pointer", fontFamily: UI, letterSpacing: "0.01em",
-        }}
+        <button
+          className="inline-flex items-center gap-[6px] bg-transparent rounded-[7px] px-4 py-2 font-medium cursor-pointer transition-colors duration-150 tracking-[0.01em] border border-solid border-[rgba(43,35,32,0.18)]"
+          style={{
+            color: C.charcoal,
+            fontSize: "0.78rem",
+            fontFamily: UI,
+          }}
           onMouseEnter={e => { (e.currentTarget as HTMLElement).style.backgroundColor = "rgba(43,35,32,0.04)"; }}
           onMouseLeave={e => { (e.currentTarget as HTMLElement).style.backgroundColor = "transparent"; }}
         >
@@ -202,35 +199,25 @@ export default function ConsoleOrders({ orders }: { orders: OrderListRow[] }) {
       </div>
 
       {/* ── Status tabs ───────────────────────────────────── */}
-      <div style={{
-        display: "flex", gap: 0, borderBottom: "1px solid rgba(43,35,32,0.1)",
-        marginBottom: "1rem", overflowX: "auto",
-      }}>
+      <div className="flex gap-0 mb-4 overflow-x-auto border-b border-solid border-[rgba(43,35,32,0.1)]">
         {TABS.map(t => {
           const active = activeTab === t.key;
           return (
             <button
               key={t.key}
               onClick={() => changeTab(t.key)}
+              className="inline-flex items-center gap-[6px] px-[0.875rem] py-[0.6rem] bg-none border-none cursor-pointer whitespace-nowrap transition-colors duration-120 mb-[-1px] border-b-2 border-solid"
               style={{
-                display: "inline-flex", alignItems: "center", gap: "6px",
-                padding: "0.6rem 0.875rem",
-                background: "none", border: "none", cursor: "pointer",
                 fontFamily: UI, fontSize: "0.78rem", fontWeight: active ? 600 : 400,
                 color: active ? C.charcoal : "rgba(43,35,32,0.48)",
-                borderBottom: active ? `2px solid ${C.gold}` : "2px solid transparent",
-                marginBottom: "-1px",
-                whiteSpace: "nowrap",
-                transition: "color 0.12s",
+                borderBottomColor: active ? C.gold : "transparent",
               }}
             >
               {t.label}
-              <span style={{
-                display: "inline-flex", alignItems: "center", justifyContent: "center",
-                minWidth: 18, height: 18, borderRadius: 9,
+              <span className="inline-flex items-center justify-center min-w-[18px] h-[18px] rounded-full font-bold px-1" style={{
                 backgroundColor: active ? C.maroon : "rgba(43,35,32,0.08)",
                 color: active ? "#fff" : "rgba(43,35,32,0.5)",
-                fontSize: "0.6rem", fontWeight: 700, padding: "0 4px",
+                fontSize: "0.6rem",
               }}>
                 {tabCounts[t.key]}
               </span>
@@ -240,15 +227,10 @@ export default function ConsoleOrders({ orders }: { orders: OrderListRow[] }) {
       </div>
 
       {/* ── Filters row ───────────────────────────────────── */}
-      <div style={{
-        backgroundColor: "#fff", borderRadius: 8,
-        border: "1px solid rgba(43,35,32,0.07)",
-        padding: "0.875rem 1.125rem", marginBottom: "1rem",
-        display: "flex", gap: "0.75rem", alignItems: "center", flexWrap: "wrap",
-      }}>
+      <div className="bg-white rounded-lg p-[0.875rem_1.125rem] mb-4 flex gap-3 items-center flex-wrap border border-solid border-[rgba(43,35,32,0.07)]">
         {/* Search */}
-        <div style={{ position: "relative", flex: "1 1 260px", minWidth: 200 }}>
-          <span style={{ position: "absolute", left: "0.625rem", top: "50%", transform: "translateY(-50%)", color: "rgba(43,35,32,0.35)", lineHeight: 0 }}>
+        <div className="relative min-w-[200px]" style={{ flex: "1 1 260px" }}>
+          <span className="absolute left-[0.625rem] top-1/2 -translate-y-1/2 leading-none" style={{ color: "rgba(43,35,32,0.35)" }}>
             <SearchIcon />
           </span>
           <input
@@ -256,19 +238,16 @@ export default function ConsoleOrders({ orders }: { orders: OrderListRow[] }) {
             placeholder="Search by order # or customer name..."
             value={search}
             onChange={e => { setSearch(e.target.value); setPage(1); }}
+            className="w-full rounded-md outline-none box-border bg-[rgba(43,35,32,0.03)] border border-solid border-[rgba(43,35,32,0.12)] py-[0.45rem] pr-[0.75rem] pl-[2.1rem]"
             style={{
               fontFamily: UI, fontSize: "0.78rem", color: C.charcoal,
-              backgroundColor: "rgba(43,35,32,0.03)",
-              border: "1px solid rgba(43,35,32,0.12)", borderRadius: 6,
-              padding: "0.45rem 0.75rem 0.45rem 2.1rem",
-              width: "100%", outline: "none", boxSizing: "border-box",
             }}
           />
         </div>
 
         {/* Date range */}
-        <div style={{ position: "relative", display: "inline-flex", alignItems: "center" }}>
-          <span style={{ position: "absolute", left: "0.625rem", color: "rgba(43,35,32,0.4)", lineHeight: 0, pointerEvents: "none" }}>
+        <div className="relative inline-flex items-center">
+          <span className="absolute left-[0.625rem] leading-none pointer-events-none" style={{ color: "rgba(43,35,32,0.4)" }}>
             <CalendarIcon />
           </span>
           <input
@@ -276,36 +255,31 @@ export default function ConsoleOrders({ orders }: { orders: OrderListRow[] }) {
             placeholder="Date range"
             value={dateRange}
             onChange={e => setDateRange(e.target.value)}
+            className="w-[150px] bg-white rounded-md outline-none border border-solid border-[rgba(43,35,32,0.14)] py-[0.45rem] pr-[0.75rem] pl-[2.1rem]"
             style={{
               fontFamily: UI, fontSize: "0.78rem", color: C.charcoal,
-              backgroundColor: "#fff", border: "1px solid rgba(43,35,32,0.14)",
-              borderRadius: 6, padding: "0.45rem 0.75rem 0.45rem 2.1rem",
-              width: 150, outline: "none",
             }}
           />
         </div>
 
-        <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: "0.5rem" }}>
-          <span style={{ fontSize: "0.72rem", color: "rgba(43,35,32,0.4)", whiteSpace: "nowrap" }}>Sort:</span>
+        <div className="ml-auto flex items-center gap-2">
+          <span className="whitespace-nowrap" style={{ fontSize: "0.72rem", color: "rgba(43,35,32,0.4)" }}>Sort:</span>
           <SelectField value={sort} onChange={setSort} options={SORTS} />
         </div>
       </div>
 
       {/* ── Table ─────────────────────────────────────────── */}
-      <div style={{
-        backgroundColor: "#fff", borderRadius: 8,
-        border: "1px solid rgba(43,35,32,0.07)", overflow: "hidden",
-      }}>
+      <div className="bg-white rounded-lg overflow-hidden border border-solid border-[rgba(43,35,32,0.07)]">
         {paginated.length === 0 ? (
           <EmptyState tab={activeTab} />
         ) : (
           <>
             <div className="table-scroll">
-              <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 760 }}>
+              <table className="w-full border-collapse min-w-[760px]">
                 <thead>
-                  <tr style={{ borderBottom: "1px solid rgba(43,35,32,0.07)" }}>
+                  <tr className="border-b border-solid border-[rgba(43,35,32,0.07)]">
                     {["Order #", "Date", "Customer", "Items", "Total", "Payment", "Status", "Actions"].map(h => (
-                      <th key={h} style={thStyle}>{h}</th>
+                      <th key={h} className="p-[0.5rem_1rem] text-left uppercase font-medium whitespace-nowrap tracking-[0.09em]" style={{ fontSize: "0.62rem", color: "rgba(43,35,32,0.38)", fontFamily: UI }}>{h}</th>
                     ))}
                   </tr>
                 </thead>
@@ -318,14 +292,11 @@ export default function ConsoleOrders({ orders }: { orders: OrderListRow[] }) {
             </div>
 
             {/* Pagination */}
-            <div style={{
-              display: "flex", alignItems: "center", justifyContent: "space-between",
-              padding: "0.875rem 1.25rem", borderTop: "1px solid rgba(43,35,32,0.06)",
-            }}>
+            <div className="flex items-center justify-between p-[0.875rem_1.25rem] border-t border-solid border-[rgba(43,35,32,0.06)]">
               <span style={{ fontSize: "0.72rem", color: "rgba(43,35,32,0.45)" }}>
                 Showing {Math.min((page - 1) * PER_PAGE + 1, filtered.length)}–{Math.min(page * PER_PAGE, filtered.length)} of {filtered.length}
               </span>
-              <div style={{ display: "flex", gap: "0.375rem", alignItems: "center" }}>
+              <div className="flex gap-[0.375rem] items-center">
                 <PagBtn onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1}>
                   <ChevronLeft />
                 </PagBtn>
@@ -354,71 +325,69 @@ function OrderRow({ order: o, alt }: { order: OrderListRow; alt: boolean }) {
 
   return (
     <tr
+      className="cursor-pointer transition-colors duration-100"
       style={{
         backgroundColor: hovering ? "rgba(212,169,78,0.04)" : alt ? "rgba(43,35,32,0.015)" : "transparent",
-        cursor: "pointer",
-        transition: "background-color 0.1s",
       }}
       onMouseEnter={() => setHovering(true)}
       onMouseLeave={() => setHovering(false)}
     >
       {/* Order # */}
-      <td style={td}>
+      <td className="p-[0.75rem_1rem] align-middle" style={{ fontFamily: UI }}>
         <Link
           to={`/console/orders/${o.id}`}
-          style={{ fontSize: "0.8rem", fontWeight: 700, color: C.maroon, textDecorationLine: "none", fontFamily: UI }}
+          className="font-bold no-underline"
+          style={{ fontSize: "0.8rem", color: C.maroon, fontFamily: UI }}
         >
           {o.number}
         </Link>
       </td>
 
       {/* Date */}
-      <td style={td}>
-        <span style={{ fontSize: "0.77rem", color: "rgba(43,35,32,0.55)", whiteSpace: "nowrap" }}>{o.placedAt}</span>
+      <td className="p-[0.75rem_1rem] align-middle" style={{ fontFamily: UI }}>
+        <span className="whitespace-nowrap" style={{ fontSize: "0.77rem", color: "rgba(43,35,32,0.55)" }}>{o.placedAt}</span>
       </td>
 
       {/* Customer */}
-      <td style={td}>
-        <div style={{ fontSize: "0.8rem", fontWeight: 500, color: C.charcoal }}>{o.customerName}</div>
-        <div style={{ fontSize: "0.67rem", color: "rgba(43,35,32,0.4)", marginTop: "1px" }}>{o.customerEmail}</div>
+      <td className="p-[0.75rem_1rem] align-middle" style={{ fontFamily: UI }}>
+        <div className="font-medium" style={{ fontSize: "0.8rem", color: C.charcoal }}>{o.customerName}</div>
+        <div className="mt-[1px]" style={{ fontSize: "0.67rem", color: "rgba(43,35,32,0.4)" }}>{o.customerEmail}</div>
       </td>
 
       {/* Items */}
-      <td style={td}>
+      <td className="p-[0.75rem_1rem] align-middle" style={{ fontFamily: UI }}>
         <div style={{ fontSize: "0.77rem", color: C.charcoal }}>
           {o.itemCount} item{o.itemCount !== 1 ? "s" : ""}
         </div>
-        <div style={{ fontSize: "0.67rem", color: "rgba(43,35,32,0.4)", marginTop: "1px", maxWidth: 180, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+        <div className="mt-[1px] max-w-[180px] overflow-hidden text-ellipsis whitespace-nowrap" style={{ fontSize: "0.67rem", color: "rgba(43,35,32,0.4)" }}>
           {o.itemLabels.join(", ")}
         </div>
       </td>
 
       {/* Total */}
-      <td style={td}>
-        <div style={{ fontSize: "0.8rem", fontWeight: 600, color: C.charcoal }}>CAD ${o.totalCad.toLocaleString()}</div>
+      <td className="p-[0.75rem_1rem] align-middle" style={{ fontFamily: UI }}>
+        <div className="font-semibold" style={{ fontSize: "0.8rem", color: C.charcoal }}>CAD ${o.totalCad.toLocaleString()}</div>
       </td>
 
       {/* Payment */}
-      <td style={td}>
+      <td className="p-[0.75rem_1rem] align-middle" style={{ fontFamily: UI }}>
         <Badge bg={pay.bg} color={pay.color} label={pay.label} />
       </td>
 
       {/* Status */}
-      <td style={td}>
+      <td className="p-[0.75rem_1rem] align-middle" style={{ fontFamily: UI }}>
         <Badge bg={fulfil.bg} color={fulfil.color} label={fulfil.label} />
       </td>
 
       {/* Actions */}
-      <td style={{ ...td, whiteSpace: "nowrap" }}>
-        <div style={{ display: "flex", gap: "0.375rem", alignItems: "center" }}>
+      <td className="p-[0.75rem_1rem] align-middle whitespace-nowrap" style={{ fontFamily: UI }}>
+        <div className="flex gap-[0.375rem] items-center">
           <Link
             to={`/console/orders/${o.id}`}
             title="View order"
+            className="inline-flex items-center justify-center w-7 h-7 rounded-[5px] bg-transparent no-underline leading-none transition-colors duration-150 border border-solid border-[rgba(43,35,32,0.14)]"
             style={{
-              display: "inline-flex", alignItems: "center", justifyContent: "center",
-              width: 28, height: 28, borderRadius: 5,
-              border: "1px solid rgba(43,35,32,0.14)", backgroundColor: "transparent",
-              color: "rgba(43,35,32,0.5)", textDecorationLine: "none", lineHeight: 0,
+              color: "rgba(43,35,32,0.5)",
             }}
             onMouseEnter={e => { (e.currentTarget as HTMLElement).style.backgroundColor = "rgba(43,35,32,0.04)"; (e.currentTarget as HTMLElement).style.color = C.charcoal; }}
             onMouseLeave={e => { (e.currentTarget as HTMLElement).style.backgroundColor = "transparent"; (e.currentTarget as HTMLElement).style.color = "rgba(43,35,32,0.5)"; }}
@@ -429,13 +398,11 @@ function OrderRow({ order: o, alt }: { order: OrderListRow; alt: boolean }) {
             <Link
               to={`/console/orders/${o.id}`}
               title="Mark as Shipped"
+              className="inline-flex items-center gap-1 px-2 h-7 rounded-[5px] font-semibold no-underline whitespace-nowrap transition-colors duration-150 tracking-[0.01em] border border-solid border-[rgba(212,169,78,0.25)] bg-[rgba(212,169,78,0.12)]"
               style={{
-                display: "inline-flex", alignItems: "center", gap: "4px",
-                padding: "0 0.5rem", height: 28, borderRadius: 5,
-                backgroundColor: "rgba(212,169,78,0.12)", color: "#8A6818",
-                border: "1px solid rgba(212,169,78,0.25)", fontSize: "0.68rem",
-                fontWeight: 600, fontFamily: UI, textDecorationLine: "none",
-                whiteSpace: "nowrap", letterSpacing: "0.01em",
+                color: "#8A6818",
+                fontSize: "0.68rem",
+                fontFamily: UI,
               }}
               onMouseEnter={e => { (e.currentTarget as HTMLElement).style.backgroundColor = C.gold; (e.currentTarget as HTMLElement).style.color = C.charcoal; }}
               onMouseLeave={e => { (e.currentTarget as HTMLElement).style.backgroundColor = "rgba(212,169,78,0.12)"; (e.currentTarget as HTMLElement).style.color = "#8A6818"; }}
@@ -461,15 +428,13 @@ function PagBtn({ children, onClick, disabled = false, active = false }: {
     <button
       onClick={onClick}
       disabled={disabled}
+      className="inline-flex items-center justify-center min-w-[28px] h-7 rounded-[5px] leading-none px-1 transition-colors duration-150 border border-solid border-[rgba(43,35,32,0.1)]"
       style={{
-        display: "inline-flex", alignItems: "center", justifyContent: "center",
-        minWidth: 28, height: 28, borderRadius: 5,
-        border: "1px solid rgba(43,35,32,0.1)",
         backgroundColor: active ? C.maroon : "transparent",
         color: disabled ? "rgba(43,35,32,0.2)" : active ? "#fff" : C.charcoal,
         cursor: disabled ? "default" : "pointer",
-        fontFamily: UI, fontSize: "0.75rem", lineHeight: 0,
-        fontWeight: active ? 600 : 400, padding: "0 4px",
+        fontFamily: UI, fontSize: "0.75rem",
+        fontWeight: active ? 600 : 400,
       }}
     >
       {children}
@@ -490,34 +455,15 @@ const TAB_COPY: Record<string, string> = {
 
 function EmptyState({ tab }: { tab: string }) {
   return (
-    <div style={{ padding: "4rem 2rem", display: "flex", flexDirection: "column", alignItems: "center", gap: "0.625rem" }}>
-      <div style={{ width: 44, height: 44, borderRadius: "50%", backgroundColor: "rgba(43,35,32,0.05)", display: "flex", alignItems: "center", justifyContent: "center", color: "rgba(43,35,32,0.25)", lineHeight: 0, marginBottom: "0.25rem" }}>
+    <div className="p-[4rem_2rem] flex flex-col items-center gap-[0.625rem]">
+      <div className="w-11 h-11 rounded-full flex items-center justify-center leading-none mb-1" style={{ backgroundColor: "rgba(43,35,32,0.05)", color: "rgba(43,35,32,0.25)" }}>
         <TruckIcon size={20} />
       </div>
-      <p style={{ fontSize: "0.9rem", fontWeight: 600, color: C.charcoal }}>{TAB_COPY[tab] ?? "No orders"}</p>
-      <p style={{ fontSize: "0.75rem", color: "rgba(43,35,32,0.42)", textAlign: "center", maxWidth: 280 }}>
+      <p className="font-semibold m-0" style={{ fontSize: "0.9rem", color: C.charcoal }}>{TAB_COPY[tab] ?? "No orders"}</p>
+      <p className="text-center max-w-[280px] m-0" style={{ fontSize: "0.75rem", color: "rgba(43,35,32,0.42)" }}>
         Orders placed in your store will appear here.
       </p>
     </div>
   );
 }
 
-// ── Shared styles ─────────────────────────────────────────────────────────────
-
-const thStyle: React.CSSProperties = {
-  padding: "0.5rem 1rem",
-  textAlign: "left",
-  fontSize: "0.62rem",
-  letterSpacing: "0.09em",
-  textTransform: "uppercase",
-  color: "rgba(43,35,32,0.38)",
-  fontWeight: 500,
-  fontFamily: UI,
-  whiteSpace: "nowrap",
-};
-
-const td: React.CSSProperties = {
-  padding: "0.75rem 1rem",
-  fontFamily: UI,
-  verticalAlign: "middle",
-};

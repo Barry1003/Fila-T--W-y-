@@ -8,8 +8,9 @@ import { z } from 'zod';
  *
  *  - `tag` is one value, not a set. The database column is a single nullable
  *    enum, so a form offering five checkboxes could never round-trip.
- *  - Colour belongs to the product, not the variant. `ProductVariant` is
- *    (size, stock) and is unique on (productId, size).
+ *  - Colour is per variant, not per product. A `ProductVariant` is
+ *    (size, colour, stock), so one product can come in several colours and
+ *    sizes, each with its own stock; a variant is unique on (size, colour).
  *  - Images are URLs. Until there is somewhere to upload files to, asking for a
  *    link is the honest version of an image picker.
  */
@@ -26,6 +27,7 @@ export const TAG_LABELS: Record<(typeof PRODUCT_TAGS)[number], string> = {
 
 export const variantSchema = z.object({
   size: z.string().trim().min(1, 'Give the size a name.').max(60),
+  color: z.string().trim().min(1, 'Give the colour a name.').max(60),
   stock: z.number().int().min(0, 'Stock cannot be negative.').max(100000),
 });
 
@@ -36,7 +38,6 @@ export const productSchema = z.object({
   title: z.string().trim().min(2, 'Give the product a name.').max(200),
   description: z.string().trim().max(4000).optional().or(z.literal('')),
   categoryId: z.string().trim().min(1, 'Choose a category.'),
-  color: z.string().trim().min(1, 'Give the product a colour.').max(60),
 
   /** Held in cents so the money never touches a float. */
   priceCadCents: z.number().int().min(1, 'Enter a price.').max(100_000_00),
@@ -49,15 +50,25 @@ export const productSchema = z.object({
   metaTitle: z.string().trim().max(200).optional().or(z.literal('')),
   metaDescription: z.string().trim().max(400).optional().or(z.literal('')),
 
-  imageUrls: z.array(z.string().trim().url('That is not a valid image URL.')).max(8),
+  images: z
+    .array(
+      z.object({
+        url: z.string().trim().url('That is not a valid image URL.'),
+        // "" is a general image, shown for every colour; a colour name ties it
+        // to that variant colour. Not checked against the variant list — a
+        // colour can be photographed before its stock is entered.
+        color: z.string().trim().max(60),
+      }),
+    )
+    .max(8),
 
   variants: z
     .array(variantSchema)
     .min(1, 'A product needs at least one size.')
     .max(30)
     .refine(
-      list => new Set(list.map(v => v.size.toLowerCase())).size === list.length,
-      'Two variants have the same size.',
+      list => new Set(list.map(v => `${v.size.toLowerCase()}|${v.color.toLowerCase()}`)).size === list.length,
+      'Two variants have the same size and colour combination.',
     ),
 });
 

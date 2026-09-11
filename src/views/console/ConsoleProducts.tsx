@@ -80,17 +80,11 @@ const STATUS_MAP: Record<Status, { label: string; bg: string; color: string }> =
 function StatusBadge({ status }: { status: Status }) {
   const s = STATUS_MAP[status];
   return (
-    <span style={{
-      display: "inline-block",
-      padding: "2px 9px",
-      borderRadius: 100,
+    <span className="inline-block px-[9px] py-[2px] rounded-full font-medium whitespace-nowrap tracking-[0.01em]" style={{
       fontSize: "0.67rem",
-      fontWeight: 500,
       backgroundColor: s.bg,
       color: s.color,
-      whiteSpace: "nowrap",
       fontFamily: UI,
-      letterSpacing: "0.01em",
     }}>
       {s.label}
     </span>
@@ -103,27 +97,20 @@ function StatusBadge({ status }: { status: Status }) {
 
 function SelectField({ value, onChange, options }: { value: string; onChange: (v: string) => void; options: string[] }) {
   return (
-    <div style={{ position: "relative", display: "inline-flex", alignItems: "center" }}>
+    <div className="relative inline-flex items-center">
       <select
         value={value}
         onChange={e => onChange(e.target.value)}
+        className="bg-white rounded-md cursor-pointer outline-none appearance-none min-w-[140px] border border-solid border-[rgba(43,35,32,0.14)] py-[0.45rem] pl-[0.75rem] pr-[2rem]"
         style={{
           fontFamily: UI,
           fontSize: "0.78rem",
           color: C.charcoal,
-          backgroundColor: "#fff",
-          border: "1px solid rgba(43,35,32,0.14)",
-          borderRadius: 6,
-          padding: "0.45rem 2rem 0.45rem 0.75rem",
-          appearance: "none",
-          cursor: "pointer",
-          outline: "none",
-          minWidth: 140,
         }}
       >
         {options.map(o => <option key={o} value={o}>{o}</option>)}
       </select>
-      <span style={{ position: "absolute", right: "0.5rem", pointerEvents: "none", color: "rgba(43,35,32,0.4)", lineHeight: 0 }}>
+      <span className="absolute right-2 pointer-events-none leading-none" style={{ color: "rgba(43,35,32,0.4)" }}>
         <ChevronIcon />
       </span>
     </div>
@@ -186,57 +173,37 @@ export default function ConsoleProducts({ products, categories }: { products: Co
   const hasBulk = selected.size > 0;
 
   return (
-    <div className="console-page" style={{ padding: "1.75rem", fontFamily: UI, minHeight: "100%" }}>
+    <div className="console-page p-7 min-h-full" style={{ fontFamily: UI }}>
 
       {/* ── Top action row ────────────────────────────────── */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "1.25rem" }}>
+      <div className="flex items-center justify-between mb-5">
         <div>
-          <p style={{ fontSize: "0.7rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(43,35,32,0.4)", marginBottom: "0.2rem" }}>
+          <p className="uppercase mb-[0.2rem] m-[0_0_0.2rem] tracking-[0.1em]" style={{ fontSize: "0.7rem", color: "rgba(43,35,32,0.4)" }}>
             {filtered.length} product{filtered.length !== 1 ? "s" : ""}
           </p>
-          <h1 style={{ fontSize: "1.35rem", fontWeight: 600, color: C.charcoal, letterSpacing: "-0.02em", margin: 0 }}>
+          <h1 className="font-semibold m-0 tracking-[-0.02em]" style={{ fontSize: "1.35rem", color: C.charcoal }}>
             Products
           </h1>
         </div>
         <Link
           to="/console/products/new"
+          className="inline-flex items-center gap-[6px] rounded-[7px] px-[1.125rem] py-[0.55rem] font-semibold cursor-pointer no-underline whitespace-nowrap tracking-[0.01em]"
           style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: "6px",
             backgroundColor: C.gold,
             color: C.charcoal,
-            border: "none",
-            borderRadius: 7,
-            padding: "0.55rem 1.125rem",
             fontSize: "0.8rem",
-            fontWeight: 600,
-            cursor: "pointer",
-            textDecorationLine: "none",
-            letterSpacing: "0.01em",
-            whiteSpace: "nowrap",
           }}
         >
-          <span style={{ fontSize: "1.05rem", lineHeight: 1 }}>+</span>
+          <span className="leading-none" style={{ fontSize: "1.05rem" }}>+</span>
           Add Product
         </Link>
       </div>
 
       {/* ── Filters row ───────────────────────────────────── */}
-      <div style={{
-        backgroundColor: "#fff",
-        borderRadius: 8,
-        border: "1px solid rgba(43,35,32,0.07)",
-        padding: "0.875rem 1.125rem",
-        marginBottom: "1rem",
-        display: "flex",
-        gap: "0.75rem",
-        alignItems: "center",
-        flexWrap: "wrap",
-      }}>
+      <div className="bg-white rounded-lg p-[0.875rem_1.125rem] mb-4 flex gap-3 items-center flex-wrap border border-solid border-[rgba(43,35,32,0.07)]">
         {/* Search */}
-        <div style={{ position: "relative", flex: "1 1 220px", minWidth: 180 }}>
-          <span style={{ position: "absolute", left: "0.625rem", top: "50%", transform: "translateY(-50%)", color: "rgba(43,35,32,0.35)", lineHeight: 0 }}>
+        <div className="relative min-w-[180px]" style={{ flex: "1 1 220px" }}>
+          <span className="absolute left-[0.625rem] top-1/2 -translate-y-1/2 leading-none" style={{ color: "rgba(43,35,32,0.35)" }}>
             <SearchInputIcon />
           </span>
           <input
@@ -244,17 +211,11 @@ export default function ConsoleProducts({ products, categories }: { products: Co
             placeholder="Search products..."
             value={search}
             onChange={e => { setSearch(e.target.value); setPage(1); }}
+            className="w-full rounded-md outline-none box-border bg-[rgba(43,35,32,0.03)] border border-solid border-[rgba(43,35,32,0.12)] py-[0.45rem] pr-[0.75rem] pl-[2.1rem]"
             style={{
               fontFamily: UI,
               fontSize: "0.78rem",
               color: C.charcoal,
-              backgroundColor: "rgba(43,35,32,0.03)",
-              border: "1px solid rgba(43,35,32,0.12)",
-              borderRadius: 6,
-              padding: "0.45rem 0.75rem 0.45rem 2.1rem",
-              width: "100%",
-              outline: "none",
-              boxSizing: "border-box",
             }}
           />
         </div>
@@ -262,42 +223,30 @@ export default function ConsoleProducts({ products, categories }: { products: Co
         <SelectField value={category} onChange={v => { setCategory(v); setPage(1); }} options={CATEGORIES} />
         <SelectField value={status} onChange={v => { setStatus(v); setPage(1); }} options={STATUSES} />
 
-        <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: "0.5rem" }}>
-          <span style={{ fontSize: "0.72rem", color: "rgba(43,35,32,0.4)", whiteSpace: "nowrap" }}>Sort:</span>
+        <div className="ml-auto flex items-center gap-2">
+          <span className="whitespace-nowrap" style={{ fontSize: "0.72rem", color: "rgba(43,35,32,0.4)" }}>Sort:</span>
           <SelectField value={sort} onChange={setSort} options={SORTS} />
         </div>
       </div>
 
       {/* ── Bulk action bar ───────────────────────────────── */}
       {hasBulk && (
-        <div style={{
+        <div className="rounded-[7px] p-[0.6rem_1.125rem] mb-3 flex items-center gap-4" style={{
           backgroundColor: C.charcoal,
-          borderRadius: 7,
-          padding: "0.6rem 1.125rem",
-          marginBottom: "0.75rem",
-          display: "flex",
-          alignItems: "center",
-          gap: "1rem",
         }}>
-          <span style={{ color: "#fff", fontSize: "0.78rem", fontWeight: 500 }}>
+          <span className="font-medium text-white" style={{ fontSize: "0.78rem" }}>
             {selected.size} item{selected.size !== 1 ? "s" : ""} selected
           </span>
-          <div style={{ flex: 1 }} />
+          <div className="flex-1" />
           {["Publish", "Unpublish", "Delete"].map(action => (
             <button
               key={action}
               onClick={() => setSelected(new Set())}
+              className="bg-[rgba(255,255,255,0.1)] border-none rounded-[5px] px-[0.875rem] py-[0.35rem] font-medium cursor-pointer tracking-[0.01em]"
               style={{
                 fontFamily: UI,
                 fontSize: "0.72rem",
-                fontWeight: 500,
                 color: action === "Delete" ? "#f87171" : "#fff",
-                backgroundColor: "rgba(255,255,255,0.1)",
-                border: "none",
-                borderRadius: 5,
-                padding: "0.35rem 0.875rem",
-                cursor: "pointer",
-                letterSpacing: "0.01em",
               }}
             >
               {action}
@@ -305,13 +254,10 @@ export default function ConsoleProducts({ products, categories }: { products: Co
           ))}
           <button
             onClick={() => setSelected(new Set())}
+            className="bg-none border-none cursor-pointer p-0"
             style={{
-              background: "none",
-              border: "none",
               color: "rgba(255,255,255,0.4)",
-              cursor: "pointer",
               fontSize: "0.72rem",
-              padding: 0,
             }}
           >
             ✕ Clear
@@ -320,30 +266,26 @@ export default function ConsoleProducts({ products, categories }: { products: Co
       )}
 
       {/* ── Table ─────────────────────────────────────────── */}
-      <div style={{
-        backgroundColor: "#fff",
-        borderRadius: 8,
-        border: "1px solid rgba(43,35,32,0.07)",
-        overflow: "hidden",
-      }}>
+      <div className="bg-white rounded-lg overflow-hidden border border-solid border-[rgba(43,35,32,0.07)]">
         {filtered.length === 0 ? (
           <EmptyState />
         ) : (
           <>
             <div className="table-scroll">
-              <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 640 }}>
+              <table className="w-full border-collapse min-w-[640px]">
                 <thead>
-                  <tr style={{ borderBottom: "1px solid rgba(43,35,32,0.07)" }}>
-                    <th style={thStyle}>
+                  <tr className="border-b border-solid border-[rgba(43,35,32,0.07)]">
+                    <th className="p-[0.5rem_1rem] text-left uppercase font-medium whitespace-nowrap tracking-[0.09em]" style={{ fontSize: "0.62rem", color: "rgba(43,35,32,0.38)", fontFamily: UI }}>
                       <input
                         type="checkbox"
                         checked={allOnPageSelected}
                         onChange={toggleAll}
-                        style={{ accentColor: C.maroon, cursor: "pointer" }}
+                        className="cursor-pointer"
+                        style={{ accentColor: C.maroon }}
                       />
                     </th>
                     {["Product", "Category", "Price", "Stock", "Status", "Actions"].map(h => (
-                      <th key={h} style={thStyle}>{h}</th>
+                      <th key={h} className="p-[0.5rem_1rem] text-left uppercase font-medium whitespace-nowrap tracking-[0.09em]" style={{ fontSize: "0.62rem", color: "rgba(43,35,32,0.38)", fontFamily: UI }}>{h}</th>
                     ))}
                   </tr>
                 </thead>
@@ -353,11 +295,11 @@ export default function ConsoleProducts({ products, categories }: { products: Co
                     return (
                       <tr
                         key={p.id}
+                        className="transition-colors duration-100"
                         style={{
                           backgroundColor: isSelected
                             ? "rgba(212,169,78,0.06)"
                             : i % 2 === 0 ? "transparent" : "rgba(43,35,32,0.015)",
-                          transition: "background-color 0.1s",
                         }}
                         onMouseEnter={e => {
                           if (!isSelected) (e.currentTarget as HTMLTableRowElement).style.backgroundColor = "rgba(212,169,78,0.04)";
@@ -367,30 +309,31 @@ export default function ConsoleProducts({ products, categories }: { products: Co
                         }}
                       >
                         {/* Checkbox */}
-                        <td style={tdCentered}>
+                        <td className="p-[0.75rem_1rem] align-middle text-center" style={{ fontFamily: UI }}>
                           <input
                             type="checkbox"
                             checked={isSelected}
                             onChange={() => toggleOne(p.id)}
-                            style={{ accentColor: C.maroon, cursor: "pointer" }}
+                            className="cursor-pointer"
+                            style={{ accentColor: C.maroon }}
                           />
                         </td>
 
                         {/* Product */}
-                        <td style={td}>
-                          <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+                        <td className="p-[0.75rem_1rem] align-middle" style={{ fontFamily: UI }}>
+                          <div className="flex items-center gap-3">
                             <img
                               src={p.imageUrl}
                               alt=""
                               width={38}
                               height={38}
-                              style={{ width: 38, height: 38, objectFit: "cover", borderRadius: 5, flexShrink: 0 }}
+                              className="w-[38px] h-[38px] object-cover rounded-[5px] shrink-0"
                             />
                             <div>
-                              <div style={{ fontSize: "0.8rem", fontWeight: 600, color: C.charcoal, lineHeight: 1.2 }}>
+                              <div className="font-semibold leading-snug" style={{ fontSize: "0.8rem", color: C.charcoal }}>
                                 {p.title}
                               </div>
-                              <div style={{ fontSize: "0.68rem", color: "rgba(43,35,32,0.4)", marginTop: "2px" }}>
+                              <div className="mt-[2px]" style={{ fontSize: "0.68rem", color: "rgba(43,35,32,0.4)" }}>
                                 #{p.id.toUpperCase()}
                               </div>
                             </div>
@@ -398,17 +341,17 @@ export default function ConsoleProducts({ products, categories }: { products: Co
                         </td>
 
                         {/* Category */}
-                        <td style={td}>
+                        <td className="p-[0.75rem_1rem] align-middle" style={{ fontFamily: UI }}>
                           <span style={{ fontSize: "0.77rem", color: "rgba(43,35,32,0.65)" }}>{p.category}</span>
                         </td>
 
                         {/* Price */}
-                        <td style={td}>
-                          <div style={{ fontSize: "0.8rem", fontWeight: 600, color: C.charcoal }}>CAD ${p.priceCad.toLocaleString()}</div>
+                        <td className="p-[0.75rem_1rem] align-middle" style={{ fontFamily: UI }}>
+                          <div className="font-semibold" style={{ fontSize: "0.8rem", color: C.charcoal }}>CAD ${p.priceCad.toLocaleString()}</div>
                         </td>
 
                         {/* Stock */}
-                        <td style={td}>
+                        <td className="p-[0.75rem_1rem] align-middle" style={{ fontFamily: UI }}>
                           <span style={{
                             fontSize: "0.8rem",
                             fontWeight: p.stock === 0 ? 600 : 400,
@@ -417,22 +360,23 @@ export default function ConsoleProducts({ products, categories }: { products: Co
                             {p.stock === 0 ? "—" : p.stock}
                           </span>
                           {p.stock > 0 && p.stock <= 3 && (
-                            <span style={{ marginLeft: 5, fontSize: "0.63rem", color: "#8A6818", fontWeight: 500 }}>low</span>
+                            <span className="ml-[5px] font-medium" style={{ fontSize: "0.63rem", color: "#8A6818" }}>low</span>
                           )}
                         </td>
 
                         {/* Status */}
-                        <td style={td}>
+                        <td className="p-[0.75rem_1rem] align-middle" style={{ fontFamily: UI }}>
                           <StatusBadge status={statusOf(p)} />
                         </td>
 
                         {/* Actions */}
-                        <td style={tdCentered}>
-                          <div style={{ display: "flex", gap: "0.375rem", alignItems: "center" }}>
+                        <td className="p-[0.75rem_1rem] align-middle text-center" style={{ fontFamily: UI }}>
+                          <div className="flex gap-[0.375rem] items-center justify-center">
                             <Link
                               to={`/console/products/${p.id}/edit`}
                               title="Edit"
-                              style={{ color: "rgba(43,35,32,0.45)", lineHeight: 0, display: "flex", textDecorationLine: "none" }}
+                              className="flex no-underline leading-none transition-colors duration-100"
+                              style={{ color: "rgba(43,35,32,0.45)" }}
                               onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = C.charcoal}
                               onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = "rgba(43,35,32,0.45)"}
                             >
@@ -440,7 +384,8 @@ export default function ConsoleProducts({ products, categories }: { products: Co
                             </Link>
                             <button
                               title="Duplicate"
-                              style={actionBtn}
+                              className="bg-none border-none cursor-pointer p-[3px] leading-none flex items-center transition-colors duration-100"
+                              style={{ color: "rgba(43,35,32,0.45)" }}
                               onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = C.charcoal}
                               onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = "rgba(43,35,32,0.45)"}
                             >
@@ -448,7 +393,8 @@ export default function ConsoleProducts({ products, categories }: { products: Co
                             </button>
                             <button
                               title="Delete"
-                              style={{ ...actionBtn }}
+                              className="bg-none border-none cursor-pointer p-[3px] leading-none flex items-center transition-colors duration-100"
+                              style={{ color: "rgba(43,35,32,0.45)" }}
                               onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = C.maroon}
                               onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = "rgba(43,35,32,0.45)"}
                             >
@@ -464,21 +410,20 @@ export default function ConsoleProducts({ products, categories }: { products: Co
             </div>
 
             {/* Pagination */}
-            <div style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              padding: "0.875rem 1.25rem",
-              borderTop: "1px solid rgba(43,35,32,0.06)",
-            }}>
+            <div className="flex items-center justify-between p-[0.875rem_1.25rem] border-t border-solid border-[rgba(43,35,32,0.06)]">
               <span style={{ fontSize: "0.72rem", color: "rgba(43,35,32,0.45)" }}>
                 Showing {Math.min((page - 1) * PER_PAGE + 1, filtered.length)}–{Math.min(page * PER_PAGE, filtered.length)} of {filtered.length}
               </span>
-              <div style={{ display: "flex", gap: "0.375rem", alignItems: "center" }}>
+              <div className="flex gap-[0.375rem] items-center">
                 <button
                   onClick={() => setPage(p => Math.max(1, p - 1))}
                   disabled={page === 1}
-                  style={pagBtn(page === 1)}
+                  className="inline-flex items-center justify-center w-7 h-7 rounded-[5px] bg-transparent leading-none border border-solid border-[rgba(43,35,32,0.1)]"
+                  style={{
+                    color: page === 1 ? "rgba(43,35,32,0.2)" : C.charcoal,
+                    cursor: page === 1 ? "default" : "pointer",
+                    fontFamily: UI, fontSize: "0.75rem",
+                  }}
                 >
                   <ChevronLeftIcon />
                 </button>
@@ -486,12 +431,13 @@ export default function ConsoleProducts({ products, categories }: { products: Co
                   <button
                     key={n}
                     onClick={() => setPage(n)}
+                    className="inline-flex items-center justify-center min-w-[28px] h-7 rounded-[5px] leading-none border border-solid border-[rgba(43,35,32,0.1)]"
                     style={{
-                      ...pagBtn(false),
                       backgroundColor: n === page ? C.maroon : "transparent",
                       color: n === page ? "#fff" : C.charcoal,
                       fontWeight: n === page ? 600 : 400,
-                      minWidth: 28,
+                      cursor: "pointer",
+                      fontFamily: UI, fontSize: "0.75rem",
                     }}
                   >
                     {n}
@@ -500,7 +446,12 @@ export default function ConsoleProducts({ products, categories }: { products: Co
                 <button
                   onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                   disabled={page === totalPages}
-                  style={pagBtn(page === totalPages)}
+                  className="inline-flex items-center justify-center w-7 h-7 rounded-[5px] bg-transparent leading-none border border-solid border-[rgba(43,35,32,0.1)]"
+                  style={{
+                    color: page === totalPages ? "rgba(43,35,32,0.2)" : C.charcoal,
+                    cursor: page === totalPages ? "default" : "pointer",
+                    fontFamily: UI, fontSize: "0.75rem",
+                  }}
                 >
                   <ChevronRightIcon />
                 </button>
@@ -517,112 +468,34 @@ export default function ConsoleProducts({ products, categories }: { products: Co
 
 function EmptyState() {
   return (
-    <div style={{
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center",
-      justifyContent: "center",
-      padding: "5rem 2rem",
-      gap: "1rem",
-    }}>
-      <div style={{
-        width: 52,
-        height: 52,
-        borderRadius: "50%",
+    <div className="flex flex-col items-center justify-center p-[5rem_2rem] gap-4">
+      <div className="w-[52px] h-[52px] rounded-full flex items-center justify-center mb-1" style={{
         backgroundColor: "rgba(212,169,78,0.12)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
         color: C.gold,
-        marginBottom: "0.25rem",
       }}>
         <TagIcon size={22} />
       </div>
-      <div style={{ textAlign: "center" }}>
-        <p style={{ fontSize: "0.95rem", fontWeight: 600, color: C.charcoal, marginBottom: "0.375rem" }}>
+      <div className="text-center">
+        <p className="font-semibold mb-[0.375rem] m-[0_0_0.375rem]" style={{ fontSize: "0.95rem", color: C.charcoal }}>
           You haven&apos;t added any products yet
         </p>
-        <p style={{ fontSize: "0.78rem", color: "rgba(43,35,32,0.45)" }}>
+        <p className="m-0" style={{ fontSize: "0.78rem", color: "rgba(43,35,32,0.45)" }}>
           Start building your catalogue — products you add will appear here.
         </p>
       </div>
       <Link
         to="/console/products/new"
+        className="mt-1 inline-flex items-center gap-[6px] rounded-[7px] px-5 py-[0.6rem] font-semibold cursor-pointer no-underline tracking-[0.01em]"
         style={{
-          marginTop: "0.25rem",
-          display: "inline-flex",
-          alignItems: "center",
-          gap: "6px",
           backgroundColor: C.gold,
           color: C.charcoal,
-          border: "none",
-          borderRadius: 7,
-          padding: "0.6rem 1.25rem",
           fontSize: "0.8rem",
-          fontWeight: 600,
-          cursor: "pointer",
-          textDecorationLine: "none",
-          letterSpacing: "0.01em",
         }}
       >
-        <span style={{ fontSize: "1.05rem", lineHeight: 1 }}>+</span>
+        <span className="leading-none" style={{ fontSize: "1.05rem" }}>+</span>
         Add Your First Product
       </Link>
     </div>
   );
 }
 
-// ── Style helpers ─────────────────────────────────────────────────────────────
-
-const thStyle: React.CSSProperties = {
-  padding: "0.5rem 1rem",
-  textAlign: "left",
-  fontSize: "0.62rem",
-  letterSpacing: "0.09em",
-  textTransform: "uppercase",
-  color: "rgba(43,35,32,0.38)",
-  fontWeight: 500,
-  fontFamily: UI,
-  whiteSpace: "nowrap",
-};
-
-const td: React.CSSProperties = {
-  padding: "0.75rem 1rem",
-  fontFamily: UI,
-  verticalAlign: "middle",
-};
-
-const tdCentered: React.CSSProperties = {
-  ...td,
-  textAlign: "center",
-};
-
-const actionBtn: React.CSSProperties = {
-  background: "none",
-  border: "none",
-  cursor: "pointer",
-  color: "rgba(43,35,32,0.45)",
-  padding: 3,
-  lineHeight: 0,
-  display: "flex",
-  alignItems: "center",
-  transition: "color 0.12s",
-};
-
-function pagBtn(disabled: boolean): React.CSSProperties {
-  return {
-    display: "inline-flex",
-    alignItems: "center",
-    justifyContent: "center",
-    width: 28,
-    height: 28,
-    borderRadius: 5,
-    border: "1px solid rgba(43,35,32,0.1)",
-    backgroundColor: "transparent",
-    color: disabled ? "rgba(43,35,32,0.2)" : C.charcoal,
-    cursor: disabled ? "default" : "pointer",
-    fontFamily: UI,
-    fontSize: "0.75rem",
-    lineHeight: 0,
-  };
-}

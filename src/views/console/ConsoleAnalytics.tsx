@@ -123,7 +123,12 @@ function Trend({ value, suffix = "%" }: { value: number; suffix?: string }) {
   const up = value >= 0;
   const col = up ? C.teal : "#B03A3A";
   return (
-    <span style={{ display: "inline-flex", alignItems: "center", gap: "3px", fontSize: "0.72rem", fontWeight: 500, color: col }}>
+    <span
+      className="inline-flex items-center gap-[3px] font-medium"
+      style={{
+        fontSize: "0.72rem",
+        color: col
+      }}>
       <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
         {up
           ? <><polyline points="23 6 13.5 15.5 8.5 10.5 1 18" /><polyline points="17 6 23 6 23 12" /></>
@@ -147,26 +152,21 @@ function StatCard({
   accentColor: string;
 }) {
   return (
-    <div style={{
-      backgroundColor: "#fff",
-      borderRadius: 8,
-      padding: "1.25rem",
-      border: "1px solid rgba(43,35,32,0.07)",
-      borderTop: `3px solid ${accentColor}`,
-      display: "flex",
-      flexDirection: "column",
-      gap: "0.25rem",
-    }}>
-      <div style={{ fontSize: "0.62rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(43,35,32,0.42)", fontWeight: 500, marginBottom: "0.25rem" }}>
+    <div
+      className="flex flex-col gap-1 p-5 rounded-lg bg-white border border-solid border-[rgba(43,35,32,0.07)]"
+      style={{
+        borderTop: `3px solid ${accentColor}`,
+      }}>
+      <div className="uppercase font-medium mb-1 tracking-[0.1em]" style={{ fontSize: "0.62rem", color: "rgba(43,35,32,0.42)" }}>
         {label}
       </div>
-      <div style={{ fontSize: "1.75rem", fontWeight: 700, color: C.charcoal, letterSpacing: "-0.03em", lineHeight: 1 }}>
+      <div className="font-bold leading-none tracking-[-0.03em]" style={{ fontSize: "1.75rem", color: C.charcoal }}>
         {primary}
       </div>
       {secondary && (
-        <div style={{ fontSize: "0.72rem", color: "rgba(43,35,32,0.38)", marginTop: "1px" }}>{secondary}</div>
+        <div className="mt-[1px]" style={{ fontSize: "0.72rem", color: "rgba(43,35,32,0.38)" }}>{secondary}</div>
       )}
-      <div style={{ marginTop: "0.5rem", display: "flex", alignItems: "center", gap: "6px" }}>
+      <div className="flex items-center gap-[6px] mt-2">
         <Trend value={trend} suffix={trendSuffix} />
         <span style={{ fontSize: "0.68rem", color: "rgba(43,35,32,0.35)" }}>vs previous period</span>
       </div>
@@ -207,7 +207,7 @@ function RevenueChart({ data, range }: { data: ChartPoint[]; range: DateRange })
       viewBox={`0 0 ${W} ${H}`}
       width="100%"
       height={H}
-      style={{ display: "block", overflow: "visible" }}
+      className="block overflow-visible"
       aria-label={`Revenue chart — ${RANGE_LABELS[range]}`}
     >
       <defs>
@@ -298,7 +298,7 @@ function DonutChart({ segments }: { segments: typeof CATEGORIES }) {
   let accDeg = -90;
 
   return (
-    <svg viewBox="0 0 160 160" width="160" height="160" style={{ flexShrink: 0 }}>
+    <svg viewBox="0 0 160 160" width="160" height="160" className="shrink-0">
       <circle cx={cx} cy={cy} r={r} fill="none" stroke="rgba(43,35,32,0.05)" strokeWidth={sw} />
       {segments.map((seg, i) => {
         const dash = (seg.pct / 100) * circ - 2;
@@ -332,20 +332,18 @@ function DonutChart({ segments }: { segments: typeof CATEGORIES }) {
 
 function InsightCard({ label, value, sub, accentColor }: { label: string; value: string; sub?: string; accentColor: string }) {
   return (
-    <div style={{
-      backgroundColor: "#fff",
-      borderRadius: 8,
-      padding: "1rem 1.125rem",
-      border: "1px solid rgba(43,35,32,0.07)",
-      borderLeft: `3px solid ${accentColor}`,
-    }}>
-      <div style={{ fontSize: "0.6rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(43,35,32,0.4)", fontWeight: 500, marginBottom: "0.25rem" }}>
+    <div
+      className="p-[1rem_1.125rem] rounded-lg bg-white border border-solid border-[rgba(43,35,32,0.07)]"
+      style={{
+        borderLeft: `3px solid ${accentColor}`,
+      }}>
+      <div className="uppercase font-medium mb-1 tracking-[0.1em]" style={{ fontSize: "0.6rem", color: "rgba(43,35,32,0.4)" }}>
         {label}
       </div>
-      <div style={{ fontSize: "1.4rem", fontWeight: 700, color: C.charcoal, letterSpacing: "-0.025em", lineHeight: 1.1 }}>
+      <div className="font-bold leading-[1.1] tracking-[-0.025em]" style={{ fontSize: "1.4rem", color: C.charcoal }}>
         {value}
       </div>
-      {sub && <div style={{ fontSize: "0.7rem", color: "rgba(43,35,32,0.42)", marginTop: "3px" }}>{sub}</div>}
+      {sub && <div className="mt-[3px]" style={{ fontSize: "0.7rem", color: "rgba(43,35,32,0.42)" }}>{sub}</div>}
     </div>
   );
 }
@@ -354,7 +352,7 @@ function InsightCard({ label, value, sub, accentColor }: { label: string; value:
 
 function SectionHead({ children }: { children: React.ReactNode }) {
   return (
-    <div style={{ fontSize: "0.8rem", fontWeight: 600, color: C.charcoal, marginBottom: "1rem" }}>
+    <div className="font-semibold mb-4" style={{ fontSize: "0.8rem", color: C.charcoal }}>
       {children}
     </div>
   );
@@ -362,22 +360,19 @@ function SectionHead({ children }: { children: React.ReactNode }) {
 
 // ── Card wrapper ──────────────────────────────────────────────────────────────
 
-function Card({ children, style }: { children: React.ReactNode; style?: React.CSSProperties }) {
+function Card({ children, style, className }: { children: React.ReactNode; style?: React.CSSProperties; className?: string }) {
   return (
-    <div style={{
-      backgroundColor: "#fff",
-      borderRadius: 8,
-      border: "1px solid rgba(43,35,32,0.07)",
-      overflow: "hidden",
-      ...style,
-    }}>
+    <div
+      className={["rounded-lg overflow-hidden bg-white border border-solid border-[rgba(43,35,32,0.07)]", className].filter(Boolean).join(" ")}
+      style={style}
+    >
       {children}
     </div>
   );
 }
 
-function CardBody({ children, style }: { children: React.ReactNode; style?: React.CSSProperties }) {
-  return <div style={{ padding: "1.25rem", ...style }}>{children}</div>;
+function CardBody({ children, style, className }: { children: React.ReactNode; style?: React.CSSProperties; className?: string }) {
+  return <div className={["p-5", className].filter(Boolean).join(" ")} style={style}>{children}</div>;
 }
 
 // ── Main page ─────────────────────────────────────────────────────────────────
@@ -390,42 +385,35 @@ export default function ConsoleAnalytics() {
   const maxRegionOrders = Math.max(...REGIONS.map((r) => r.orders));
 
   return (
-    <div className="console-page" style={{ padding: "1.75rem", fontFamily: UI, display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+    <div className="console-page flex flex-col gap-5 p-7" style={{ fontFamily: UI }}>
 
       {/* ── Page header row ──────────────────────────────── */}
-      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
+      <div className="flex items-start justify-between">
         <div>
-          <h1 style={{ fontFamily: UI, fontSize: "1.35rem", fontWeight: 600, color: C.charcoal, letterSpacing: "-0.02em", margin: 0 }}>
+          <h1 className="font-semibold m-0 tracking-[-0.02em]" style={{ fontFamily: UI, fontSize: "1.35rem", color: C.charcoal }}>
             Analytics
           </h1>
-          <p style={{ fontFamily: UI, fontSize: "0.78rem", color: "rgba(43,35,32,0.45)", margin: "4px 0 0" }}>
+          <p className="m-[4px_0_0]" style={{ fontFamily: UI, fontSize: "0.78rem", color: "rgba(43,35,32,0.45)" }}>
             Store performance overview
           </p>
         </div>
         {/* Date range selector */}
-        <div style={{ position: "relative", display: "inline-flex", alignItems: "center" }}>
+        <div className="relative inline-flex items-center">
           <select
             value={range}
             onChange={(e) => setRange(e.target.value as DateRange)}
+            className="appearance-none cursor-pointer outline-none font-medium bg-white rounded-md border border-solid border-[rgba(43,35,32,0.16)] py-2 pl-[0.875rem] pr-9"
             style={{
               fontFamily: UI,
               fontSize: "0.8rem",
               color: C.charcoal,
-              backgroundColor: "#fff",
-              border: "1px solid rgba(43,35,32,0.16)",
-              borderRadius: 6,
-              padding: "0.5rem 2.25rem 0.5rem 0.875rem",
-              appearance: "none",
-              cursor: "pointer",
-              outline: "none",
-              fontWeight: 500,
             }}
           >
             <option value="7d">Last 7 days</option>
             <option value="30d">Last 30 days</option>
             <option value="90d">Last 90 days</option>
           </select>
-          <span style={{ position: "absolute", right: "0.625rem", pointerEvents: "none", color: "rgba(43,35,32,0.4)", lineHeight: 0 }}>
+          <span className="absolute right-[0.625rem] pointer-events-none leading-none" style={{ color: "rgba(43,35,32,0.4)" }}>
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
               <polyline points="6 9 12 15 18 9" />
             </svg>
@@ -434,7 +422,7 @@ export default function ConsoleAnalytics() {
       </div>
 
       {/* ── Top stat cards ────────────────────────────────── */}
-      <div className="rg-4" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "1rem" }}>
+      <div className="rg-4 grid grid-cols-[repeat(4,1fr)] gap-4">
         <StatCard
           label="Total Revenue"
           primary={fmtCad(stats.revenue)}
@@ -465,17 +453,17 @@ export default function ConsoleAnalytics() {
       {/* ── Revenue trend chart ───────────────────────────── */}
       <Card>
         <CardBody>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "1.25rem" }}>
+          <div className="flex items-center justify-between mb-5">
             <div>
-              <div style={{ fontSize: "0.8rem", fontWeight: 600, color: C.charcoal, marginBottom: "2px" }}>
+              <div className="font-semibold mb-[2px]" style={{ fontSize: "0.8rem", color: C.charcoal }}>
                 Revenue Trend
               </div>
               <div style={{ fontSize: "0.7rem", color: "rgba(43,35,32,0.4)" }}>
                 {RANGE_LABELS[range]}
               </div>
             </div>
-            <div style={{ display: "flex", alignItems: "baseline", gap: "8px" }}>
-              <span style={{ fontSize: "1.5rem", fontWeight: 700, color: C.charcoal, letterSpacing: "-0.03em" }}>
+            <div className="flex items-baseline gap-2">
+              <span className="font-bold tracking-[-0.03em]" style={{ fontSize: "1.5rem", color: C.charcoal }}>
                 {fmtCad(stats.revenue)}
               </span>
               <Trend value={stats.revTrend} />
@@ -486,55 +474,48 @@ export default function ConsoleAnalytics() {
       </Card>
 
       {/* ── Two-column: Products + Categories ─────────────── */}
-      <div className="rg-split" style={{ display: "grid", gridTemplateColumns: "1fr 360px", gap: "1rem" }}>
+      <div className="rg-split grid grid-cols-[1fr_360px] gap-4">
 
         {/* Top Products */}
         <Card>
           <CardBody>
             <SectionHead>Top Products</SectionHead>
-            <div style={{ display: "flex", flexDirection: "column", gap: "0.125rem" }}>
+            <div className="flex flex-col gap-[0.125rem]">
               {TOP_PRODUCTS.map((p, i) => {
                 const barPct = (p.revenue / maxRevenue) * 100;
                 return (
                   <div
                     key={p.name}
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "0.875rem",
-                      padding: "0.625rem 0.75rem",
-                      borderRadius: 6,
-                      backgroundColor: i % 2 === 0 ? "transparent" : "rgba(43,35,32,0.018)",
-                    }}
+                    className={`flex items-center gap-[0.875rem] py-[0.625rem] px-3 rounded-[6px] ${i % 2 === 0 ? 'bg-transparent' : 'bg-[rgba(43,35,32,0.018)]'}`}
                   >
                     {/* Rank */}
-                    <span style={{ fontSize: "0.72rem", fontWeight: 600, color: "rgba(43,35,32,0.3)", width: 16, textAlign: "center", flexShrink: 0 }}>
+                    <span className="font-semibold text-center shrink-0 w-4" style={{ fontSize: "0.72rem", color: "rgba(43,35,32,0.3)" }}>
                       {i + 1}
                     </span>
 
                     {/* Name + category */}
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontSize: "0.82rem", fontWeight: 500, color: C.charcoal, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                    <div className="flex-1 min-w-0">
+                      <div className="font-medium whitespace-nowrap overflow-hidden text-ellipsis" style={{ fontSize: "0.82rem", color: C.charcoal }}>
                         {p.name}
                       </div>
-                      <div style={{ fontSize: "0.66rem", color: "rgba(43,35,32,0.4)", marginTop: "1px" }}>{p.category}</div>
+                      <div className="mt-[1px]" style={{ fontSize: "0.66rem", color: "rgba(43,35,32,0.4)" }}>{p.category}</div>
                     </div>
 
                     {/* Bar */}
-                    <div style={{ width: 100, flexShrink: 0 }}>
-                      <div style={{ height: 5, borderRadius: 3, backgroundColor: "rgba(43,35,32,0.08)", overflow: "hidden" }}>
-                        <div style={{ height: "100%", width: `${barPct}%`, borderRadius: 3, backgroundColor: C.gold }} />
+                    <div className="w-[100px] shrink-0">
+                      <div className="h-[5px] rounded-[3px] overflow-hidden bg-[rgba(43,35,32,0.08)]">
+                        <div className="h-full rounded-[3px]" style={{ width: `${barPct}%`, backgroundColor: C.gold }} />
                       </div>
                     </div>
 
                     {/* Units */}
-                    <div style={{ width: 52, textAlign: "right", flexShrink: 0 }}>
+                    <div className="w-[52px] text-right shrink-0">
                       <div style={{ fontSize: "0.72rem", color: "rgba(43,35,32,0.5)" }}>{p.units} sold</div>
                     </div>
 
                     {/* Revenue */}
-                    <div style={{ width: 64, textAlign: "right", flexShrink: 0 }}>
-                      <div style={{ fontSize: "0.82rem", fontWeight: 600, color: C.charcoal }}>
+                    <div className="w-[64px] text-right shrink-0">
+                      <div className="font-semibold" style={{ fontSize: "0.82rem", color: C.charcoal }}>
                         {fmtCad(p.revenue)}
                       </div>
                     </div>
@@ -547,22 +528,22 @@ export default function ConsoleAnalytics() {
 
         {/* Sales by Category */}
         <Card>
-          <CardBody style={{ display: "flex", flexDirection: "column", height: "100%", boxSizing: "border-box" }}>
+          <CardBody className="flex flex-col h-full box-border">
             <SectionHead>Sales by Category</SectionHead>
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "1.25rem" }}>
+            <div className="flex flex-col items-center gap-5">
               {/* Donut */}
               <DonutChart segments={CATEGORIES} />
 
               {/* Legend */}
-              <div style={{ width: "100%", display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+              <div className="w-full flex flex-col gap-2">
                 {CATEGORIES.map((cat) => (
-                  <div key={cat.name} style={{ display: "flex", alignItems: "center", gap: "0.625rem" }}>
-                    <span style={{ width: 10, height: 10, borderRadius: 2, backgroundColor: cat.color, flexShrink: 0, display: "block" }} />
-                    <span style={{ flex: 1, fontSize: "0.77rem", color: C.charcoal }}>{cat.name}</span>
-                    <span style={{ fontSize: "0.77rem", fontWeight: 600, color: C.charcoal }}>{cat.pct}%</span>
+                  <div key={cat.name} className="flex items-center gap-[0.625rem]">
+                    <span className="w-[10px] h-[10px] rounded-[2px] shrink-0 block" style={{ backgroundColor: cat.color }} />
+                    <span className="flex-1" style={{ fontSize: "0.77rem", color: C.charcoal }}>{cat.name}</span>
+                    <span className="font-semibold" style={{ fontSize: "0.77rem", color: C.charcoal }}>{cat.pct}%</span>
                     {/* Mini bar */}
-                    <div style={{ width: 50, height: 4, borderRadius: 2, backgroundColor: "rgba(43,35,32,0.07)", overflow: "hidden" }}>
-                      <div style={{ height: "100%", width: `${cat.pct * (100 / 34)}%`, backgroundColor: cat.color, borderRadius: 2 }} />
+                    <div className="w-[50px] h-1 rounded-[2px] overflow-hidden bg-[rgba(43,35,32,0.07)]">
+                      <div className="h-full rounded-[2px]" style={{ width: `${cat.pct * (100 / 34)}%`, backgroundColor: cat.color }} />
                     </div>
                   </div>
                 ))}
@@ -574,10 +555,10 @@ export default function ConsoleAnalytics() {
 
       {/* ── Traffic & customer insight cards ──────────────── */}
       <div>
-        <div style={{ fontSize: "0.7rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(43,35,32,0.38)", fontWeight: 500, marginBottom: "0.75rem" }}>
+        <div className="uppercase font-medium mb-3 tracking-[0.1em]" style={{ fontSize: "0.7rem", color: "rgba(43,35,32,0.38)" }}>
           Traffic & Customers
         </div>
-        <div className="rg-4" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "0.875rem" }}>
+        <div className="rg-4 grid grid-cols-[repeat(4,1fr)] gap-[0.875rem]">
           <InsightCard
             label="New Customers"
             value={String(stats.newCustomers)}
@@ -609,25 +590,24 @@ export default function ConsoleAnalytics() {
       <Card>
         <CardBody>
           <SectionHead>Orders by Region</SectionHead>
-          <div style={{ display: "flex", flexDirection: "column", gap: "0.625rem" }}>
+          <div className="flex flex-col gap-[0.625rem]">
             {REGIONS.map((reg) => {
               const barPct = (reg.orders / maxRegionOrders) * 100;
               return (
-                <div key={reg.name} style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+                <div key={reg.name} className="flex items-center gap-4">
                   {/* Flag + name */}
-                  <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", width: 180, flexShrink: 0 }}>
+                  <div className="flex items-center gap-2 w-[180px] shrink-0">
                     <span style={{ fontSize: "1rem" }}>{reg.flag}</span>
-                    <span style={{ fontSize: "0.8rem", color: C.charcoal, fontWeight: 500 }}>{reg.name}</span>
+                    <span className="font-medium" style={{ fontSize: "0.8rem", color: C.charcoal }}>{reg.name}</span>
                   </div>
 
                   {/* Bar */}
-                  <div style={{ flex: 1 }}>
-                    <div style={{ height: 8, borderRadius: 4, backgroundColor: "rgba(43,35,32,0.07)", overflow: "hidden" }}>
+                  <div className="flex-1">
+                    <div className="h-2 rounded-[4px] overflow-hidden bg-[rgba(43,35,32,0.07)]">
                       <div
+                        className="h-full rounded-[4px]"
                         style={{
-                          height: "100%",
                           width: `${barPct}%`,
-                          borderRadius: 4,
                           backgroundColor: C.maroon,
                           opacity: 0.75 + (barPct / 100) * 0.25,
                         }}
@@ -636,15 +616,15 @@ export default function ConsoleAnalytics() {
                   </div>
 
                   {/* Orders count */}
-                  <div style={{ width: 70, textAlign: "right", flexShrink: 0 }}>
+                  <div className="w-[70px] text-right shrink-0">
                     <span style={{ fontSize: "0.78rem", color: "rgba(43,35,32,0.5)" }}>
                       {reg.orders} order{reg.orders !== 1 ? "s" : ""}
                     </span>
                   </div>
 
                   {/* Revenue */}
-                  <div style={{ width: 72, textAlign: "right", flexShrink: 0 }}>
-                    <span style={{ fontSize: "0.82rem", fontWeight: 600, color: C.charcoal }}>
+                  <div className="w-[72px] text-right shrink-0">
+                    <span className="font-semibold" style={{ fontSize: "0.82rem", color: C.charcoal }}>
                       {fmtCad(reg.revenue)}
                     </span>
                   </div>

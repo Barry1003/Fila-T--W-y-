@@ -15,6 +15,9 @@ export const SHIPPING_SPEEDS = ['standard', 'express'] as const;
 export const orderLineSchema = z.object({
   productId: z.string().trim().min(1),
   size: z.string().trim().min(1).max(60),
+  // A line is a product in a specific size and colour; the server matches the
+  // variant on both before pricing and claiming stock.
+  color: z.string().trim().min(1).max(60),
   quantity: z.number().int().min(1, 'Quantity must be at least 1.').max(20, 'That is more than we can ship in one order.'),
 });
 

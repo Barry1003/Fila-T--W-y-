@@ -258,7 +258,9 @@ export type ProductProps = {
 export default function Product({ product, related }: ProductProps) {
 
   const [mainIdx, setMainIdx] = useState(0);
-  const [selectedSize, setSelectedSize] = useState(product.sizes[0] ?? '');
+  const uniqueSizes = useMemo(() => [...new Set(product.variants.map(v => v.size))], [product.variants]);
+  const [selectedSize, setSelectedSize] = useState(uniqueSizes[0] ?? '');
+  const [selectedColor, setSelectedColor] = useState(product.colors[0] ?? '');
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState<'description' | 'sizing' | 'shipping'>('description');
   const [shareOpen, setShareOpen] = useState(false);
@@ -272,7 +274,7 @@ export default function Product({ product, related }: ProductProps) {
       slug: product.slug,
       title: product.title,
       size: selectedSize,
-      color: product.color,
+      color: selectedColor,
       unitPriceCents: Math.round(product.priceCad * 100),
       imageUrl: product.imageUrl,
       quantity,
@@ -302,7 +304,8 @@ export default function Product({ product, related }: ProductProps) {
   const isFootwear = ['Shoes', 'Pam Slippers'].includes(product.category);
   const isMTO = product.tag === 'MADE TO ORDER';
   const isSoldOut = product.tag === 'SOLD OUT';
-  const hasVariableSizes = product.sizes.length > 1 && product.sizes[0] !== 'One Size';
+  const hasVariableSizes = uniqueSizes.length > 1 && uniqueSizes[0] !== 'One Size';
+  const hasVariableColors = product.colors.length > 0 && product.colors[0] !== '';
 
   const sizingRows = isHeadwear ? [
     ['S', '54–56', '21.3–22"'],
@@ -433,21 +436,57 @@ export default function Product({ product, related }: ProductProps) {
                   </button>
                 </div>
                 <div className="flex gap-2 flex-wrap">
-                  {product.sizes.map(s => (
-                    <button
-                      key={s}
-                      onClick={() => setSelectedSize(s)}
-                      className="min-w-[46px] py-2 px-3 cursor-pointer"
-                      style={{
-                        border: selectedSize === s ? `2px solid ${C.gold}` : '1px solid rgba(43,35,32,0.18)',
-                        backgroundColor: selectedSize === s ? 'rgba(212,169,78,0.07)' : 'transparent',
-                        color: C.charcoal, fontFamily: UI, fontSize: '0.825rem',
-                        transition: 'border-color 0.15s, background 0.15s', outline: 'none',
-                      }}
-                    >
-                      {s}
-                    </button>
-                  ))}
+                  {uniqueSizes.map(s => {
+                    const available = product.variants.some(v => v.size === s && v.color === selectedColor && v.inStock);
+                    return (
+                      <button
+                        key={s}
+                        onClick={() => setSelectedSize(s)}
+                        className="min-w-[46px] py-2 px-3 cursor-pointer"
+                        style={{
+                          border: selectedSize === s ? `2px solid ${C.gold}` : '1px solid rgba(43,35,32,0.18)',
+                          backgroundColor: selectedSize === s ? 'rgba(212,169,78,0.07)' : 'transparent',
+                          color: available ? C.charcoal : 'rgba(43,35,32,0.35)',
+                          textDecoration: available ? 'none' : 'line-through',
+                          fontFamily: UI, fontSize: '0.825rem',
+                          transition: 'border-color 0.15s, background 0.15s', outline: 'none',
+                        }}
+                      >
+                        {s}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Color selector */}
+            {hasVariableColors && (
+              <div className="mb-7">
+                <div className="mb-3.5" style={{ ...label, fontSize: '0.58rem', color: C.charcoal }}>
+                  Colour: <span style={{ fontWeight: 400, color: 'rgba(43,35,32,0.6)' }}>{selectedColor}</span>
+                </div>
+                <div className="flex gap-2 flex-wrap">
+                  {product.colors.map(c => {
+                    const available = product.variants.some(v => v.color === c && v.size === selectedSize && v.inStock);
+                    return (
+                      <button
+                        key={c}
+                        onClick={() => setSelectedColor(c)}
+                        className="py-2 px-4 cursor-pointer"
+                        style={{
+                          border: selectedColor === c ? `2px solid ${C.gold}` : '1px solid rgba(43,35,32,0.18)',
+                          backgroundColor: selectedColor === c ? 'rgba(212,169,78,0.07)' : 'transparent',
+                          color: available ? C.charcoal : 'rgba(43,35,32,0.35)',
+                          textDecoration: available ? 'none' : 'line-through',
+                          fontFamily: UI, fontSize: '0.825rem',
+                          transition: 'border-color 0.15s, background 0.15s', outline: 'none',
+                        }}
+                      >
+                        {c}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             )}
@@ -734,8 +773,8 @@ export default function Product({ product, related }: ProductProps) {
                             productId: p.id,
                             slug: p.slug,
                             title: p.title,
-                            size: p.sizes[0] ?? 'One Size',
-                            color: p.color,
+                            size: p.variants[0]?.size ?? 'One Size',
+                            color: p.colors[0] ?? '',
                             unitPriceCents: Math.round(p.priceCad * 100),
                             imageUrl: p.imageUrl,
                           });
