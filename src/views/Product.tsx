@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Link } from '@/lib/router';
 import { useCart } from '@/lib/cart';
 import { C, DISPLAY, UI, label } from '../tokens';
@@ -276,7 +276,8 @@ export default function Product({ product, related }: ProductProps) {
       size: selectedSize,
       color: selectedColor,
       unitPriceCents: Math.round(product.priceCad * 100),
-      imageUrl: product.imageUrl,
+      // The photo for the colour they picked, so the cart shows what they chose.
+      imageUrl: shownImages[0]?.url ?? product.imageUrl,
       quantity,
     });
 
@@ -286,19 +287,34 @@ export default function Product({ product, related }: ProductProps) {
     window.setTimeout(() => setJustAdded(false), 2600);
   }
 
-  // One stored image, shown at several crops until products carry a real
-  // gallery. Unsplash-hosted URLs accept crop hints; anything else falls back
-  // to the image as stored.
-  const gallery = ['entropy', 'top', 'bottom', 'left', 'right'].map(crop => {
-    const unsplash = product.imageUrl.includes('images.unsplash.com');
-    const base = product.imageUrl.split('?')[0];
-    return unsplash
-      ? {
+  // The gallery follows the chosen colour: that colour's own photos first, then
+  // the general ones that apply to every colour.
+  const shownImages = useMemo(() => {
+    const all = product.images ?? [];
+    const forColor = all.filter(img => img.color === selectedColor);
+    const general = all.filter(img => !img.color);
+    return [...forColor, ...general];
+  }, [product.images, selectedColor]);
+
+  // A product with a real gallery shows its photos as stored. One with a single
+  // image (the seeded catalogue) is shown at several crops so the strip is not a
+  // lone thumbnail — Unsplash URLs accept crop hints; anything else repeats.
+  const gallery = useMemo(() => {
+    if (shownImages.length > 1) {
+      return shownImages.map(img => ({ main: img.url, thumb: img.url }));
+    }
+    const url = shownImages[0]?.url ?? product.imageUrl;
+    const base = url.split('?')[0];
+    return url.includes('images.unsplash.com')
+      ? ['entropy', 'top', 'bottom', 'left', 'right'].map(crop => ({
           main: `${base}?w=900&h=1125&fit=crop&crop=${crop}&auto=format`,
           thumb: `${base}?w=200&h=200&fit=crop&crop=${crop}&auto=format`,
-        }
-      : { main: product.imageUrl, thumb: product.imageUrl };
-  });
+        }))
+      : [{ main: url, thumb: url }];
+  }, [shownImages, product.imageUrl]);
+
+  // Switching colour changes the gallery, so start it back at the first photo.
+  useEffect(() => { setMainIdx(0); }, [selectedColor]);
 
   const isHeadwear = ['Fila Gobi', 'Abetiaja', 'Shisha', 'Fila Senator', 'Gele', 'Ipele'].includes(product.category);
   const isFootwear = ['Shoes', 'Pam Slippers'].includes(product.category);
