@@ -15,3 +15,5 @@ yarn-error.log*
 
 # Prisma client is generated, not source
 src/generated
+.vercel
+.env*
