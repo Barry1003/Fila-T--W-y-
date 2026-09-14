@@ -1058,6 +1058,24 @@ body {
   flex-shrink: 0;
 }
 
+/* Grid children default to min-width:auto, so a wide child — the orders table,
+   which has its own horizontal scroll — would stretch its track past the
+   content width and push the whole console sideways. Let the tracks shrink so
+   the table scrolls inside its box instead. */
+.console-lower-grid > *,
+.console-stat-grid > * {
+  min-width: 0;
+}
+
+/* Below this the fixed 340px side column would squeeze the orders table into a
+   cramped internal scroll, so stack the two panels full-width instead — while
+   the sidebar is still shown (it only becomes a drawer at 900px). */
+@media (max-width: 1140px) {
+  .console-lower-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
 @media (max-width: 900px) {
   .console-hamburger {
     display: flex;
