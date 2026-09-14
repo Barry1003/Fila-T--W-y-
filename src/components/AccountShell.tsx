@@ -1,7 +1,7 @@
 'use client';
 
 import { NavLink } from '@/lib/router';
-import { signOut } from '@/server/auth-actions';
+import SignOutForm from './SignOutForm';
 import { useUser, getInitials, type CurrentUser } from '@/lib/user';
 import { C, DISPLAY, UI, label } from '../tokens';
 
@@ -211,7 +211,7 @@ export default function AccountShell({
             ))}
 
             {/* Sign out */}
-            <form action={signOut}><button
+            <SignOutForm><button
               className="flex items-center gap-3 py-[0.65rem] px-3.5 mt-3 rounded-[5px] cursor-pointer text-left"
               style={{
                 background: 'none', border: 'none',
@@ -223,7 +223,7 @@ export default function AccountShell({
             >
               <span style={{ lineHeight: 0 }}>{SIGN_OUT_ICON}</span>
               Sign Out
-            </button></form>
+            </button></SignOutForm>
           </nav>
         </aside>
 

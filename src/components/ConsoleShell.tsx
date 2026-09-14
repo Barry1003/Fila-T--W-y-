@@ -4,7 +4,7 @@ import { useCallback, useState } from "react";
 import type { ReactNode } from "react";
 import { useOverlay } from "@/lib/useOverlay";
 import { NavLink, Link, useLocation } from '@/lib/router';
-import { signOut } from '@/server/auth-actions';
+import SignOutForm from './SignOutForm';
 import { useUser, getInitials, type CurrentUser } from '@/lib/user';
 import CardTableLabels from './CardTableLabels';
 import { C, DISPLAY, UI } from "../tokens";
@@ -131,7 +131,7 @@ function SidebarContent({ onNavClick, user: userProp }: { onNavClick?: () => voi
             </div>
           </div>
         </div>
-        <form action={signOut}>
+        <SignOutForm>
           <button
             type="submit"
             className="p-0 cursor-pointer text-left"
@@ -139,7 +139,7 @@ function SidebarContent({ onNavClick, user: userProp }: { onNavClick?: () => voi
           >
             Log Out
           </button>
-        </form>
+        </SignOutForm>
       </div>
     </>
   );

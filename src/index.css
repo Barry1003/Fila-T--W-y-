@@ -1554,24 +1554,41 @@ body {
 
 .promo-dots {
   display: flex;
+  align-items: center;
   justify-content: center;
   gap: 0.4rem;
   margin-top: 0.875rem;
 }
 
+/* The button is the tap target (kept a comfortable 40px tall on touch by the
+   global rule below); the visual dot is a centred ::before, so the indicator
+   stays small even where buttons get a bigger touch height. */
 .promo-dot {
   width: 7px;
-  height: 7px;
   padding: 0;
   border: none;
+  background: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: width 0.2s;
+}
+
+.promo-dot::before {
+  content: '';
+  width: 100%;
+  height: 7px;
   border-radius: 50%;
   background: rgba(43, 35, 32, 0.2);
-  cursor: pointer;
-  transition: background-color 0.2s, width 0.2s;
+  transition: background-color 0.2s, border-radius 0.2s;
 }
 
 .promo-dot.active {
   width: 22px;
+}
+
+.promo-dot.active::before {
   border-radius: 4px;
   background: #7A2E38;
 }

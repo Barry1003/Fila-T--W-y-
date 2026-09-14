@@ -4,7 +4,7 @@ import { useCallback, useState } from 'react';
 import { Link, NavLink, useNavigate } from '@/lib/router';
 import { useOverlay } from '@/lib/useOverlay';
 import { useCart } from '@/lib/cart';
-import { signOut } from '@/server/auth-actions';
+import SignOutForm from './SignOutForm';
 import type { CurrentUser } from '@/server/auth';
 import { C, DISPLAY, label, UI } from '../tokens';
 import { SearchIcon, HeartIcon, UserIcon, CartIcon, GridIcon } from '../icons';
@@ -283,7 +283,7 @@ export default function Nav({ user }: { user: CurrentUser | null }) {
               </Link>
 
               {user ? (
-                <form action={signOut}>
+                <SignOutForm>
                   <button type="submit" className="nav-drawer-sublink w-full cursor-pointer text-left" style={{ background: 'none', border: 'none', font: 'inherit' }}>
                     <span className="nav-drawer-sublink-icon">
                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
@@ -294,7 +294,7 @@ export default function Nav({ user }: { user: CurrentUser | null }) {
                     </span>
                     Sign out
                   </button>
-                </form>
+                </SignOutForm>
               ) : (
                 <Link to="/auth" onClick={close} className="nav-drawer-sublink">
                   <span className="nav-drawer-sublink-icon"><UserIcon /></span>
