@@ -2,6 +2,7 @@
 
 import { NavLink } from '@/lib/router';
 import { signOut } from '@/server/auth-actions';
+import { useUser, getInitials, type CurrentUser } from '@/lib/user';
 import { C, DISPLAY, UI, label } from '../tokens';
 
 type SidebarItem = {
@@ -119,7 +120,19 @@ const SIGN_OUT_ICON = (
   </svg>
 );
 
-export default function AccountShell({ children }: { children: React.ReactNode }) {
+export default function AccountShell({
+  children,
+  user: userProp,
+}: {
+  children: React.ReactNode;
+  user?: CurrentUser | null;
+}) {
+  const contextUser = useUser();
+  const user = userProp !== undefined ? userProp : contextUser;
+  const name = user?.name?.trim() || 'Adunola Okonkwo';
+  const email = user?.email?.trim() || 'adunola@example.com';
+  const initial = getInitials(name, 1);
+
   return (
     <div className="min-h-[calc(100vh-70px)]" style={{ backgroundColor: C.cream, fontFamily: UI }}>
 
@@ -127,11 +140,11 @@ export default function AccountShell({ children }: { children: React.ReactNode }
       <div className="account-mobile-nav">
         <div className="account-mobile-id">
           <div className="account-mobile-avatar">
-            <span style={{ fontFamily: DISPLAY, fontSize: '0.95rem', color: C.cream, fontWeight: 500, lineHeight: 1 }}>A</span>
+            <span style={{ fontFamily: DISPLAY, fontSize: '0.95rem', color: C.cream, fontWeight: 500, lineHeight: 1 }}>{initial}</span>
           </div>
           <div className="min-w-0">
-            <div className="account-mobile-name">Adunola Okonkwo</div>
-            <div className="account-mobile-email">adunola@example.com</div>
+            <div className="account-mobile-name">{name}</div>
+            <div className="account-mobile-email">{email}</div>
           </div>
         </div>
 
@@ -160,11 +173,11 @@ export default function AccountShell({ children }: { children: React.ReactNode }
               className="w-11 h-11 rounded-full flex items-center justify-center shrink-0"
               style={{ background: `linear-gradient(135deg, ${C.maroon} 0%, rgba(122,46,56,0.6) 100%)` }}
             >
-              <span style={{ fontFamily: DISPLAY, fontSize: '1.1rem', color: C.cream, fontWeight: 500, lineHeight: 1 }}>A</span>
+              <span style={{ fontFamily: DISPLAY, fontSize: '1.1rem', color: C.cream, fontWeight: 500, lineHeight: 1 }}>{initial}</span>
             </div>
             <div>
-              <div style={{ fontFamily: UI, fontSize: '0.875rem', fontWeight: 600, color: C.charcoal, lineHeight: 1.3 }}>Adunola Okonkwo</div>
-              <div className="mt-[2px]" style={{ fontFamily: UI, fontSize: '0.72rem', color: 'rgba(43,35,32,0.48)' }}>adunola@example.com</div>
+              <div style={{ fontFamily: UI, fontSize: '0.875rem', fontWeight: 600, color: C.charcoal, lineHeight: 1.3 }}>{name}</div>
+              <div className="mt-[2px]" style={{ fontFamily: UI, fontSize: '0.72rem', color: 'rgba(43,35,32,0.48)' }}>{email}</div>
             </div>
           </div>
 

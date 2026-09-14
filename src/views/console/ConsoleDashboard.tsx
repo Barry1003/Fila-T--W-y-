@@ -1,5 +1,6 @@
 'use client';
 
+import { useUser } from "@/lib/user";
 import { C, UI } from "../../tokens";
 import {
   TrendUpIcon,
@@ -241,6 +242,9 @@ function StatusBadge({ status, type }: { status: string; type: string }) {
 // ── Page ─────────────────────────────────────────────────────────────────────
 
 export default function ConsoleDashboard() {
+  const user = useUser();
+  const firstName = user?.name ? user.name.trim().split(/\s+/)[0] : "Adunola";
+
   return (
     <div className="console-page p-7" style={{ fontFamily: UI }}>
       {/* Greeting */}
@@ -257,6 +261,7 @@ export default function ConsoleDashboard() {
             weekday: "long",
             day: "numeric",
             month: "long",
+            year: "numeric",
           })}
         </p>
         <h1
@@ -267,7 +272,7 @@ export default function ConsoleDashboard() {
             color: C.charcoal,
           }}
         >
-          Welcome back, Adunola
+          Welcome back, {firstName}
         </h1>
       </div>
 

@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { redirect } from 'next/navigation';
 import ConsoleShell from '@/components/ConsoleShell';
 import { getCurrentUser } from '@/server/auth';
+import { UserProvider } from '@/lib/user';
 
 /**
  * The console is owner-only.
@@ -19,5 +20,9 @@ export default async function ConsoleLayout({ children }: { children: ReactNode 
   if (!user) redirect('/auth?next=/console');
   if (user.role !== 'OWNER') redirect('/');
 
-  return <ConsoleShell>{children}</ConsoleShell>;
+  return (
+    <UserProvider user={user}>
+      <ConsoleShell user={user}>{children}</ConsoleShell>
+    </UserProvider>
+  );
 }

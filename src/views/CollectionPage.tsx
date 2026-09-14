@@ -2,17 +2,20 @@
 
 import { Link } from '@/lib/router';
 import { C, DISPLAY, UI, label } from '../tokens';
+import { useCart } from '@/lib/cart';
 import type { CatalogueProduct, CatalogueCollection } from '@/server/catalogue';
 
 function ProductCard({ p }: { p: CatalogueProduct }) {
+  const { add } = useCart();
+
   return (
-    <Link to={`/product/${p.slug}`} className="no-underline block" style={{ color: 'inherit' }}>
+    <Link to={`/product/${p.slug}`} className="product-card no-underline block" style={{ color: 'inherit' }}>
       <div className="relative aspect-[3/4] overflow-hidden mb-3" style={{ backgroundColor: 'rgba(43,35,32,0.05)' }}>
         <img
           src={p.imageUrl}
           alt={p.title}
           loading="lazy"
-          className="w-full h-full object-cover block"
+          className="product-img w-full h-full object-cover block"
         />
         {p.tag && (
           <span
@@ -26,6 +29,38 @@ function ProductCard({ p }: { p: CatalogueProduct }) {
             {p.tag}
           </span>
         )}
+
+        {/* Reveals on hover — same Quick View / Add to Cart as the shop grid. */}
+        <div className="product-overlay">
+          <div className="product-overlay-btns">
+            <button
+              onClick={e => e.preventDefault()}
+              className="flex-1 cursor-pointer py-[0.55rem]"
+              style={{ border: '1px solid rgba(250,246,240,0.55)', color: C.cream, background: 'transparent', ...label, fontSize: '0.585rem', letterSpacing: '0.12em', backdropFilter: 'blur(4px)' }}
+            >
+              Quick View
+            </button>
+            <button
+              onClick={e => {
+                // The whole card is a link to the product; adding must not navigate.
+                e.preventDefault();
+                add({
+                  productId: p.id,
+                  slug: p.slug,
+                  title: p.title,
+                  size: p.variants[0]?.size ?? 'One Size',
+                  color: p.colors[0] ?? '',
+                  unitPriceCents: Math.round(p.priceCad * 100),
+                  imageUrl: p.imageUrl,
+                });
+              }}
+              className="flex-1 cursor-pointer py-[0.55rem]"
+              style={{ border: 'none', color: C.charcoal, background: C.gold, ...label, fontSize: '0.585rem', letterSpacing: '0.12em' }}
+            >
+              Add to Cart
+            </button>
+          </div>
+        </div>
       </div>
       <div style={{ fontFamily: UI, fontSize: '0.85rem', color: C.charcoal, lineHeight: 1.4 }}>{p.title}</div>
       <div className="mt-[0.2rem]" style={{ fontFamily: UI, fontSize: '0.9rem', fontWeight: 600, color: C.charcoal }}>
@@ -90,7 +125,7 @@ export default function CollectionPage({ collection, products }: {
             </div>
 
             {products.length > 0 ? (
-              <div className="rg-4 grid grid-cols-4 gap-6">
+              <div className="collection-grid grid gap-6">
                 {products.map(p => <ProductCard key={p.id} p={p} />)}
               </div>
             ) : (

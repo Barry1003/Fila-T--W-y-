@@ -119,7 +119,7 @@ function SectionHead({ title, linkTo, linkLabel }: { title: string; linkTo: stri
 /* ─── Main ──────────────────────────────────────────────────── */
 export default function Account({ user }: { user: CurrentUser | null }) {
   return (
-    <AccountShell>
+    <AccountShell user={user}>
       <div className="flex flex-col gap-10">
 
         {/* ── Greeting ─────────────────────────────────────── */}

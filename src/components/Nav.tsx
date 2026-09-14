@@ -8,6 +8,7 @@ import { signOut } from '@/server/auth-actions';
 import type { CurrentUser } from '@/server/auth';
 import { C, DISPLAY, label, UI } from '../tokens';
 import { SearchIcon, HeartIcon, UserIcon, CartIcon, GridIcon } from '../icons';
+import { COLLECTIONS } from '../data/products';
 
 /** The collections sit under Shop rather than beside it — they are ways into
  *  the catalogue, not siblings of Lookbook and About. */
@@ -40,7 +41,7 @@ function CartBadge({ count }: { count: number }) {
   );
 }
 
-function SearchField({ className, onSubmitted }: { className: string; onSubmitted?: () => void }) {
+function SearchField({ className, onSubmitted, autoFocus }: { className: string; onSubmitted?: () => void; autoFocus?: boolean }) {
   const navigate = useNavigate();
   const [query, setQuery] = useState('');
 
@@ -62,13 +63,20 @@ function SearchField({ className, onSubmitted }: { className: string; onSubmitte
         onChange={e => setQuery(e.target.value)}
         placeholder="Search caps, gele, kaftans…"
         aria-label="Search products"
+        autoFocus={autoFocus}
       />
     </form>
   );
 }
 
+/** Turns a category name into the anchor CollectionPage gives its section. */
+function categoryAnchor(name: string): string {
+  return name.replace(/\s+/g, '-').toLowerCase();
+}
+
 export default function Nav({ user }: { user: CurrentUser | null }) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const close = useCallback(() => setMenuOpen(false), []);
   const isOwner = user?.role === 'OWNER';
 
@@ -105,19 +113,37 @@ export default function Nav({ user }: { user: CurrentUser | null }) {
             <div className="nav-dropdown">
               <NavLink
                 to="/shop"
-                className={({ isActive }) => `nav-link nav-dropdown-trigger${isActive ? ' active' : ''}`}
-                style={{ ...label, color: C.cream, textDecorationLine: 'none', fontSize: '0.68rem' }}
+                className={({ isActive }) => `nav-text-link nav-dropdown-trigger${isActive ? ' active' : ''}`}
+                style={label}
               >
                 Shop
-                <svg width="9" height="6" viewBox="0 0 10 6" fill="none" aria-hidden="true">
-                  <path d="M1 1l4 4 4-4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
               </NavLink>
 
-              <div className="nav-dropdown-menu">
-                {COLLECTION_LINKS.map(({ label: lbl, to }) => (
-                  <Link key={lbl} to={to} className="nav-dropdown-item">{lbl}</Link>
-                ))}
+              <div className="nav-dropdown-menu nav-mega">
+                <div className="nav-mega-grid">
+                  {COLLECTIONS.map(col => (
+                    <div key={col.slug} className="nav-mega-col">
+                      <Link to={`/collections/${col.slug}`} className="nav-mega-heading">{col.name}</Link>
+                      {col.categories.map(cat => (
+                        <Link
+                          key={cat}
+                          to={`/collections/${col.slug}#${categoryAnchor(cat)}`}
+                          className="nav-mega-link"
+                        >
+                          {cat}
+                        </Link>
+                      ))}
+                    </div>
+                  ))}
+
+                  {/* Featured panel — a way into the made-to-order line, like a
+                      shop's promo tile. */}
+                  <Link to="/custom-order" className="nav-mega-feature">
+                    <span className="nav-mega-feature-eyebrow">Bespoke</span>
+                    <span className="nav-mega-feature-title">Made to your measurements</span>
+                    <span className="nav-mega-feature-cta">Start a custom order →</span>
+                  </Link>
+                </div>
               </div>
             </div>
 
@@ -125,15 +151,8 @@ export default function Nav({ user }: { user: CurrentUser | null }) {
               <NavLink
                 key={lbl}
                 to={to}
-                className="nav-link pb-[2px]"
-                style={({ isActive }) => ({
-                  ...label,
-                  color: C.cream,
-                  textDecorationLine: 'none',
-                  opacity: isActive ? 1 : 0.82,
-                  fontSize: '0.68rem',
-                  borderBottom: isActive ? `1px solid ${C.gold}` : '1px solid transparent',
-                })}
+                className={({ isActive }) => `nav-text-link${isActive ? ' active' : ''}`}
+                style={label}
               >
                 {lbl}
               </NavLink>
@@ -165,8 +184,17 @@ export default function Nav({ user }: { user: CurrentUser | null }) {
             </Link>
           </div>
 
-          {/* Mobile actions — cart stays reachable without opening the menu */}
+          {/* Mobile actions — search and cart stay reachable without opening the menu */}
           <div className="nav-actions-mobile">
+            <button
+              className="nav-icon-btn"
+              onClick={() => setSearchOpen(v => !v)}
+              aria-label={searchOpen ? 'Close search' : 'Search'}
+              aria-expanded={searchOpen}
+              aria-controls="nav-mobile-search"
+            >
+              <SearchIcon />
+            </button>
             <Link to="/cart" className="nav-icon-btn" aria-label={cartLabel}>
               <CartIcon />
               <CartBadge count={cartCount} />
@@ -186,6 +214,17 @@ export default function Nav({ user }: { user: CurrentUser | null }) {
             </button>
           </div>
         </div>
+
+        {/* Mobile search bar — revealed from the header, not buried in the menu */}
+        {searchOpen && (
+          <div className="nav-mobile-search" id="nav-mobile-search">
+            <SearchField
+              className="nav-search nav-search-mobilebar"
+              onSubmitted={() => setSearchOpen(false)}
+              autoFocus
+            />
+          </div>
+        )}
       </nav>
 
       {/* Mobile drawer */}
@@ -210,8 +249,6 @@ export default function Nav({ user }: { user: CurrentUser | null }) {
           </div>
 
           <div className="nav-drawer-body">
-            <SearchField className="nav-search nav-search-drawer" onSubmitted={close} />
-
             <nav aria-label="Shop">
               {COLLECTION_LINKS.map(({ label: lbl, to }) => (
                 <NavLink key={lbl} to={to} onClick={close} className={({ isActive }) => `nav-drawer-link${isActive ? ' active' : ''}`}>

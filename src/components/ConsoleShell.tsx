@@ -4,6 +4,8 @@ import { useCallback, useState } from "react";
 import type { ReactNode } from "react";
 import { useOverlay } from "@/lib/useOverlay";
 import { NavLink, Link, useLocation } from '@/lib/router';
+import { signOut } from '@/server/auth-actions';
+import { useUser, getInitials, type CurrentUser } from '@/lib/user';
 import { C, DISPLAY, UI } from "../tokens";
 import {
   GridIcon,
@@ -42,7 +44,13 @@ function usePageTitle() {
 
 // ── Sidebar inner content (shared between desktop & mobile) ──────────────────
 
-function SidebarContent({ onNavClick }: { onNavClick?: () => void }) {
+function SidebarContent({ onNavClick, user: userProp }: { onNavClick?: () => void; user?: CurrentUser | null }) {
+  const contextUser = useUser();
+  const user = userProp !== undefined ? userProp : contextUser;
+  const name = user?.name?.trim() || "Adunola Okonkwo";
+  const initials = getInitials(user?.name, 2) || "AO";
+  const roleLabel = user?.role === "OWNER" ? "Store Owner" : "Admin";
+
   return (
     <>
       {/* Wordmark + back link */}
@@ -111,23 +119,26 @@ function SidebarContent({ onNavClick }: { onNavClick?: () => void }) {
             className="w-8 h-8 rounded-full flex items-center justify-center shrink-0"
             style={{ backgroundColor: C.gold, color: C.charcoal, fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em" }}
           >
-            AO
+            {initials}
           </div>
           <div>
             <div style={{ color: C.cream, fontSize: "0.78rem", fontWeight: 500, lineHeight: 1.2 }}>
-              Adunola Okonkwo
+              {name}
             </div>
             <div className="mt-[1px]" style={{ color: "rgba(250,246,240,0.4)", fontSize: "0.66rem" }}>
-              Store Owner
+              {roleLabel}
             </div>
           </div>
         </div>
-        <button
-          className="p-0 cursor-pointer text-left"
-          style={{ background: "none", border: "none", color: "rgba(250,246,240,0.38)", fontSize: "0.7rem" }}
-        >
-          Log Out
-        </button>
+        <form action={signOut}>
+          <button
+            type="submit"
+            className="p-0 cursor-pointer text-left"
+            style={{ background: "none", border: "none", color: "rgba(250,246,240,0.38)", fontSize: "0.7rem" }}
+          >
+            Log Out
+          </button>
+        </form>
       </div>
     </>
   );
@@ -135,7 +146,10 @@ function SidebarContent({ onNavClick }: { onNavClick?: () => void }) {
 
 // ── Shell ────────────────────────────────────────────────────────────────────
 
-export default function ConsoleShell({ children }: { children: ReactNode }) {
+export default function ConsoleShell({ children, user: userProp }: { children: ReactNode; user?: CurrentUser | null }) {
+  const contextUser = useUser();
+  const user = userProp !== undefined ? userProp : contextUser;
+  const initials = getInitials(user?.name, 2) || "AO";
   const title = usePageTitle();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const closeSidebar = useCallback(() => setSidebarOpen(false), []);
@@ -154,7 +168,7 @@ export default function ConsoleShell({ children }: { children: ReactNode }) {
         className={`console-sidebar${sidebarOpen ? " sidebar-open" : ""} w-60 flex flex-col shrink-0 overflow-hidden`}
         style={{ backgroundColor: C.maroon }}
       >
-        <SidebarContent onNavClick={closeSidebar} />
+        <SidebarContent onNavClick={closeSidebar} user={user} />
       </aside>
 
       {/* ── Main column ─────────────────────────────────────── */}
@@ -207,7 +221,7 @@ export default function ConsoleShell({ children }: { children: ReactNode }) {
               className="w-[30px] h-[30px] rounded-full flex items-center justify-center cursor-pointer"
               style={{ backgroundColor: C.gold, color: C.charcoal, fontSize: "0.68rem", fontWeight: 700, letterSpacing: "0.02em" }}
             >
-              AO
+              {initials}
             </div>
           </div>
         </header>

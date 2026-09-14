@@ -1,9 +1,8 @@
 'use client';
 
 import { useState, useCallback, useTransition } from 'react';
-import { useRouter } from 'next/navigation';
 import { signInWithEmail, signUpWithEmail, requestPasswordReset } from '@/server/auth-actions';
-import { Link } from '@/lib/router';
+import { Link, useNavigate } from '@/lib/router';
 import { C, DISPLAY, UI, label } from '../tokens';
 
 /* ─── Field styles ─────────────────────────────────────────── */
@@ -203,7 +202,7 @@ function OrDivider() {
 
 /* ─── Sign In form ──────────────────────────────────────────── */
 function SignInForm({ switchTab }: { switchTab: () => void }) {
-  const router = useRouter();
+  const navigate = useNavigate();
   const [pending, startTransition] = useTransition();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -228,7 +227,7 @@ function SignInForm({ switchTab }: { switchTab: () => void }) {
 
     startTransition(async () => {
       const result = await signInWithEmail(data);
-      if (result.ok) router.push('/account');
+      if (result.ok) navigate('/account');
       else setServerError(result.message);
     });
   }
@@ -307,7 +306,7 @@ function SignInForm({ switchTab }: { switchTab: () => void }) {
 
 /* ─── Register form ─────────────────────────────────────────── */
 function RegisterForm({ switchTab }: { switchTab: () => void }) {
-  const router = useRouter();
+  const navigate = useNavigate();
   const [pending, startTransition] = useTransition();
   const [serverError, setServerError] = useState<string | null>(null);
   const [name, setName] = useState('');
@@ -344,7 +343,7 @@ function RegisterForm({ switchTab }: { switchTab: () => void }) {
       const result = await signUpWithEmail(data);
       // Phone is collected for delivery contact; sign-in by phone needs an SMS
       // provider, so it is not part of the account yet.
-      if (result.ok) router.push('/account?welcome=1');
+      if (result.ok) navigate('/account?welcome=1');
       else setServerError(result.message);
     });
   }

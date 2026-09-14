@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import AccountShell from '../components/AccountShell';
+import { useUser, getInitials } from '@/lib/user';
 import { C, DISPLAY, UI, label } from '../tokens';
 
 /* ─── Shared primitives ──────────────────────────────────────── */
@@ -288,14 +289,17 @@ function OutlineBtn({ children, red, onClick }: { children: React.ReactNode; red
 }
 
 /* ─── Avatar block ───────────────────────────────────────────── */
-function AvatarBlock() {
+function AvatarBlock({ name }: { name?: string | null }) {
+  const user = useUser();
+  const initial = getInitials(name || user?.name, 1);
+
   return (
     <div className="flex items-center gap-5 mb-6">
       <div className="w-[68px] h-[68px] rounded-full shrink-0 flex items-center justify-center" style={{
         background: `linear-gradient(135deg, ${C.maroon} 0%, rgba(122,46,56,0.62) 100%)`,
         boxShadow: '0 2px 12px rgba(122,46,56,0.22)',
       }}>
-        <span className="block" style={{ fontFamily: DISPLAY, fontSize: '1.5rem', color: '#fff', fontWeight: 500, lineHeight: 1 }}>A</span>
+        <span className="block" style={{ fontFamily: DISPLAY, fontSize: '1.5rem', color: '#fff', fontWeight: 500, lineHeight: 1 }}>{initial}</span>
       </div>
       <div>
         <div className="mb-[0.35rem]" style={{ fontFamily: UI, fontSize: '0.875rem', fontWeight: 600, color: C.charcoal }}>
@@ -319,12 +323,18 @@ function AvatarBlock() {
 
 /* ─── Main page ──────────────────────────────────────────────── */
 export default function AccountSettings() {
+  const user = useUser();
   /* Profile */
-  const [fullName, setFullName] = useState('Adunola Okonkwo');
-  const [email] = useState('adunola@example.com');
+  const [fullName, setFullName] = useState(user?.name || 'Adunola Okonkwo');
+  const [email, setEmail] = useState(user?.email || 'adunola@example.com');
   const [phoneCode, setPhoneCode] = useState('+234');
   const [phone, setPhone] = useState('806 123 4567');
   const [profileSaved, setProfileSaved] = useState(false);
+
+  useEffect(() => {
+    if (user?.name) setFullName(user.name);
+    if (user?.email) setEmail(user.email);
+  }, [user]);
 
   /* Password */
   const [currentPw, setCurrentPw] = useState('');
@@ -368,7 +378,7 @@ export default function AccountSettings() {
         {/* ── 1. Profile ─────────────────────────────────────────── */}
         <SectionCard>
           <SectionLabel>Profile</SectionLabel>
-          <AvatarBlock />
+          <AvatarBlock name={fullName} />
 
           <div className="rg-2 grid grid-cols-2 gap-x-4">
             <FInput label="Full Name" value={fullName} onChange={setFullName} />

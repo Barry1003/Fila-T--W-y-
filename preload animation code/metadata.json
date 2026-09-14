@@ -1,0 +1,6 @@
+{
+  "name": "AdeClassics Preloader",
+  "description": "Luxury animated preloader and page transition system for AdeClassics featuring elegant SVG stroke drawing, golden shimmer, and seamless navigation triggers.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

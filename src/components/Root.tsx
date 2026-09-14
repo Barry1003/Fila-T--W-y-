@@ -5,6 +5,7 @@ import type { ReactNode } from 'react';
 import type { CurrentUser } from '@/server/auth';
 import { useLocation } from '@/lib/router';
 import { C, UI } from '../tokens';
+import { UserProvider } from '@/lib/user';
 import Nav from './Nav';
 import Footer from './Footer';
 
@@ -49,12 +50,14 @@ export default function Root({ children, user }: { children: ReactNode; user: Cu
   useScrollReveal();
 
   return (
-    <div className="overflow-x-hidden min-h-screen" style={{ backgroundColor: C.cream, color: C.charcoal, fontFamily: UI }}>
-      <Nav user={user} />
-      <main>
-        {children}
-      </main>
-      <Footer />
-    </div>
+    <UserProvider user={user}>
+      <div className="overflow-x-hidden min-h-screen" style={{ backgroundColor: C.cream, color: C.charcoal, fontFamily: UI }}>
+        <Nav user={user} />
+        <main>
+          {children}
+        </main>
+        <Footer />
+      </div>
+    </UserProvider>
   );
 }
