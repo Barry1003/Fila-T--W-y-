@@ -6,6 +6,7 @@ import { useOverlay } from "@/lib/useOverlay";
 import { NavLink, Link, useLocation } from '@/lib/router';
 import { signOut } from '@/server/auth-actions';
 import { useUser, getInitials, type CurrentUser } from '@/lib/user';
+import CardTableLabels from './CardTableLabels';
 import { C, DISPLAY, UI } from "../tokens";
 import {
   GridIcon,
@@ -228,6 +229,7 @@ export default function ConsoleShell({ children, user: userProp }: { children: R
 
         {/* Content */}
         <main className="flex-1 overflow-y-auto" style={{ backgroundColor: "#EDE9E3" }}>
+          <CardTableLabels />
           {children}
         </main>
       </div>

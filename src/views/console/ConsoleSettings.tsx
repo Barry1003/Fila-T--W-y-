@@ -985,7 +985,7 @@ function TabShipping() {
 
         <div className="overflow-x-auto">
           <div className="table-scroll">
-            <table className="w-full border-collapse min-w-[560px]">
+            <table className="card-table w-full border-collapse min-w-[560px]">
               <thead>
                 <tr>
                   {colHead("Region")}

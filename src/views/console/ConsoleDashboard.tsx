@@ -362,7 +362,7 @@ export default function ConsoleDashboard() {
           </div>
 
           <div className="table-scroll">
-            <table className="w-full border-collapse min-w-[540px]">
+            <table className="card-table w-full border-collapse min-w-[540px]">
               <thead>
                 <tr>
                   {["Order", "Buyer", "Item", "Total", "Status", ""].map((h) => (

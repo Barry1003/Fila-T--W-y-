@@ -275,7 +275,7 @@ export default function ConsoleOrders({ orders }: { orders: OrderListRow[] }) {
         ) : (
           <>
             <div className="table-scroll">
-              <table className="w-full border-collapse min-w-[760px]">
+              <table className="card-table w-full border-collapse min-w-[760px]">
                 <thead>
                   <tr className="border-b border-solid border-[rgba(43,35,32,0.07)]">
                     {["Order #", "Date", "Customer", "Items", "Total", "Payment", "Status", "Actions"].map(h => (

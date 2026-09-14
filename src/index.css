@@ -1770,6 +1770,62 @@ html {
   overscroll-behavior-x: contain;
 }
 
+/* ── Card tables (mobile) ───────────────────────────────────────────────────────
+   Below the phone breakpoint a `.card-table` stops being a wide scrolling grid
+   and stacks each row into a labelled card. Labels come from the column headers,
+   applied to each cell's data-label by CardTableLabels. */
+@media (max-width: 640px) {
+  .card-table {
+    min-width: 0 !important;
+  }
+  .card-table thead {
+    display: none;
+  }
+  .card-table tbody {
+    display: block;
+  }
+  .card-table tr {
+    display: block;
+    margin-bottom: 0.7rem;
+    padding: 0.35rem 0.9rem;
+    border: 1px solid rgba(43, 35, 32, 0.12) !important;
+    border-radius: 10px;
+    background: #fff !important;
+    box-shadow: 0 1px 6px rgba(43, 35, 32, 0.04);
+  }
+  .card-table td {
+    display: flex !important;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    width: auto !important;
+    min-width: 0 !important;
+    padding: 0.5rem 0 !important;
+    border: none !important;
+    border-bottom: 1px solid rgba(43, 35, 32, 0.06) !important;
+    text-align: right;
+    white-space: normal !important;
+  }
+  .card-table tbody tr td:last-child {
+    border-bottom: none !important;
+  }
+  .card-table td::before {
+    content: attr(data-label);
+    flex-shrink: 0;
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 0.6rem;
+    font-weight: 600;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: rgba(43, 35, 32, 0.42);
+    text-align: left;
+  }
+  /* Header-less columns (checkbox, actions) show no label prefix. */
+  .card-table td[data-label='']::before {
+    content: none;
+  }
+}
+
 /* Media never pushes a layout wider than its column. */
 img,
 video,

@@ -190,7 +190,7 @@ export default function ConsoleOrderDetail({ order: raw }: { order: OrderDetail 
           {/* Order items */}
           <SectionCard title="Items">
             <div className="table-scroll">
-              <table className="w-full border-collapse min-w-[520px]">
+              <table className="card-table w-full border-collapse min-w-[520px]">
                 <thead>
                   <tr>
                     {["Product", "Variant", "Qty", "Unit Price", "Line Total"].map(h => (

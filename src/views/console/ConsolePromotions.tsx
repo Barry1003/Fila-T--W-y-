@@ -177,7 +177,7 @@ function DiscountTable({
       }}
     >
       <div className="table-scroll">
-        <table className="w-full border-collapse min-w-[680px]">
+        <table className="card-table w-full border-collapse min-w-[680px]">
           <thead>
             <tr>
               {["Code", "Type", "Value", "Usage", "Status", "Expiry", ""].map((h) => (

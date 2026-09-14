@@ -272,7 +272,7 @@ export default function ConsoleProducts({ products, categories }: { products: Co
         ) : (
           <>
             <div className="table-scroll">
-              <table className="w-full border-collapse min-w-[640px]">
+              <table className="card-table w-full border-collapse min-w-[640px]">
                 <thead>
                   <tr className="border-b border-solid border-[rgba(43,35,32,0.07)]">
                     <th className="p-[0.5rem_1rem] text-left uppercase font-medium whitespace-nowrap tracking-[0.09em]" style={{ fontSize: "0.62rem", color: "rgba(43,35,32,0.38)", fontFamily: UI }}>
