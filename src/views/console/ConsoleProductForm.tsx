@@ -432,7 +432,7 @@ export default function ConsoleProductForm({ product, categories, knownColors }:
                     placeholder="0.00"
                     value={priceCad}
                     onChange={e => setPriceCad(e.target.value)}
-                    className="block box-border w-full rounded-[6px] py-2 pr-3 pl-[1.6rem]"
+                    className="block box-border w-full rounded-[6px] py-2 pr-3 pl-[3.6rem]"
                     style={inputBase}
                   />
                 </div>

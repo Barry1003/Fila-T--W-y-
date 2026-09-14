@@ -5,6 +5,17 @@ import { signInWithEmail, signUpWithEmail, requestPasswordReset } from '@/server
 import { Link, useNavigate } from '@/lib/router';
 import { C, DISPLAY, UI, label } from '../tokens';
 
+/**
+ * Where to land after signing in — the `?next=` the visitor was gated with when
+ * they were bounced here (e.g. from checkout), falling back to their account.
+ * Only same-origin paths are honoured, so the param can't push them off-site.
+ */
+function returnTo(fallback: string): string {
+  if (typeof window === 'undefined') return fallback;
+  const next = new URLSearchParams(window.location.search).get('next');
+  return next && next.startsWith('/') && !next.startsWith('//') ? next : fallback;
+}
+
 /* ─── Field styles ─────────────────────────────────────────── */
 const fieldBase: React.CSSProperties = {
   fontFamily: UI,
@@ -227,7 +238,7 @@ function SignInForm({ switchTab }: { switchTab: () => void }) {
 
     startTransition(async () => {
       const result = await signInWithEmail(data);
-      if (result.ok) navigate('/account');
+      if (result.ok) navigate(returnTo('/account'));
       else setServerError(result.message);
     });
   }
@@ -343,7 +354,7 @@ function RegisterForm({ switchTab }: { switchTab: () => void }) {
       const result = await signUpWithEmail(data);
       // Phone is collected for delivery contact; sign-in by phone needs an SMS
       // provider, so it is not part of the account yet.
-      if (result.ok) navigate('/account?welcome=1');
+      if (result.ok) navigate(returnTo('/account?welcome=1'));
       else setServerError(result.message);
     });
   }

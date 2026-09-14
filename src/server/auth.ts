@@ -1,4 +1,5 @@
 import 'server-only';
+import { cache } from 'react';
 import { prisma } from '@/lib/prisma';
 import { withDbRetry } from './db';
 import { getAppwriteAccount } from './appwrite-server';
@@ -38,7 +39,7 @@ export type CurrentUser = {
  * A seeded row with the same email is adopted rather than duplicated, so the
  * sample data lines up with a real account instead of leaving an orphan.
  */
-export async function getCurrentUser(): Promise<CurrentUser | null> {
+export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
   const account = await getAppwriteAccount();
   if (!account) return null;
 
@@ -77,7 +78,7 @@ export async function getCurrentUser(): Promise<CurrentUser | null> {
     name: user.name,
     role: user.role,
   };
-}
+});
 
 /** True when the current visitor may open the owner console. */
 export async function isOwner(): Promise<boolean> {

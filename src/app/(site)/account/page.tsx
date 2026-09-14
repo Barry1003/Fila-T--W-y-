@@ -5,6 +5,6 @@ import { getCurrentUser } from '@/server/auth';
 // Resolves the Appwrite session to a local row, creating it on first sign-in.
 export default async function Page() {
   const user = await getCurrentUser();
-  if (!user) redirect('/auth');
+  if (!user) redirect('/auth?next=/account');
   return <Account user={user} />;
 }
