@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Link, useNavigate } from '@/lib/router';
 import { saveProduct } from '@/server/product-actions';
+import { uploadProductImage } from '@/server/product-image-actions';
 import { PRODUCT_TAGS, TAG_LABELS } from '@/server/product-schema';
 import type { CategoryOption, ProductForEdit } from '@/server/catalogue';
 import { C, UI } from "../../tokens";
@@ -259,6 +260,9 @@ export default function ConsoleProductForm({ product, categories, knownColors }:
     (product?.images ?? []).map((img, i) => ({ id: `i${i}`, url: img.url, color: img.color }))
   );
   const [imageDraft, setImageDraft] = useState("");
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -283,6 +287,24 @@ export default function ConsoleProductForm({ product, categories, knownColors }:
   }
   function removeImage(iid: string) {
     setImages(imgs => imgs.filter(i => i.id !== iid));
+  }
+
+  async function uploadFiles(files: FileList | null) {
+    if (!files || files.length === 0) return;
+    setUploadError("");
+    setUploading(true);
+    try {
+      for (const file of Array.from(files)) {
+        const data = new FormData();
+        data.set("file", file);
+        const res = await uploadProductImage(data);
+        if (!res.ok) { setUploadError(res.message); break; }
+        setImages(imgs => [...imgs, { id: `i${Date.now()}-${Math.random().toString(36).slice(2, 6)}`, url: res.url, color: "" }]);
+      }
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
   }
   function setImageColor(iid: string, color: string) {
     setImages(imgs => imgs.map(i => (i.id === iid ? { ...i, color } : i)));
@@ -625,6 +647,44 @@ export default function ConsoleProductForm({ product, categories, knownColors }:
                 />
               ))}
             </div>
+            {/* Upload from device */}
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/png,image/jpeg,image/webp,image/gif,image/avif"
+              multiple
+              className="hidden"
+              onChange={e => uploadFiles(e.target.files)}
+            />
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={uploading}
+              className="w-full flex flex-col items-center justify-center gap-1.5 rounded-[8px] py-5 px-4 mb-2 cursor-pointer transition-colors"
+              style={{
+                border: "1.5px dashed rgba(43,35,32,0.25)",
+                background: uploading ? "rgba(43,35,32,0.03)" : "transparent",
+                color: "rgba(43,35,32,0.55)",
+                cursor: uploading ? "wait" : "pointer",
+              }}
+              onMouseEnter={e => { if (!uploading) { (e.currentTarget as HTMLElement).style.borderColor = C.gold; (e.currentTarget as HTMLElement).style.color = C.charcoal; } }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = "rgba(43,35,32,0.25)"; (e.currentTarget as HTMLElement).style.color = "rgba(43,35,32,0.55)"; }}
+            >
+              <UploadIcon size={22} />
+              <span style={{ fontSize: "0.75rem", fontWeight: 500 }}>
+                {uploading ? "Uploading…" : "Upload images from your device"}
+              </span>
+              <span style={{ fontSize: "0.63rem", color: "rgba(43,35,32,0.4)" }}>
+                JPG, PNG, WEBP, GIF or AVIF · up to 10 MB each
+              </span>
+            </button>
+
+            {/* Or paste a URL */}
+            <div className="flex items-center gap-2 my-2">
+              <div className="flex-1 h-px" style={{ background: "rgba(43,35,32,0.1)" }} />
+              <span style={{ fontSize: "0.6rem", color: "rgba(43,35,32,0.35)", textTransform: "uppercase", letterSpacing: "0.1em" }}>or paste a link</span>
+              <div className="flex-1 h-px" style={{ background: "rgba(43,35,32,0.1)" }} />
+            </div>
             <div className="flex gap-[0.4rem] mb-2">
               <input
                 type="url"
@@ -638,26 +698,30 @@ export default function ConsoleProductForm({ product, categories, knownColors }:
               <button
                 type="button"
                 onClick={addImage}
-                aria-label="Add image"
-                className="shrink-0 rounded-[6px] px-[0.6rem] py-0 flex items-center cursor-pointer"
+                aria-label="Add image from URL"
+                className="shrink-0 rounded-[6px] px-[0.7rem] py-0 flex items-center cursor-pointer"
                 style={{
-                  border: "1px dashed rgba(43,35,32,0.2)",
+                  border: "1px solid rgba(43,35,32,0.2)",
                   background: "none",
-                  color: "rgba(43,35,32,0.5)",
-                  lineHeight: 0,
+                  color: "rgba(43,35,32,0.55)",
+                  fontSize: "0.72rem",
+                  fontWeight: 600,
                 }}
                 onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = C.gold; (e.currentTarget as HTMLElement).style.color = C.charcoal; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = "rgba(43,35,32,0.2)"; (e.currentTarget as HTMLElement).style.color = "rgba(43,35,32,0.5)"; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = "rgba(43,35,32,0.2)"; (e.currentTarget as HTMLElement).style.color = "rgba(43,35,32,0.55)"; }}
               >
-                <UploadIcon size={15} />
+                Add
               </button>
             </div>
+            {uploadError && (
+              <p className="mb-[0.4rem]" style={{ fontSize: "0.68rem", color: C.maroon }}>{uploadError}</p>
+            )}
             {firstError('images') && (
               <p className="mb-[0.4rem]" style={{ fontSize: "0.68rem", color: C.maroon }}>{firstError('images')}</p>
             )}
             <p style={{ fontSize: "0.63rem", color: "rgba(43,35,32,0.38)", lineHeight: 1.5 }}>
-              The first image is the main photo. Uploads need blob storage, which
-              is not configured yet — paste a link for now.
+              The first image is the main photo. Drag to reorder is not available
+              yet — remove and re-add to change the main photo.
             </p>
           </FormCard>
 
