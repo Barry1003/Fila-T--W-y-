@@ -2,139 +2,8 @@
 
 import { useState } from 'react';
 import AccountShell from '../components/AccountShell';
+import type { AccountOrder as Order, AccountOrderStatus as OrderStatus, AccountTimelineStep as TimelineStep } from '@/server/account';
 import { C, DISPLAY, UI, label } from '../tokens';
-
-/* ─── Types ───────────────────────────────────────────────── */
-type OrderStatus = 'placed' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
-
-type TimelineStep = {
-  key: string;
-  label: string;
-  date?: string;
-  state: 'done' | 'active' | 'upcoming';
-};
-
-type OrderItem = {
-  img: string;
-  title: string;
-  variant: string;
-  qty: number;
-  cad: number;
-  ngn: number;
-};
-
-type Order = {
-  id: string;
-  date: string;
-  status: OrderStatus;
-  items: OrderItem[];
-  cadTotal: number;
-  ngnTotal: number;
-  address: string;
-  tracking?: string;
-  timeline: TimelineStep[];
-};
-
-/* ─── Seed data ───────────────────────────────────────────── */
-const ORDERS: Order[] = [
-  {
-    id: 'FTW-2024-0847',
-    date: 'Dec 14, 2024',
-    status: 'shipped',
-    cadTotal: 399,
-    ngnTotal: 198100,
-    address: 'Adunola Okonkwo · 12 Maple Grove, Toronto, ON M4C 2K1, Canada',
-    tracking: 'CA-9400111202130193',
-    items: [
-      { img: 'photo-1765910083971-aa0e3688be46', title: 'Embroidered Agbada Kaftan', variant: 'Gold · Size L', qty: 1, cad: 310, ngn: 153950 },
-      { img: 'photo-1760086626077-55da1cb1ecb3', title: 'Ọjọ Ipele — Crimson Drape', variant: 'Crimson · One Size', qty: 1, cad: 78, ngn: 38750 },
-    ],
-    timeline: [
-      { key: 'placed', label: 'Placed', date: 'Dec 14', state: 'done' },
-      { key: 'confirmed', label: 'Confirmed', date: 'Dec 15', state: 'done' },
-      { key: 'shipped', label: 'Shipped', date: 'Dec 17', state: 'active' },
-      { key: 'out', label: 'Out for Delivery', state: 'upcoming' },
-      { key: 'delivered', label: 'Delivered', state: 'upcoming' },
-    ],
-  },
-  {
-    id: 'FTW-2024-0821',
-    date: 'Nov 28, 2024',
-    status: 'delivered',
-    cadTotal: 554,
-    ngnTotal: 275100,
-    address: 'Adunola Okonkwo · 12 Maple Grove, Toronto, ON M4C 2K1, Canada',
-    tracking: 'CA-9400111201000012',
-    items: [
-      { img: 'photo-1763823133159-c6f8ec380e33', title: 'Gobi Filà Cap — Burgundy Velvet', variant: 'Burgundy · Size M', qty: 2, cad: 89, ngn: 44200 },
-      { img: 'photo-1714124731489-7eb16af0ac91', title: 'Aso-oke Gele — Ivory & Gold Set', variant: 'Ivory & Gold · One Size', qty: 1, cad: 145, ngn: 71900 },
-      { img: 'photo-1661332360810-28aa035f14db', title: 'Tailored Yoruba Trouser Set', variant: 'Ivory · Size 32', qty: 1, cad: 195, ngn: 96850 },
-    ],
-    timeline: [
-      { key: 'placed', label: 'Placed', date: 'Nov 28', state: 'done' },
-      { key: 'confirmed', label: 'Confirmed', date: 'Nov 29', state: 'done' },
-      { key: 'shipped', label: 'Shipped', date: 'Dec 1', state: 'done' },
-      { key: 'out', label: 'Out for Delivery', date: 'Dec 5', state: 'done' },
-      { key: 'delivered', label: 'Delivered', date: 'Dec 6', state: 'done' },
-    ],
-  },
-  {
-    id: 'FTW-2024-0803',
-    date: 'Nov 9, 2024',
-    status: 'processing',
-    cadTotal: 310,
-    ngnTotal: 153950,
-    address: 'Adunola Okonkwo · 12 Maple Grove, Toronto, ON M4C 2K1, Canada',
-    items: [
-      { img: 'photo-1765910083971-aa0e3688be46', title: 'Embroidered Agbada Kaftan', variant: 'Maroon · Size XL — Custom', qty: 1, cad: 310, ngn: 153950 },
-    ],
-    timeline: [
-      { key: 'placed', label: 'Placed', date: 'Nov 9', state: 'done' },
-      { key: 'confirmed', label: 'Confirmed', date: 'Nov 10', state: 'active' },
-      { key: 'shipped', label: 'Shipped', state: 'upcoming' },
-      { key: 'out', label: 'Out for Delivery', state: 'upcoming' },
-      { key: 'delivered', label: 'Delivered', state: 'upcoming' },
-    ],
-  },
-  {
-    id: 'FTW-2024-0788',
-    date: 'Oct 23, 2024',
-    status: 'delivered',
-    cadTotal: 267,
-    ngnTotal: 132700,
-    address: 'Adunola Okonkwo · 12 Maple Grove, Toronto, ON M4C 2K1, Canada',
-    tracking: 'CA-9400111200887755',
-    items: [
-      { img: 'photo-1632948056627-41482f69c38c', title: 'Adire Roundneck — Indigo', variant: 'Indigo · Size M', qty: 1, cad: 125, ngn: 62000 },
-      { img: 'photo-1646133512747-babfd708d662', title: 'Hand-tooled Pam Slippers', variant: 'Tan · Size 42', qty: 1, cad: 160, ngn: 79500 },
-    ],
-    timeline: [
-      { key: 'placed', label: 'Placed', date: 'Oct 23', state: 'done' },
-      { key: 'confirmed', label: 'Confirmed', date: 'Oct 24', state: 'done' },
-      { key: 'shipped', label: 'Shipped', date: 'Oct 26', state: 'done' },
-      { key: 'out', label: 'Out for Delivery', date: 'Oct 30', state: 'done' },
-      { key: 'delivered', label: 'Delivered', date: 'Oct 31', state: 'done' },
-    ],
-  },
-  {
-    id: 'FTW-2024-0765',
-    date: 'Oct 2, 2024',
-    status: 'cancelled',
-    cadTotal: 89,
-    ngnTotal: 44200,
-    address: 'Adunola Okonkwo · 12 Maple Grove, Toronto, ON M4C 2K1, Canada',
-    items: [
-      { img: 'photo-1763823133159-c6f8ec380e33', title: 'Gobi Filà Cap — Burgundy Velvet', variant: 'Navy · Size S', qty: 1, cad: 89, ngn: 44200 },
-    ],
-    timeline: [
-      { key: 'placed', label: 'Placed', date: 'Oct 2', state: 'done' },
-      { key: 'confirmed', label: 'Confirmed', state: 'upcoming' },
-      { key: 'shipped', label: 'Shipped', state: 'upcoming' },
-      { key: 'out', label: 'Out for Delivery', state: 'upcoming' },
-      { key: 'delivered', label: 'Delivered', state: 'upcoming' },
-    ],
-  },
-];
 
 type FilterTab = 'all' | OrderStatus;
 const FILTER_TABS: { key: FilterTab; label: string }[] = [
@@ -272,9 +141,10 @@ function OrderCard({ order }: { order: Order }) {
               }}
             >
               <img
-                src={`https://images.unsplash.com/${item.img}?w=60&h=60&fit=crop&auto=format`}
+                src={item.img}
                 alt={item.title}
                 className="w-full h-full object-cover block"
+                style={{ backgroundColor: 'rgba(43,35,32,0.07)' }}
               />
             </div>
           ))}
@@ -349,7 +219,7 @@ function OrderCard({ order }: { order: Order }) {
                 {order.items.map((item, i) => (
                   <div key={i} className="flex gap-3.5 items-start">
                     <img
-                      src={`https://images.unsplash.com/${item.img}?w=80&h=80&fit=crop&auto=format`}
+                      src={item.img}
                       alt={item.title}
                       className="w-14 h-14 rounded-[5px] object-cover shrink-0"
                       style={{ backgroundColor: 'rgba(43,35,32,0.07)' }}
@@ -424,12 +294,12 @@ function OrderCard({ order }: { order: Order }) {
 }
 
 /* ─── Main ──────────────────────────────────────────────────── */
-export default function Orders() {
+export default function Orders({ orders = [] }: { orders?: Order[] }) {
   const [activeFilter, setActiveFilter] = useState<FilterTab>('all');
 
   const filtered = activeFilter === 'all'
-    ? ORDERS
-    : ORDERS.filter(o => o.status === activeFilter);
+    ? orders
+    : orders.filter(o => o.status === activeFilter);
 
   return (
     <AccountShell>
@@ -450,7 +320,7 @@ export default function Orders() {
         <div className="flex" style={{ borderBottom: `1px solid rgba(43,35,32,0.12)` }}>
           {FILTER_TABS.map(tab => {
             const isActive = activeFilter === tab.key;
-            const count = tab.key === 'all' ? ORDERS.length : ORDERS.filter(o => o.status === tab.key).length;
+            const count = tab.key === 'all' ? orders.length : orders.filter(o => o.status === tab.key).length;
             return (
               <button
                 key={tab.key}

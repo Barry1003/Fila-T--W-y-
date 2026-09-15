@@ -129,9 +129,9 @@ export default function AccountShell({
 }) {
   const contextUser = useUser();
   const user = userProp !== undefined ? userProp : contextUser;
-  const name = user?.name?.trim() || 'Adunola Okonkwo';
-  const email = user?.email?.trim() || 'adunola@example.com';
-  const initial = getInitials(name, 1);
+  const name = user?.name?.trim() || 'Your Account';
+  const email = user?.email?.trim() || '';
+  const initial = getInitials(user?.name, 1);
 
   return (
     <div className="min-h-[calc(100vh-70px)]" style={{ backgroundColor: C.cream, fontFamily: UI }}>

@@ -22,104 +22,15 @@ type Conversation = {
   messages: Message[];
 };
 
-const INITIAL: Conversation[] = [
-  {
-    id: 'c1',
-    subject: 'Question about Order #FTW-10492',
-    order: '#FTW-10492',
-    preview: "Hi! I wanted to check on my order — has it shipped yet?",
-    date: 'Today, 10:42 AM',
-    unread: true,
-    messages: [
-      {
-        id: 'm1',
-        sender: 'buyer',
-        text: "Hi! I wanted to check on my order — has it shipped yet? I placed it about a week ago and haven't received any tracking info.",
-        timestamp: 'Today, 10:42 AM',
-      },
-      {
-        id: 'm2',
-        sender: 'support',
-        text: "Hello Adunola! Thank you for reaching out. Your order #FTW-10492 is currently being prepared and will ship within 1–2 business days. We'll send your tracking number as soon as it's dispatched.",
-        timestamp: 'Today, 11:15 AM',
-      },
-      {
-        id: 'm3',
-        sender: 'buyer',
-        text: "That's great, thank you! Will it arrive before the weekend?",
-        timestamp: 'Today, 11:28 AM',
-      },
-    ],
-  },
-  {
-    id: 'c2',
-    subject: 'Sizing help — Igbo Gele',
-    order: null,
-    preview: "Thank you! We recommend measuring around the fullest part…",
-    date: 'Aug 28',
-    unread: false,
-    messages: [
-      {
-        id: 'm1',
-        sender: 'buyer',
-        text: "Hello, I'm interested in the Igbo Gele headwrap but I'm not sure what size to get. I have a 22-inch head circumference.",
-        timestamp: 'Aug 28, 2:14 PM',
-      },
-      {
-        id: 'm2',
-        sender: 'support',
-        text: "Thank you for reaching out! We recommend measuring around the fullest part of your head, just above the ears. For a 22-inch circumference, our Standard size fits perfectly — it has a 7-yard wrap length for plenty of styling options.",
-        timestamp: 'Aug 28, 3:30 PM',
-      },
-      {
-        id: 'm3',
-        sender: 'buyer',
-        text: "Perfect, thank you so much! I'll go ahead and order the Standard.",
-        timestamp: 'Aug 28, 3:45 PM',
-      },
-      {
-        id: 'm4',
-        sender: 'support',
-        text: "Wonderful! If you have any other questions after your order arrives, we're here to help. Enjoy!",
-        timestamp: 'Aug 28, 4:00 PM',
-      },
-    ],
-  },
-  {
-    id: 'c3',
-    subject: 'Return request for #FTW-10389',
-    order: '#FTW-10389',
-    preview: "Your return has been approved. Please use the label…",
-    date: 'Aug 19',
-    unread: false,
-    messages: [
-      {
-        id: 'm1',
-        sender: 'buyer',
-        text: "I'd like to return the Aso-Oke shawl from order #FTW-10389. The colour is slightly different from what I expected.",
-        timestamp: 'Aug 19, 9:00 AM',
-      },
-      {
-        id: 'm2',
-        sender: 'support',
-        text: "We're sorry to hear that! Your return has been approved. Please use the prepaid label — pack the item, affix it, and drop it at any Canada Post location. Your refund will be processed within 5–7 business days of receipt.",
-        timestamp: 'Aug 19, 10:22 AM',
-      },
-      {
-        id: 'm3',
-        sender: 'buyer',
-        text: "Thank you for the quick response! I'll drop it off today.",
-        timestamp: 'Aug 19, 10:35 AM',
-      },
-    ],
-  },
-];
-
-const ORDERS = ['#FTW-10492', '#FTW-10389', '#FTW-10201'];
-
-export default function Support() {
-  const [conversations, setConversations] = useState<Conversation[]>(INITIAL);
-  const [activeId, setActiveId] = useState<string | null>('c1');
+export default function Support({
+  initialConversations = [],
+  orderNumbers = [],
+}: {
+  initialConversations?: Conversation[];
+  orderNumbers?: string[];
+}) {
+  const [conversations, setConversations] = useState<Conversation[]>(initialConversations);
+  const [activeId, setActiveId] = useState<string | null>(initialConversations[0]?.id ?? null);
   const [draft, setDraft] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [modalSubject, setModalSubject] = useState('');
@@ -440,7 +351,7 @@ export default function Support() {
                     }}
                   >
                     <option value="">Select an order…</option>
-                    {ORDERS.map(o => <option key={o} value={o}>{o}</option>)}
+                    {orderNumbers.map(o => <option key={o} value={o}>{o}</option>)}
                   </select>
                   <svg className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: 'rgba(43,35,32,0.38)' }} width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <polyline points="6 9 12 15 18 9" />

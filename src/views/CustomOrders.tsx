@@ -3,33 +3,8 @@
 import { useState } from "react";
 import { Link } from '@/lib/router';
 import AccountShell from "../components/AccountShell";
+import type { AccountCustomRequest as CustomRequest, AccountCustomStatus as RequestStatus } from '@/server/account';
 import { C, DISPLAY, UI, label } from "../tokens";
-
-// ── Types ─────────────────────────────────────────────────────────────────────
-
-type RequestStatus = "submitted" | "quoted" | "approved" | "in-production" | "completed" | "declined";
-
-type Measurement = { label: string; value: string };
-
-type CustomRequest = {
-  id: string;
-  garmentType: string;
-  summary: string;
-  submittedDate: string;
-  status: RequestStatus;
-  occasion: string;
-  neededBy: string;
-  measurements: Measurement[];
-  fabricPreference: string;
-  colorPreference: string;
-  notes: string;
-  refImages: { bg: string; label: string }[];
-  quotedPriceCad?: number;
-  quotedPriceNGN?: number;
-  estimatedCompletion?: string;
-  storeNotes?: string;
-  declineReason?: string;
-};
 
 // ── Status config (mirrors ConsoleCustomOrders colors exactly) ────────────────
 
@@ -54,117 +29,6 @@ const STEPPER_STEPS: { key: RequestStatus; label: string }[] = [
 
 const STATUS_ORDER: RequestStatus[] = ["submitted", "quoted", "approved", "in-production", "completed"];
 
-// ── Seed data ─────────────────────────────────────────────────────────────────
-
-const MY_REQUESTS: CustomRequest[] = [
-  {
-    id: "FTW-CO-2026-008",
-    garmentType: "3-Piece Custom Agbada",
-    summary: "Custom Agbada — needed by Dec 14, 2026",
-    submittedDate: "Sep 1, 2026",
-    status: "quoted",
-    occasion: "Traditional wedding ceremony",
-    neededBy: "Dec 14, 2026",
-    measurements: [
-      { label: "Chest",          value: "44\"" },
-      { label: "Waist",          value: "38\"" },
-      { label: "Hip",            value: "42\"" },
-      { label: "Shoulder Width", value: "19\"" },
-      { label: "Sleeve Length",  value: "27.5\"" },
-      { label: "Body Length",    value: "30\"" },
-      { label: "Neck",           value: "17\"" },
-      { label: "Kaftan Length",  value: "60\"" },
-    ],
-    fabricPreference: "Heavy Aso-Oke — woven textured finish, not smooth",
-    colorPreference: "Deep royal blue with gold embroidery detailing",
-    notes: "Needed for my traditional wedding. Requesting a matching Fila cap in the same fabric. Please include extra embroidery at the collar and chest panel.",
-    refImages: [
-      { bg: "#2E4A9E", label: "Style ref 1" },
-      { bg: "#8A6818", label: "Embroidery ref" },
-    ],
-    quotedPriceCad: 1462,
-    quotedPriceNGN: 1258905,
-    estimatedCompletion: "Dec 8, 2026",
-    storeNotes: "We have the royal blue Aso-Oke in stock. Embroidery on collar and chest is confirmed. We'll share a fabric swatch photo before cutting. Please approve so we can begin sourcing.",
-  },
-  {
-    id: "FTW-CO-2026-005",
-    garmentType: "Tailored Senator Suit (2-piece)",
-    summary: "Senator Suit — needed by Nov 28, 2026",
-    submittedDate: "Aug 28, 2026",
-    status: "in-production",
-    occasion: "Corporate gala dinner",
-    neededBy: "Nov 28, 2026",
-    measurements: [
-      { label: "Chest",          value: "40\"" },
-      { label: "Waist",          value: "34\"" },
-      { label: "Hip",            value: "40\"" },
-      { label: "Shoulder Width", value: "18\"" },
-      { label: "Sleeve Length",  value: "26.5\"" },
-      { label: "Body Length",    value: "29\"" },
-      { label: "Neck",           value: "15.5\"" },
-      { label: "Trouser Waist",  value: "34\"" },
-      { label: "Trouser Inseam", value: "32\"" },
-    ],
-    fabricPreference: "Premium linen blend — breathable but structured",
-    colorPreference: "Charcoal grey with off-white contrast piping on collar and pocket trim",
-    notes: "Clean modern senator cut. No embroidery. Trousers should have a slight taper.",
-    refImages: [
-      { bg: "#2B2320", label: "Style ref" },
-      { bg: "#888", label: "Fabric swatch" },
-    ],
-    quotedPriceCad: 894,
-    quotedPriceNGN: 769676,
-    estimatedCompletion: "Nov 20, 2026",
-    storeNotes: "Linen sourced. Pattern cut confirmed. We will send you progress photos by Nov 10.",
-  },
-  {
-    id: "FTW-CO-2026-001",
-    garmentType: "Custom Gele & Wrapper Set",
-    summary: "Gele & Wrapper — church thanksgiving",
-    submittedDate: "Jun 10, 2026",
-    status: "completed",
-    occasion: "Church thanksgiving & reception",
-    neededBy: "Jul 4, 2026",
-    measurements: [
-      { label: "Bust",         value: "36\"" },
-      { label: "Waist",        value: "30\"" },
-      { label: "Hip",          value: "40\"" },
-      { label: "Skirt Length", value: "44\"" },
-    ],
-    fabricPreference: "Silk Aso-Oke — lightweight, high drape",
-    colorPreference: "Coral pink with gold woven stripe",
-    notes: "Delivered and I loved it! The gele fold instructions card was a lovely touch.",
-    refImages: [
-      { bg: "#E87050", label: "Colour ref" },
-    ],
-    quotedPriceCad: 757,
-    quotedPriceNGN: 651772,
-    estimatedCompletion: "Jun 28, 2026",
-  },
-  {
-    id: "FTW-CO-2025-014",
-    garmentType: "Embroidered Kaftan (Bespoke)",
-    summary: "Kaftan — Valentine dinner",
-    submittedDate: "Jan 5, 2026",
-    status: "declined",
-    occasion: "Valentine dinner",
-    neededBy: "Feb 10, 2026",
-    measurements: [
-      { label: "Chest",         value: "40\"" },
-      { label: "Waist",         value: "34\"" },
-      { label: "Kaftan Length", value: "56\"" },
-    ],
-    fabricPreference: "Velvet — deep plum",
-    colorPreference: "Deep plum with silver thread embroidery",
-    notes: "Needed delivery in 5 days.",
-    refImages: [
-      { bg: "#5A1B7A", label: "Style ref" },
-    ],
-    declineReason: "Requested timeline of 5 days is not feasible for bespoke embroidery work. Minimum lead time for this garment type is 3 weeks. We'd love to make this for a future occasion — please resubmit with more lead time.",
-  },
-];
-
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 function fmtCad(n: number) {
@@ -172,22 +36,15 @@ function fmtCad(n: number) {
 }
 // ── Ref swatch (color placeholder for uploaded reference images) ───────────────
 
-function RefSwatch({ bg, size = 56 }: { bg: string; size?: number }) {
+function RefSwatch({ url, size = 56 }: { url?: string; size?: number }) {
   return (
     <div
-      className="shrink-0 overflow-hidden relative rounded-[6px] border border-solid border-[rgba(43,35,32,0.12)]"
-      style={{
-        width: size,
-        height: size,
-        backgroundColor: bg,
-      }}
+      className="shrink-0 overflow-hidden relative rounded-[6px] border border-solid border-[rgba(43,35,32,0.12)] bg-[rgba(43,35,32,0.06)]"
+      style={{ width: size, height: size }}
     >
-      <svg width={size} height={size} className="absolute inset-0" style={{ opacity: 0.12 }}>
-        <pattern id={`h-${bg.replace("#", "")}`} width="6" height="6" patternUnits="userSpaceOnUse">
-          <line x1="0" y1="6" x2="6" y2="0" stroke="#fff" strokeWidth="0.8" />
-        </pattern>
-        <rect width={size} height={size} fill={`url(#h-${bg.replace("#", "")})`} />
-      </svg>
+      {url && (
+        <img src={url} alt="" className="w-full h-full object-cover block" />
+      )}
     </div>
   );
 }
@@ -423,7 +280,7 @@ function ExpandedDetail({
             <div className="flex gap-[0.625rem] flex-wrap">
               {req.refImages.map((img, i) => (
                 <div key={i} className="flex flex-col items-center gap-[0.35rem]">
-                  <RefSwatch bg={img.bg} size={72} />
+                  <RefSwatch url={img.url} size={72} />
                   <span style={{ fontSize: "0.62rem", color: "rgba(43,35,32,0.45)", fontFamily: UI }}>{img.label}</span>
                 </div>
               ))}
@@ -621,7 +478,7 @@ function RequestCard({
         {/* Left: thumbnail + info */}
         <div className="flex items-start gap-4 flex-1 min-w-0">
           {thumb && (
-            <RefSwatch bg={thumb.bg} size={48} />
+            <RefSwatch url={thumb.url} size={48} />
           )}
           <div className="flex-1 min-w-0">
             <div className="font-bold leading-tight mb-[0.2rem]" style={{ fontFamily: UI, fontSize: "0.95rem", color: C.charcoal }}>
@@ -742,8 +599,8 @@ function matchesFilter(req: CustomRequest, filter: FilterKey): boolean {
 
 // ── Main page ─────────────────────────────────────────────────────────────────
 
-export default function CustomOrders() {
-  const [requests, setRequests] = useState<CustomRequest[]>(MY_REQUESTS);
+export default function CustomOrders({ initialRequests = [] }: { initialRequests?: CustomRequest[] }) {
+  const [requests, setRequests] = useState<CustomRequest[]>(initialRequests);
   const [activeFilter, setActiveFilter] = useState<FilterKey>("all");
 
   const filtered = requests.filter(r => matchesFilter(r, activeFilter));

@@ -325,10 +325,10 @@ function AvatarBlock({ name }: { name?: string | null }) {
 export default function AccountSettings() {
   const user = useUser();
   /* Profile */
-  const [fullName, setFullName] = useState(user?.name || 'Adunola Okonkwo');
-  const [email, setEmail] = useState(user?.email || 'adunola@example.com');
-  const [phoneCode, setPhoneCode] = useState('+234');
-  const [phone, setPhone] = useState('806 123 4567');
+  const [fullName, setFullName] = useState(user?.name || '');
+  const [email, setEmail] = useState(user?.email || '');
+  const [phoneCode, setPhoneCode] = useState('+1');
+  const [phone, setPhone] = useState('');
   const [profileSaved, setProfileSaved] = useState(false);
 
   useEffect(() => {

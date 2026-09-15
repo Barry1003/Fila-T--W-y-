@@ -3,53 +3,12 @@
 import { useState } from 'react';
 import { useLocation, useNavigate } from '@/lib/router';
 import AccountShell from '../components/AccountShell';
+import type { AccountAddress as Address, AccountPayment as Payment } from '@/server/account';
 import { C, DISPLAY, UI, label } from '../tokens';
 
-/* ─── Types ─────────────────────────────────────────────────── */
-type Address = {
-  id: number;
-  isDefault: boolean;
-  name: string;
-  line1: string;
-  line2: string;
-  city: string;
-  state: string;
-  postal: string;
-  country: string;
-  phone: string;
-};
-
-type Payment = {
-  id: number;
-  isDefault: boolean;
-  brand: 'visa' | 'mastercard';
-  last4: string;
-  expiry: string;
-};
-
+/* ─── Form shapes ───────────────────────────────────────────── */
 type AddrForm = Omit<Address, 'id'>;
 type PayForm = { cardNumber: string; expiry: string; cvc: string; nameOnCard: string; sameAsShipping: boolean };
-
-/* ─── Seed data ──────────────────────────────────────────────── */
-const SEED_ADDR: Address[] = [
-  {
-    id: 1, isDefault: true, name: 'Adunola Okonkwo',
-    line1: '14 Adeola Hopewell Street', line2: '',
-    city: 'Victoria Island', state: 'Lagos', postal: '101001', country: 'Nigeria',
-    phone: '+234 806 123 4567',
-  },
-  {
-    id: 2, isDefault: false, name: 'Adunola Okonkwo',
-    line1: '3120 Bathurst Street', line2: 'Apt 4B',
-    city: 'Toronto', state: 'ON', postal: 'M6A 2A1', country: 'Canada',
-    phone: '+1 416 555 0198',
-  },
-];
-
-const SEED_PAY: Payment[] = [
-  { id: 1, isDefault: true, brand: 'visa', last4: '4242', expiry: '09/27' },
-  { id: 2, isDefault: false, brand: 'mastercard', last4: '8804', expiry: '03/26' },
-];
 
 const COUNTRIES = [
   'Nigeria', 'Canada', 'United Kingdom', 'United States',
@@ -468,28 +427,35 @@ function TrustNote() {
 }
 
 /* ─── Main page ──────────────────────────────────────────────── */
-export default function AddressesPayment() {
+export default function AddressesPayment({
+  initialAddresses = [],
+  initialPayments = [],
+}: {
+  initialAddresses?: Address[];
+  initialPayments?: Payment[];
+}) {
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const activeTab: 'addresses' | 'payment' = pathname.includes('/payment') ? 'payment' : 'addresses';
 
-  const [addresses, setAddresses] = useState<Address[]>(SEED_ADDR);
-  const [payments, setPayments] = useState<Payment[]>(SEED_PAY);
+  const [addresses, setAddresses] = useState<Address[]>(initialAddresses);
+  const [payments, setPayments] = useState<Payment[]>(initialPayments);
 
-  // Modal state: null=closed, 'add'=new, number=editing that id
-  const [addrModal, setAddrModal] = useState<'add' | number | null>(null);
-  const [payModal, setPayModal] = useState<'add' | number | null>(null);
+  // Modal state: null=closed, 'add'=new, an id string=editing that address
+  const [addrModal, setAddrModal] = useState<'add' | string | null>(null);
+  const [payModal, setPayModal] = useState<'add' | string | null>(null);
+  const isEditingAddr = addrModal !== null && addrModal !== 'add';
 
   /* Address actions */
   function saveAddress(data: AddrForm) {
     if (addrModal === 'add') {
-      const newAddr: Address = { id: Date.now(), ...data };
+      const newAddr: Address = { id: String(Date.now()), ...data };
       setAddresses(prev =>
         data.isDefault
           ? [...prev.map(a => ({ ...a, isDefault: false })), newAddr]
           : [...prev, newAddr]
       );
-    } else if (typeof addrModal === 'number') {
+    } else if (isEditingAddr) {
       setAddresses(prev =>
         prev.map(a => {
           if (a.id === addrModal) return { ...a, ...data };
@@ -501,15 +467,15 @@ export default function AddressesPayment() {
   }
 
   /* Payment actions */
-  function removePayment(id: number) {
+  function removePayment(id: string) {
     setPayments(prev => prev.filter(p => p.id !== id));
   }
 
-  function setDefaultPayment(id: number) {
+  function setDefaultPayment(id: string) {
     setPayments(prev => prev.map(p => ({ ...p, isDefault: p.id === id })));
   }
 
-  const editingAddr = typeof addrModal === 'number'
+  const editingAddr = isEditingAddr
     ? addresses.find(a => a.id === addrModal)
     : undefined;
 
@@ -602,7 +568,7 @@ export default function AddressesPayment() {
       {addrModal !== null && (
         <AddressSlideOver
           initial={editingAddr ? { ...editingAddr } : { ...BLANK_ADDR }}
-          isEdit={typeof addrModal === 'number'}
+          isEdit={isEditingAddr}
           onSave={saveAddress}
           onClose={() => setAddrModal(null)}
         />

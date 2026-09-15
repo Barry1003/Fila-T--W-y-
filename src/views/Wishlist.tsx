@@ -3,28 +3,8 @@
 import { useState } from 'react';
 import { Link } from '@/lib/router';
 import AccountShell from '../components/AccountShell';
+import type { AccountWishItem as WishItem } from '@/server/account';
 import { C, DISPLAY, UI, label } from '../tokens';
-import { slugify } from '@/lib/slug';
-
-/* ─── Seed data ───────────────────────────────────────────── */
-type WishItem = {
-  id: number;
-  img: string;
-  tag: string;
-  title: string;
-  cadNum: number;
-  ngnNum: number;
-  inStock: boolean;
-};
-
-const INITIAL_WISHLIST: WishItem[] = [
-  { id: 1,  img: 'photo-1763823133159-c6f8ec380e33', tag: 'NEW',           title: 'Gobi Filà Cap — Burgundy Velvet',    cadNum: 89,  ngnNum: 44200,  inStock: true  },
-  { id: 3,  img: 'photo-1765910083971-aa0e3688be46', tag: 'MADE TO ORDER', title: 'Embroidered Agbada Kaftan',           cadNum: 310, ngnNum: 153950, inStock: true  },
-  { id: 6,  img: 'photo-1632948056627-41482f69c38c', tag: 'SOLD OUT',      title: 'Adire Roundneck — Indigo',            cadNum: 125, ngnNum: 62000,  inStock: false },
-  { id: 4,  img: 'photo-1760086626077-55da1cb1ecb3', tag: 'NEW',           title: 'Ọjọ Ipele — Crimson Drape',          cadNum: 78,  ngnNum: 38750,  inStock: true  },
-  { id: 7,  img: 'photo-1646133512747-babfd708d662', tag: 'NEW',           title: 'Hand-tooled Pam Slippers',            cadNum: 160, ngnNum: 79500,  inStock: true  },
-  { id: 2,  img: 'photo-1714124731489-7eb16af0ac91', tag: 'NEW',           title: 'Aso-oke Gele — Ivory & Gold Set',     cadNum: 145, ngnNum: 71900,  inStock: true  },
-];
 
 const fmt = (n: number, prefix: string) => `${prefix}${n.toLocaleString()}`;
 
@@ -53,9 +33,9 @@ function WishCard({ item, onRemove, onAddToCart }: { item: WishItem; onRemove: (
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
       >
-        <Link to={`/product/${slugify(item.title)}`}>
+        <Link to={`/product/${item.slug}`}>
           <img
-            src={`https://images.unsplash.com/${item.img}?w=600&h=800&fit=crop&auto=format`}
+            src={item.img}
             alt={item.title}
             className="w-full h-full object-cover block"
             style={{
@@ -103,7 +83,7 @@ function WishCard({ item, onRemove, onAddToCart }: { item: WishItem; onRemove: (
       </div>
 
       {/* Text */}
-      <Link to={`/product/${slugify(item.title)}`} className="no-underline" style={{ color: C.charcoal }}>
+      <Link to={`/product/${item.slug}`} className="no-underline" style={{ color: C.charcoal }}>
         <div className="mb-[0.45rem]" style={{ fontFamily: UI, fontSize: '0.875rem', lineHeight: 1.4, color: C.charcoal }}>
           {item.title}
         </div>
@@ -167,10 +147,10 @@ function WishCard({ item, onRemove, onAddToCart }: { item: WishItem; onRemove: (
 }
 
 /* ─── Main ──────────────────────────────────────────────────── */
-export default function Wishlist() {
-  const [items, setItems] = useState<WishItem[]>(INITIAL_WISHLIST);
+export default function Wishlist({ initialItems = [] }: { initialItems?: WishItem[] }) {
+  const [items, setItems] = useState<WishItem[]>(initialItems);
 
-  function removeItem(id: number) {
+  function removeItem(id: string) {
     setItems(prev => prev.filter(i => i.id !== id));
   }
 

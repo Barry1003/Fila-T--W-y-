@@ -3,44 +3,27 @@
 import { Link } from '@/lib/router';
 import AccountShell from '../components/AccountShell';
 import type { CurrentUser } from '@/server/auth';
+import type { AccountOverview } from '@/server/account';
 import { C, DISPLAY, UI, label } from '../tokens';
 
-/* ─── Stat tiles ────────────────────────────────────────────── */
-const STATS = [
-  {
-    value: '2',
-    label: 'Active Orders',
-    icon: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
-        <line x1="3" y1="6" x2="21" y2="6" />
-        <path d="M16 10a4 4 0 0 1-8 0" />
-      </svg>
-    ),
-    accent: C.maroon,
-  },
-  {
-    value: '6',
-    label: 'Wishlist Items',
-    icon: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-      </svg>
-    ),
-    accent: C.teal,
-  },
-  {
-    value: '5',
-    label: 'Total Orders',
-    icon: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
-        <polyline points="9 11 12 14 22 4" />
-        <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
-      </svg>
-    ),
-    accent: C.gold,
-  },
-];
+const ORDER_ICON = (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+    <line x1="3" y1="6" x2="21" y2="6" />
+    <path d="M16 10a4 4 0 0 1-8 0" />
+  </svg>
+);
+const HEART_ICON = (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+  </svg>
+);
+const CHECK_ICON = (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="9 11 12 14 22 4" />
+    <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+  </svg>
+);
 
 /* ─── Status badge ─────────────────────────────────────────── */
 type Status = 'Shipped' | 'Delivered' | 'Confirmed' | 'Processing' | 'Placed' | 'Cancelled';
@@ -66,41 +49,11 @@ function StatusBadge({ status }: { status: Status }) {
   );
 }
 
-/* ─── Recent orders seed ────────────────────────────────────── */
-const RECENT = [
-  {
-    id: 'FTW-2025-0847',
-    title: 'Embroidered Agbada Kaftan',
-    date: 'Dec 14, 2025',
-    status: 'Shipped' as Status,
-    total: 'CAD $399',
-    img: 'photo-1765910083971-aa0e3688be46',
-  },
-  {
-    id: 'FTW-2025-0821',
-    title: 'Gobi Filà Cap — Burgundy Velvet',
-    date: 'Nov 28, 2025',
-    status: 'Delivered' as Status,
-    total: 'CAD $89',
-    img: 'photo-1763823133159-c6f8ec380e33',
-  },
-  {
-    id: 'FTW-2025-0803',
-    title: 'Aso-oke Gele — Ivory & Gold Set',
-    date: 'Nov 12, 2025',
-    status: 'Confirmed' as Status,
-    total: 'CAD $145',
-    img: 'photo-1714124731489-7eb16af0ac91',
-  },
-];
-
-/* ─── Wishlist preview seed ────────────────────────────────── */
-const WISHLIST_PREVIEW = [
-  { id: 1, img: 'photo-1763823133159-c6f8ec380e33', title: 'Gobi Filà Cap — Burgundy Velvet', cadNum: 89 },
-  { id: 2, img: 'photo-1765910083971-aa0e3688be46', title: 'Embroidered Agbada Kaftan',        cadNum: 310 },
-  { id: 3, img: 'photo-1632948056627-41482f69c38c', title: 'Adire Roundneck — Indigo',         cadNum: 125 },
-  { id: 4, img: 'photo-1760086626077-55da1cb1ecb3', title: 'Ọjọ Ipele — Crimson Drape',       cadNum: 78 },
-];
+/** Stored status → the badge's title-cased label. */
+const STATUS_LABEL: Record<string, Status> = {
+  placed: 'Placed', processing: 'Processing', shipped: 'Shipped',
+  delivered: 'Delivered', cancelled: 'Cancelled',
+};
 
 /* ─── Section heading ──────────────────────────────────────── */
 function SectionHead({ title, linkTo, linkLabel }: { title: string; linkTo: string; linkLabel: string }) {
@@ -116,8 +69,35 @@ function SectionHead({ title, linkTo, linkLabel }: { title: string; linkTo: stri
   );
 }
 
+/* ─── Empty row ────────────────────────────────────────────── */
+function EmptyRow({ text, cta, to }: { text: string; cta: string; to: string }) {
+  return (
+    <div
+      className="rounded-lg py-8 px-6 flex flex-col items-center text-center gap-4"
+      style={{ backgroundColor: '#fff', border: `1px solid rgba(43,35,32,0.09)` }}
+    >
+      <p style={{ fontFamily: UI, fontSize: '0.85rem', color: 'rgba(43,35,32,0.5)' }}>{text}</p>
+      <Link
+        to={to}
+        className="no-underline rounded-[5px] py-[0.6rem] px-6 uppercase"
+        style={{ fontFamily: UI, fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.1em', color: C.charcoal, backgroundColor: C.gold }}
+      >
+        {cta}
+      </Link>
+    </div>
+  );
+}
+
 /* ─── Main ──────────────────────────────────────────────────── */
-export default function Account({ user }: { user: CurrentUser | null }) {
+export default function Account({ user, overview }: { user: CurrentUser | null; overview: AccountOverview }) {
+  const stats = [
+    { value: overview.activeOrders, label: 'Active Orders', icon: ORDER_ICON, accent: C.maroon },
+    { value: overview.wishlistCount, label: 'Wishlist Items', icon: HEART_ICON, accent: C.teal },
+    { value: overview.totalOrders, label: 'Total Orders', icon: CHECK_ICON, accent: C.gold },
+  ];
+  const hasOrders = overview.recentOrders.length > 0;
+  const hasWishlist = overview.wishlistPreview.length > 0;
+
   return (
     <AccountShell user={user}>
       <div className="flex flex-col gap-10">
@@ -134,7 +114,7 @@ export default function Account({ user }: { user: CurrentUser | null }) {
 
         {/* ── Stat tiles ──────────────────────────────────── */}
         <div className="rg-3 grid grid-cols-3 gap-4">
-          {STATS.map(s => (
+          {stats.map(s => (
             <div
               key={s.label}
               className="rounded-lg py-[1.4rem] px-6 flex flex-col gap-3"
@@ -160,97 +140,106 @@ export default function Account({ user }: { user: CurrentUser | null }) {
         {/* ── Recent Orders ───────────────────────────────── */}
         <div>
           <SectionHead title="Recent Orders" linkTo="/account/orders" linkLabel="View all orders" />
-          <div className="flex flex-col gap-[0.6rem]">
-            {RECENT.map(order => (
-              <div
-                key={order.id}
-                className="rounded-lg py-4 px-5 flex items-center gap-4"
-                style={{
-                  backgroundColor: '#fff',
-                  border: `1px solid rgba(43,35,32,0.09)`,
-                  transition: 'box-shadow 0.15s',
-                }}
-                onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.boxShadow = '0 2px 14px rgba(43,35,32,0.09)'; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.boxShadow = 'none'; }}
-              >
-                <img
-                  src={`https://images.unsplash.com/${order.img}?w=80&h=80&fit=crop&auto=format`}
-                  alt=""
-                  width={44} height={44}
-                  className="rounded-[5px] object-cover shrink-0"
-                  style={{ backgroundColor: 'rgba(43,35,32,0.06)' }}
-                />
-                <div className="flex-1 min-w-0">
-                  <div style={{ fontFamily: UI, fontSize: '0.82rem', fontWeight: 600, color: C.charcoal, lineHeight: 1.3 }}>
-                    {order.title}
-                  </div>
-                  <div className="mt-[2px]" style={{ fontFamily: UI, fontSize: '0.72rem', color: 'rgba(43,35,32,0.44)', letterSpacing: '0.01em' }}>
-                    #{order.id} · {order.date}
-                  </div>
-                </div>
-                <StatusBadge status={order.status} />
-                <div className="min-w-[80px] text-right shrink-0" style={{ fontFamily: UI, fontSize: '0.84rem', fontWeight: 500, color: C.charcoal }}>
-                  {order.total}
-                </div>
-                <Link
-                  to="/account/orders"
-                  className="no-underline shrink-0 whitespace-nowrap"
-                  style={{ fontFamily: UI, fontSize: '0.72rem', color: C.indigo, letterSpacing: '0.01em' }}
+          {hasOrders ? (
+            <div className="flex flex-col gap-[0.6rem]">
+              {overview.recentOrders.map(order => (
+                <div
+                  key={order.id}
+                  className="rounded-lg py-4 px-5 flex items-center gap-4"
+                  style={{
+                    backgroundColor: '#fff',
+                    border: `1px solid rgba(43,35,32,0.09)`,
+                    transition: 'box-shadow 0.15s',
+                  }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.boxShadow = '0 2px 14px rgba(43,35,32,0.09)'; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.boxShadow = 'none'; }}
                 >
-                  Details →
-                </Link>
-              </div>
-            ))}
-          </div>
+                  <img
+                    src={order.img}
+                    alt=""
+                    width={44} height={44}
+                    className="rounded-[5px] object-cover shrink-0"
+                    style={{ backgroundColor: 'rgba(43,35,32,0.06)' }}
+                  />
+                  <div className="flex-1 min-w-0">
+                    <div style={{ fontFamily: UI, fontSize: '0.82rem', fontWeight: 600, color: C.charcoal, lineHeight: 1.3 }}>
+                      {order.title}
+                    </div>
+                    <div className="mt-[2px]" style={{ fontFamily: UI, fontSize: '0.72rem', color: 'rgba(43,35,32,0.44)', letterSpacing: '0.01em' }}>
+                      #{order.id} · {order.date}
+                    </div>
+                  </div>
+                  <StatusBadge status={STATUS_LABEL[order.status] ?? 'Placed'} />
+                  <div className="min-w-[80px] text-right shrink-0" style={{ fontFamily: UI, fontSize: '0.84rem', fontWeight: 500, color: C.charcoal }}>
+                    {order.total}
+                  </div>
+                  <Link
+                    to="/account/orders"
+                    className="no-underline shrink-0 whitespace-nowrap"
+                    style={{ fontFamily: UI, fontSize: '0.72rem', color: C.indigo, letterSpacing: '0.01em' }}
+                  >
+                    Details →
+                  </Link>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <EmptyRow
+              text="No orders yet — when you place one, it'll show up here."
+              cta="Start Shopping" to="/shop"
+            />
+          )}
         </div>
 
         {/* ── Wishlist preview ─────────────────────────────── */}
-        <div>
-          <SectionHead title="From Your Wishlist" linkTo="/account/wishlist" linkLabel="View wishlist" />
-          <div className="flex gap-4 overflow-x-auto pb-2" style={{ scrollbarWidth: 'thin' }}>
-            {WISHLIST_PREVIEW.map(item => (
-              <div
-                key={item.id}
-                className="shrink-0 w-[168px] rounded-lg overflow-hidden"
-                style={{
-                  backgroundColor: '#fff',
-                  border: `1px solid rgba(43,35,32,0.09)`,
-                  boxShadow: '0 1px 6px rgba(43,35,32,0.04)',
-                }}
-              >
-                <div className="relative pt-[100%] overflow-hidden">
-                  <img
-                    src={`https://images.unsplash.com/${item.img}?w=340&h=340&fit=crop&auto=format`}
-                    alt={item.title}
-                    className="absolute inset-0 w-full h-full object-cover"
-                  />
-                </div>
-                <div className="p-3">
-                  <div className="mb-[0.35rem] line-clamp-2" style={{ fontFamily: UI, fontSize: '0.75rem', fontWeight: 500, color: C.charcoal, lineHeight: 1.35 }}>
-                    {item.title}
-                  </div>
-                  <div style={{ fontFamily: UI, fontSize: '0.78rem', fontWeight: 600, color: C.charcoal }}>
-                    CAD ${item.cadNum}
-                  </div>
-                  <Link
-                    to="/account/wishlist"
-                    className="block mt-[0.6rem] text-center py-[0.45rem] rounded-[4px] uppercase no-underline"
-                    style={{
-                      fontFamily: UI, fontSize: '0.65rem', fontWeight: 700,
-                      letterSpacing: '0.1em',
-                      backgroundColor: C.gold, color: C.charcoal,
-                      transition: 'opacity 0.15s',
-                    }}
-                    onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.opacity = '0.85'; }}
-                    onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.opacity = '1'; }}
-                  >
-                    Add to Cart
+        {hasWishlist && (
+          <div>
+            <SectionHead title="From Your Wishlist" linkTo="/account/wishlist" linkLabel="View wishlist" />
+            <div className="flex gap-4 overflow-x-auto pb-2" style={{ scrollbarWidth: 'thin' }}>
+              {overview.wishlistPreview.map(item => (
+                <div
+                  key={item.id}
+                  className="shrink-0 w-[168px] rounded-lg overflow-hidden"
+                  style={{
+                    backgroundColor: '#fff',
+                    border: `1px solid rgba(43,35,32,0.09)`,
+                    boxShadow: '0 1px 6px rgba(43,35,32,0.04)',
+                  }}
+                >
+                  <Link to={`/product/${item.slug}`} className="block relative pt-[100%] overflow-hidden">
+                    <img
+                      src={item.img}
+                      alt={item.title}
+                      className="absolute inset-0 w-full h-full object-cover"
+                    />
                   </Link>
+                  <div className="p-3">
+                    <div className="mb-[0.35rem] line-clamp-2" style={{ fontFamily: UI, fontSize: '0.75rem', fontWeight: 500, color: C.charcoal, lineHeight: 1.35 }}>
+                      {item.title}
+                    </div>
+                    <div style={{ fontFamily: UI, fontSize: '0.78rem', fontWeight: 600, color: C.charcoal }}>
+                      CAD ${item.cadNum}
+                    </div>
+                    <Link
+                      to={`/product/${item.slug}`}
+                      className="block mt-[0.6rem] text-center py-[0.45rem] rounded-[4px] uppercase no-underline"
+                      style={{
+                        fontFamily: UI, fontSize: '0.65rem', fontWeight: 700,
+                        letterSpacing: '0.1em',
+                        backgroundColor: C.gold, color: C.charcoal,
+                        transition: 'opacity 0.15s',
+                      }}
+                      onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.opacity = '0.85'; }}
+                      onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.opacity = '1'; }}
+                    >
+                      View Item
+                    </Link>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* ── Promo card ──────────────────────────────────── */}
         <div

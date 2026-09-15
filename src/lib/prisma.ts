@@ -39,6 +39,22 @@ function createClient() {
   });
 }
 
-export const prisma = globalForPrisma.prisma ?? createClient();
-
-if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
+/**
+ * Created lazily, on first use, rather than at import.
+ *
+ * `next build` loads every route module to collect its data, and the Neon
+ * integration only injects DATABASE_URL at runtime — so constructing the client
+ * (which reads DATABASE_URL) at import time crashes the build with no database
+ * present. This proxy defers `createClient()` until the first query, by which
+ * point the runtime has the connection string; the real client is cached on
+ * globalThis so hot reloads and serverless invocations reuse one instance.
+ */
+export const prisma: PrismaClient =
+  globalForPrisma.prisma ??
+  new Proxy({} as PrismaClient, {
+    get(_target, prop) {
+      const client = (globalForPrisma.prisma ??= createClient());
+      const value = Reflect.get(client as object, prop);
+      return typeof value === 'function' ? value.bind(client) : value;
+    },
+  });

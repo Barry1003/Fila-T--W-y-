@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useState } from 'react';
-import { Link, NavLink, useNavigate } from '@/lib/router';
+import { Link, NavLink, useNavigate, useLocation } from '@/lib/router';
 import { useOverlay } from '@/lib/useOverlay';
 import { useCart } from '@/lib/cart';
 import SignOutForm from './SignOutForm';
@@ -79,6 +79,16 @@ export default function Nav({ user }: { user: CurrentUser | null }) {
   const [searchOpen, setSearchOpen] = useState(false);
   const close = useCallback(() => setMenuOpen(false), []);
   const isOwner = user?.role === 'OWNER';
+
+  // Signed in → straight to the account; signed out → sign in and come back to
+  // the page they were on, not a fixed landing. /auth itself is never a return
+  // target (it would strand them on the form after logging in).
+  const { pathname } = useLocation();
+  const signInHref = user
+    ? '/account'
+    : pathname && pathname !== '/auth'
+      ? `/auth?next=${encodeURIComponent(pathname)}`
+      : '/auth';
 
   // Zero until the stored cart has been read, so the server's markup and the
   // first client render agree; the badge appears a moment later.
@@ -172,7 +182,7 @@ export default function Nav({ user }: { user: CurrentUser | null }) {
             )}
             {([
               { icon: <HeartIcon />, to: '/account/wishlist', label: 'Wishlist' },
-              { icon: <UserIcon />, to: user ? '/account' : '/auth', label: user ? 'Account' : 'Sign in' },
+              { icon: <UserIcon />, to: signInHref, label: user ? 'Account' : 'Sign in' },
             ] as const).map(({ icon, to, label: lbl }) => (
               <Link key={lbl} to={to} className="nav-icon-btn" aria-label={lbl}>
                 {icon}
@@ -296,7 +306,7 @@ export default function Nav({ user }: { user: CurrentUser | null }) {
                   </button>
                 </SignOutForm>
               ) : (
-                <Link to="/auth" onClick={close} className="nav-drawer-sublink">
+                <Link to={signInHref} onClick={close} className="nav-drawer-sublink">
                   <span className="nav-drawer-sublink-icon"><UserIcon /></span>
                   Sign in
                 </Link>

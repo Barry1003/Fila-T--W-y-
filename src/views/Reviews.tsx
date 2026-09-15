@@ -3,83 +3,8 @@
 import { useState } from 'react';
 import { Link } from '@/lib/router';
 import AccountShell from '../components/AccountShell';
+import type { AccountReview as Review, AccountPendingReview as Pending } from '@/server/account';
 import { C, DISPLAY, UI, label } from '../tokens';
-import { slugify } from '@/lib/slug';
-
-/* ─── Mock data ─────────────────────────────────────────────── */
-
-type Review = {
-  id: string;
-  product: string;
-  productId: string;
-  thumbnail: string;
-  rating: number;
-  date: string;
-  body: string;
-  photos?: string[];
-};
-
-type Pending = {
-  id: string;
-  product: string;
-  productId: string;
-  thumbnail: string;
-  deliveredOn: string;
-  orderId: string;
-};
-
-const REVIEWS: Review[] = [
-  {
-    id: 'r1',
-    product: 'Ìgbàgbọ́ Woven Tote',
-    productId: '1',
-    thumbnail: 'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=80&h=80&fit=crop&auto=format',
-    rating: 5,
-    date: 'August 12, 2026',
-    body: "Absolutely stunning craftsmanship. The weave is tight and the colours are even more vibrant in person than on screen. I've carried it daily for three weeks and it still looks pristine. The shoulder strap is well-padded and the interior is deeper than it looks — fits my A4 notebook, water bottle, and daily essentials with room to spare.",
-    photos: [
-      'https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=64&h=64&fit=crop&auto=format',
-      'https://images.unsplash.com/photo-1591195853828-11db59a44f43?w=64&h=64&fit=crop&auto=format',
-    ],
-  },
-  {
-    id: 'r2',
-    product: 'Odòdó Linen Blouse',
-    productId: '2',
-    thumbnail: 'https://images.unsplash.com/photo-1551488831-00ddcb6c6bd3?w=80&h=80&fit=crop&auto=format',
-    rating: 4,
-    date: 'July 3, 2026',
-    body: "Beautiful piece. The embroidery detail around the collar is intricate and clearly hand-finished. I sized up as recommended and the fit was perfect. Linen does wrinkle a little after a full day, but honestly it just adds character. Knocked one star only because the sleeve buttons are a touch stiff — they'll loosen with wear.",
-  },
-  {
-    id: 'r3',
-    product: 'Àṣà Raffia Sandals',
-    productId: '3',
-    thumbnail: 'https://images.unsplash.com/photo-1543163521-1bf539c55dd2?w=80&h=80&fit=crop&auto=format',
-    rating: 5,
-    date: 'May 22, 2026',
-    body: "My favourite purchase of the year. Comfortable straight out of the box, no break-in period, and they go with everything from linen to denim. The raffia weave on the strap is genuinely beautiful and holds its shape well even after beach outings.",
-  },
-];
-
-const PENDING: Pending[] = [
-  {
-    id: 'p1',
-    product: 'Ewé Indigo Block-Print Shirt',
-    productId: '4',
-    thumbnail: 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=80&h=80&fit=crop&auto=format',
-    deliveredOn: 'August 28, 2026',
-    orderId: 'FTW-2025-0847',
-  },
-  {
-    id: 'p2',
-    product: 'Ìrántí Leather Card Wallet',
-    productId: '5',
-    thumbnail: 'https://images.unsplash.com/photo-1627123424574-724758594e93?w=80&h=80&fit=crop&auto=format',
-    deliveredOn: 'August 19, 2026',
-    orderId: 'FTW-2025-0821',
-  },
-];
 
 /* ─── Star display ───────────────────────────────────────────── */
 function StarDisplay({ rating, max = 5 }: { rating: number; max?: number }) {
@@ -130,12 +55,12 @@ function ReviewCard({ review }: { review: Review }) {
     <div className="rounded-[10px] p-6 flex flex-col gap-4" style={{ backgroundColor: '#fff', border: '1px solid rgba(43,35,32,0.08)' }}>
       {/* Product row */}
       <div className="flex items-start gap-3.5">
-        <Link to={`/product/${slugify(review.product)}`} className="shrink-0">
+        <Link to={`/product/${review.slug}`} className="shrink-0">
           <img src={review.thumbnail} alt={review.product} width={52} height={52}
             className="rounded-[6px] object-cover block" />
         </Link>
         <div className="flex-1 min-w-0">
-          <Link to={`/product/${slugify(review.product)}`}
+          <Link to={`/product/${review.slug}`}
             className="block no-underline mb-[0.3rem]"
             style={{ fontFamily: UI, fontSize: '0.875rem', fontWeight: 600, color: C.charcoal }}>
             {review.product}
@@ -210,12 +135,12 @@ function PendingCard({ item }: { item: Pending }) {
   return (
     <div className="rounded-[10px] p-6 flex flex-col" style={{ backgroundColor: '#fff', border: '1px solid rgba(43,35,32,0.08)', gap: writing ? '1.125rem' : '0' }}>
       <div className="flex items-center gap-3.5 flex-wrap">
-        <Link to={`/product/${slugify(item.product)}`} className="shrink-0">
+        <Link to={`/product/${item.slug}`} className="shrink-0">
           <img src={item.thumbnail} alt={item.product} width={52} height={52}
             className="rounded-[6px] object-cover block" />
         </Link>
         <div className="flex-1 min-w-[140px]">
-          <Link to={`/product/${slugify(item.product)}`}
+          <Link to={`/product/${item.slug}`}
             className="block no-underline mb-1"
             style={{ fontFamily: UI, fontSize: '0.875rem', fontWeight: 600, color: C.charcoal }}>
             {item.product}
@@ -313,7 +238,7 @@ type Tab = 'reviews' | 'pending';
 // Layout for the tab buttons; colour/weight/underline stay dynamic in tabBtn.
 const TAB_CLS = 'inline-flex items-center gap-[0.4rem] pb-2.5 px-0 mr-8 cursor-pointer uppercase';
 
-export default function Reviews() {
+export default function Reviews({ reviews = [], pending = [] }: { reviews?: Review[]; pending?: Pending[] }) {
   const [activeTab, setActiveTab] = useState<Tab>('reviews');
 
   const tabBtn = (t: Tab): React.CSSProperties => ({
@@ -343,7 +268,7 @@ export default function Reviews() {
           </button>
           <button className={TAB_CLS} style={tabBtn('pending')} onClick={() => setActiveTab('pending')}>
             Pending Reviews
-            {PENDING.length > 0 && (
+            {pending.length > 0 && (
               <span
                 className="inline-flex items-center justify-center w-[17px] h-[17px] rounded-full"
                 style={{
@@ -353,7 +278,7 @@ export default function Reviews() {
                   transition: 'background-color 0.15s, color 0.15s',
                 }}
               >
-                {PENDING.length}
+                {pending.length}
               </span>
             )}
           </button>
@@ -361,7 +286,7 @@ export default function Reviews() {
 
         {/* Reviews tab */}
         {activeTab === 'reviews' && (
-          REVIEWS.length === 0 ? (
+          reviews.length === 0 ? (
             <div className="rounded-[10px] py-14 px-8 text-center" style={{ backgroundColor: '#fff', border: '1px solid rgba(43,35,32,0.08)' }}>
               <div className="mb-4" style={{ color: 'rgba(43,35,32,0.18)' }}>
                 <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round">
@@ -385,14 +310,14 @@ export default function Reviews() {
             </div>
           ) : (
             <div className="flex flex-col gap-4">
-              {REVIEWS.map(r => <ReviewCard key={r.id} review={r} />)}
+              {reviews.map(r => <ReviewCard key={r.id} review={r} />)}
             </div>
           )
         )}
 
         {/* Pending tab */}
         {activeTab === 'pending' && (
-          PENDING.length === 0 ? (
+          pending.length === 0 ? (
             <div className="rounded-[10px] py-14 px-8 text-center" style={{ backgroundColor: '#fff', border: '1px solid rgba(43,35,32,0.08)' }}>
               <div className="mb-4" style={{ color: 'rgba(43,35,32,0.18)' }}>
                 <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
@@ -409,7 +334,7 @@ export default function Reviews() {
                 These items were recently delivered and are waiting for your review.
               </p>
               <div className="flex flex-col gap-4">
-                {PENDING.map(p => <PendingCard key={p.id} item={p} />)}
+                {pending.map(p => <PendingCard key={p.id} item={p} />)}
               </div>
             </>
           )
