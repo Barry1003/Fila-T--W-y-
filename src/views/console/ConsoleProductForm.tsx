@@ -152,6 +152,9 @@ function VariantRow({ v, onChange, onRemove }: {
 
 type ImageEntry = { id: string; url: string; color: string };
 
+// Mirrors the images .max(8) in product-schema.ts — keep the two in step.
+const MAX_IMAGES = 8;
+
 function ImageSlot({ img, isMain, colors, onColorChange, onRemove }: {
   img: ImageEntry;
   isMain: boolean;
@@ -262,6 +265,7 @@ export default function ConsoleProductForm({ product, categories, knownColors }:
   const [imageDraft, setImageDraft] = useState("");
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState("");
+  const [dragOver, setDragOver] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [saving, setSaving] = useState(false);
@@ -289,17 +293,61 @@ export default function ConsoleProductForm({ product, categories, knownColors }:
     setImages(imgs => imgs.filter(i => i.id !== iid));
   }
 
-  async function uploadFiles(files: FileList | null) {
-    if (!files || files.length === 0) return;
+  async function uploadFiles(fileList: FileList | File[] | null) {
+    let files = fileList ? Array.from(fileList).filter(f => f.type.startsWith("image/")) : [];
+    if (files.length === 0) return;
     setUploadError("");
+
+    // A product holds at most MAX_IMAGES; trim the batch to the free slots so we
+    // never upload photos the save would then reject.
+    const remaining = MAX_IMAGES - images.length;
+    if (remaining <= 0) {
+      setUploadError(`You can add up to ${MAX_IMAGES} images. Remove one to add more.`);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      return;
+    }
+    let trimmedNote = "";
+    if (files.length > remaining) {
+      trimmedNote = ` Only the first ${remaining} were added (max ${MAX_IMAGES}).`;
+      files = files.slice(0, remaining);
+    }
+
     setUploading(true);
     try {
-      for (const file of Array.from(files)) {
-        const data = new FormData();
-        data.set("file", file);
-        const res = await uploadProductImage(data);
-        if (!res.ok) { setUploadError(res.message); break; }
-        setImages(imgs => [...imgs, { id: `i${Date.now()}-${Math.random().toString(36).slice(2, 6)}`, url: res.url, color: "" }]);
+      // Upload every selected file, independently — one failure no longer stops
+      // the rest, and each success is added as it lands.
+      const results = await Promise.all(
+        files.map(async file => {
+          const data = new FormData();
+          data.set("file", file);
+          try {
+            return await uploadProductImage(data);
+          } catch {
+            return { ok: false as const, message: "Upload failed." };
+          }
+        })
+      );
+
+      const uploaded = results.filter((r): r is { ok: true; url: string } => r.ok);
+      if (uploaded.length > 0) {
+        setImages(imgs => [
+          ...imgs,
+          ...uploaded.map((r, i) => ({
+            id: `i${Date.now()}-${i}-${Math.random().toString(36).slice(2, 6)}`,
+            url: r.url,
+            color: "",
+          })),
+        ]);
+      }
+
+      const firstFail = results.find(r => !r.ok) as { ok: false; message: string } | undefined;
+      const failed = results.length - uploaded.length;
+      if (firstFail) {
+        setUploadError(
+          `${failed} of ${results.length} image${results.length > 1 ? "s" : ""} could not be uploaded — ${firstFail.message}${trimmedNote}`
+        );
+      } else if (trimmedNote) {
+        setUploadError(trimmedNote.trim());
       }
     } finally {
       setUploading(false);
@@ -660,22 +708,25 @@ export default function ConsoleProductForm({ product, categories, knownColors }:
               type="button"
               onClick={() => fileInputRef.current?.click()}
               disabled={uploading}
+              onDragOver={e => { e.preventDefault(); if (!uploading) setDragOver(true); }}
+              onDragLeave={e => { e.preventDefault(); setDragOver(false); }}
+              onDrop={e => { e.preventDefault(); setDragOver(false); if (!uploading) uploadFiles(e.dataTransfer.files); }}
               className="w-full flex flex-col items-center justify-center gap-1.5 rounded-[8px] py-5 px-4 mb-2 cursor-pointer transition-colors"
               style={{
-                border: "1.5px dashed rgba(43,35,32,0.25)",
-                background: uploading ? "rgba(43,35,32,0.03)" : "transparent",
-                color: "rgba(43,35,32,0.55)",
+                border: `1.5px dashed ${dragOver ? C.gold : "rgba(43,35,32,0.25)"}`,
+                background: dragOver ? "rgba(212,169,78,0.08)" : uploading ? "rgba(43,35,32,0.03)" : "transparent",
+                color: dragOver ? C.charcoal : "rgba(43,35,32,0.55)",
                 cursor: uploading ? "wait" : "pointer",
               }}
-              onMouseEnter={e => { if (!uploading) { (e.currentTarget as HTMLElement).style.borderColor = C.gold; (e.currentTarget as HTMLElement).style.color = C.charcoal; } }}
-              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = "rgba(43,35,32,0.25)"; (e.currentTarget as HTMLElement).style.color = "rgba(43,35,32,0.55)"; }}
+              onMouseEnter={e => { if (!uploading && !dragOver) { (e.currentTarget as HTMLElement).style.borderColor = C.gold; (e.currentTarget as HTMLElement).style.color = C.charcoal; } }}
+              onMouseLeave={e => { if (!dragOver) { (e.currentTarget as HTMLElement).style.borderColor = "rgba(43,35,32,0.25)"; (e.currentTarget as HTMLElement).style.color = "rgba(43,35,32,0.55)"; } }}
             >
               <UploadIcon size={22} />
               <span style={{ fontSize: "0.75rem", fontWeight: 500 }}>
-                {uploading ? "Uploading…" : "Upload images from your device"}
+                {uploading ? "Uploading…" : dragOver ? "Drop to upload" : "Upload images — click or drag & drop"}
               </span>
               <span style={{ fontSize: "0.63rem", color: "rgba(43,35,32,0.4)" }}>
-                JPG, PNG, WEBP, GIF or AVIF · up to 10 MB each
+                Select or drop several at once · JPG, PNG, WEBP, GIF, AVIF · up to 10 MB each
               </span>
             </button>
 
