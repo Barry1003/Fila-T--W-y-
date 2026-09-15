@@ -2,6 +2,8 @@ import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import Product from '@/views/Product';
 import { getProductBySlug, listProducts } from '@/server/catalogue';
+import { getCurrentUser } from '@/server/auth';
+import { isInWishlist } from '@/server/account';
 
 type Params = { params: Promise<{ slug: string }> };
 
@@ -28,5 +30,8 @@ export default async function Page({ params }: Params) {
     ...all.filter(p => p.category !== product.category),
   ].slice(0, 4);
 
-  return <Product product={product} related={related} />;
+  const user = await getCurrentUser().catch(() => null);
+  const inWishlist = user ? await isInWishlist(user.id, product.id) : false;
+
+  return <Product product={product} related={related} inWishlist={inWishlist} signedIn={Boolean(user)} />;
 }

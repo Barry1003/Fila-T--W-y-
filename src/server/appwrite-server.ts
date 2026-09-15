@@ -35,8 +35,17 @@ export function adminUsers() {
   return new Users(adminClient());
 }
 
+/** Whether the public Appwrite settings are present. */
+function isConfigured() {
+  return Boolean(endpoint && projectId);
+}
+
 /** Client acting as the signed-in visitor, or null when there is no session. */
 export async function sessionClient() {
+  // Not configured (e.g. a build with no env yet) reads as "signed out" rather
+  // than throwing — the same reasoning as the lazy Prisma client. Auth needs
+  // the env set to actually work at runtime.
+  if (!isConfigured()) return null;
   const secret = (await cookies()).get(SESSION_COOKIE)?.value;
   if (!secret) return null;
   return baseClient().setSession(secret);

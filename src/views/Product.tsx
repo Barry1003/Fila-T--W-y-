@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
-import { Link } from '@/lib/router';
+import { useState, useMemo, useEffect, useTransition } from 'react';
+import { Link, useNavigate } from '@/lib/router';
 import { useCart } from '@/lib/cart';
+import { toggleWishlist } from '@/server/wishlist-actions';
 import { C, DISPLAY, UI, label } from '../tokens';
 import type { CatalogueProduct } from '@/server/catalogue';
 
@@ -253,9 +254,11 @@ function Stars({ rating, size = 13 }: { rating: number; size?: number }) {
 export type ProductProps = {
   product: CatalogueProduct;
   related: CatalogueProduct[];
+  inWishlist?: boolean;
+  signedIn?: boolean;
 };
 
-export default function Product({ product, related }: ProductProps) {
+export default function Product({ product, related, inWishlist = false, signedIn = false }: ProductProps) {
 
   const [mainIdx, setMainIdx] = useState(0);
   const uniqueSizes = useMemo(() => [...new Set(product.variants.map(v => v.size))], [product.variants]);
@@ -267,6 +270,22 @@ export default function Product({ product, related }: ProductProps) {
   const [justAdded, setJustAdded] = useState(false);
 
   const { add } = useCart();
+  const navigate = useNavigate();
+  const [saved, setSaved] = useState(inWishlist);
+  const [, startWishlist] = useTransition();
+
+  function toggleSaved() {
+    if (!signedIn) {
+      navigate(`/auth?next=/product/${product.slug}`);
+      return;
+    }
+    setSaved(s => !s); // optimistic
+    startWishlist(async () => {
+      const res = await toggleWishlist(product.id);
+      if (!res.ok) { setSaved(inWishlist); alert(res.message); return; }
+      setSaved(res.inWishlist);
+    });
+  }
 
   function addToCart() {
     add({
@@ -551,6 +570,25 @@ export default function Product({ product, related }: ProductProps) {
                   }}
                 >
                   {isSoldOut ? 'Sold Out' : justAdded ? 'Added to Cart' : 'Add to Cart'}
+                </button>
+
+                {/* Save to wishlist */}
+                <button
+                  onClick={toggleSaved}
+                  title={saved ? 'Remove from wishlist' : 'Save to wishlist'}
+                  aria-label={saved ? 'Remove from wishlist' : 'Save to wishlist'}
+                  aria-pressed={saved}
+                  className="w-[50px] h-[50px] shrink-0 rounded-full flex items-center justify-center cursor-pointer"
+                  style={{
+                    border: `1.5px solid ${C.maroon}`,
+                    backgroundColor: saved ? C.maroon : 'transparent',
+                    color: saved ? C.cream : C.maroon,
+                    transition: 'background 0.18s, color 0.18s',
+                  }}
+                >
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill={saved ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                  </svg>
                 </button>
 
                 {/* Share button */}

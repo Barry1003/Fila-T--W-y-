@@ -1,9 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useTransition } from 'react';
+import { useRouter } from 'next/navigation';
 import { Link } from '@/lib/router';
 import AccountShell from '../components/AccountShell';
 import type { AccountWishItem as WishItem } from '@/server/account';
+import { removeFromWishlist } from '@/server/wishlist-actions';
 import { C, DISPLAY, UI, label } from '../tokens';
 
 const fmt = (n: number, prefix: string) => `${prefix}${n.toLocaleString()}`;
@@ -148,10 +150,22 @@ function WishCard({ item, onRemove, onAddToCart }: { item: WishItem; onRemove: (
 
 /* ─── Main ──────────────────────────────────────────────────── */
 export default function Wishlist({ initialItems = [] }: { initialItems?: WishItem[] }) {
+  const router = useRouter();
+  const [, startTransition] = useTransition();
   const [items, setItems] = useState<WishItem[]>(initialItems);
 
+  // Adopt the server's list after a removal is persisted and the route re-runs.
+  useEffect(() => { setItems(initialItems); }, [initialItems]);
+
   function removeItem(id: string) {
+    const item = items.find(i => i.id === id);
     setItems(prev => prev.filter(i => i.id !== id));
+    if (!item) return;
+    startTransition(async () => {
+      const res = await removeFromWishlist(item.productId);
+      if (!res.ok) alert(res.message);
+      router.refresh();
+    });
   }
 
   return (

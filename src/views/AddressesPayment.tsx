@@ -1,9 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useTransition } from 'react';
+import { useRouter } from 'next/navigation';
 import { useLocation, useNavigate } from '@/lib/router';
 import AccountShell from '../components/AccountShell';
 import type { AccountAddress as Address, AccountPayment as Payment } from '@/server/account';
+import { saveAddress as saveAddressAction, deleteAddress, setDefaultAddress } from '@/server/address-actions';
 import { C, DISPLAY, UI, label } from '../tokens';
 
 /* ─── Form shapes ───────────────────────────────────────────── */
@@ -438,35 +440,69 @@ export default function AddressesPayment({
   const navigate = useNavigate();
   const activeTab: 'addresses' | 'payment' = pathname.includes('/payment') ? 'payment' : 'addresses';
 
+  const router = useRouter();
+  const [, startTransition] = useTransition();
   const [addresses, setAddresses] = useState<Address[]>(initialAddresses);
   const [payments, setPayments] = useState<Payment[]>(initialPayments);
+
+  // Reconcile with the server after each save: the route re-runs, the fresh
+  // rows arrive as props (with their real database ids), and local state adopts
+  // them — replacing the optimistic placeholders shown a moment earlier.
+  useEffect(() => { setAddresses(initialAddresses); }, [initialAddresses]);
+  useEffect(() => { setPayments(initialPayments); }, [initialPayments]);
 
   // Modal state: null=closed, 'add'=new, an id string=editing that address
   const [addrModal, setAddrModal] = useState<'add' | string | null>(null);
   const [payModal, setPayModal] = useState<'add' | string | null>(null);
   const isEditingAddr = addrModal !== null && addrModal !== 'add';
 
-  /* Address actions */
+  /* Address actions — optimistic locally, then persisted and reconciled */
   function saveAddress(data: AddrForm) {
+    const editingId = isEditingAddr ? (addrModal as string) : undefined;
+
     if (addrModal === 'add') {
-      const newAddr: Address = { id: String(Date.now()), ...data };
+      const newAddr: Address = { id: `tmp-${Date.now()}`, ...data };
       setAddresses(prev =>
         data.isDefault
           ? [...prev.map(a => ({ ...a, isDefault: false })), newAddr]
           : [...prev, newAddr]
       );
-    } else if (isEditingAddr) {
+    } else if (editingId) {
       setAddresses(prev =>
         prev.map(a => {
-          if (a.id === addrModal) return { ...a, ...data };
+          if (a.id === editingId) return { ...a, ...data };
           return data.isDefault ? { ...a, isDefault: false } : a;
         })
       );
     }
     setAddrModal(null);
+
+    startTransition(async () => {
+      const res = await saveAddressAction({ ...data, id: editingId });
+      if (!res.ok) { alert(res.message); router.refresh(); return; }
+      router.refresh();
+    });
   }
 
-  /* Payment actions */
+  function deleteAddr(id: string) {
+    setAddresses(prev => prev.filter(a => a.id !== id));
+    startTransition(async () => {
+      const res = await deleteAddress(id);
+      if (!res.ok) alert(res.message);
+      router.refresh();
+    });
+  }
+
+  function makeDefaultAddr(id: string) {
+    setAddresses(prev => prev.map(a => ({ ...a, isDefault: a.id === id })));
+    startTransition(async () => {
+      const res = await setDefaultAddress(id);
+      if (!res.ok) alert(res.message);
+      router.refresh();
+    });
+  }
+
+  /* Payment actions — display only; card storage needs a payment provider */
   function removePayment(id: string) {
     setPayments(prev => prev.filter(p => p.id !== id));
   }
@@ -539,8 +575,8 @@ export default function AddressesPayment({
               key={addr.id}
               addr={addr}
               onEdit={() => setAddrModal(addr.id)}
-              onDelete={() => setAddresses(prev => prev.filter(a => a.id !== addr.id))}
-              onSetDefault={() => setAddresses(prev => prev.map(a => ({ ...a, isDefault: a.id === addr.id })))}
+              onDelete={() => deleteAddr(addr.id)}
+              onSetDefault={() => makeDefaultAddr(addr.id)}
             />
           ))}
           <AddNewCard text="Add New Address" onClick={() => setAddrModal('add')} />

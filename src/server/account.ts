@@ -163,6 +163,17 @@ export async function listMyWishlist(userId: string): Promise<AccountWishItem[]>
   });
 }
 
+/** Whether this user has the product saved — for the product page's heart. */
+export async function isInWishlist(userId: string, productId: string): Promise<boolean> {
+  const row = await withDbRetry('wishlist membership', () =>
+    prisma.wishlistItem.findUnique({
+      where: { userId_productId: { userId, productId } },
+      select: { id: true },
+    })
+  );
+  return Boolean(row);
+}
+
 /* ─── Custom requests ─────────────────────────────────────────── */
 
 export type AccountCustomStatus =
