@@ -46,7 +46,11 @@ function ShareModal({
   onClose: () => void;
 }) {
   const [copied, setCopied] = useState(false);
-  const productUrl = `https://adeclassics.com/product/${product.slug}`;
+  // The real site — wherever this page is actually served from — rather than a
+  // hard-coded domain, so the shared link always resolves.
+  const origin = typeof window !== 'undefined' ? window.location.origin : '';
+  const host = origin.replace(/^https?:\/\//, '') || 'adeclassics.com';
+  const productUrl = `${origin}/product/${product.slug}`;
   const shareText = `Check out ${product.title} on AdeClassics — CAD $${product.priceCad.toLocaleString()}`;
 
   function handleCopy() {
@@ -156,7 +160,7 @@ function ShareModal({
             {/* Text block — mimics a WhatsApp / iMessage OG card */}
             <div className="pt-3 px-4 pb-[0.9rem]" style={{ backgroundColor: '#fff', borderTop: '1px solid rgba(43,35,32,0.07)' }}>
               <div className="mb-[0.3rem] uppercase" style={{ fontFamily: UI, fontSize: '0.575rem', color: 'rgba(43,35,32,0.3)', letterSpacing: '0.13em' }}>
-                adeclassics.com
+                {host}
               </div>
               <div className="mb-[0.3rem]" style={{ fontFamily: UI, fontSize: '0.925rem', fontWeight: 600, color: C.charcoal, lineHeight: 1.32 }}>
                 {product.title}
@@ -411,7 +415,9 @@ export default function Product({ product, related, inWishlist = false, signedIn
                 {product.tag}
               </span>
             </div>
-            {/* Thumbnail strip */}
+            {/* Thumbnail strip — only when there is more than one photo, so a
+                single image isn't echoed as a full-width square below it. */}
+            {gallery.length > 1 && (
             <div className="flex gap-2.5">
               {gallery.map((g, i) => (
                 <button
@@ -429,6 +435,7 @@ export default function Product({ product, related, inWishlist = false, signedIn
                 </button>
               ))}
             </div>
+            )}
           </div>
 
           {/* RIGHT: Product info */}
