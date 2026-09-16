@@ -1,13 +1,12 @@
 'use client';
 
-import { useState, useMemo, useEffect, useTransition } from 'react';
+import { useState, useMemo, useTransition } from 'react';
 import { Link, useNavigate } from '@/lib/router';
+import { useOverlay } from '@/lib/useOverlay';
 import { useCart } from '@/lib/cart';
 import { toggleWishlist } from '@/server/wishlist-actions';
 import { C, DISPLAY, UI, label } from '../tokens';
 import type { CatalogueProduct } from '@/server/catalogue';
-
-const U = 'https://images.unsplash.com/';
 
 const MOCK_REVIEWS = [
   {
@@ -38,20 +37,34 @@ const AVG_RATING = 4.7;
 
 function ShareModal({
   product,
-  imgSrc,
+  baseUrl,
   onClose,
 }: {
   product: CatalogueProduct;
-  imgSrc: string;
+  baseUrl?: string;
   onClose: () => void;
 }) {
   const [copied, setCopied] = useState(false);
-  // The real site — wherever this page is actually served from — rather than a
-  // hard-coded domain, so the shared link always resolves.
-  const origin = typeof window !== 'undefined' ? window.location.origin : '';
-  const host = origin.replace(/^https?:\/\//, '') || 'adeclassics.com';
+  useOverlay(true, onClose); // Escape-to-close + scroll lock while the modal is open
+  // Prefer the canonical origin passed from the server (survives redeploys, never
+  // a preview/localhost host); fall back to the current origin, then production.
+  const origin = (baseUrl || (typeof window !== 'undefined' ? window.location.origin : '') || 'https://fila-t-w-y.vercel.app').replace(/\/+$/, '');
+  const host = origin.replace(/^https?:\/\//, '');
   const productUrl = `${origin}/product/${product.slug}`;
+  // The real card that platforms unfurl — the same 1200×630 "Shop Now" image.
+  const previewUrl = `${productUrl}/og.jpg`;
   const shareText = `Check out ${product.title} on AdeClassics — CAD $${product.priceCad.toLocaleString()}`;
+
+  // Native share sheet (mobile) — the reliable way to reach Instagram, which has
+  // no web share intent. Falls back to copying the link on desktop.
+  function nativeShare() {
+    const nav = navigator as Navigator & { share?: (d: { title?: string; text?: string; url?: string }) => Promise<void> };
+    if (typeof nav.share === 'function') {
+      nav.share({ title: product.title, text: shareText, url: productUrl }).catch(() => {});
+    } else {
+      handleCopy();
+    }
+  }
 
   function handleCopy() {
     navigator.clipboard.writeText(productUrl).then(() => {
@@ -69,11 +82,12 @@ function ShareModal({
     });
   }
 
-  const channels = [
+  const channels: { name: string; bg: string; icon: React.ReactNode; href?: string; onClick?: () => void }[] = [
     {
       name: 'WhatsApp',
       bg: '#25D366',
-      href: `https://wa.me/?text=${encodeURIComponent(shareText + '\n' + productUrl)}`,
+      // URL first so WhatsApp unfurls it — leading text suppresses the preview.
+      href: `https://wa.me/?text=${encodeURIComponent(productUrl + '\n\n' + shareText)}`,
       icon: (
         <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
           <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
@@ -81,9 +95,9 @@ function ShareModal({
       ),
     },
     {
-      name: 'Instagram',
+      name: 'Share',
       bg: '#C13584',
-      href: 'https://www.instagram.com/',
+      onClick: nativeShare,
       icon: (
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
           <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
@@ -153,11 +167,11 @@ function ShareModal({
           className="block no-underline mb-2.5"
         >
           <div className="rounded-[10px] overflow-hidden" style={{ border: '1px solid rgba(43,35,32,0.11)', boxShadow: '0 2px 14px rgba(43,35,32,0.09)' }}>
-            {/* Product image — same as PDP main */}
-            <div className="h-[180px] overflow-hidden relative" style={{ backgroundColor: '#ddd5c8' }}>
-              <img src={imgSrc} alt={product.title} className="w-full h-full object-cover block" />
+            {/* The actual share card platforms render, at its true 1.91:1 ratio. */}
+            <div className="overflow-hidden relative" style={{ backgroundColor: '#ddd5c8', aspectRatio: '1200 / 630' }}>
+              <img src={previewUrl} alt={product.title} className="w-full h-full object-cover block" />
             </div>
-            {/* Text block — mimics a WhatsApp / iMessage OG card */}
+            {/* Text row — mimics the domain/title line a WhatsApp card shows below. */}
             <div className="pt-3 px-4 pb-[0.9rem]" style={{ backgroundColor: '#fff', borderTop: '1px solid rgba(43,35,32,0.07)' }}>
               <div className="mb-[0.3rem] uppercase" style={{ fontFamily: UI, fontSize: '0.575rem', color: 'rgba(43,35,32,0.3)', letterSpacing: '0.13em' }}>
                 {host}
@@ -179,20 +193,35 @@ function ShareModal({
 
         {/* Channel buttons */}
         <div className="flex justify-center gap-3.5 mb-[1.625rem]">
-          {channels.map(ch => (
-            <a
-              key={ch.name}
-              href={ch.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex flex-col items-center gap-1.5 no-underline"
-            >
-              <span className="w-[46px] h-[46px] rounded-full flex items-center justify-center shrink-0" style={{ backgroundColor: ch.bg, boxShadow: '0 2px 8px rgba(43,35,32,0.14)' }}>
-                {ch.icon}
-              </span>
-              <span style={{ fontFamily: UI, fontSize: '0.565rem', color: 'rgba(43,35,32,0.42)', letterSpacing: '0.04em' }}>{ch.name}</span>
-            </a>
-          ))}
+          {channels.map(ch => {
+            const inner = (
+              <>
+                <span className="w-[46px] h-[46px] rounded-full flex items-center justify-center shrink-0" style={{ backgroundColor: ch.bg, boxShadow: '0 2px 8px rgba(43,35,32,0.14)' }}>
+                  {ch.icon}
+                </span>
+                <span style={{ fontFamily: UI, fontSize: '0.565rem', color: 'rgba(43,35,32,0.42)', letterSpacing: '0.04em' }}>{ch.name}</span>
+              </>
+            );
+            return 'onClick' in ch && ch.onClick ? (
+              <button
+                key={ch.name}
+                onClick={ch.onClick}
+                className="flex flex-col items-center gap-1.5 bg-transparent border-none cursor-pointer p-0"
+              >
+                {inner}
+              </button>
+            ) : (
+              <a
+                key={ch.name}
+                href={ch.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex flex-col items-center gap-1.5 no-underline"
+              >
+                {inner}
+              </a>
+            );
+          })}
         </div>
 
         {/* Copy-link row */}
@@ -260,9 +289,12 @@ export type ProductProps = {
   related: CatalogueProduct[];
   inWishlist?: boolean;
   signedIn?: boolean;
+  /** Canonical origin (from siteUrl()) so shared links survive redeploys and
+   *  never point at a preview/localhost host. */
+  shareBaseUrl?: string;
 };
 
-export default function Product({ product, related, inWishlist = false, signedIn = false }: ProductProps) {
+export default function Product({ product, related, inWishlist = false, signedIn = false, shareBaseUrl }: ProductProps) {
 
   const [mainIdx, setMainIdx] = useState(0);
   const uniqueSizes = useMemo(() => [...new Set(product.variants.map(v => v.size))], [product.variants]);
@@ -283,15 +315,17 @@ export default function Product({ product, related, inWishlist = false, signedIn
       navigate(`/auth?next=/product/${product.slug}`);
       return;
     }
-    setSaved(s => !s); // optimistic
+    const prev = saved;
+    setSaved(!prev); // optimistic
     startWishlist(async () => {
       const res = await toggleWishlist(product.id);
-      if (!res.ok) { setSaved(inWishlist); alert(res.message); return; }
+      if (!res.ok) { setSaved(prev); alert(res.message); return; }
       setSaved(res.inWishlist);
     });
   }
 
   function addToCart() {
+    if (!canBuy) return;
     add({
       productId: product.id,
       slug: product.slug,
@@ -299,8 +333,9 @@ export default function Product({ product, related, inWishlist = false, signedIn
       size: selectedSize,
       color: selectedColor,
       unitPriceCents: Math.round(product.priceCad * 100),
-      // The photo for the colour they picked, so the cart shows what they chose.
-      imageUrl: shownImages[0]?.url ?? product.imageUrl,
+      // The photo the shopper is actually looking at, so the cart shows what
+      // they chose — the selected colour and the crop they clicked to.
+      imageUrl: gallery[safeIdx]?.main ?? shownImages[0]?.url ?? product.imageUrl,
       quantity,
     });
 
@@ -336,13 +371,23 @@ export default function Product({ product, related, inWishlist = false, signedIn
       : [{ main: url, thumb: url }];
   }, [shownImages, product.imageUrl]);
 
-  // Switching colour changes the gallery, so start it back at the first photo.
-  useEffect(() => { setMainIdx(0); }, [selectedColor]);
+  // Switching colour can shrink the gallery below the current index. Clamp here,
+  // during render, rather than correcting in an effect afterwards — an effect
+  // runs after the render that would already have read gallery[mainIdx] and
+  // thrown on a shorter list.
+  const safeIdx = mainIdx < gallery.length ? mainIdx : 0;
 
-  const isHeadwear = ['Fila Gobi', 'Abetiaja', 'Shisha', 'Fila Senator', 'Gele', 'Ipele'].includes(product.category);
+  const isHeadwear = ['Fila Gobi', 'Abetiaja', 'Shisha', 'Fila Senator', 'Gele'].includes(product.category);
   const isFootwear = ['Shoes', 'Pam Slippers'].includes(product.category);
   const isMTO = product.tag === 'MADE TO ORDER';
   const isSoldOut = product.tag === 'SOLD OUT';
+
+  // The exact variant the shopper has selected — what actually governs whether
+  // they can buy, not the product-level SOLD OUT tag. A made-to-order piece is
+  // buyable even with no stock on hand.
+  const selectedVariant = product.variants.find(v => v.size === selectedSize && v.color === selectedColor);
+  const canBuy = !isSoldOut && (isMTO || selectedVariant?.inStock !== false);
+
   const hasVariableSizes = uniqueSizes.length > 1 && uniqueSizes[0] !== 'One Size';
   const hasVariableColors = product.colors.length > 0 && product.colors[0] !== '';
 
@@ -406,9 +451,9 @@ export default function Product({ product, related, inWishlist = false, signedIn
           <div>
             <div className="relative aspect-[4/5] overflow-hidden mb-3.5" style={{ backgroundColor: '#ddd5c8' }}>
               <img
-                key={mainIdx}
+                key={safeIdx}
                 className="pdp-main-img w-full h-full object-cover block"
-                src={gallery[mainIdx].main}
+                src={gallery[safeIdx].main}
                 alt={product.title}
               />
               <span className="absolute top-4 left-4 py-[4px] px-[10px]" style={{ backgroundColor: isSoldOut ? C.charcoal : isMTO ? C.charcoal : C.maroon, color: C.cream, ...label, fontSize: '0.575rem', letterSpacing: '0.12em' }}>
@@ -426,7 +471,7 @@ export default function Product({ product, related, inWishlist = false, signedIn
                   className="flex-1 aspect-square overflow-hidden p-0 cursor-pointer"
                   style={{
                     border: 'none',
-                    outline: mainIdx === i ? `2px solid ${C.gold}` : '2px solid transparent',
+                    outline: safeIdx === i ? `2px solid ${C.gold}` : '2px solid transparent',
                     outlineOffset: '2px', backgroundColor: '#ddd5c8',
                     transition: 'outline 0.15s',
                   }}
@@ -566,17 +611,17 @@ export default function Product({ product, related, inWishlist = false, signedIn
                 {/* Add to Cart */}
                 <button
                   onClick={addToCart}
-                  disabled={isSoldOut}
-                  className={`flex-1 h-[50px] ${isSoldOut ? '' : 'shimmer-cta'}`}
+                  disabled={!canBuy}
+                  className={`flex-1 h-[50px] ${canBuy ? 'shimmer-cta' : ''}`}
                   style={{
-                    backgroundColor: isSoldOut ? 'rgba(43,35,32,0.08)' : justAdded ? C.teal : C.gold,
-                    color: isSoldOut ? 'rgba(43,35,32,0.3)' : justAdded ? C.cream : C.charcoal,
+                    backgroundColor: !canBuy ? 'rgba(43,35,32,0.08)' : justAdded ? C.teal : C.gold,
+                    color: !canBuy ? 'rgba(43,35,32,0.3)' : justAdded ? C.cream : C.charcoal,
                     border: 'none', ...label, fontSize: '0.68rem', letterSpacing: '0.17em',
-                    cursor: isSoldOut ? 'not-allowed' : 'pointer',
+                    cursor: !canBuy ? 'not-allowed' : 'pointer',
                     transition: 'background-color 0.2s, color 0.2s',
                   }}
                 >
-                  {isSoldOut ? 'Sold Out' : justAdded ? 'Added to Cart' : 'Add to Cart'}
+                  {isSoldOut ? 'Sold Out' : !canBuy ? 'Unavailable' : justAdded ? 'Added to Cart' : 'Add to Cart'}
                 </button>
 
                 {/* Save to wishlist */}
@@ -623,9 +668,9 @@ export default function Product({ product, related, inWishlist = false, signedIn
 
             {/* Custom size link */}
             <div className="text-center mb-8">
-              <a href="#" className="no-underline pb-[1px]" style={{ fontFamily: UI, fontSize: '0.8125rem', color: C.indigo, borderBottom: `1px solid ${C.indigo}` }}>
+              <Link to="/custom-order" className="no-underline pb-[1px]" style={{ fontFamily: UI, fontSize: '0.8125rem', color: C.indigo, borderBottom: `1px solid ${C.indigo}` }}>
                 Request Custom Size →
-              </a>
+              </Link>
             </div>
 
             {/* Trust row */}
@@ -860,7 +905,7 @@ export default function Product({ product, related, inWishlist = false, signedIn
       {shareOpen && (
         <ShareModal
           product={product}
-          imgSrc={gallery[mainIdx].main}
+          baseUrl={shareBaseUrl}
           onClose={() => setShareOpen(false)}
         />
       )}

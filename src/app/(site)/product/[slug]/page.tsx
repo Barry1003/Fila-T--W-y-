@@ -72,5 +72,13 @@ export default async function Page({ params }: Params) {
   const user = await getCurrentUser().catch(() => null);
   const inWishlist = user ? await isInWishlist(user.id, product.id) : false;
 
-  return <Product product={product} related={related} inWishlist={inWishlist} signedIn={Boolean(user)} />;
+  return (
+    <Product
+      product={product}
+      related={related}
+      inWishlist={inWishlist}
+      signedIn={Boolean(user)}
+      shareBaseUrl={siteUrl()}
+    />
+  );
 }
