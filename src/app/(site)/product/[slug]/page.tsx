@@ -5,6 +5,7 @@ import { getProductBySlug, listProducts } from '@/server/catalogue';
 import { getCurrentUser } from '@/server/auth';
 import { isInWishlist } from '@/server/account';
 import { siteUrl } from '@/lib/site';
+import { ogImageUrl } from '@/server/storage';
 
 type Params = { params: Promise<{ slug: string }> };
 
@@ -21,10 +22,10 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const description = `${product.title}${product.colors.length ? ` in ${product.colors.join(', ')}` : ''}. Handcrafted in Nigeria — CAD $${product.priceCad.toLocaleString()}.`;
   const path = `/product/${product.slug}`;
 
-  // Absolute, extension-bearing image URL with a matching secure_url — the form
-  // the fussiest unfurlers (WhatsApp on-device) accept. The card itself is the
-  // "Shop Now" image rendered by ./og.jpg.
-  const ogImage = `${base}${path}/og.jpg`;
+  // A static, pre-baked file on Appwrite's CDN — no render on the scraper's
+  // fetch, which is what WhatsApp's on-device fetcher needs. Baked on save and
+  // by the backfill; the ./og.jpg route re-creates it on access as a fallback.
+  const ogImage = ogImageUrl(product.id);
   const image = {
     url: ogImage,
     secureUrl: ogImage,

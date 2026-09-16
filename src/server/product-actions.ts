@@ -5,10 +5,11 @@ import { revalidatePath, revalidateTag } from 'next/cache';
 import { Prisma } from '@/generated/prisma';
 import { prisma } from '@/lib/prisma';
 import { slugify } from '@/lib/slug';
-import { CATALOGUE_TAG } from './catalogue';
+import { CATALOGUE_TAG, getProductBySlug } from './catalogue';
 import { withDbRetry } from './db';
 import { getCurrentUser } from './auth';
 import { productSchema } from './product-schema';
+import { bakeProductOg } from './og-bake';
 
 /**
  * Creating and editing products from the console.
@@ -140,6 +141,24 @@ export async function saveProduct(raw: unknown): Promise<SaveProductResult> {
     revalidateTag(CATALOGUE_TAG);
     revalidatePath('/console/products');
     revalidatePath(`/product/${saved.slug}`);
+
+    // Re-bake the static share card so its Appwrite CDN copy matches the edit.
+    // Best-effort: a baking hiccup must not fail the save (the /og.jpg route
+    // still self-heals on access).
+    try {
+      const fresh = await getProductBySlug(saved.slug);
+      if (fresh) {
+        await bakeProductOg({
+          id: fresh.id,
+          title: fresh.title,
+          priceCad: fresh.priceCad,
+          category: fresh.category,
+          imageUrl: fresh.imageUrl,
+        });
+      }
+    } catch (bakeError) {
+      console.error('[save product] og bake failed', bakeError);
+    }
 
     return { ok: true, id: saved.id, slug: saved.slug };
   } catch (error) {

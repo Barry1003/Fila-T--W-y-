@@ -1,5 +1,6 @@
 import 'server-only';
-import { Storage } from 'node-appwrite';
+import { Storage, Permission, Role } from 'node-appwrite';
+import { InputFile } from 'node-appwrite/file';
 import { adminClient } from './appwrite-server';
 
 /**
@@ -29,4 +30,38 @@ export function getStorage() {
 /** The public view URL for a stored file — safe to drop straight into `<img>`. */
 export function publicFileUrl(fileId: string): string {
   return `${endpoint}/storage/buckets/${PRODUCT_BUCKET_ID}/files/${fileId}/view?project=${projectId}`;
+}
+
+/* ─── Pre-baked share cards ───────────────────────────────────── */
+
+/**
+ * A product's baked share-card lives at a deterministic file id, so its public
+ * URL is known without a lookup and re-baking overwrites the same file. cuids
+ * fit Appwrite's 36-char id limit with the `og_` prefix.
+ */
+export function ogFileId(productId: string): string {
+  return `og_${productId}`;
+}
+
+/** The stable, static CDN URL of a product's baked share card. */
+export function ogImageUrl(productId: string): string {
+  return publicFileUrl(ogFileId(productId));
+}
+
+/** Store (or replace) a product's baked share card. Public-read, like the bucket. */
+export async function putOgImage(productId: string, jpeg: Buffer): Promise<void> {
+  const storage = getStorage();
+  const id = ogFileId(productId);
+  // No upsert in Appwrite — replace by removing any existing file first.
+  try {
+    await storage.deleteFile(PRODUCT_BUCKET_ID, id);
+  } catch {
+    // Not there yet — fine.
+  }
+  await storage.createFile(
+    PRODUCT_BUCKET_ID,
+    id,
+    InputFile.fromBuffer(jpeg, `${id}.jpg`),
+    [Permission.read(Role.any())],
+  );
 }
