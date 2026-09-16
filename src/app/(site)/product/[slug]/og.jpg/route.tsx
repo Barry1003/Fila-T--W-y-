@@ -32,8 +32,15 @@ export async function GET(_req: Request, { params }: { params: Promise<{ slug: s
   });
 
   // Persist the static copy so og:image resolves after any access (self-heal).
+  // Awaited, not fire-and-forget: a serverless function can be frozen the moment
+  // it responds, cancelling an un-awaited upload — which left some static files
+  // missing. A store failure still returns the image (it just isn't cached yet).
   if (product) {
-    putOgImage(product.id, jpeg).catch(err => console.error('[og] store failed for', slug, err));
+    try {
+      await putOgImage(product.id, jpeg);
+    } catch (err) {
+      console.error('[og] store failed for', slug, err);
+    }
   }
 
   return new Response(new Uint8Array(jpeg), {
