@@ -1,4 +1,5 @@
 import { ImageResponse } from 'next/og';
+import sharp from 'sharp';
 import { getProductBySlug } from '@/server/catalogue';
 
 /**
@@ -14,7 +15,10 @@ import { getProductBySlug } from '@/server/catalogue';
 
 export const alt = 'AdeClassics product';
 export const size = { width: 1200, height: 630 };
-export const contentType = 'image/png';
+// JPEG, not PNG: a photographic card renders to ~800 KB as PNG, and WhatsApp
+// silently drops preview images over ~600 KB. sharp re-encodes to a ~150 KB
+// JPEG so the card unfurls on WhatsApp too (bigger apps were already fine).
+export const contentType = 'image/jpeg';
 
 const MAROON = '#7A2E38';
 const GOLD = '#D4A94E';
@@ -30,7 +34,7 @@ export default async function OgImage({ params }: { params: Promise<{ slug: stri
   const image = product?.imageUrl;
   const category = product?.category ?? 'Handcrafted in Nigeria';
 
-  return new ImageResponse(
+  const png = await new ImageResponse(
     (
       <div style={{ display: 'flex', width: '100%', height: '100%', backgroundColor: CREAM }}>
         {/* Product photo */}
@@ -98,5 +102,15 @@ export default async function OgImage({ params }: { params: Promise<{ slug: stri
       </div>
     ),
     { ...size },
-  );
+  ).arrayBuffer();
+
+  const jpeg = await sharp(Buffer.from(png)).jpeg({ quality: 82, mozjpeg: true }).toBuffer();
+
+  return new Response(new Uint8Array(jpeg), {
+    headers: {
+      'Content-Type': 'image/jpeg',
+      // Let CDNs and unfurlers cache the card; it only changes with the product.
+      'Cache-Control': 'public, max-age=86400, s-maxage=86400',
+    },
+  });
 }
