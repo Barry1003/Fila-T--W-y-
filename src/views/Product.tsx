@@ -8,30 +8,8 @@ import { toggleWishlist } from '@/server/wishlist-actions';
 import { C, DISPLAY, UI, label } from '../tokens';
 import type { CatalogueProduct } from '@/server/catalogue';
 
-const MOCK_REVIEWS = [
-  {
-    id: 1, name: 'Adaeze O.', location: 'Lagos, Nigeria', rating: 5, date: 'Aug 12, 2026',
-    text: "I ordered the Gobi Filà for my husband's traditional wedding and it arrived in perfect condition. The velvet quality is exceptional — rich, deep colour that photographs beautifully. Delivery to Lagos took exactly 4 business days.",
-  },
-  {
-    id: 2, name: 'Tokunbo A.', location: 'Toronto, Canada', rating: 5, date: 'Jul 28, 2026',
-    text: "Finally a brand that gets the diaspora experience right. Ordered two filàs for a cultural event in Toronto — sizing was spot on and the craftsmanship is outstanding. Will be a repeat customer.",
-  },
-  {
-    id: 3, name: 'Chisom N.', location: 'London, UK', rating: 4, date: 'Jun 15, 2026',
-    text: "Beautiful piece, arrived well-packaged. The burgundy velvet is even richer in person. Took off one star only because I'd love to see more brocade options. Otherwise flawless.",
-  },
-];
-
-const RATING_DIST = [
-  { stars: 5, count: 18 },
-  { stars: 4, count: 5 },
-  { stars: 3, count: 1 },
-  { stars: 2, count: 0 },
-  { stars: 1, count: 0 },
-];
-const TOTAL_REVIEWS = RATING_DIST.reduce((s, r) => s + r.count, 0);
-const AVG_RATING = 4.7;
+// Reviews are not wired to real data yet, so the product page shows none rather
+// than placeholder ratings — no invented "4.7 / 24 reviews" as social proof.
 
 // ── Share Modal ──────────────────────────────────────────────────────────────
 
@@ -270,20 +248,6 @@ function ShareModal({
 
 // ─────────────────────────────────────────────────────────────────────────────
 
-function Stars({ rating, size = 13 }: { rating: number; size?: number }) {
-  return (
-    <span className="inline-flex gap-[2px]" style={{ verticalAlign: 'middle' }}>
-      {[1, 2, 3, 4, 5].map(n => (
-        <svg key={n} width={size} height={size} viewBox="0 0 24 24"
-          fill={n <= Math.round(rating) ? C.gold : 'none'}
-          stroke={C.gold} strokeWidth="1.5">
-          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-        </svg>
-      ))}
-    </span>
-  );
-}
-
 export type ProductProps = {
   product: CatalogueProduct;
   related: CatalogueProduct[];
@@ -491,17 +455,9 @@ export default function Product({ product, related, inWishlist = false, signedIn
             </div>
 
             {/* Title */}
-            <h1 className="m-0 mb-4" style={{ fontFamily: DISPLAY, fontSize: 'clamp(1.75rem, 2.6vw, 2.5rem)', fontWeight: 400, letterSpacing: '-0.022em', color: C.charcoal, lineHeight: 1.12 }}>
+            <h1 className="m-0 mb-6" style={{ fontFamily: DISPLAY, fontSize: 'clamp(1.75rem, 2.6vw, 2.5rem)', fontWeight: 400, letterSpacing: '-0.022em', color: C.charcoal, lineHeight: 1.12 }}>
               {product.title}
             </h1>
-
-            {/* Stars + review count */}
-            <div className="flex items-center gap-2.5 mb-7">
-              <Stars rating={AVG_RATING} size={14} />
-              <span style={{ fontFamily: UI, fontSize: '0.8rem', color: 'rgba(43,35,32,0.5)' }}>
-                {AVG_RATING} · {TOTAL_REVIEWS} reviews
-              </span>
-            </div>
 
             {/* Price block */}
             <div className="mb-8 pb-8" style={{ borderBottom: '1px solid rgba(43,35,32,0.08)' }}>
@@ -796,58 +752,7 @@ export default function Product({ product, related, inWishlist = false, signedIn
         </div>
       </div>
 
-      {/* ── REVIEWS ── */}
-      <section style={{ borderTop: '1px solid rgba(43,35,32,0.09)', backgroundColor: 'rgba(122,46,56,0.025)' }}>
-        <div className="max-w-[1440px] mx-auto py-20 px-10">
-          <h2 className="mb-12" style={{ fontFamily: DISPLAY, fontSize: 'clamp(1.75rem, 2.6vw, 2.5rem)', fontWeight: 400, letterSpacing: '-0.022em', color: C.charcoal }}>
-            Customer Reviews.
-          </h2>
-
-          {/* Summary row */}
-          <div className="pdp-review-summary grid grid-cols-[auto_1fr] gap-14 items-start mb-14 max-w-[660px]">
-            <div className="text-center">
-              <div style={{ fontFamily: DISPLAY, fontSize: '4rem', fontWeight: 400, color: C.charcoal, lineHeight: 1 }}>{AVG_RATING}</div>
-              <div className="my-[0.4rem]"><Stars rating={AVG_RATING} size={16} /></div>
-              <div style={{ fontFamily: UI, fontSize: '0.75rem', color: 'rgba(43,35,32,0.42)' }}>{TOTAL_REVIEWS} reviews</div>
-            </div>
-            <div className="flex flex-col gap-2 pt-2.5">
-              {RATING_DIST.map(({ stars, count }) => (
-                <div key={stars} className="flex items-center gap-3">
-                  <span className="w-[10px] text-right shrink-0" style={{ fontFamily: UI, fontSize: '0.75rem', color: 'rgba(43,35,32,0.5)' }}>{stars}</span>
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill={C.gold} stroke={C.gold} strokeWidth="1">
-                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                  </svg>
-                  <div className="flex-1 h-[6px] rounded-[3px] overflow-hidden" style={{ backgroundColor: 'rgba(43,35,32,0.1)' }}>
-                    <div className="h-full rounded-[3px]" style={{ width: `${TOTAL_REVIEWS > 0 ? (count / TOTAL_REVIEWS) * 100 : 0}%`, backgroundColor: C.gold }} />
-                  </div>
-                  <span className="w-[20px] shrink-0" style={{ fontFamily: UI, fontSize: '0.75rem', color: 'rgba(43,35,32,0.42)' }}>{count}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Review cards */}
-          <div className="pdp-reviews-grid grid grid-cols-3 gap-6 mb-10">
-            {MOCK_REVIEWS.map(review => (
-              <div key={review.id} className="p-[1.875rem]" style={{ backgroundColor: C.cream, border: '1px solid rgba(43,35,32,0.08)' }}>
-                <div className="flex justify-between items-start mb-4">
-                  <div>
-                    <div className="mb-[0.2rem]" style={{ fontFamily: UI, fontSize: '0.9rem', fontWeight: 600, color: C.charcoal }}>{review.name}</div>
-                    <div style={{ fontFamily: UI, fontSize: '0.75rem', color: 'rgba(43,35,32,0.42)' }}>{review.location}</div>
-                  </div>
-                  <Stars rating={review.rating} size={12} />
-                </div>
-                <p className="m-0 mb-4" style={{ fontFamily: UI, fontSize: '0.875rem', lineHeight: 1.78, color: 'rgba(43,35,32,0.7)' }}>"{review.text}"</p>
-                <div style={{ fontFamily: UI, fontSize: '0.72rem', color: 'rgba(43,35,32,0.32)' }}>{review.date}</div>
-              </div>
-            ))}
-          </div>
-
-          <button className="py-3.5 px-9 cursor-pointer" style={{ border: `1.5px solid ${C.gold}`, color: C.charcoal, backgroundColor: 'transparent', ...label, fontSize: '0.655rem', letterSpacing: '0.14em' }}>
-            Write a Review
-          </button>
-        </div>
-      </section>
+      {/* Reviews section intentionally omitted until real reviews are wired. */}
 
       {/* ── RELATED PRODUCTS ── */}
       <section style={{ borderTop: '1px solid rgba(43,35,32,0.09)' }}>
