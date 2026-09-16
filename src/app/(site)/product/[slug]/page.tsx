@@ -21,9 +21,19 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const description = `${product.title}${product.colors.length ? ` in ${product.colors.join(', ')}` : ''}. Handcrafted in Nigeria — CAD $${product.priceCad.toLocaleString()}.`;
   const path = `/product/${product.slug}`;
 
-  // og:image is supplied by the sibling opengraph-image.tsx (the rendered
-  // "Shop Now" card), which Next resolves to an absolute URL and mirrors onto
-  // twitter:image — so a pasted link unfurls the same rich image everywhere.
+  // Absolute, extension-bearing image URL with a matching secure_url — the form
+  // the fussiest unfurlers (WhatsApp on-device) accept. The card itself is the
+  // "Shop Now" image rendered by ./og.jpg.
+  const ogImage = `${base}${path}/og.jpg`;
+  const image = {
+    url: ogImage,
+    secureUrl: ogImage,
+    width: 1200,
+    height: 630,
+    type: 'image/jpeg',
+    alt: title,
+  };
+
   return {
     metadataBase: new URL(base),
     title,
@@ -35,11 +45,13 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
       siteName: 'AdeClassics',
       title,
       description,
+      images: [image],
     },
     twitter: {
       card: 'summary_large_image',
       title,
       description,
+      images: [ogImage],
     },
   };
 }
