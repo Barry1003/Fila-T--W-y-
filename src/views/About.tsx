@@ -137,6 +137,30 @@ function StatCounter({ target, suffix = '', style }: { target: number; suffix?: 
 }
 
 export default function About() {
+  // Scroll-reveal: fade + slide each tagged element in the first time it enters
+  // the viewport. Elements already on screen reveal immediately; reduced-motion
+  // shows everything at once.
+  useEffect(() => {
+    const els = document.querySelectorAll<HTMLElement>('.reveal, .reveal-left, .reveal-right');
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      els.forEach(el => el.classList.add('reveal-in'));
+      return;
+    }
+    const io = new IntersectionObserver(
+      entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('reveal-in');
+            io.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.14, rootMargin: '0px 0px -8% 0px' }
+    );
+    els.forEach(el => io.observe(el));
+    return () => io.disconnect();
+  }, []);
+
   return (
     <div style={{ backgroundColor: C.cream }}>
 
@@ -328,8 +352,8 @@ export default function About() {
 
           <div className="timeline-row" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', position: 'relative', padding: '0 1rem' }}>
             <div aria-hidden="true" style={{ position: 'absolute', top: '8px', left: '6%', right: '6%', height: '1px', backgroundColor: 'rgba(43,35,32,0.15)' }} />
-            {TIMELINE.map(t => (
-              <div key={t.year} style={{ position: 'relative', textAlign: 'center' }}>
+            {TIMELINE.map((t, i) => (
+              <div key={t.year} className="reveal" data-delay={`${(i % 3) + 1}`} style={{ position: 'relative', textAlign: 'center' }}>
                 <div style={{ width: '16px', height: '16px', borderRadius: '50%', backgroundColor: C.cream, border: `2px solid ${C.gold}`, margin: '0 auto 1.5rem', position: 'relative', zIndex: 1 }} />
                 <div style={{ fontFamily: DISPLAY, fontSize: '1.5rem', color: C.gold, marginBottom: '0.6rem' }}>{t.year}</div>
                 <p style={{ fontFamily: UI, fontSize: '0.82rem', color: 'rgba(43,35,32,0.62)', lineHeight: 1.6, maxWidth: '210px', margin: '0 auto' }}>{t.desc}</p>
@@ -382,8 +406,8 @@ export default function About() {
             </h2>
           </div>
           <div className="spotlight-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '2rem' }}>
-            {SPOTLIGHT.map(s => (
-              <div key={s.initials} className="spot-card" tabIndex={0} style={{
+            {SPOTLIGHT.map((s, i) => (
+              <div key={s.initials} className="spot-card reveal" data-delay={`${i + 1}`} tabIndex={0} style={{
                 border: '1px solid rgba(43,35,32,0.1)', borderRadius: '10px',
                 padding: '2.5rem 2rem', textAlign: 'center', position: 'relative',
               }}>
@@ -663,6 +687,26 @@ export default function About() {
       </section>
 
       <style>{`
+        /* Scroll-reveal — hidden until .reveal-in is added by the observer */
+        .reveal, .reveal-left, .reveal-right {
+          opacity: 0;
+          transition: opacity .75s cubic-bezier(.22,.61,.36,1), transform .75s cubic-bezier(.22,.61,.36,1);
+          will-change: opacity, transform;
+        }
+        .reveal { transform: translateY(30px); }
+        .reveal-left { transform: translateX(-34px); }
+        .reveal-right { transform: translateX(34px); }
+        .reveal-in { opacity: 1 !important; transform: none !important; }
+        .reveal[data-delay="1"] { transition-delay: .09s; }
+        .reveal[data-delay="2"] { transition-delay: .18s; }
+        .reveal[data-delay="3"] { transition-delay: .27s; }
+
+        @media (prefers-reduced-motion: reduce) {
+          .reveal, .reveal-left, .reveal-right {
+            opacity: 1 !important; transform: none !important; transition: none !important;
+          }
+        }
+
         @media (max-width: 900px) {
           .about-two-col { grid-template-columns: 1fr !important; gap: 3rem !important; }
           .about-two-col > *:first-child { aspect-ratio: unset !important; min-height: 300px; }
