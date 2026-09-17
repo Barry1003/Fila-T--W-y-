@@ -1,145 +1,25 @@
 'use client';
 
+import { Link } from "@/lib/router";
 import { useUser } from "@/lib/user";
+import type { DashboardData, DashActivity } from "@/server/dashboard";
 import { C, UI } from "../../tokens";
 import {
   TrendUpIcon,
   TrendDownIcon,
   AlertIcon,
   ShoppingBagIcon,
-  StarIcon,
-  PenIcon,
-  PackageIcon,
 } from "../../icons";
 
-// ── Mock data ────────────────────────────────────────────────────────────────
+const cad = (n: number) => "CAD $" + Math.round(n).toLocaleString("en-CA");
 
-const STATS = [
-  {
-    label: "Today's Sales",
-    value: "CAD $4,885",
-    sub: null,
-    trend: "+14%",
-    trendUp: true,
-    note: "vs yesterday",
-    accent: C.teal,
-  },
-  {
-    label: "Pending Orders",
-    value: "7",
-    sub: null,
-    trend: "3 urgent",
-    trendUp: false,
-    note: "need action",
-    accent: C.maroon,
-  },
-  {
-    label: "Total Products",
-    value: "142",
-    sub: null,
-    trend: "5 low stock",
-    trendUp: false,
-    note: "in catalogue",
-    accent: "#2E4A9E",
-  },
-  {
-    label: "Month Revenue",
-    value: "CAD $31,734",
-    sub: null,
-    trend: "+8%",
-    trendUp: true,
-    note: "vs last month",
-    accent: C.gold,
-  },
-];
+/** The icon + colour each activity kind renders with. */
+const ACTIVITY_STYLE: Record<DashActivity["kind"], { icon: React.ReactNode; bg: string }> = {
+  order: { icon: <ShoppingBagIcon size={13} />, bg: C.teal },
+  lowstock: { icon: <AlertIcon size={13} />, bg: C.maroon },
+};
 
-const ORDERS = [
-  {
-    id: "#FTW-2891",
-    buyer: "Chiamaka Eze",
-    item: "Aso-Oke Gele Set ×2",
-    total: "CAD $585",
-    status: "Payment Received",
-    statusType: "received",
-  },
-  {
-    id: "#FTW-2887",
-    buyer: "David Mensah",
-    item: "Yoruba Filà (Custom)",
-    total: "CAD $490",
-    status: "Awaiting Fabric",
-    statusType: "waiting",
-  },
-  {
-    id: "#FTW-2882",
-    buyer: "Bola Adeyemi",
-    item: "Adire Wrapper Set",
-    total: "CAD $335",
-    status: "Ready to Ship",
-    statusType: "ready",
-  },
-  {
-    id: "#FTW-2871",
-    buyer: "Ngozi Obi",
-    item: "Embroidered Cap (Large)",
-    total: "CAD $206",
-    status: "Payment Received",
-    statusType: "received",
-  },
-  {
-    id: "#FTW-2869",
-    buyer: "Kwame Asante",
-    item: "Aso-Oke Cap ×3",
-    total: "CAD $722",
-    status: "In Production",
-    statusType: "production",
-  },
-];
-
-const ACTIVITY = [
-  {
-    icon: <ShoppingBagIcon size={13} />,
-    iconBg: C.teal,
-    text: "New order from Temi Adeyemi",
-    sub: "Aso-Oke Gele Set · CAD $585",
-    time: "2 min ago",
-  },
-  {
-    icon: <AlertIcon size={13} />,
-    iconBg: C.maroon,
-    text: "Low stock alert",
-    sub: "Aso-Oke Gele (White, M) · only 3 left",
-    time: "18 min ago",
-  },
-  {
-    icon: <StarIcon size={13} />,
-    iconBg: "#2E4A9E",
-    text: "New 5★ review — Ola Balogun",
-    sub: "Embroidered Cap · \"Beautifully crafted...\"",
-    time: "1 hr ago",
-  },
-  {
-    icon: <PenIcon size={13} />,
-    iconBg: C.gold,
-    text: "New custom order request",
-    sub: "Temi Fadare · Gele for wedding (July)",
-    time: "2 hrs ago",
-  },
-  {
-    icon: <PackageIcon size={13} />,
-    iconBg: "rgba(43,35,32,0.45)",
-    text: "Order #FTW-2862 shipped",
-    sub: "David Chen · Filà (Large, Maroon)",
-    time: "3 hrs ago",
-  },
-];
-
-// ── Sales chart (7-day bar chart) ────────────────────────────────────────────
-
-const CHART_DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-const CHART_VALS = [3200, 4100, 2800, 5200, 4800, 6100, 2840];
-
-function SalesChart() {
+function SalesChart({ points }: { points: DashboardData["chart"] }) {
   const W = 600;
   const H = 140;
   const PAD_T = 12;
@@ -147,9 +27,10 @@ function SalesChart() {
   const PAD_H = 8;
   const innerW = W - PAD_H * 2;
   const innerH = H - PAD_T - PAD_B;
-  const maxVal = Math.max(...CHART_VALS);
-  const barW = (innerW / CHART_VALS.length) * 0.52;
-  const spacing = innerW / CHART_VALS.length;
+  const vals = points.map(p => p.value);
+  const maxVal = Math.max(...vals, 1); // avoid divide-by-zero on a quiet week
+  const barW = (innerW / points.length) * 0.52;
+  const spacing = innerW / points.length;
 
   const gridLines = [0.25, 0.5, 0.75, 1];
 
@@ -178,11 +59,11 @@ function SalesChart() {
       })}
 
       {/* Bars */}
-      {CHART_VALS.map((val, i) => {
-        const barH = (val / maxVal) * innerH;
+      {points.map((pt, i) => {
+        const barH = (pt.value / maxVal) * innerH;
         const x = PAD_H + i * spacing + (spacing - barW) / 2;
         const y = PAD_T + innerH - barH;
-        const isToday = i === CHART_VALS.length - 1;
+        const isToday = pt.isToday;
         return (
           <g key={i}>
             <rect
@@ -204,7 +85,7 @@ function SalesChart() {
               fontFamily={UI}
               fontWeight={isToday ? "600" : "400"}
             >
-              {CHART_DAYS[i]}
+              {pt.label}
             </text>
           </g>
         );
@@ -241,9 +122,19 @@ function StatusBadge({ status, type }: { status: string; type: string }) {
 
 // ── Page ─────────────────────────────────────────────────────────────────────
 
-export default function ConsoleDashboard() {
+export default function ConsoleDashboard({ data }: { data: DashboardData }) {
   const user = useUser();
-  const firstName = user?.name ? user.name.trim().split(/\s+/)[0] : "Adunola";
+  const firstName = user?.name ? user.name.trim().split(/\s+/)[0] : "there";
+
+  const pctText = (p: number | null) => (p == null ? "—" : `${p >= 0 ? "+" : ""}${p}%`);
+  const STATS = [
+    { label: "Today's Sales", value: cad(data.todaySales), trend: pctText(data.todayTrendPct), trendUp: (data.todayTrendPct ?? 0) >= 0, note: "vs yesterday", accent: C.teal },
+    { label: "Pending Orders", value: String(data.pendingCount), trend: data.pendingCount > 0 ? `${data.pendingCount} open` : "all clear", trendUp: data.pendingCount === 0, note: "need action", accent: C.maroon },
+    { label: "Total Products", value: String(data.totalProducts), trend: data.lowStockCount > 0 ? `${data.lowStockCount} low stock` : "all stocked", trendUp: data.lowStockCount === 0, note: "in catalogue", accent: "#2E4A9E" },
+    { label: "Month Revenue", value: cad(data.monthRevenue), trend: pctText(data.monthTrendPct), trendUp: (data.monthTrendPct ?? 0) >= 0, note: "vs last month", accent: C.gold },
+  ];
+  const ORDERS = data.orders;
+  const ACTIVITY = data.activity;
 
   return (
     <div className="console-page p-7" style={{ fontFamily: UI }}>
@@ -304,17 +195,6 @@ export default function ConsoleDashboard() {
             >
               {s.value}
             </div>
-            {s.sub && (
-              <div
-                className="mt-[1px]"
-                style={{
-                  fontSize: "0.75rem",
-                  color: "rgba(43,35,32,0.38)",
-                }}
-              >
-                {s.sub}
-              </div>
-            )}
             <div
               className="flex items-center gap-1 mt-2 font-medium"
               style={{
@@ -380,6 +260,13 @@ export default function ConsoleDashboard() {
                 </tr>
               </thead>
               <tbody>
+                {ORDERS.length === 0 && (
+                  <tr>
+                    <td colSpan={6} className="p-[1.5rem_1.25rem] text-center" style={{ fontSize: "0.78rem", color: "rgba(43,35,32,0.45)" }}>
+                      No orders need action right now.
+                    </td>
+                  </tr>
+                )}
                 {ORDERS.map((o, i) => (
                   <tr
                     key={o.id}
@@ -425,8 +312,9 @@ export default function ConsoleDashboard() {
                       <StatusBadge status={o.status} type={o.statusType} />
                     </td>
                     <td className="p-[0.7rem_1.25rem]">
-                      <button
-                        className="border-none rounded-[4px] p-[4px_12px] font-semibold cursor-pointer whitespace-nowrap tracking-[0.02em]"
+                      <Link
+                        to="/console/orders"
+                        className="inline-block no-underline border-none rounded-[4px] p-[4px_12px] font-semibold cursor-pointer whitespace-nowrap tracking-[0.02em]"
                         style={{
                           backgroundColor: C.gold,
                           color: C.charcoal,
@@ -434,7 +322,7 @@ export default function ConsoleDashboard() {
                         }}
                       >
                         Fulfil
-                      </button>
+                      </Link>
                     </td>
                   </tr>
                 ))}
@@ -461,6 +349,11 @@ export default function ConsoleDashboard() {
             </span>
           </div>
           <div className="py-2">
+            {ACTIVITY.length === 0 && (
+              <div className="p-[1.25rem]" style={{ fontSize: "0.78rem", color: "rgba(43,35,32,0.45)" }}>
+                No recent activity yet.
+              </div>
+            )}
             {ACTIVITY.map((a, i) => (
               <div
                 key={i}
@@ -469,10 +362,10 @@ export default function ConsoleDashboard() {
                 <div
                   className="w-[26px] h-[26px] rounded-full text-white flex items-center justify-center shrink-0 mt-[1px]"
                   style={{
-                    backgroundColor: a.iconBg,
+                    backgroundColor: ACTIVITY_STYLE[a.kind].bg,
                   }}
                 >
-                  {a.icon}
+                  {ACTIVITY_STYLE[a.kind].icon}
                 </div>
                 <div className="flex-1 min-w-0">
                   <div
@@ -546,20 +439,20 @@ export default function ConsoleDashboard() {
                 color: C.charcoal,
               }}
             >
-              CAD $49,691
+              {cad(data.weekTotal)}
             </span>
             <span
-              className="font-medium flex items-center gap-[3px]"
+              className="font-medium"
               style={{
                 fontSize: "0.72rem",
-                color: C.teal,
+                color: "rgba(43,35,32,0.4)",
               }}
             >
-              <TrendUpIcon /> +11% vs prev week
+              7-day total
             </span>
           </div>
         </div>
-        <SalesChart />
+        <SalesChart points={data.chart} />
       </div>
     </div>
   );

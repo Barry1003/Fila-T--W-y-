@@ -10,6 +10,7 @@ import { withDbRetry } from './db';
 import { getCurrentUser } from './auth';
 import { productSchema } from './product-schema';
 import { bakeProductOg } from './og-bake';
+import { deleteOgImage } from './storage';
 
 /**
  * Creating and editing products from the console.
@@ -164,5 +165,125 @@ export async function saveProduct(raw: unknown): Promise<SaveProductResult> {
   } catch (error) {
     console.error('[save product] failed', error);
     return { ok: false, message: 'We could not save this product just now. Please try again.' };
+  }
+}
+
+export type ActionResult = { ok: true } | { ok: false; message: string };
+
+/** Publish or unpublish a set of products at once (the bulk bar). */
+export async function setProductsStatus(ids: string[], status: 'PUBLISHED' | 'DRAFT'): Promise<ActionResult> {
+  const user = await getCurrentUser().catch(() => null);
+  if (user?.role !== 'OWNER') {
+    return { ok: false, message: 'You do not have permission to change products.' };
+  }
+  if (ids.length === 0) return { ok: true };
+
+  try {
+    await withDbRetry('bulk set status', () =>
+      prisma.product.updateMany({ where: { id: { in: ids } }, data: { status } })
+    );
+    revalidateTag(CATALOGUE_TAG);
+    revalidatePath('/console/products');
+    return { ok: true };
+  } catch (error) {
+    console.error('[bulk status] failed', error);
+    return { ok: false, message: 'Could not update those products just now. Please try again.' };
+  }
+}
+
+/** Delete a set of products at once (the bulk bar). */
+export async function deleteProducts(ids: string[]): Promise<ActionResult> {
+  const user = await getCurrentUser().catch(() => null);
+  if (user?.role !== 'OWNER') {
+    return { ok: false, message: 'You do not have permission to delete products.' };
+  }
+  if (ids.length === 0) return { ok: true };
+
+  try {
+    await withDbRetry('bulk delete', () => prisma.product.deleteMany({ where: { id: { in: ids } } }));
+    ids.forEach(id => { deleteOgImage(id).catch(() => {}); });
+    revalidateTag(CATALOGUE_TAG);
+    revalidatePath('/console/products');
+    return { ok: true };
+  } catch (error) {
+    console.error('[bulk delete] failed', error);
+    return { ok: false, message: 'Could not delete those products just now. Please try again.' };
+  }
+}
+
+/**
+ * Remove a product. Images and variants cascade; order items keep their
+ * snapshotted name (the FK is set null), so order history stays intact.
+ */
+export async function deleteProduct(id: string): Promise<ActionResult> {
+  const user = await getCurrentUser().catch(() => null);
+  if (user?.role !== 'OWNER') {
+    return { ok: false, message: 'You do not have permission to delete products.' };
+  }
+
+  try {
+    await withDbRetry('delete product', () => prisma.product.delete({ where: { id } }));
+    deleteOgImage(id).catch(() => {}); // best-effort share-card cleanup
+
+    revalidateTag(CATALOGUE_TAG);
+    revalidatePath('/console/products');
+    return { ok: true };
+  } catch (error) {
+    console.error('[delete product] failed', error);
+    return { ok: false, message: 'Could not delete this product just now. Please try again.' };
+  }
+}
+
+/**
+ * Copy a product — its details, images and variants — as a new DRAFT with a
+ * "(Copy)" title, so the owner can tweak it before publishing. Handy for a run
+ * of near-identical pieces (a colour of the same cap, say).
+ */
+export async function duplicateProduct(id: string): Promise<SaveProductResult> {
+  const user = await getCurrentUser().catch(() => null);
+  if (user?.role !== 'OWNER') {
+    return { ok: false, message: 'You do not have permission to duplicate products.' };
+  }
+
+  try {
+    const src = await withDbRetry('read for duplicate', () =>
+      prisma.product.findUnique({
+        where: { id },
+        include: { images: { orderBy: { position: 'asc' } }, variants: true },
+      })
+    );
+    if (!src) return { ok: false, message: 'That product no longer exists.' };
+
+    const title = `${src.title} (Copy)`;
+    const created = await withDbRetry('create duplicate', async () => {
+      const slug = await uniqueSlug(title);
+      return prisma.product.create({
+        data: {
+          title,
+          slug,
+          description: src.description,
+          categoryId: src.categoryId,
+          priceCad: src.priceCad,
+          priceNgn: src.priceNgn,
+          productionDays: src.productionDays,
+          status: 'DRAFT', // a copy starts unpublished so it isn't a duplicate live listing
+          tag: src.tag,
+          inStock: src.inStock,
+          metaTitle: src.metaTitle,
+          metaDescription: src.metaDescription,
+          images: { create: src.images.map(im => ({ url: im.url, position: im.position, alt: im.alt, color: im.color })) },
+          // sku is unique, so a copy can't reuse it.
+          variants: { create: src.variants.map(v => ({ size: v.size, color: v.color, stock: v.stock })) },
+        },
+        select: { id: true, slug: true },
+      });
+    });
+
+    revalidateTag(CATALOGUE_TAG);
+    revalidatePath('/console/products');
+    return { ok: true, id: created.id, slug: created.slug };
+  } catch (error) {
+    console.error('[duplicate product] failed', error);
+    return { ok: false, message: 'Could not duplicate this product just now. Please try again.' };
   }
 }

@@ -1,7 +1,9 @@
 'use client';
 
-import { useState } from "react";
-import { Link } from '@/lib/router';
+import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
+import { Link, useNavigate } from '@/lib/router';
+import { deleteProduct, duplicateProduct, setProductsStatus, deleteProducts } from "@/server/product-actions";
 import { C, UI } from "../../tokens";
 import type { ConsoleProduct } from "@/server/catalogue";
 
@@ -126,7 +128,47 @@ export default function ConsoleProducts({ products, categories }: { products: Co
   const [sort, setSort] = useState("Newest");
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [page, setPage] = useState(1);
+  const [busyId, setBusyId] = useState<string | null>(null);
+  const [, startAction] = useTransition();
+  const router = useRouter();
+  const navigate = useNavigate();
   const PER_PAGE = 8;
+
+  function handleDuplicate(id: string) {
+    setBusyId(id);
+    startAction(async () => {
+      const res = await duplicateProduct(id);
+      setBusyId(null);
+      if (!res.ok) { alert(res.message); return; }
+      // Open the copy so the owner can rename/adjust before publishing.
+      navigate(`/console/products/${res.id}/edit`);
+    });
+  }
+
+  function handleDelete(id: string, title: string) {
+    if (!window.confirm(`Delete “${title}”? This can’t be undone.`)) return;
+    setBusyId(id);
+    startAction(async () => {
+      const res = await deleteProduct(id);
+      setBusyId(null);
+      if (!res.ok) { alert(res.message); return; }
+      router.refresh();
+    });
+  }
+
+  function handleBulk(action: "Publish" | "Unpublish" | "Delete") {
+    const ids = [...selected];
+    if (ids.length === 0) return;
+    if (action === "Delete" && !window.confirm(`Delete ${ids.length} product${ids.length !== 1 ? "s" : ""}? This can’t be undone.`)) return;
+    startAction(async () => {
+      const res = action === "Delete"
+        ? await deleteProducts(ids)
+        : await setProductsStatus(ids, action === "Publish" ? "PUBLISHED" : "DRAFT");
+      if (!res.ok) { alert(res.message); return; }
+      setSelected(new Set());
+      router.refresh();
+    });
+  }
 
   const CATEGORIES = ["All Categories", ...categories];
 
@@ -238,10 +280,10 @@ export default function ConsoleProducts({ products, categories }: { products: Co
             {selected.size} item{selected.size !== 1 ? "s" : ""} selected
           </span>
           <div className="flex-1" />
-          {["Publish", "Unpublish", "Delete"].map(action => (
+          {(["Publish", "Unpublish", "Delete"] as const).map(action => (
             <button
               key={action}
-              onClick={() => setSelected(new Set())}
+              onClick={() => handleBulk(action)}
               className="bg-[rgba(255,255,255,0.1)] border-none rounded-[5px] px-[0.875rem] py-[0.35rem] font-medium cursor-pointer tracking-[0.01em]"
               style={{
                 fontFamily: UI,
@@ -384,7 +426,9 @@ export default function ConsoleProducts({ products, categories }: { products: Co
                             </Link>
                             <button
                               title="Duplicate"
-                              className="bg-none border-none cursor-pointer p-[3px] leading-none flex items-center transition-colors duration-100"
+                              disabled={busyId === p.id}
+                              onClick={() => handleDuplicate(p.id)}
+                              className="bg-none border-none cursor-pointer p-[3px] leading-none flex items-center transition-colors duration-100 disabled:opacity-40 disabled:cursor-wait"
                               style={{ color: "rgba(43,35,32,0.45)" }}
                               onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = C.charcoal}
                               onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = "rgba(43,35,32,0.45)"}
@@ -393,7 +437,9 @@ export default function ConsoleProducts({ products, categories }: { products: Co
                             </button>
                             <button
                               title="Delete"
-                              className="bg-none border-none cursor-pointer p-[3px] leading-none flex items-center transition-colors duration-100"
+                              disabled={busyId === p.id}
+                              onClick={() => handleDelete(p.id, p.title)}
+                              className="bg-none border-none cursor-pointer p-[3px] leading-none flex items-center transition-colors duration-100 disabled:opacity-40 disabled:cursor-wait"
                               style={{ color: "rgba(43,35,32,0.45)" }}
                               onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = C.maroon}
                               onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = "rgba(43,35,32,0.45)"}

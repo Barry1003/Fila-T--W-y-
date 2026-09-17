@@ -48,6 +48,15 @@ export function ogImageUrl(productId: string): string {
   return publicFileUrl(ogFileId(productId));
 }
 
+/** Remove a product's baked share card, if any. Best-effort — a missing file is fine. */
+export async function deleteOgImage(productId: string): Promise<void> {
+  try {
+    await getStorage().deleteFile(PRODUCT_BUCKET_ID, ogFileId(productId));
+  } catch {
+    // Not there — nothing to clean up.
+  }
+}
+
 /** Store (or replace) a product's baked share card. Public-read, like the bucket. */
 export async function putOgImage(productId: string, jpeg: Buffer): Promise<void> {
   const storage = getStorage();
