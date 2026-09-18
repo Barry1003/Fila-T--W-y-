@@ -2,177 +2,7 @@
 
 import { useState } from "react";
 import { C, UI } from "../../tokens";
-
-// ── Types ─────────────────────────────────────────────────────────────────────
-
-type RequestStatus = "new" | "quoted" | "approved" | "in-production" | "completed" | "declined";
-
-interface Measurement {
-  label: string;
-  value: string;
-}
-
-interface CustomRequest {
-  id: string;
-  garmentType: string;
-  submittedDate: string;
-  status: RequestStatus;
-  customer: { name: string; email: string; phone: string; location: string };
-  occasion: string;
-  neededBy: string;
-  measurements: Measurement[];
-  fabricPreference: string;
-  colorPreference: string;
-  additionalNotes: string;
-  refImages: { bg: string; label: string }[];
-  quotedPrice?: number;
-  estimatedCompletion?: string;
-  declineReason?: string;
-}
-
-// ── Mock data ─────────────────────────────────────────────────────────────────
-
-const REQUESTS: CustomRequest[] = [
-  {
-    id: "r1",
-    garmentType: "3-Piece Custom Agbada",
-    submittedDate: "1 Sep 2026",
-    status: "new",
-    customer: { name: "Emeka Okafor", email: "emeka.okafor@gmail.com", phone: "+44 7700 914 022", location: "London, UK" },
-    occasion: "Traditional wedding ceremony",
-    neededBy: "14 Dec 2026",
-    measurements: [
-      { label: "Chest", value: "44\"" }, { label: "Waist", value: "38\"" },
-      { label: "Hip", value: "42\"" }, { label: "Shoulder width", value: "19\"" },
-      { label: "Sleeve length", value: "27.5\"" }, { label: "Body length", value: "30\"" },
-      { label: "Neck", value: "17\"" }, { label: "Kaftan length", value: "60\"" },
-    ],
-    fabricPreference: "Heavy Aso-Oke — prefers the woven textured finish, not smooth",
-    colorPreference: "Deep royal blue with gold embroidery detailing",
-    additionalNotes: "This is for my traditional wedding. Needs to be paired with a Fila cap in matching fabric. Please include extra embroidery at the collar and chest panel. My brother (same build) may want a second set.",
-    refImages: [
-      { bg: "#2E4A9E", label: "Style ref 1" },
-      { bg: "#8A6818", label: "Style ref 2" },
-      { bg: "#3B5A9E", label: "Embroidery ref" },
-    ],
-  },
-  {
-    id: "r2",
-    garmentType: "Bride's Aso-Oke Set (Gele, Ipele & Iro)",
-    submittedDate: "30 Aug 2026",
-    status: "quoted",
-    customer: { name: "Adaeze Obi", email: "adaeze.obi@outlook.com", phone: "+44 7823 119 445", location: "Birmingham, UK" },
-    occasion: "Traditional engagement ceremony",
-    neededBy: "5 Jan 2027",
-    measurements: [
-      { label: "Bust", value: "36\"" }, { label: "Waist", value: "30\"" },
-      { label: "Hip", value: "40\"" }, { label: "Shoulder width", value: "15.5\"" },
-      { label: "Sleeve length", value: "22\"" }, { label: "Body length", value: "24\"" },
-      { label: "Skirt length", value: "44\"" }, { label: "Neck", value: "13.5\"" },
-    ],
-    fabricPreference: "Silk-woven Aso-Oke — must have visible sheen",
-    colorPreference: "Burnt orange with champagne gold woven thread",
-    additionalNotes: "I am the bride. The ipele must drape properly over the left shoulder. Please also advise on the gele stiffening process — I want the fan fold style.",
-    refImages: [
-      { bg: "#C4501A", label: "Colour ref" },
-      { bg: "#D4A94E", label: "Gele style" },
-    ],
-    quotedPrice: 680,
-    estimatedCompletion: "22 Dec 2026",
-  },
-  {
-    id: "r3",
-    garmentType: "Tailored Senator Suit (2-piece)",
-    submittedDate: "28 Aug 2026",
-    status: "approved",
-    customer: { name: "Femi Adeyemi", email: "f.adeyemi@business.com", phone: "+44 7711 203 887", location: "Manchester, UK" },
-    occasion: "Corporate gala dinner",
-    neededBy: "28 Nov 2026",
-    measurements: [
-      { label: "Chest", value: "40\"" }, { label: "Waist", value: "34\"" },
-      { label: "Hip", value: "40\"" }, { label: "Shoulder width", value: "18\"" },
-      { label: "Sleeve length", value: "26.5\"" }, { label: "Body length", value: "29\"" },
-      { label: "Neck", value: "15.5\"" }, { label: "Trouser waist", value: "34\"" },
-      { label: "Trouser inseam", value: "32\"" }, { label: "Trouser outseam", value: "43\"" },
-    ],
-    fabricPreference: "Premium linen blend — breathable but structured",
-    colorPreference: "Charcoal grey with subtle pin-dot weave. No embroidery.",
-    additionalNotes: "Clean, modern senator cut. No embroidery. I want contrast piping on the collar and pocket trim in off-white. Trousers should have a slight taper.",
-    refImages: [
-      { bg: "#2B2320", label: "Style ref" },
-      { bg: "#555", label: "Fabric swatch" },
-    ],
-    quotedPrice: 520,
-    estimatedCompletion: "15 Nov 2026",
-  },
-  {
-    id: "r4",
-    garmentType: "Hand-embroidered Agbada (Full Set)",
-    submittedDate: "25 Aug 2026",
-    status: "in-production",
-    customer: { name: "Chidi Nwachukwu", email: "chidi.n@email.com", phone: "+44 7900 441 556", location: "Leeds, UK" },
-    occasion: "New Year gala celebration",
-    neededBy: "26 Dec 2026",
-    measurements: [
-      { label: "Chest", value: "46\"" }, { label: "Waist", value: "40\"" },
-      { label: "Hip", value: "44\"" }, { label: "Shoulder width", value: "20\"" },
-      { label: "Sleeve length", value: "28\"" }, { label: "Body length", value: "31\"" },
-      { label: "Neck", value: "17.5\"" }, { label: "Kaftan length", value: "62\"" },
-    ],
-    fabricPreference: "Aso-Oke — ivory base, heavy weight",
-    colorPreference: "Ivory with emerald green hand-embroidered geometric pattern",
-    additionalNotes: "The embroidery pattern should reference traditional Igbo geometric motifs. I've sent reference images. Please confirm the pattern placement on chest and cuffs before cutting.",
-    refImages: [
-      { bg: "#2A5E3A", label: "Embroidery pattern" },
-      { bg: "#F0E8D8", label: "Fabric base" },
-      { bg: "#1A4A28", label: "Motif detail" },
-    ],
-    quotedPrice: 890,
-    estimatedCompletion: "18 Dec 2026",
-  },
-  {
-    id: "r5",
-    garmentType: "Custom Gele & Wrapper Set",
-    submittedDate: "10 Aug 2026",
-    status: "completed",
-    customer: { name: "Nnenna Okeke", email: "nnenna.okeke@gmail.com", phone: "+44 7812 334 001", location: "London, UK" },
-    occasion: "Church thanksgiving & wedding reception",
-    neededBy: "24 Aug 2026",
-    measurements: [
-      { label: "Bust", value: "38\"" }, { label: "Waist", value: "33\"" },
-      { label: "Hip", value: "44\"" }, { label: "Body length", value: "26\"" },
-      { label: "Skirt length", value: "46\"" }, { label: "Neck", value: "14\"" },
-    ],
-    fabricPreference: "Silk Aso-Oke — lightweight, high drape",
-    colorPreference: "Coral pink with gold woven stripe",
-    additionalNotes: "Delivered and customer confirmed receipt. She loved the gele fold instructions card we included.",
-    refImages: [
-      { bg: "#E87050", label: "Colour match" },
-    ],
-    quotedPrice: 440,
-    estimatedCompletion: "20 Aug 2026",
-  },
-  {
-    id: "r6",
-    garmentType: "Embroidered Kaftan (Bespoke)",
-    submittedDate: "5 Aug 2026",
-    status: "declined",
-    customer: { name: "Tunde Bakare", email: "tunde.b@email.com", phone: "+44 7755 882 113", location: "Bristol, UK" },
-    occasion: "Valentine dinner",
-    neededBy: "10 Feb 2026",
-    measurements: [
-      { label: "Chest", value: "38\"" }, { label: "Waist", value: "32\"" },
-      { label: "Hip", value: "38\"" }, { label: "Kaftan length", value: "56\"" },
-    ],
-    fabricPreference: "Velvet — deep plum",
-    colorPreference: "Deep plum with silver thread embroidery",
-    additionalNotes: "Needs delivery in 5 days — very tight timeline.",
-    refImages: [
-      { bg: "#5A1B7A", label: "Style ref" },
-    ],
-    declineReason: "Requested timeline of 5 days is not feasible for bespoke embroidery work. Minimum lead time for this garment type is 3 weeks.",
-  },
-];
+import type { ConsoleCustomRequest as CustomRequest, ConsoleCustomStatus as RequestStatus } from "@/server/console";
 
 // ── Status config ─────────────────────────────────────────────────────────────
 
@@ -262,23 +92,13 @@ function StatusBadge({ status }: { status: RequestStatus }) {
 
 // ── Ref image swatch (colored placeholder) ────────────────────────────────────
 
-function RefSwatch({ bg, size = 48 }: { bg: string; size?: number }) {
+function RefSwatch({ url, size = 48 }: { url: string; size?: number }) {
   return (
     <div
-      className="rounded-md shrink-0 flex items-center justify-center overflow-hidden relative border border-solid border-[rgba(43,35,32,0.12)]"
-      style={{
-        width: size,
-        height: size,
-        backgroundColor: bg,
-      }}
+      className="rounded-md shrink-0 overflow-hidden relative border border-solid border-[rgba(43,35,32,0.12)] bg-[rgba(43,35,32,0.06)]"
+      style={{ width: size, height: size }}
     >
-      {/* Fabric-like cross-hatch overlay */}
-      <svg width={size} height={size} style={{ position: "absolute", inset: 0, opacity: 0.15 }}>
-        <pattern id={`hatch-${bg.replace("#", "")}`} width="6" height="6" patternUnits="userSpaceOnUse">
-          <line x1="0" y1="6" x2="6" y2="0" stroke="#fff" strokeWidth="0.8" />
-        </pattern>
-        <rect width={size} height={size} fill={`url(#hatch-${bg.replace("#", "")})`} />
-      </svg>
+      {url && <img src={url} alt="" className="w-full h-full object-cover block" />}
     </div>
   );
 }
@@ -333,7 +153,7 @@ function RequestCard({ req, onOpen }: { req: CustomRequest; onOpen: () => void }
       {req.refImages.length > 0 && (
         <div className="flex gap-2 items-center">
           {req.refImages.map((img, i) => (
-            <RefSwatch key={i} bg={img.bg} size={44} />
+            <RefSwatch key={i} url={img.url} size={44} />
           ))}
           <span className="ml-1" style={{ fontSize: "0.7rem", color: "rgba(43,35,32,0.4)" }}>
             {req.refImages.length} style reference{req.refImages.length !== 1 ? "s" : ""}
@@ -540,7 +360,7 @@ function RequestDetailPanel({
               <div className="flex gap-3 flex-wrap">
                 {req.refImages.map((img, i) => (
                   <div key={i} className="relative">
-                    <RefSwatch bg={img.bg} size={88} />
+                    <RefSwatch url={img.url} size={88} />
                     <button
                       onClick={() => setZoomedImg(i)}
                       aria-label={`Zoom ${img.label}`}
@@ -731,7 +551,7 @@ function RequestDetailPanel({
           className="fixed inset-0 z-[300] flex items-center justify-center bg-[rgba(43,35,32,0.7)]"
         >
           <div className="flex flex-col items-center gap-3">
-            <RefSwatch bg={req.refImages[zoomedImg].bg} size={240} />
+            <RefSwatch url={req.refImages[zoomedImg].url} size={240} />
             <span className="opacity-70" style={{ color: C.cream, fontSize: "0.78rem" }}>
               {req.refImages[zoomedImg].label} — click anywhere to close
             </span>
@@ -797,8 +617,8 @@ function EmptyState({ tab }: { tab: TabKey }) {
 
 // ── Main page ─────────────────────────────────────────────────────────────────
 
-export default function ConsoleCustomOrders() {
-  const [requests, setRequests] = useState<CustomRequest[]>(REQUESTS);
+export default function ConsoleCustomOrders({ requests: initialRequests = [] }: { requests?: CustomRequest[] }) {
+  const [requests, setRequests] = useState<CustomRequest[]>(initialRequests);
   const [activeTab, setActiveTab] = useState<TabKey>("all");
   const [selectedId, setSelectedId] = useState<string | null>(null);
 

@@ -2,116 +2,13 @@
 
 import { useState, useRef, useEffect } from "react";
 import { C, UI } from "../../tokens";
+import type { ConsoleConversation as Conversation, ConsoleMessage as Message } from "@/server/console";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
-type Sender = "customer" | "owner";
 type ConvTag = "order" | "custom" | null;
 type Filter = "all" | "unread" | "order" | "custom";
 
-interface Message {
-  id: string;
-  sender: Sender;
-  text: string;
-  timestamp: string;
-}
-
-interface Conversation {
-  id: string;
-  customerName: string;
-  subject: string;
-  tag: ConvTag;
-  tagLabel?: string;
-  preview: string;
-  date: string;
-  unread: boolean;
-  resolved: boolean;
-  messages: Message[];
-}
-
-// ── Mock data ─────────────────────────────────────────────────────────────────
-
-const INITIAL_CONVS: Conversation[] = [
-  {
-    id: "c1",
-    customerName: "Chiamaka Eze",
-    subject: "Shipping update for my Gele set",
-    tag: "order",
-    tagLabel: "#FTW-2891",
-    preview: "Hi, I placed order #FTW-2891 three days ago — any shipping update?",
-    date: "Today, 10:42",
-    unread: true,
-    resolved: false,
-    messages: [
-      { id: "m1", sender: "customer", text: "Hi! I placed order #FTW-2891 three days ago for a Gele set. Do you have a shipping update? I haven't received any tracking info yet.", timestamp: "Today, 10:42" },
-      { id: "m2", sender: "owner", text: "Hi Chiamaka! Your order is packed and ready to go — we're dispatching it today and you'll receive your tracking number by this evening. Thank you for your patience!", timestamp: "Today, 11:10" },
-      { id: "m3", sender: "customer", text: "Wonderful, thank you so much! Really looking forward to receiving it.", timestamp: "Today, 11:18" },
-    ],
-  },
-  {
-    id: "c2",
-    customerName: "David Mensah",
-    subject: "Measurement correction — Custom Agbada",
-    tag: "custom",
-    tagLabel: "Custom Request",
-    preview: "Hello, I think I put the wrong sleeve length in my request...",
-    date: "Yesterday, 15:15",
-    unread: true,
-    resolved: false,
-    messages: [
-      { id: "m1", sender: "customer", text: "Hello, I submitted a custom Agbada request but I think I put the wrong sleeve length. Can it still be corrected?", timestamp: "Yesterday, 15:15" },
-      { id: "m2", sender: "owner", text: "Yes of course! Your request is still in New status so no cutting has started. Just confirm the correct measurement and I'll update it straight away.", timestamp: "Yesterday, 15:42" },
-      { id: "m3", sender: "customer", text: "That's a relief! The sleeve should be 28.5 inches, not 27. Really appreciate the flexibility.", timestamp: "Yesterday, 15:58" },
-      { id: "m4", sender: "owner", text: "Updated — I have 28.5 inches noted on your request. We'll be in touch once the quote is ready. Looking forward to creating this for you!", timestamp: "Yesterday, 16:05" },
-    ],
-  },
-  {
-    id: "c3",
-    customerName: "Ngozi Obi",
-    subject: "Return policy question",
-    tag: null,
-    preview: "If an item's colour doesn't match the listing, can I return it?",
-    date: "28 Aug",
-    unread: false,
-    resolved: false,
-    messages: [
-      { id: "m1", sender: "customer", text: "Hello! If I receive an item and the colour doesn't match what I see online, am I able to return it?", timestamp: "28 Aug, 14:30" },
-      { id: "m2", sender: "owner", text: "Hello Ngozi! Absolutely — we accept returns within 14 days for any item that doesn't match its listing. We provide a prepaid return label and process refunds within 5–7 business days of receiving the item back. Please do reach out as soon as you receive it if there's any concern.", timestamp: "28 Aug, 15:00" },
-    ],
-  },
-  {
-    id: "c4",
-    customerName: "Kwame Asante",
-    subject: "Delivery delay — Order #FTW-2869",
-    tag: "order",
-    tagLabel: "#FTW-2869",
-    preview: "My order was supposed to arrive by now...",
-    date: "26 Aug",
-    unread: false,
-    resolved: true,
-    messages: [
-      { id: "m1", sender: "customer", text: "Hi, my order was supposed to arrive by now and I haven't received anything. Is everything okay?", timestamp: "26 Aug, 09:00" },
-      { id: "m2", sender: "owner", text: "Hi Kwame, I sincerely apologise for the delay. Your parcel was held at customs — it's now been cleared and is out for delivery. You should receive it tomorrow. I'm sorry for any inconvenience caused.", timestamp: "26 Aug, 10:15" },
-      { id: "m3", sender: "customer", text: "Thank you for the quick update and explanation. I'll keep an eye out for it.", timestamp: "26 Aug, 10:28" },
-      { id: "m4", sender: "owner", text: "Of course! Please let me know once it arrives and confirm everything is in order.", timestamp: "26 Aug, 10:30" },
-    ],
-  },
-  {
-    id: "c5",
-    customerName: "Temi Fadare",
-    subject: "Size guide — Gele headwrap",
-    tag: null,
-    preview: "What does 'yards' mean in the size guide?",
-    date: "22 Aug",
-    unread: false,
-    resolved: false,
-    messages: [
-      { id: "m1", sender: "customer", text: "I'm a bit confused by the size guide. What does 'yards' mean in terms of how much fabric comes with the gele?", timestamp: "22 Aug, 11:00" },
-      { id: "m2", sender: "owner", text: "Great question! One yard is roughly 91cm. Our Standard size (5 yards) gives you about 4.5 metres of fabric — plenty for most styles. The Large (7 yards) is ideal if you prefer elaborate sculptured folds that need more volume. Hope that helps!", timestamp: "22 Aug, 11:45" },
-      { id: "m3", sender: "customer", text: "That's really helpful, thank you! I'll go with the Standard.", timestamp: "22 Aug, 11:52" },
-    ],
-  },
-];
 
 const QUICK_REPLIES = [
   "Thanks for reaching out!",
@@ -229,9 +126,9 @@ function TagChip({ tag, tagLabel }: { tag: ConvTag; tagLabel?: string }) {
 
 // ── Main page ─────────────────────────────────────────────────────────────────
 
-export default function ConsoleMessages() {
-  const [convs, setConvs] = useState<Conversation[]>(INITIAL_CONVS);
-  const [activeId, setActiveId] = useState<string>("c1");
+export default function ConsoleMessages({ conversations = [] }: { conversations?: Conversation[] }) {
+  const [convs, setConvs] = useState<Conversation[]>(conversations);
+  const [activeId, setActiveId] = useState<string>(conversations[0]?.id ?? "");
   const [filter, setFilter] = useState<Filter>("all");
   const [search, setSearch] = useState("");
   const [draft, setDraft] = useState("");

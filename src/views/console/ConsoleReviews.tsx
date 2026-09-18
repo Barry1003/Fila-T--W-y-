@@ -1,135 +1,7 @@
 'use client';
 
 import { useState } from "react";
-// import { C, UI, label } from "../../tokens";
-
-// ── Types ─────────────────────────────────────────────────────────────────────
-
-type Review = {
-  id: string;
-  customer: { name: string; initials: string; location: string };
-  rating: 1 | 2 | 3 | 4 | 5;
-  date: string;
-  product: { name: string; img: string };
-  text: string;
-  photos: string[];
-  reply: string | null;
-  repliedAt?: string;
-  flagged: boolean;
-};
-
-// ── Seed data ─────────────────────────────────────────────────────────────────
-
-const REVIEWS: Review[] = [
-  {
-    id: "rv1",
-    customer: { name: "Chiamaka Eze", initials: "CE", location: "London, UK" },
-    rating: 5,
-    date: "Aug 28, 2026",
-    product: { name: "Aso-Oke Gele — Ivory & Gold Set", img: "photo-1714124731489-7eb16af0ac91" },
-    text: "Absolutely stunning craftsmanship. The Gele drapes perfectly and the colour is exactly what I wanted. AdeClassics truly delivers on their promise of quality. I wore this to my cousin's traditional ceremony and received compliments all evening. Will definitely order again for my sister's wedding.",
-    photos: [],
-    reply: "Thank you so much, Chiamaka! We're overjoyed that the Gele was everything you hoped for — and congratulations on the ceremony! We can't wait to create something special for your sister's celebration too.",
-    repliedAt: "Aug 29, 2026",
-    flagged: false,
-  },
-  {
-    id: "rv2",
-    customer: { name: "David Mensah", initials: "DM", location: "Birmingham, UK" },
-    rating: 4,
-    date: "Aug 25, 2026",
-    product: { name: "Embroidered Agbada Kaftan", img: "photo-1765910083971-aa0e3688be46" },
-    text: "Very well made and the embroidery is exquisite. Delivery was a little slower than expected — arrived on day 8 when I was told 5–7 days — but the quality more than makes up for it. The packaging felt like a luxury gift. I photographed the unboxing.",
-    photos: ["#8A6818", "#2E4A9E"],
-    reply: null,
-    flagged: false,
-  },
-  {
-    id: "rv3",
-    customer: { name: "Bola Adeyemi", initials: "BA", location: "Toronto, Canada" },
-    rating: 5,
-    date: "Aug 20, 2026",
-    product: { name: "Adire Roundneck — Indigo", img: "photo-1632948056627-41482f69c38c" },
-    text: "The Adire fabric is gorgeous — rich indigo with such intricate patterns. I've received so many compliments every time I wear this. True artistry. You can see the care that went into each hand-drawn detail.",
-    photos: ["#1A3D7A"],
-    reply: "Thank you Bola! Those Adire patterns are hand-drawn by our master artisan in Lagos — we're so glad you love it. We'd love to see you in it. Feel free to tag us on Instagram!",
-    repliedAt: "Aug 21, 2026",
-    flagged: false,
-  },
-  {
-    id: "rv4",
-    customer: { name: "Ola Balogun", initials: "OB", location: "Manchester, UK" },
-    rating: 5,
-    date: "Aug 15, 2026",
-    product: { name: "Gobi Filà Cap — Burgundy Velvet", img: "photo-1763823133159-c6f8ec380e33" },
-    text: "Perfect fit on the first try. The velvet is rich and the cap holds its shape beautifully. I ordered the Large and it fits my head exactly as described in the sizing guide. The burgundy colour is deeper and richer in person than the photos show — in a good way.",
-    photos: [],
-    reply: null,
-    flagged: false,
-  },
-  {
-    id: "rv5",
-    customer: { name: "Tunde Bakare", initials: "TB", location: "Bristol, UK" },
-    rating: 3,
-    date: "Aug 10, 2026",
-    product: { name: "Embroidered Agbada Kaftan", img: "photo-1765910083971-aa0e3688be46" },
-    text: "The garment itself is beautiful but the sizing runs larger than expected. I had to have it taken in by a local tailor. The size chart could do with more detail — perhaps a chest measurement table. Would still recommend the quality but check the measurements carefully.",
-    photos: [],
-    reply: null,
-    flagged: false,
-  },
-  {
-    id: "rv6",
-    customer: { name: "Ngozi Obi", initials: "NO", location: "Lagos, Nigeria" },
-    rating: 2,
-    date: "Aug 5, 2026",
-    product: { name: "Hand-tooled Pam Slippers", img: "photo-1646133512747-babfd708d662" },
-    text: "Very disappointed. The leather started cracking after just 3 wears and the stitching came loose on the right slipper. Expected much better quality for this price point. I've left photos below.",
-    photos: ["#C4501A", "#8B3A1A"],
-    reply: "Hi Ngozi, we are truly sorry — this is not the quality standard we hold ourselves to and we want to make this right immediately. We've sent you a direct email with options for a replacement or full refund. Thank you for giving us the opportunity to resolve this.",
-    repliedAt: "Aug 6, 2026",
-    flagged: true,
-  },
-  {
-    id: "rv7",
-    customer: { name: "Kwame Asante", initials: "KA", location: "Leeds, UK" },
-    rating: 5,
-    date: "Jul 30, 2026",
-    product: { name: "Yoruba Filà (Custom)", img: "photo-1763823133159-c6f8ec380e33" },
-    text: "My custom Filà arrived and it is beyond perfect. The measurements were spot on, the embroidery is incredibly detailed, and the fabric is premium. Ordering a second one in navy blue.",
-    photos: [],
-    reply: "Kwame, thank you! We put extra care into your custom piece and it's wonderful to hear it arrived exactly right. Your navy blue order is already on our list — we'll reach out once we confirm fabric availability.",
-    repliedAt: "Jul 31, 2026",
-    flagged: false,
-  },
-  {
-    id: "rv8",
-    customer: { name: "Adaeze Obi", initials: "AO", location: "Glasgow, UK" },
-    rating: 4,
-    date: "Jul 22, 2026",
-    product: { name: "Ọjọ Ipele — Crimson Drape", img: "photo-1760086626077-55da1cb1ecb3" },
-    text: "Beautiful drape with vibrant colour. Fits well and the fabric is high quality. Minor point: I wish the care instructions were printed rather than just on the website, as I nearly washed it incorrectly. Five stars for the product, four stars overall.",
-    photos: [],
-    reply: null,
-    flagged: false,
-  },
-];
-
-// ── Store summary stats ───────────────────────────────────────────────────────
-
-const STORE_STATS = {
-  average: 4.8,
-  total: 47,
-  breakdown: [
-    { stars: 5, count: 40, pct: 85 },
-    { stars: 4, count: 4,  pct: 9  },
-    { stars: 3, count: 2,  pct: 4  },
-    { stars: 2, count: 1,  pct: 2  },
-    { stars: 1, count: 0,  pct: 0  },
-  ],
-  responseRate: 68,
-  responded: 32,
-};
+import type { ConsoleReview as Review, ReviewStats } from "@/server/console";
 
 // ── Star renderer ─────────────────────────────────────────────────────────────
 
@@ -152,8 +24,8 @@ function Stars({ rating, size = 13 }: { rating: number; size?: number }) {
 
 // ── Summary block ─────────────────────────────────────────────────────────────
 
-function SummaryBlock({ filtered, needsResponse }: { filtered: boolean; needsResponse: boolean }) {
-  const s = STORE_STATS;
+function SummaryBlock({ stats }: { stats: ReviewStats }) {
+  const s = stats;
   return (
     <div className="bg-white rounded-lg grid items-center p-6 gap-10 mb-5 border border-solid border-[#2b232012] grid-cols-[auto_1fr_auto]">
       {/* Big rating */}
@@ -318,7 +190,7 @@ function ReviewCard({ review, onReplyPosted }: {
         {/* ── Product link ── */}
         <div className="inline-flex items-center gap-2 px-[0.625rem] py-[0.375rem] rounded-[5px] cursor-pointer no-underline mb-[0.875rem] transition-colors duration-100 bg-[#2b232008] border border-solid border-[#2b232012] hover:bg-[#2b23200f]">
           <img
-            src={`https://images.unsplash.com/${review.product.img}?w=40&h=40&fit=crop&auto=format`}
+            src={review.product.img}
             alt=""
             className="w-6 h-6 rounded-[3px] object-cover shrink-0 bg-[#2b232014]"
           />
@@ -339,21 +211,13 @@ function ReviewCard({ review, onReplyPosted }: {
         {/* ── Customer photos ── */}
         {review.photos.length > 0 && (
           <div className="flex gap-2 mb-[0.875rem]">
-            {review.photos.map((bg, i) => (
-              <div
+            {review.photos.map((url, i) => (
+              <img
                 key={i}
-                className="w-[52px] h-[52px] rounded-md overflow-hidden relative cursor-pointer shrink-0 border border-solid border-[rgba(43,35,32,0.12)]"
-                style={{
-                  backgroundColor: bg,
-                }}
-              >
-                <svg width="52" height="52" className="absolute inset-0 opacity-[0.12]">
-                  <pattern id={`hatch-rv-${review.id}-${i}`} width="6" height="6" patternUnits="userSpaceOnUse">
-                    <line x1="0" y1="6" x2="6" y2="0" stroke="#fff" strokeWidth="0.8" />
-                  </pattern>
-                  <rect width="52" height="52" fill={`url(#hatch-rv-${review.id}-${i})`} />
-                </svg>
-              </div>
+                src={url}
+                alt=""
+                className="w-[52px] h-[52px] rounded-md object-cover cursor-pointer shrink-0 border border-solid border-[rgba(43,35,32,0.12)] bg-[#2b232014]"
+              />
             ))}
             <span className="self-center ml-1 font-sans text-[0.68rem] text-[#2b232066]">
               {review.photos.length} customer photo{review.photos.length !== 1 ? "s" : ""}
@@ -461,8 +325,8 @@ function EmptyState({ label: msg }: { label: string }) {
 
 type RatingFilter = "all" | 5 | 4 | 3 | 2 | 1;
 
-export default function ConsoleReviews() {
-  const [reviews, setReviews] = useState<Review[]>(REVIEWS);
+export default function ConsoleReviews({ reviews: initialReviews = [], stats }: { reviews?: Review[]; stats: ReviewStats }) {
+  const [reviews, setReviews] = useState<Review[]>(initialReviews);
   const [ratingFilter, setRatingFilter] = useState<RatingFilter>("all");
   const [needsResponse, setNeedsResponse] = useState(false);
 
@@ -532,7 +396,7 @@ export default function ConsoleReviews() {
       </div>
 
       {/* ── Summary block ──────────────────────────────────── */}
-      <SummaryBlock filtered={ratingFilter !== "all"} needsResponse={needsResponse} />
+      <SummaryBlock stats={stats} />
 
       {/* ── Review list ────────────────────────────────────── */}
       {filtered.length === 0 ? (
