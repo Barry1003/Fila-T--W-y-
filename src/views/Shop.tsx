@@ -5,7 +5,7 @@ import { Link, useSearchParams } from '@/lib/router';
 import { C, DISPLAY, UI, label } from '../tokens';
 import { SlidersIcon, GridIcon, ListIcon, XIcon } from '../icons';
 import { useCart } from '@/lib/cart';
-import { COLOR_HEX } from '../data/products';
+import { swatchFor } from '../data/products';
 import type { CatalogueProduct, CatalogueCollection } from '@/server/catalogue';
 import PromoCarousel, { type Promo } from '../components/PromoCarousel';
 
@@ -148,7 +148,7 @@ function Sidebar({ collections, colors, selectedCats, onCat, priceMax, onPriceMa
         <div className="flex flex-wrap gap-2">
           {colors.map(col => {
             const active = selectedColors.includes(col);
-            const bg = COLOR_HEX[col];
+            const bg = swatchFor(col);
             return (
               <button
                 key={col}

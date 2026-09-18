@@ -90,3 +90,35 @@ export const COLOR_HEX: Record<string, string> = {
   Tan:      '#C4A882', Multi: 'conic-gradient(#7A2E38,#D4A94E,#2E4A9E,#3B8A93,#7A2E38)',
   Blue:     '#2C5F8A', Navy: '#1A2E5C',
 };
+
+/** Single base colours a name can resolve to, incl. a few two-word ones. */
+const BASE_COLORS: Record<string, string> = {
+  black: '#2B2320', white: '#FAF6F0', cream: '#FAF6F0', ivory: '#F2E8D5',
+  gold: '#D4A94E', tan: '#C4A882', camel: '#B58A5E', beige: '#D8C4A0', brown: '#6B4A2B',
+  maroon: '#7A2E38', burgundy: '#7A2E38', crimson: '#C0392B', red: '#C0392B', rust: '#C0622B',
+  pink: '#C13584', magenta: '#B0338A', purple: '#6B3FA0', violet: '#6B3FA0',
+  indigo: '#2E4A9E', navy: '#1A2E5C', blue: '#2C5F8A', 'royal blue': '#3B49B0', teal: '#3B8A93',
+  green: '#2E7D57', emerald: '#1F7A5A', olive: '#6E7B2A',
+  grey: '#8A8580', gray: '#8A8580', silver: '#C9C6BF', charcoal: '#2B2320',
+};
+
+/**
+ * A CSS background for a colour name — never blank. Known names use COLOR_HEX;
+ * anything else resolves from the base-colour words it contains, and a
+ * two-colour name ("Green & Gold") becomes a split swatch. Unrecognised names
+ * fall back to a neutral tone rather than rendering empty.
+ */
+export function swatchFor(name: string): string {
+  if (COLOR_HEX[name]) return COLOR_HEX[name];
+  const lower = name.toLowerCase().trim();
+  if (BASE_COLORS[lower]) return BASE_COLORS[lower];
+
+  const hexes: string[] = [];
+  for (const token of lower.split(/[^a-z]+/).filter(Boolean)) {
+    const hex = BASE_COLORS[token];
+    if (hex && !hexes.includes(hex)) hexes.push(hex);
+  }
+  if (hexes.length >= 2) return `linear-gradient(135deg, ${hexes[0]} 0 50%, ${hexes[1]} 50% 100%)`;
+  if (hexes.length === 1) return hexes[0];
+  return '#B8AE9E';
+}

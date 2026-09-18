@@ -121,7 +121,7 @@ export const listProducts = unstable_cache(
       prisma.product.findMany({
         where: { status: 'PUBLISHED' },
         select: productSelect,
-        orderBy: { createdAt: 'asc' },
+        orderBy: { createdAt: 'desc' },
       })
     );
     return (rows as unknown as ProductRow[]).map(toCatalogueProduct);
@@ -137,7 +137,7 @@ export const listProducts = unstable_cache(
  */
 export async function listProductsForConsole(): Promise<ConsoleProduct[]> {
   const rows = await withDbRetry('list products for console', () =>
-    prisma.product.findMany({ select: productSelect, orderBy: { createdAt: 'asc' } })
+    prisma.product.findMany({ select: productSelect, orderBy: { createdAt: 'desc' } })
   );
 
   return (rows as unknown as ProductRow[]).map(row => ({
