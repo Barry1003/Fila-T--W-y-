@@ -1,6 +1,8 @@
 'use client';
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
+import { replyToReview, setReviewFlagged } from "@/server/review-actions";
 import type { ConsoleReview as Review, ReviewStats } from "@/server/console";
 
 // ── Star renderer ─────────────────────────────────────────────────────────────
@@ -103,9 +105,10 @@ function SummaryBlock({ stats }: { stats: ReviewStats }) {
 
 // ── Review card ───────────────────────────────────────────────────────────────
 
-function ReviewCard({ review, onReplyPosted }: {
+function ReviewCard({ review, onReplyPosted, onToggleFlag }: {
   review: Review;
   onReplyPosted: (id: string, text: string) => void;
+  onToggleFlag: (id: string, flagged: boolean) => void;
 }) {
   const [replyOpen, setReplyOpen] = useState(false);
   const [replyText, setReplyText] = useState("");
@@ -160,9 +163,10 @@ function ReviewCard({ review, onReplyPosted }: {
           {/* Flag + rating chip */}
           <div className="flex items-center gap-2 shrink-0">
             {review.flagged && (
-              <div
-                title="Flagged for moderation review"
-                className="flex items-center gap-[3px] px-[7px] py-[3px] rounded-full border border-solid border-[#7a2e3847] bg-[#7a2e380f] text-[#7A2E38]"
+              <button
+                onClick={() => onToggleFlag(review.id, false)}
+                title="Flagged — click to remove flag"
+                className="flex items-center gap-[3px] px-[7px] py-[3px] rounded-full cursor-pointer border border-solid border-[#7a2e3847] bg-[#7a2e380f] text-[#7A2E38]"
               >
                 <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z" />
@@ -171,10 +175,11 @@ function ReviewCard({ review, onReplyPosted }: {
                 <span className="font-semibold uppercase tracking-[0.06em] font-sans text-[0.58rem]">
                   Flagged
                 </span>
-              </div>
+              </button>
             )}
             {!review.flagged && (
               <button
+                onClick={() => onToggleFlag(review.id, true)}
                 title="Flag this review for moderation"
                 className="bg-transparent border-none cursor-pointer p-1 flex items-center rounded transition-colors duration-100 text-[#2b232038] hover:text-[#7A2E38]"
               >
@@ -328,6 +333,8 @@ type RatingFilter = "all" | 5 | 4 | 3 | 2 | 1;
 export default function ConsoleReviews({ reviews: initialReviews = [], stats }: { reviews?: Review[]; stats: ReviewStats }) {
   const [reviews, setReviews] = useState<Review[]>(initialReviews);
   const [ratingFilter, setRatingFilter] = useState<RatingFilter>("all");
+  const router = useRouter();
+  const [, startAction] = useTransition();
   const [needsResponse, setNeedsResponse] = useState(false);
 
   const selectClassName = "font-sans text-[0.77rem] text-[#2B2320] bg-white border border-solid border-[#2b232026] rounded-[6px] py-[0.45rem] pr-[2rem] pl-[0.75rem] appearance-none bg-no-repeat bg-[right_0.625rem_center] cursor-pointer outline-none";
@@ -341,13 +348,21 @@ export default function ConsoleReviews({ reviews: initialReviews = [], stats }: 
   const needsResponseCount = reviews.filter(r => r.reply === null).length;
 
   function handleReplyPosted(id: string, text: string) {
-    setReviews(prev =>
-      prev.map(r =>
-        r.id === id
-          ? { ...r, reply: text, repliedAt: "Just now" }
-          : r
-      )
-    );
+    setReviews(prev => prev.map(r => (r.id === id ? { ...r, reply: text, repliedAt: "Just now" } : r)));
+    startAction(async () => {
+      const res = await replyToReview(id, text);
+      if (!res.ok) { alert(res.message); }
+      router.refresh();
+    });
+  }
+
+  function handleToggleFlag(id: string, flagged: boolean) {
+    setReviews(prev => prev.map(r => (r.id === id ? { ...r, flagged } : r)));
+    startAction(async () => {
+      const res = await setReviewFlagged(id, flagged);
+      if (!res.ok) { alert(res.message); }
+      router.refresh();
+    });
   }
 
   return (
@@ -414,7 +429,7 @@ export default function ConsoleReviews({ reviews: initialReviews = [], stats }: 
       ) : (
         <div className="flex flex-col gap-[0.875rem]">
           {filtered.map(r => (
-            <ReviewCard key={r.id} review={r} onReplyPosted={handleReplyPosted} />
+            <ReviewCard key={r.id} review={r} onReplyPosted={handleReplyPosted} onToggleFlag={handleToggleFlag} />
           ))}
         </div>
       )}
