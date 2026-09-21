@@ -1,7 +1,9 @@
 'use client';
 
-import { useState } from "react";
+import { useState, useTransition, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { C, UI } from "../../tokens";
+import { createDiscountCode, toggleDiscountCode, deleteDiscountCode, createBanner, deleteBanner } from "@/server/promotion-actions";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -28,20 +30,6 @@ interface Banner {
 }
 
 // ── Mock data ─────────────────────────────────────────────────────────────────
-
-const INIT_CODES: DiscountCode[] = [
-  { id: "1", code: "WELCOME10", type: "Percentage", value: "10%", usedCount: 42, limitCount: 200, active: true, expiry: "31 Dec 2026", expired: false },
-  { id: "2", code: "FREESHIP25", type: "Fixed Amount", value: "CAD $43", usedCount: 18, limitCount: 100, active: true, expiry: "15 Oct 2026", expired: false },
-  { id: "3", code: "GELE15", type: "Percentage", value: "15%", usedCount: 7, limitCount: 50, active: false, expiry: "30 Sep 2026", expired: false },
-  { id: "4", code: "ASOKEVIP", type: "Percentage", value: "20%", usedCount: 89, limitCount: 150, active: true, expiry: "01 Jan 2027", expired: false },
-  { id: "5", code: "NEWCUSTOMER", type: "Fixed Amount", value: "CAD $26", usedCount: 203, limitCount: null, active: false, expiry: "Expired", expired: true },
-];
-
-const INIT_BANNERS: Banner[] = [
-  { id: "1", text: "Free shipping on all orders over CAD $258 — use code FREESHIP25", cta: "Shop Now", dateRange: "01 Sep 2026 – 30 Sep 2026", status: "Live" },
-  { id: "2", text: "New Aso-Oke collection dropping 15 Oct — early access for newsletter subscribers", cta: "Sign up", dateRange: "10 Oct 2026 – 30 Oct 2026", status: "Scheduled" },
-  { id: "3", text: "Summer sale: 15% off everything with SUMMER15", cta: "", dateRange: "01 Jun 2026 – 31 Aug 2026", status: "Expired" },
-];
 
 const CATEGORIES = ["Aso-Oke", "Filà / Caps", "Gele Sets", "Adire", "Custom Orders", "Accessories"];
 
@@ -272,8 +260,20 @@ function DiscountTable({
 
 // ── Homepage banners tab ──────────────────────────────────────────────────────
 
-function BannersTab({ onAdd }: { onAdd: () => void }) {
-  const [banners, setBanners] = useState<Banner[]>(INIT_BANNERS);
+function BannersTab({ initialBanners, onAdd }: { initialBanners: Banner[]; onAdd: () => void }) {
+  const [banners, setBanners] = useState<Banner[]>(initialBanners);
+  const router = useRouter();
+  const [, startTransition] = useTransition();
+
+  useEffect(() => setBanners(initialBanners), [initialBanners]);
+
+  const handleDelete = async (id: string) => {
+    setBanners((prev) => prev.filter((x) => x.id !== id));
+    await deleteBanner(id);
+    startTransition(() => {
+      router.refresh();
+    });
+  };
 
   if (banners.length === 0) {
     return <EmptyState label="No active banners" onAction={onAdd} actionLabel="+ Add Banner" />;
@@ -375,7 +375,7 @@ function BannersTab({ onAdd }: { onAdd: () => void }) {
                 Edit
               </button>
               <button
-                onClick={() => setBanners((prev) => prev.filter((x) => x.id !== b.id))}
+                onClick={() => handleDelete(b.id)}
                 className="bg-none rounded px-[10px] py-[3px] cursor-pointer border border-solid border-[rgba(122,46,56,0.2)]"
                 style={{
                   fontSize: "0.7rem",
@@ -402,14 +402,36 @@ function generateCode(): string {
   return `${p}${n}`;
 }
 
-function CreateCodePanel({ onClose }: { onClose: () => void }) {
+function CreateCodePanel({ onClose, onCreated }: { onClose: () => void; onCreated: (data: any) => Promise<void> }) {
   const [discountType, setDiscountType] = useState<"Percentage" | "Fixed Amount">("Percentage");
   const [code, setCode] = useState("");
   const [appliesTo, setAppliesTo] = useState<"all" | "categories">("all");
   const [selectedCats, setSelectedCats] = useState<string[]>([]);
+  const [value, setValue] = useState("");
+  const [limit, setLimit] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const toggleCat = (cat: string) =>
     setSelectedCats((prev) => (prev.includes(cat) ? prev.filter((c) => c !== cat) : [...prev, cat]));
+
+  const handleCreate = async () => {
+    const val = Number(value);
+    if (!code || isNaN(val) || val <= 0) {
+      alert("Invalid code or value");
+      return;
+    }
+    setIsSubmitting(true);
+    await onCreated({
+      code,
+      type: discountType,
+      value: val,
+      usageLimit: limit ? Number(limit) : null,
+      expiresAt: endDate ? new Date(endDate).toISOString() : null,
+    });
+    setIsSubmitting(false);
+  };
 
   return (
     <div style={{ position: "fixed", inset: 0, zIndex: 200, display: "flex", alignItems: "flex-start", justifyContent: "flex-end" }}>
@@ -528,6 +550,8 @@ function CreateCodePanel({ onClose }: { onClose: () => void }) {
                 </label>
                 <input
                   type="number"
+                  value={value}
+                  onChange={(e) => setValue(e.target.value)}
                   placeholder={discountType === "Percentage" ? "10" : "25.00"}
                   className="w-full px-3 py-2 rounded-md outline-none box-border bg-white border border-solid border-[rgba(43,35,32,0.18)]"
                   style={{ fontSize: "0.82rem", fontFamily: UI, color: C.charcoal }}
@@ -550,6 +574,8 @@ function CreateCodePanel({ onClose }: { onClose: () => void }) {
                 </label>
                 <input
                   type="number"
+                  value={limit}
+                  onChange={(e) => setLimit(e.target.value)}
                   placeholder="Unlimited"
                   className="w-full px-3 py-2 rounded-md outline-none box-border bg-white border border-solid border-[rgba(43,35,32,0.18)]"
                   style={{ fontSize: "0.82rem", fontFamily: UI, color: C.charcoal }}
@@ -617,11 +643,11 @@ function CreateCodePanel({ onClose }: { onClose: () => void }) {
             <div className="rg-2">
               <div>
                 <label className="block font-medium mb-[0.375rem]" style={{ fontSize: "0.78rem", color: C.charcoal }}>Start Date</label>
-                <input type="date" className="w-full px-3 py-2 rounded-md outline-none box-border bg-white border border-solid border-[rgba(43,35,32,0.18)]" style={{ fontSize: "0.82rem", fontFamily: UI, color: C.charcoal }} />
+                <input type="date" value={startDate} onChange={e => setStartDate(e.target.value)} className="w-full px-3 py-2 rounded-md outline-none box-border bg-white border border-solid border-[rgba(43,35,32,0.18)]" style={{ fontSize: "0.82rem", fontFamily: UI, color: C.charcoal }} />
               </div>
               <div>
                 <label className="block font-medium mb-[0.375rem]" style={{ fontSize: "0.78rem", color: C.charcoal }}>End Date</label>
-                <input type="date" className="w-full px-3 py-2 rounded-md outline-none box-border bg-white border border-solid border-[rgba(43,35,32,0.18)]" style={{ fontSize: "0.82rem", fontFamily: UI, color: C.charcoal }} />
+                <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)} className="w-full px-3 py-2 rounded-md outline-none box-border bg-white border border-solid border-[rgba(43,35,32,0.18)]" style={{ fontSize: "0.82rem", fontFamily: UI, color: C.charcoal }} />
               </div>
             </div>
           </section>
@@ -642,10 +668,12 @@ function CreateCodePanel({ onClose }: { onClose: () => void }) {
             Cancel
           </button>
           <button
+            onClick={handleCreate}
+            disabled={isSubmitting}
             className="px-6 py-2 border-none rounded-md font-semibold cursor-pointer"
-            style={{ backgroundColor: C.gold, color: C.charcoal, fontSize: "0.82rem", fontFamily: UI }}
+            style={{ backgroundColor: C.gold, color: C.charcoal, fontSize: "0.82rem", fontFamily: UI, opacity: isSubmitting ? 0.7 : 1 }}
           >
-            Create Code
+            {isSubmitting ? "Creating..." : "Create Code"}
           </button>
         </div>
       </div>
@@ -655,9 +683,35 @@ function CreateCodePanel({ onClose }: { onClose: () => void }) {
 
 // ── Create Banner slide-over ───────────────────────────────────────────────────
 
-function CreateBannerPanel({ onClose }: { onClose: () => void }) {
+function CreateBannerPanel({ onClose, onCreated }: { onClose: () => void; onCreated: (data: any) => Promise<void> }) {
   const [bannerText, setBannerText] = useState("");
   const [bannerCTA, setBannerCTA] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleCreate = async () => {
+    if (!bannerText || !startDate || !endDate) {
+      alert("Please fill in required fields (Text, Start Date, End Date).");
+      return;
+    }
+    const now = new Date();
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    let status: 'LIVE' | 'SCHEDULED' | 'EXPIRED' = 'SCHEDULED';
+    if (now >= start && now <= end) status = 'LIVE';
+    if (now > end) status = 'EXPIRED';
+
+    setIsSubmitting(true);
+    await onCreated({
+      text: bannerText,
+      ctaLabel: bannerCTA,
+      startsAt: start.toISOString(),
+      endsAt: end.toISOString(),
+      status,
+    });
+    setIsSubmitting(false);
+  };
 
   return (
     <div style={{ position: "fixed", inset: 0, zIndex: 200, display: "flex", alignItems: "flex-start", justifyContent: "flex-end" }}>
@@ -729,11 +783,11 @@ function CreateBannerPanel({ onClose }: { onClose: () => void }) {
           <div className="rg-2">
             <div>
               <label className="block font-medium mb-[0.375rem]" style={{ fontSize: "0.78rem", color: C.charcoal }}>Start Date</label>
-              <input type="date" className="w-full px-3 py-2 rounded-md outline-none box-border bg-white border border-solid border-[rgba(43,35,32,0.18)]" style={{ fontSize: "0.82rem", fontFamily: UI, color: C.charcoal }} />
+              <input type="date" value={startDate} onChange={e => setStartDate(e.target.value)} className="w-full px-3 py-2 rounded-md outline-none box-border bg-white border border-solid border-[rgba(43,35,32,0.18)]" style={{ fontSize: "0.82rem", fontFamily: UI, color: C.charcoal }} />
             </div>
             <div>
               <label className="block font-medium mb-[0.375rem]" style={{ fontSize: "0.78rem", color: C.charcoal }}>End Date</label>
-              <input type="date" className="w-full px-3 py-2 rounded-md outline-none box-border bg-white border border-solid border-[rgba(43,35,32,0.18)]" style={{ fontSize: "0.82rem", fontFamily: UI, color: C.charcoal }} />
+              <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)} className="w-full px-3 py-2 rounded-md outline-none box-border bg-white border border-solid border-[rgba(43,35,32,0.18)]" style={{ fontSize: "0.82rem", fontFamily: UI, color: C.charcoal }} />
             </div>
           </div>
 
@@ -814,10 +868,12 @@ function CreateBannerPanel({ onClose }: { onClose: () => void }) {
             Cancel
           </button>
           <button
+            onClick={handleCreate}
+            disabled={isSubmitting}
             className="px-6 py-2 border-none rounded-md font-semibold cursor-pointer"
-            style={{ backgroundColor: C.gold, color: C.charcoal, fontSize: "0.82rem", fontFamily: UI }}
+            style={{ backgroundColor: C.gold, color: C.charcoal, fontSize: "0.82rem", fontFamily: UI, opacity: isSubmitting ? 0.7 : 1 }}
           >
-            Add Banner
+            {isSubmitting ? "Creating..." : "Add Banner"}
           </button>
         </div>
       </div>
@@ -831,16 +887,56 @@ function OptLabel() {
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 
-export default function ConsolePromotions() {
+export default function ConsolePromotions({ initialCodes, initialBanners }: { initialCodes: DiscountCode[]; initialBanners: Banner[] }) {
   const [tab, setTab] = useState<Tab>("codes");
-  const [codes, setCodes] = useState<DiscountCode[]>(INIT_CODES);
+  const [codes, setCodes] = useState<DiscountCode[]>(initialCodes);
   const [showPanel, setShowPanel] = useState(false);
+  const router = useRouter();
+  const [, startTransition] = useTransition();
 
-  const toggleCode = (id: string) =>
+  useEffect(() => setCodes(initialCodes), [initialCodes]);
+
+  const toggleCode = async (id: string) => {
+    const target = codes.find(c => c.id === id);
+    if (!target) return;
     setCodes((prev) => prev.map((c) => (c.id === id ? { ...c, active: !c.active } : c)));
+    await toggleDiscountCode(id, !target.active);
+    startTransition(() => {
+      router.refresh();
+    });
+  };
 
-  const deleteCode = (id: string) =>
+  const deleteCode = async (id: string) => {
     setCodes((prev) => prev.filter((c) => c.id !== id));
+    await deleteDiscountCode(id);
+    startTransition(() => {
+      router.refresh();
+    });
+  };
+
+  const handleCreateCode = async (data: any) => {
+    const res = await createDiscountCode(data);
+    if (!res.ok) {
+      alert(res.message);
+      return;
+    }
+    startTransition(() => {
+      router.refresh();
+    });
+    setShowPanel(false);
+  };
+
+  const handleCreateBanner = async (data: any) => {
+    const res = await createBanner(data);
+    if (!res.ok) {
+      alert(res.message);
+      return;
+    }
+    startTransition(() => {
+      router.refresh();
+    });
+    setShowPanel(false);
+  };
 
   const TAB_LABELS: Record<Tab, string> = { codes: "Discount Codes", banners: "Homepage Banners" };
 
@@ -913,11 +1009,11 @@ export default function ConsolePromotions() {
         ) : (
           <DiscountTable codes={codes} onToggle={toggleCode} onDelete={deleteCode} />
         ))}
-      {tab === "banners" && <BannersTab onAdd={() => setShowPanel(true)} />}
+      {tab === "banners" && <BannersTab initialBanners={initialBanners} onAdd={() => setShowPanel(true)} />}
 
       {/* Slide-over panels */}
-      {showPanel && tab === "codes" && <CreateCodePanel onClose={() => setShowPanel(false)} />}
-      {showPanel && tab === "banners" && <CreateBannerPanel onClose={() => setShowPanel(false)} />}
+      {showPanel && tab === "codes" && <CreateCodePanel onClose={() => setShowPanel(false)} onCreated={handleCreateCode} />}
+      {showPanel && tab === "banners" && <CreateBannerPanel onClose={() => setShowPanel(false)} onCreated={handleCreateBanner} />}
     </div>
   );
 }

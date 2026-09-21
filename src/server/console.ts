@@ -205,3 +205,66 @@ export async function listConsoleConversations(): Promise<ConsoleConversation[]>
     };
   });
 }
+
+/* ─── Promotions & Banners ────────────────────────────────────── */
+
+export type ConsoleDiscountCode = {
+  id: string;
+  code: string;
+  type: 'Percentage' | 'Fixed Amount';
+  value: string;
+  usedCount: number;
+  limitCount: number | null;
+  active: boolean;
+  expiry: string;
+  expired: boolean;
+};
+
+export async function listDiscountCodes(): Promise<ConsoleDiscountCode[]> {
+  const rows = await withDbRetry('console: discount codes', () =>
+    prisma.discountCode.findMany({ orderBy: { createdAt: 'desc' } })
+  );
+
+  const now = new Date();
+  return rows.map(r => {
+    const expired = !!r.expiresAt && r.expiresAt < now;
+    return {
+      id: r.id,
+      code: r.code,
+      type: r.type === 'PERCENTAGE' ? 'Percentage' : 'Fixed Amount',
+      value: r.type === 'PERCENTAGE' ? `${Number(r.value)}%` : `CAD $${Number(r.value)}`,
+      usedCount: r.usedCount,
+      limitCount: r.usageLimit ?? null,
+      active: r.active,
+      expiry: r.expiresAt ? fmtDate(r.expiresAt) : 'No expiry',
+      expired,
+    };
+  });
+}
+
+export type ConsoleBanner = {
+  id: string;
+  text: string;
+  cta: string;
+  dateRange: string;
+  status: 'Live' | 'Scheduled' | 'Expired';
+};
+
+export async function listBanners(): Promise<ConsoleBanner[]> {
+  const rows = await withDbRetry('console: banners', () =>
+    prisma.banner.findMany({ orderBy: { position: 'asc' } })
+  );
+
+  return rows.map(r => {
+    let status: 'Live' | 'Scheduled' | 'Expired' = 'Scheduled';
+    if (r.status === 'LIVE') status = 'Live';
+    else if (r.status === 'EXPIRED') status = 'Expired';
+    return {
+      id: r.id,
+      text: r.text,
+      cta: r.ctaLabel ?? '',
+      dateRange: `${fmtDate(r.startsAt)} – ${fmtDate(r.endsAt)}`,
+      status,
+    };
+  });
+}
