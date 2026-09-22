@@ -17,6 +17,7 @@
     "test": "node --import tsx --test src/server/__tests__/*.test.mjs"
   },
   "dependencies": {
+    "@neondatabase/neon-js": "0.7.0-beta",
     "@neondatabase/serverless": "^1.1.0",
     "@prisma/adapter-neon": "^7.10.0",
     "@prisma/client": "7.10.0",

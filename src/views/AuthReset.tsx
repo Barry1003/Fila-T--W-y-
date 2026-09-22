@@ -3,7 +3,7 @@
 import { useState, useTransition } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Link } from '@/lib/router';
-import { completePasswordReset } from '@/server/auth-actions';
+import { authClient } from '@/lib/auth/client';
 import { C, DISPLAY, UI, label } from '../tokens';
 
 export default function AuthReset() {
@@ -15,9 +15,11 @@ export default function AuthReset() {
   const [error, setError] = useState<string | null>(null);
   const [done, setDone] = useState(false);
 
-  const userId = params?.get('userId') ?? '';
-  const secret = params?.get('secret') ?? '';
-  const linkValid = Boolean(userId && secret);
+  // Neon Auth appends a one-time token to the reset link; an invalid or expired
+  // link comes back with ?error= instead.
+  const token = params?.get('token') ?? '';
+  const linkError = params?.get('error');
+  const linkValid = Boolean(token) && !linkError;
 
   function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -26,18 +28,18 @@ export default function AuthReset() {
     if (password.length < 8) return setError('Use at least 8 characters.');
     if (password !== confirm) return setError('Those passwords do not match.');
 
-    const data = new FormData();
-    data.set('userId', userId);
-    data.set('secret', secret);
-    data.set('password', password);
-
     startTransition(async () => {
-      const result = await completePasswordReset(data);
-      if (result.ok) {
+      const { error: resetError } = await authClient.resetPassword({
+        newPassword: password,
+        token,
+      });
+      if (!resetError) {
         setDone(true);
         setTimeout(() => router.push('/auth'), 2200);
       } else {
-        setError(result.message);
+        setError(
+          'Could not update your password. Your reset link may have expired — request a new one.'
+        );
       }
     });
   }

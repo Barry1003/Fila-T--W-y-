@@ -1,9 +1,43 @@
 'use client';
 
 import { useState, useCallback, useTransition } from 'react';
-import { signInWithEmail, signUpWithEmail, requestPasswordReset } from '@/server/auth-actions';
+import { authClient } from '@/lib/auth/client';
 import { Link, useNavigate } from '@/lib/router';
 import { C, DISPLAY, UI, label } from '../tokens';
+
+/**
+ * Turns a Neon Auth (Better Auth) client error into a line a customer can read.
+ * Sign-in failures stay vague on purpose — naming "no such email" would tell an
+ * attacker which addresses are registered.
+ */
+function authMessage(
+  error: { code?: string; message?: string } | null | undefined,
+  context: 'signin' | 'signup',
+): string {
+  const code = error?.code ?? '';
+  switch (code) {
+    case 'INVALID_EMAIL_OR_PASSWORD':
+      return 'Those details did not match an account.';
+    case 'USER_ALREADY_EXISTS':
+      return 'An account with that email already exists. Try signing in instead.';
+    case 'EMAIL_NOT_VERIFIED':
+      return 'Please verify your email first — check your inbox for the link.';
+    case 'PASSWORD_TOO_SHORT':
+      return 'Use at least 8 characters for your password.';
+    case 'TOO_MANY_REQUESTS':
+      return 'Too many attempts. Wait a minute and try again.';
+    default:
+      return context === 'signup'
+        ? 'Could not create the account. Check the details and try again.'
+        : 'Could not sign in. Check the details and try again.';
+  }
+}
+
+/** Absolute URL for a same-origin path (used for OAuth and reset redirects). */
+function appUrl(path: string): string {
+  if (typeof window === 'undefined') return path;
+  return `${window.location.origin}${path}`;
+}
 
 /**
  * Where to land after signing in — the `?next=` the visitor was gated with when
@@ -157,10 +191,11 @@ function GoldButton({ children, onClick, disabled }: { children: React.ReactNode
 }
 
 /* ─── GoogleButton ──────────────────────────────────────────── */
-function GoogleButton({ label: lbl }: { label: string }) {
+function GoogleButton({ label: lbl, onClick }: { label: string; onClick?: () => void }) {
   return (
     <button
       type="button"
+      onClick={onClick}
       className="w-full py-[0.85rem] px-8 rounded-[5px] cursor-pointer flex items-center justify-center gap-[0.6rem] font-semibold tracking-[0.06em] bg-transparent border-[1.5px] border-solid border-[rgba(43,35,32,0.28)] transition-colors duration-150"
       style={{
         color: C.charcoal,
@@ -220,6 +255,7 @@ function SignInForm({ switchTab }: { switchTab: () => void }) {
   const [submitted, setSubmitted] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
   const [resetSent, setResetSent] = useState(false);
+  const [resetPending, setResetPending] = useState(false);
 
   const errors: Record<string, string> = {};
   if (submitted && !email.trim()) errors.email = 'Email is required.';
@@ -232,27 +268,39 @@ function SignInForm({ switchTab }: { switchTab: () => void }) {
     setServerError(null);
     if (Object.keys(errors).length) return;
 
-    const data = new FormData();
-    data.set('email', email);
-    data.set('password', password);
-
     startTransition(async () => {
-      const result = await signInWithEmail(data);
-      if (result.ok) navigate(returnTo('/account'));
-      else setServerError(result.message);
+      const { error } = await authClient.signIn.email({
+        email: email.trim().toLowerCase(),
+        password,
+      });
+      if (error) setServerError(authMessage(error, 'signin'));
+      else navigate(returnTo('/account'));
     });
   }
 
   async function handleForgotPassword() {
+    if (resetPending) return;
     if (!email.trim()) {
       setSubmitted(true);
       setServerError('Enter your email address first, then choose "Forgot password?".');
       return;
     }
-    const data = new FormData();
-    data.set('email', email);
-    await requestPasswordReset(data);
-    setResetSent(true);
+    setServerError(null);
+    setResetSent(false);
+    setResetPending(true);
+    // The reset link lands on /auth/reset with a one-time token. Neon Auth sends
+    // the email; the success message is kept neutral so it can't be used to
+    // discover which addresses have accounts.
+    const { error } = await authClient.requestPasswordReset({
+      email: email.trim().toLowerCase(),
+      redirectTo: appUrl('/auth/reset'),
+    });
+    setResetPending(false);
+    if (error && error.code === 'TOO_MANY_REQUESTS') {
+      setServerError('Too many attempts. Wait a minute and try again.');
+    } else {
+      setResetSent(true);
+    }
   }
 
   return (
@@ -284,10 +332,11 @@ function SignInForm({ switchTab }: { switchTab: () => void }) {
           <button
             type="button"
             onClick={handleForgotPassword}
-            className="p-0 bg-transparent border-none cursor-pointer tracking-[0.01em]"
-            style={{ fontFamily: UI, fontSize: '0.72rem', color: C.indigo }}
+            disabled={resetPending}
+            className="p-0 bg-transparent border-none tracking-[0.01em]"
+            style={{ fontFamily: UI, fontSize: '0.72rem', color: C.indigo, cursor: resetPending ? 'wait' : 'pointer', opacity: resetPending ? 0.6 : 1 }}
           >
-            Forgot password?
+            {resetPending ? 'Sending…' : 'Forgot password?'}
           </button>
         </div>
         <PasswordInput
@@ -303,7 +352,10 @@ function SignInForm({ switchTab }: { switchTab: () => void }) {
 
       <OrDivider />
 
-      <GoogleButton label="Continue with Google" />
+      <GoogleButton
+        label="Continue with Google"
+        onClick={() => authClient.signIn.social({ provider: 'google', callbackURL: returnTo('/account') })}
+      />
 
       <p className="text-center mt-2 tracking-[0.01em]" style={{ fontFamily: UI, fontSize: '0.8rem', color: 'rgba(43,35,32,0.6)' }}>
         {"Don't have an account? "}
@@ -320,6 +372,7 @@ function RegisterForm({ switchTab }: { switchTab: () => void }) {
   const navigate = useNavigate();
   const [pending, startTransition] = useTransition();
   const [serverError, setServerError] = useState<string | null>(null);
+  const [verifySent, setVerifySent] = useState<string | null>(null);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phoneCode, setPhoneCode] = useState('+1');
@@ -345,18 +398,43 @@ function RegisterForm({ switchTab }: { switchTab: () => void }) {
     setServerError(null);
     if (Object.keys(errors).length) return;
 
-    const data = new FormData();
-    data.set('name', name);
-    data.set('email', email);
-    data.set('password', password);
-
     startTransition(async () => {
-      const result = await signUpWithEmail(data);
       // Phone is collected for delivery contact; sign-in by phone needs an SMS
       // provider, so it is not part of the account yet.
-      if (result.ok) navigate(returnTo('/account?welcome=1'));
-      else setServerError(result.message);
+      const { error } = await authClient.signUp.email({
+        email: email.trim().toLowerCase(),
+        password,
+        name: name.trim(),
+      });
+      if (error) {
+        setServerError(authMessage(error, 'signup'));
+        return;
+      }
+      // If email verification is required there is no session yet — send them to
+      // their inbox. Otherwise sign-up creates a session and we go on in.
+      const session = await authClient.getSession();
+      if (session?.data?.user) navigate(returnTo('/account?welcome=1'));
+      else setVerifySent(email.trim().toLowerCase());
     });
+  }
+
+  if (verifySent) {
+    return (
+      <div className="flex flex-col gap-4">
+        <FormBanner tone="info">
+          We&rsquo;ve sent a verification link to <strong>{verifySent}</strong>. Click it to
+          activate your account, then sign in.
+        </FormBanner>
+        <button
+          type="button"
+          onClick={switchTab}
+          className="p-0 bg-transparent border-none cursor-pointer underline font-semibold text-left decoration-[rgba(212,169,78,0.4)]"
+          style={{ fontFamily: UI, fontSize: '0.8rem', color: C.gold }}
+        >
+          Back to sign in
+        </button>
+      </div>
+    );
   }
 
   return (
@@ -448,7 +526,10 @@ function RegisterForm({ switchTab }: { switchTab: () => void }) {
 
       <OrDivider />
 
-      <GoogleButton label="Sign up with Google" />
+      <GoogleButton
+        label="Sign up with Google"
+        onClick={() => authClient.signIn.social({ provider: 'google', callbackURL: returnTo('/account') })}
+      />
 
       <p className="text-center mt-2 tracking-[0.01em]" style={{ fontFamily: UI, fontSize: '0.8rem', color: 'rgba(43,35,32,0.6)' }}>
         Already have an account?{' '}

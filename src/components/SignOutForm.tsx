@@ -1,18 +1,28 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import { signOut } from '@/server/auth-actions';
+import { authClient } from '@/lib/auth/client';
+import { useNavigate } from '@/lib/router';
 import { usePageTransition } from '@/lib/PageTransition';
 
 /**
- * Sign-out is a server action that redirects, so it never went through the
- * client router and the branded loader never played. Firing `startTransition`
- * on submit gives signing out the same intro as any other navigation.
+ * Signs the visitor out through the Neon Auth client, then navigates home.
+ * Firing `startTransition` first gives signing out the same branded intro as any
+ * other navigation.
  */
 export default function SignOutForm({ children, className }: { children: ReactNode; className?: string }) {
   const { startTransition } = usePageTransition();
+  const navigate = useNavigate();
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    startTransition();
+    await authClient.signOut().catch(() => {});
+    navigate('/');
+  }
+
   return (
-    <form action={signOut} onSubmit={() => startTransition()} className={className}>
+    <form onSubmit={handleSubmit} className={className}>
       {children}
     </form>
   );
