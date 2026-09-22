@@ -14,6 +14,16 @@ import type { ComponentProps, CSSProperties, ReactNode } from 'react';
 
 import { usePageTransition } from './PageTransition';
 
+function shouldSkipLoader(to: string) {
+  const path = to.split('?')[0];
+  return (
+    path.startsWith('/console') ||
+    path.startsWith('/account') ||
+    path === '/cart' ||
+    path === '/checkout'
+  );
+}
+
 type AnchorProps = Omit<ComponentProps<typeof NextLink>, 'href' | 'children' | 'className' | 'style'>;
 
 type LinkProps = AnchorProps & {
@@ -30,10 +40,7 @@ export function Link({ to, children, className, style, onClick, ...rest }: LinkP
   const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     if (onClick) onClick(e);
     if (!e.defaultPrevented && e.button === 0 && !e.ctrlKey && !e.metaKey && !e.altKey && !e.shiftKey) {
-      // Basic check: only trigger if actually navigating somewhere new
-      // (ignores hash changes or same page if desired, but we can just trigger always for simplicity,
-      // or check if `to` starts with something different)
-      if (to && to !== pathname) {
+      if (to && to !== pathname && !shouldSkipLoader(to)) {
         startTransition();
       }
     }
@@ -66,7 +73,7 @@ export function NavLink({ to, end, children, className, style, onClick, ...rest 
   const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     if (onClick) onClick(e);
     if (!e.defaultPrevented && e.button === 0 && !e.ctrlKey && !e.metaKey && !e.altKey && !e.shiftKey) {
-      if (to && to !== pathname) {
+      if (to && to !== pathname && !shouldSkipLoader(to)) {
         startTransition();
       }
     }
@@ -92,9 +99,11 @@ export function useNavigate() {
   const { startTransition } = usePageTransition();
 
   return (to: string) => {
-    // Skip the intro when we are already where we are going — otherwise the
-    // path never changes and the loader would have nothing to wait for.
-    if (to.split('?')[0] !== pathname) startTransition();
+    // Skip the intro when we are already where we are going, or if it's a fast-path route
+    // (like cart, console, or account) where a branded loader is disruptive.
+    if (to.split('?')[0] !== pathname && !shouldSkipLoader(to)) {
+      startTransition();
+    }
     router.push(to);
   };
 }
