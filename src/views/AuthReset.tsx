@@ -29,14 +29,12 @@ export default function AuthReset() {
     if (password !== confirm) return setError('Those passwords do not match.');
 
     startTransition(async () => {
-      const { error: resetError } = await authClient.resetPassword({
-        newPassword: password,
-        token,
-      });
-      if (!resetError) {
+      try {
+        await authClient.resetPassword({ newPassword: password, token });
         setDone(true);
         setTimeout(() => router.push('/auth'), 2200);
-      } else {
+      } catch {
+        // The client throws on failure (expired/invalid token, etc.).
         setError(
           'Could not update your password. Your reset link may have expired — request a new one.'
         );

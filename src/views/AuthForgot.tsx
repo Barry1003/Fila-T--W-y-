@@ -32,14 +32,19 @@ export default function AuthForgot() {
     startTransition(async () => {
       const redirectTo =
         typeof window !== 'undefined' ? `${window.location.origin}/auth/reset` : '/auth/reset';
-      const { error: resetError } = await authClient.requestPasswordReset({
-        email: value,
-        redirectTo,
-      });
-      if (resetError && resetError.code === 'TOO_MANY_REQUESTS') {
-        setError('Too many attempts. Wait a minute and try again.');
-      } else {
+      try {
+        await authClient.requestPasswordReset({ email: value, redirectTo });
         setSent(true);
+      } catch (err) {
+        // The client throws on failure. A rate-limit is worth surfacing;
+        // anything else stays neutral so the form can't reveal which addresses
+        // have accounts.
+        const e = (err ?? {}) as { code?: string; status?: number; message?: string };
+        if (e.code === 'TOO_MANY_REQUESTS' || e.status === 429 || (e.message ?? '').toLowerCase().includes('too many')) {
+          setError('Too many attempts. Wait a minute and try again.');
+        } else {
+          setSent(true);
+        }
       }
     });
   }

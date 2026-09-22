@@ -6,31 +6,40 @@ import { Link, useNavigate } from '@/lib/router';
 import { C, DISPLAY, UI, label } from '../tokens';
 
 /**
- * Turns a Neon Auth (Better Auth) client error into a line a customer can read.
- * Sign-in failures stay vague on purpose — naming "no such email" would tell an
- * attacker which addresses are registered.
+ * Turns a thrown Neon Auth (Better Auth) client error into a line a customer can
+ * read. The client throws AuthApiError on failure, so this takes `unknown` and
+ * digs the code/status/message out defensively. Sign-in failures stay vague on
+ * purpose — naming "no such email" would tell an attacker which addresses are
+ * registered.
  */
-function authMessage(
-  error: { code?: string; message?: string } | null | undefined,
-  context: 'signin' | 'signup',
-): string {
-  const code = error?.code ?? '';
-  switch (code) {
-    case 'INVALID_EMAIL_OR_PASSWORD':
-      return 'Those details did not match an account.';
-    case 'USER_ALREADY_EXISTS':
-      return 'An account with that email already exists. Try signing in instead.';
-    case 'EMAIL_NOT_VERIFIED':
-      return 'Please verify your email first — check your inbox for the link.';
-    case 'PASSWORD_TOO_SHORT':
-      return 'Use at least 8 characters for your password.';
-    case 'TOO_MANY_REQUESTS':
-      return 'Too many attempts. Wait a minute and try again.';
-    default:
-      return context === 'signup'
-        ? 'Could not create the account. Check the details and try again.'
-        : 'Could not sign in. Check the details and try again.';
+function authMessage(error: unknown, context: 'signin' | 'signup'): string {
+  const e = (error ?? {}) as { code?: string; status?: number; message?: string; body?: { code?: string } };
+  const code = (e.code ?? e.body?.code ?? '').toString().toUpperCase();
+  const msg = (e.message ?? '').toLowerCase();
+
+  if (code === 'USER_ALREADY_EXISTS' || msg.includes('already exists')) {
+    return 'An account with that email already exists. Try signing in instead.';
   }
+  if (code === 'EMAIL_NOT_VERIFIED' || msg.includes('not verified') || msg.includes('verify')) {
+    return 'Please verify your email first — check your inbox for the link.';
+  }
+  if (code === 'PASSWORD_TOO_SHORT' || msg.includes('at least') || msg.includes('too short')) {
+    return 'Use at least 8 characters for your password.';
+  }
+  if (code === 'TOO_MANY_REQUESTS' || e.status === 429 || msg.includes('too many')) {
+    return 'Too many attempts. Wait a minute and try again.';
+  }
+  if (
+    code === 'INVALID_EMAIL_OR_PASSWORD' ||
+    e.status === 401 ||
+    msg.includes('invalid email or password') ||
+    msg.includes('invalid credentials')
+  ) {
+    return 'Those details did not match an account.';
+  }
+  return context === 'signup'
+    ? 'Could not create the account. Check the details and try again.'
+    : 'Could not sign in. Check the details and try again.';
 }
 
 /**
@@ -261,12 +270,12 @@ function SignInForm({ switchTab }: { switchTab: () => void }) {
     if (Object.keys(errors).length) return;
 
     startTransition(async () => {
-      const { error } = await authClient.signIn.email({
-        email: email.trim().toLowerCase(),
-        password,
-      });
-      if (error) setServerError(authMessage(error, 'signin'));
-      else navigate(returnTo('/account'));
+      try {
+        await authClient.signIn.email({ email: email.trim().toLowerCase(), password });
+        navigate(returnTo('/account'));
+      } catch (err) {
+        setServerError(authMessage(err, 'signin'));
+      }
     });
   }
 
@@ -364,18 +373,19 @@ function RegisterForm({ switchTab }: { switchTab: () => void }) {
     startTransition(async () => {
       // Phone is collected for delivery contact; sign-in by phone needs an SMS
       // provider, so it is not part of the account yet.
-      const { error } = await authClient.signUp.email({
-        email: email.trim().toLowerCase(),
-        password,
-        name: name.trim(),
-      });
-      if (error) {
-        setServerError(authMessage(error, 'signup'));
+      try {
+        await authClient.signUp.email({
+          email: email.trim().toLowerCase(),
+          password,
+          name: name.trim(),
+        });
+      } catch (err) {
+        setServerError(authMessage(err, 'signup'));
         return;
       }
       // If email verification is required there is no session yet — send them to
       // their inbox. Otherwise sign-up creates a session and we go on in.
-      const session = await authClient.getSession();
+      const session = await authClient.getSession().catch(() => null);
       if (session?.data?.user) navigate(returnTo('/account?welcome=1'));
       else setVerifySent(email.trim().toLowerCase());
     });
