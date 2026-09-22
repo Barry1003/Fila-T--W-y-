@@ -194,15 +194,43 @@ function GoldButton({ children, onClick, disabled }: { children: React.ReactNode
 }
 
 /* ─── GoogleButton ──────────────────────────────────────────── */
-function GoogleButton({ label: lbl, onClick }: { label: string; onClick?: () => void }) {
+/**
+ * Google sign-in via Neon Auth. Kicks off the OAuth redirect; on return the
+ * `/api/auth/callback/google` handler completes it and lands on `callbackURL`.
+ * Self-contained: shows a redirecting state and reports failures to the form.
+ */
+function GoogleButton({ label: lbl, onError }: { label: string; onError?: (msg: string) => void }) {
+  const [pending, setPending] = useState(false);
+
+  async function handleClick() {
+    if (pending) return;
+    onError?.('');
+    setPending(true);
+    try {
+      const res = await authClient.signIn.social({
+        provider: 'google',
+        callbackURL: returnTo('/account'),
+      });
+      // Better Auth usually redirects the browser itself; if it handed back a
+      // URL instead, follow it. (If it already navigated, this never runs.)
+      const url = (res as { data?: { url?: string } } | undefined)?.data?.url;
+      if (url && typeof window !== 'undefined') window.location.href = url;
+    } catch {
+      setPending(false);
+      onError?.('Could not start Google sign-in. Please try again.');
+    }
+  }
+
   return (
     <button
       type="button"
-      onClick={onClick}
+      onClick={handleClick}
+      disabled={pending}
       className="w-full py-[0.85rem] px-8 rounded-[5px] cursor-pointer flex items-center justify-center gap-[0.6rem] font-semibold tracking-[0.06em] bg-transparent border-[1.5px] border-solid border-[rgba(43,35,32,0.28)] transition-colors duration-150"
       style={{
         color: C.charcoal,
         fontFamily: UI, fontSize: '0.82rem',
+        cursor: pending ? 'wait' : 'pointer', opacity: pending ? 0.7 : 1,
       }}
       onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = C.gold; (e.currentTarget as HTMLButtonElement).style.background = 'rgba(212,169,78,0.05)'; }}
       onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(43,35,32,0.28)'; (e.currentTarget as HTMLButtonElement).style.background = 'transparent'; }}
@@ -214,7 +242,7 @@ function GoogleButton({ label: lbl, onClick }: { label: string; onClick?: () => 
         <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
         <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
       </svg>
-      {lbl}
+      {pending ? 'Redirecting…' : lbl}
     </button>
   );
 }
@@ -324,10 +352,7 @@ function SignInForm({ switchTab }: { switchTab: () => void }) {
 
       <OrDivider />
 
-      <GoogleButton
-        label="Continue with Google"
-        onClick={() => authClient.signIn.social({ provider: 'google', callbackURL: returnTo('/account') })}
-      />
+      <GoogleButton label="Continue with Google" onError={m => setServerError(m || null)} />
 
       <p className="text-center mt-2 tracking-[0.01em]" style={{ fontFamily: UI, fontSize: '0.8rem', color: 'rgba(43,35,32,0.6)' }}>
         {"Don't have an account? "}
@@ -499,10 +524,7 @@ function RegisterForm({ switchTab }: { switchTab: () => void }) {
 
       <OrDivider />
 
-      <GoogleButton
-        label="Sign up with Google"
-        onClick={() => authClient.signIn.social({ provider: 'google', callbackURL: returnTo('/account') })}
-      />
+      <GoogleButton label="Sign up with Google" onError={m => setServerError(m || null)} />
 
       <p className="text-center mt-2 tracking-[0.01em]" style={{ fontFamily: UI, fontSize: '0.8rem', color: 'rgba(43,35,32,0.6)' }}>
         Already have an account?{' '}
