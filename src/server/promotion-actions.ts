@@ -42,6 +42,49 @@ export async function createDiscountCode(data: {
   return { ok: true };
 }
 
+export async function updateDiscountCode(
+  id: string,
+  data: {
+    code: string;
+    type: 'Percentage' | 'Fixed Amount';
+    value: number;
+    usageLimit: number | null;
+    expiresAt: string | null;
+  }
+) {
+  const user = await getCurrentUser().catch(() => null);
+  if (user?.role !== 'OWNER') return { ok: false, message: 'Unauthorized' };
+
+  if (!data.code.trim()) {
+    return { ok: false, message: 'Code cannot be empty' };
+  }
+
+  // A code name must stay unique — allow keeping the same name on this row, but
+  // not colliding with a different one.
+  const existing = await withDbRetry('check existing code', () =>
+    prisma.discountCode.findUnique({ where: { code: data.code.trim() } })
+  );
+  if (existing && existing.id !== id) {
+    return { ok: false, message: 'A discount code with this name already exists' };
+  }
+
+  await withDbRetry('update discount code', () =>
+    prisma.discountCode.update({
+      where: { id },
+      data: {
+        code: data.code.trim(),
+        type: data.type === 'Percentage' ? 'PERCENTAGE' : 'FIXED_AMOUNT',
+        value: data.value,
+        usageLimit: data.usageLimit,
+        expiresAt: data.expiresAt ? new Date(data.expiresAt) : null,
+      },
+    })
+  );
+
+  revalidatePath('/console/promotions');
+  return { ok: true };
+}
+
 export async function toggleDiscountCode(id: string, active: boolean) {
   const user = await getCurrentUser().catch(() => null);
   if (user?.role !== 'OWNER') return { ok: false, message: 'Unauthorized' };
@@ -83,6 +126,40 @@ export async function createBanner(data: {
 
   await withDbRetry('create banner', () =>
     prisma.banner.create({
+      data: {
+        text: data.text,
+        ctaLabel: data.ctaLabel || null,
+        startsAt: new Date(data.startsAt),
+        endsAt: new Date(data.endsAt),
+        status: data.status,
+      },
+    })
+  );
+
+  revalidatePath('/console/promotions');
+  return { ok: true };
+}
+
+export async function updateBanner(
+  id: string,
+  data: {
+    text: string;
+    ctaLabel?: string;
+    startsAt: string;
+    endsAt: string;
+    status: 'LIVE' | 'SCHEDULED' | 'EXPIRED';
+  }
+) {
+  const user = await getCurrentUser().catch(() => null);
+  if (user?.role !== 'OWNER') return { ok: false, message: 'Unauthorized' };
+
+  if (!data.text.trim()) {
+    return { ok: false, message: 'Banner text cannot be empty' };
+  }
+
+  await withDbRetry('update banner', () =>
+    prisma.banner.update({
+      where: { id },
       data: {
         text: data.text,
         ctaLabel: data.ctaLabel || null,

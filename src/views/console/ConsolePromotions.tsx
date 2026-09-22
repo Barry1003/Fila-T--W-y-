@@ -3,7 +3,7 @@
 import { useState, useTransition, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { C, UI } from "../../tokens";
-import { createDiscountCode, toggleDiscountCode, deleteDiscountCode, createBanner, deleteBanner } from "@/server/promotion-actions";
+import { createDiscountCode, updateDiscountCode, toggleDiscountCode, deleteDiscountCode, createBanner, updateBanner, deleteBanner } from "@/server/promotion-actions";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -19,6 +19,8 @@ interface DiscountCode {
   active: boolean;
   expiry: string;
   expired: boolean;
+  rawValue: number;
+  rawExpiresAt: string | null;
 }
 
 interface Banner {
@@ -27,6 +29,8 @@ interface Banner {
   cta: string;
   dateRange: string;
   status: "Live" | "Scheduled" | "Expired";
+  rawStartsAt: string;
+  rawEndsAt: string;
 }
 
 // ── Mock data ─────────────────────────────────────────────────────────────────
@@ -152,10 +156,12 @@ function DiscountTable({
   codes,
   onToggle,
   onDelete,
+  onEdit,
 }: {
   codes: DiscountCode[];
   onToggle: (id: string) => void;
   onDelete: (id: string) => void;
+  onEdit: (code: DiscountCode) => void;
 }) {
   return (
     <div
@@ -227,6 +233,7 @@ function DiscountTable({
                 <td className="p-[0.75rem_1.25rem]">
                   <div className="flex gap-2">
                     <button
+                      onClick={() => onEdit(c)}
                       className="bg-none rounded px-[10px] py-[3px] cursor-pointer whitespace-nowrap border border-solid border-[rgba(43,35,32,0.14)]"
                       style={{
                         fontSize: "0.7rem",
@@ -260,7 +267,7 @@ function DiscountTable({
 
 // ── Homepage banners tab ──────────────────────────────────────────────────────
 
-function BannersTab({ initialBanners, onAdd }: { initialBanners: Banner[]; onAdd: () => void }) {
+function BannersTab({ initialBanners, onAdd, onEdit }: { initialBanners: Banner[]; onAdd: () => void; onEdit: (banner: Banner) => void }) {
   const [banners, setBanners] = useState<Banner[]>(initialBanners);
   const router = useRouter();
   const [, startTransition] = useTransition();
@@ -402,15 +409,16 @@ function generateCode(): string {
   return `${p}${n}`;
 }
 
-function CreateCodePanel({ onClose, onCreated }: { onClose: () => void; onCreated: (data: any) => Promise<void> }) {
-  const [discountType, setDiscountType] = useState<"Percentage" | "Fixed Amount">("Percentage");
-  const [code, setCode] = useState("");
+function CreateCodePanel({ onClose, onSubmit, initial }: { onClose: () => void; onSubmit: (data: any) => Promise<void>; initial?: DiscountCode }) {
+  const isEdit = !!initial;
+  const [discountType, setDiscountType] = useState<"Percentage" | "Fixed Amount">(initial?.type ?? "Percentage");
+  const [code, setCode] = useState(initial?.code ?? "");
   const [appliesTo, setAppliesTo] = useState<"all" | "categories">("all");
   const [selectedCats, setSelectedCats] = useState<string[]>([]);
-  const [value, setValue] = useState("");
-  const [limit, setLimit] = useState("");
+  const [value, setValue] = useState(initial ? String(initial.rawValue) : "");
+  const [limit, setLimit] = useState(initial?.limitCount != null ? String(initial.limitCount) : "");
   const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
+  const [endDate, setEndDate] = useState(initial?.rawExpiresAt ?? "");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const toggleCat = (cat: string) =>
@@ -423,7 +431,7 @@ function CreateCodePanel({ onClose, onCreated }: { onClose: () => void; onCreate
       return;
     }
     setIsSubmitting(true);
-    await onCreated({
+    await onSubmit({
       code,
       type: discountType,
       value: val,
@@ -460,9 +468,9 @@ function CreateCodePanel({ onClose, onCreated }: { onClose: () => void; onCreate
           }}
         >
           <div>
-            <div className="font-semibold" style={{ fontSize: "1rem", color: C.charcoal }}>Create Discount Code</div>
+            <div className="font-semibold" style={{ fontSize: "1rem", color: C.charcoal }}>{isEdit ? "Edit Discount Code" : "Create Discount Code"}</div>
             <div className="mt-[2px]" style={{ fontSize: "0.72rem", color: "rgba(43,35,32,0.45)" }}>
-              Set up a new promotional code for your store
+              {isEdit ? "Update this promotional code" : "Set up a new promotional code for your store"}
             </div>
           </div>
           <button
@@ -673,7 +681,7 @@ function CreateCodePanel({ onClose, onCreated }: { onClose: () => void; onCreate
             className="px-6 py-2 border-none rounded-md font-semibold cursor-pointer"
             style={{ backgroundColor: C.gold, color: C.charcoal, fontSize: "0.82rem", fontFamily: UI, opacity: isSubmitting ? 0.7 : 1 }}
           >
-            {isSubmitting ? "Creating..." : "Create Code"}
+            {isSubmitting ? "Saving..." : isEdit ? "Save Changes" : "Create Code"}
           </button>
         </div>
       </div>
@@ -683,11 +691,12 @@ function CreateCodePanel({ onClose, onCreated }: { onClose: () => void; onCreate
 
 // ── Create Banner slide-over ───────────────────────────────────────────────────
 
-function CreateBannerPanel({ onClose, onCreated }: { onClose: () => void; onCreated: (data: any) => Promise<void> }) {
-  const [bannerText, setBannerText] = useState("");
-  const [bannerCTA, setBannerCTA] = useState("");
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
+function CreateBannerPanel({ onClose, onSubmit, initial }: { onClose: () => void; onSubmit: (data: any) => Promise<void>; initial?: Banner }) {
+  const isEdit = !!initial;
+  const [bannerText, setBannerText] = useState(initial?.text ?? "");
+  const [bannerCTA, setBannerCTA] = useState(initial?.cta ?? "");
+  const [startDate, setStartDate] = useState(initial?.rawStartsAt ?? "");
+  const [endDate, setEndDate] = useState(initial?.rawEndsAt ?? "");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleCreate = async () => {
@@ -703,7 +712,7 @@ function CreateBannerPanel({ onClose, onCreated }: { onClose: () => void; onCrea
     if (now > end) status = 'EXPIRED';
 
     setIsSubmitting(true);
-    await onCreated({
+    await onSubmit({
       text: bannerText,
       ctaLabel: bannerCTA,
       startsAt: start.toISOString(),
@@ -731,7 +740,7 @@ function CreateBannerPanel({ onClose, onCreated }: { onClose: () => void; onCrea
         {/* Header */}
         <div className="p-[1.25rem_1.5rem] border-b border-solid border-[rgba(43,35,32,0.08)] flex items-start justify-between shrink-0">
           <div>
-            <div style={{ fontSize: "1rem", fontWeight: 600, color: C.charcoal }}>Add Homepage Banner</div>
+            <div style={{ fontSize: "1rem", fontWeight: 600, color: C.charcoal }}>{isEdit ? "Edit Homepage Banner" : "Add Homepage Banner"}</div>
             <div style={{ fontSize: "0.72rem", color: "rgba(43,35,32,0.45)", marginTop: 2 }}>
               Configure a promotional strip for the buyer-facing site
             </div>
@@ -873,7 +882,7 @@ function CreateBannerPanel({ onClose, onCreated }: { onClose: () => void; onCrea
             className="px-6 py-2 border-none rounded-md font-semibold cursor-pointer"
             style={{ backgroundColor: C.gold, color: C.charcoal, fontSize: "0.82rem", fontFamily: UI, opacity: isSubmitting ? 0.7 : 1 }}
           >
-            {isSubmitting ? "Creating..." : "Add Banner"}
+            {isSubmitting ? "Saving..." : isEdit ? "Save Changes" : "Add Banner"}
           </button>
         </div>
       </div>
@@ -891,6 +900,8 @@ export default function ConsolePromotions({ initialCodes, initialBanners }: { in
   const [tab, setTab] = useState<Tab>("codes");
   const [codes, setCodes] = useState<DiscountCode[]>(initialCodes);
   const [showPanel, setShowPanel] = useState(false);
+  const [editingCode, setEditingCode] = useState<DiscountCode | undefined>();
+  const [editingBanner, setEditingBanner] = useState<Banner | undefined>();
   const router = useRouter();
   const [, startTransition] = useTransition();
 
@@ -915,7 +926,7 @@ export default function ConsolePromotions({ initialCodes, initialBanners }: { in
   };
 
   const handleCreateCode = async (data: any) => {
-    const res = await createDiscountCode(data);
+    const res = editingCode ? await updateDiscountCode(editingCode.id, data) : await createDiscountCode(data);
     if (!res.ok) {
       alert(res.message);
       return;
@@ -923,11 +934,11 @@ export default function ConsolePromotions({ initialCodes, initialBanners }: { in
     startTransition(() => {
       router.refresh();
     });
-    setShowPanel(false);
+    closePanel();
   };
 
   const handleCreateBanner = async (data: any) => {
-    const res = await createBanner(data);
+    const res = editingBanner ? await updateBanner(editingBanner.id, data) : await createBanner(data);
     if (!res.ok) {
       alert(res.message);
       return;
@@ -935,7 +946,29 @@ export default function ConsolePromotions({ initialCodes, initialBanners }: { in
     startTransition(() => {
       router.refresh();
     });
+    closePanel();
+  };
+
+  const closePanel = () => {
     setShowPanel(false);
+    setEditingCode(undefined);
+    setEditingBanner(undefined);
+  };
+
+  const openPanel = () => {
+    setEditingCode(undefined);
+    setEditingBanner(undefined);
+    setShowPanel(true);
+  };
+
+  const editCode = (code: DiscountCode) => {
+    setEditingCode(code);
+    setShowPanel(true);
+  };
+
+  const editBanner = (banner: Banner) => {
+    setEditingBanner(banner);
+    setShowPanel(true);
   };
 
   const TAB_LABELS: Record<Tab, string> = { codes: "Discount Codes", banners: "Homepage Banners" };
@@ -960,7 +993,7 @@ export default function ConsolePromotions({ initialCodes, initialBanners }: { in
           </p>
         </div>
         <button
-          onClick={() => setShowPanel(true)}
+          onClick={openPanel}
           className="border-none rounded-md px-[1.125rem] py-[0.575rem] font-semibold cursor-pointer flex items-center gap-[0.375rem] shrink-0 tracking-[0.01em]"
           style={{
             backgroundColor: C.gold,
@@ -1005,15 +1038,15 @@ export default function ConsolePromotions({ initialCodes, initialBanners }: { in
       {/* Tab content */}
       {tab === "codes" &&
         (codes.length === 0 ? (
-          <EmptyState label="No active promotions" onAction={() => setShowPanel(true)} actionLabel="+ Create Promotion" />
+          <EmptyState label="No active promotions" onAction={openPanel} actionLabel="+ Create Promotion" />
         ) : (
-          <DiscountTable codes={codes} onToggle={toggleCode} onDelete={deleteCode} />
+          <DiscountTable codes={codes} onToggle={toggleCode} onDelete={deleteCode} onEdit={editCode} />
         ))}
-      {tab === "banners" && <BannersTab initialBanners={initialBanners} onAdd={() => setShowPanel(true)} />}
+      {tab === "banners" && <BannersTab initialBanners={initialBanners} onAdd={openPanel} onEdit={editBanner} />}
 
       {/* Slide-over panels */}
-      {showPanel && tab === "codes" && <CreateCodePanel onClose={() => setShowPanel(false)} onCreated={handleCreateCode} />}
-      {showPanel && tab === "banners" && <CreateBannerPanel onClose={() => setShowPanel(false)} onCreated={handleCreateBanner} />}
+      {showPanel && tab === "codes" && <CreateCodePanel onClose={closePanel} onSubmit={handleCreateCode} initial={editingCode} />}
+      {showPanel && tab === "banners" && <CreateBannerPanel onClose={closePanel} onSubmit={handleCreateBanner} initial={editingBanner} />}
     </div>
   );
 }

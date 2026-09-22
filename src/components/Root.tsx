@@ -8,6 +8,7 @@ import { C, UI } from '../tokens';
 import { UserProvider } from '@/lib/user';
 import Nav from './Nav';
 import Footer from './Footer';
+import CartToast from './CartToast';
 
 function useScrollReveal() {
   const { pathname } = useLocation();
@@ -57,6 +58,7 @@ export default function Root({ children, user }: { children: ReactNode; user: Cu
           {children}
         </main>
         <Footer />
+        <CartToast />
       </div>
     </UserProvider>
   );

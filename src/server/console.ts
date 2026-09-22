@@ -218,6 +218,9 @@ export type ConsoleDiscountCode = {
   active: boolean;
   expiry: string;
   expired: boolean;
+  // Raw values for the edit form (the display fields above are formatted).
+  rawValue: number;
+  rawExpiresAt: string | null; // YYYY-MM-DD for <input type="date">
 };
 
 export async function listDiscountCodes(): Promise<ConsoleDiscountCode[]> {
@@ -238,6 +241,8 @@ export async function listDiscountCodes(): Promise<ConsoleDiscountCode[]> {
       active: r.active,
       expiry: r.expiresAt ? fmtDate(r.expiresAt) : 'No expiry',
       expired,
+      rawValue: Number(r.value),
+      rawExpiresAt: r.expiresAt ? r.expiresAt.toISOString().slice(0, 10) : null,
     };
   });
 }
@@ -248,6 +253,9 @@ export type ConsoleBanner = {
   cta: string;
   dateRange: string;
   status: 'Live' | 'Scheduled' | 'Expired';
+  // Raw dates for the edit form (YYYY-MM-DD for <input type="date">).
+  rawStartsAt: string;
+  rawEndsAt: string;
 };
 
 export async function listBanners(): Promise<ConsoleBanner[]> {
@@ -265,6 +273,8 @@ export async function listBanners(): Promise<ConsoleBanner[]> {
       cta: r.ctaLabel ?? '',
       dateRange: `${fmtDate(r.startsAt)} – ${fmtDate(r.endsAt)}`,
       status,
+      rawStartsAt: r.startsAt.toISOString().slice(0, 10),
+      rawEndsAt: r.endsAt.toISOString().slice(0, 10),
     };
   });
 }

@@ -43,6 +43,8 @@ type CartContextValue = {
    * first paint would not match the server's empty one, so consumers wait.
    */
   hydrated: boolean;
+  /** The most recently added item, kept for 3 seconds to show a toast. */
+  lastAdded: CartLine | null;
   add: (line: NewCartLine) => void;
   setQuantity: (productId: string, size: string, color: string, quantity: number) => void;
   remove: (productId: string, size: string, color: string) => void;
@@ -100,6 +102,7 @@ function parseStored(raw: string | null): CartLine[] {
 export function CartProvider({ children }: { children: ReactNode }) {
   const [lines, setLines] = useState<CartLine[]>([]);
   const [hydrated, setHydrated] = useState(false);
+  const [lastAdded, setLastAdded] = useState<CartLine | null>(null);
 
   // Read once on mount. Doing this in an effect rather than in useState's
   // initialiser keeps the first client render identical to the server's.
@@ -150,6 +153,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
           : line
       );
     });
+
+    setLastAdded({ ...incoming, quantity });
+    setTimeout(() => setLastAdded(null), 3000);
   }, []);
 
   const setQuantity = useCallback((productId: string, size: string, color: string, quantity: number) => {
@@ -181,11 +187,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
     count: lines.reduce((total, line) => total + line.quantity, 0),
     subtotalCents: lines.reduce((total, line) => total + line.unitPriceCents * line.quantity, 0),
     hydrated,
+    lastAdded,
     add,
     setQuantity,
     remove,
     clear,
-  }), [lines, hydrated, add, setQuantity, remove, clear]);
+  }), [lines, hydrated, lastAdded, add, setQuantity, remove, clear]);
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 }
