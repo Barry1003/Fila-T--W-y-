@@ -207,9 +207,12 @@ function GoogleButton({ label: lbl, onError }: { label: string; onError?: (msg: 
     onError?.('');
     setPending(true);
     try {
+      // Pinned to /account (not returnTo): the middleware that completes the
+      // OAuth handoff runs only on /account and /console, so the provider must
+      // return there for the session cookie to be set.
       const res = await authClient.signIn.social({
         provider: 'google',
-        callbackURL: returnTo('/account'),
+        callbackURL: '/account',
       });
       // Better Auth usually redirects the browser itself; if it handed back a
       // URL instead, follow it. (If it already navigated, this never runs.)
