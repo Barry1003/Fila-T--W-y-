@@ -372,6 +372,7 @@ function BannersTab({ initialBanners, onAdd, onEdit }: { initialBanners: Banner[
             <BannerStatusBadge status={b.status} />
             <div className="flex gap-2">
               <button
+                onClick={() => onEdit(b)}
                 className="bg-none rounded px-[10px] py-[3px] cursor-pointer border border-solid border-[rgba(43,35,32,0.14)]"
                 style={{
                   fontSize: "0.7rem",
