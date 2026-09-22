@@ -43,6 +43,7 @@ export type CurrentUser = {
  * instead of leaving an orphan.
  */
 export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
+  if (!auth) return null; // env not configured — read as signed out
   const session = await auth.getSession().catch(() => null);
   const account = session?.data?.user;
   if (!account?.id || !account.email) return null;

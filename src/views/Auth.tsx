@@ -33,12 +33,6 @@ function authMessage(
   }
 }
 
-/** Absolute URL for a same-origin path (used for OAuth and reset redirects). */
-function appUrl(path: string): string {
-  if (typeof window === 'undefined') return path;
-  return `${window.location.origin}${path}`;
-}
-
 /**
  * Where to land after signing in — the `?next=` the visitor was gated with when
  * they were bounced here (e.g. from checkout), falling back to their account.
@@ -254,8 +248,6 @@ function SignInForm({ switchTab }: { switchTab: () => void }) {
   const [password, setPassword] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
-  const [resetSent, setResetSent] = useState(false);
-  const [resetPending, setResetPending] = useState(false);
 
   const errors: Record<string, string> = {};
   if (submitted && !email.trim()) errors.email = 'Email is required.';
@@ -278,39 +270,12 @@ function SignInForm({ switchTab }: { switchTab: () => void }) {
     });
   }
 
-  async function handleForgotPassword() {
-    if (resetPending) return;
-    if (!email.trim()) {
-      setSubmitted(true);
-      setServerError('Enter your email address first, then choose "Forgot password?".');
-      return;
-    }
-    setServerError(null);
-    setResetSent(false);
-    setResetPending(true);
-    // The reset link lands on /auth/reset with a one-time token. Neon Auth sends
-    // the email; the success message is kept neutral so it can't be used to
-    // discover which addresses have accounts.
-    const { error } = await authClient.requestPasswordReset({
-      email: email.trim().toLowerCase(),
-      redirectTo: appUrl('/auth/reset'),
-    });
-    setResetPending(false);
-    if (error && error.code === 'TOO_MANY_REQUESTS') {
-      setServerError('Too many attempts. Wait a minute and try again.');
-    } else {
-      setResetSent(true);
-    }
-  }
+  // Carry whatever they have typed over to the dedicated reset page.
+  const forgotHref = `/auth/forgot${email.trim() ? `?email=${encodeURIComponent(email.trim())}` : ''}`;
 
   return (
     <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-[1.1rem]">
       {serverError && <FormBanner tone="error">{serverError}</FormBanner>}
-      {resetSent && (
-        <FormBanner tone="info">
-          If an account exists for that address, a reset link is on its way.
-        </FormBanner>
-      )}
 
       {/* Email */}
       <div>
@@ -329,15 +294,13 @@ function SignInForm({ switchTab }: { switchTab: () => void }) {
       <div>
         <div className="flex justify-between items-baseline mb-[0.4rem]">
           <label style={{ ...label, fontSize: '0.65rem', color: C.charcoal }}>Password</label>
-          <button
-            type="button"
-            onClick={handleForgotPassword}
-            disabled={resetPending}
-            className="p-0 bg-transparent border-none tracking-[0.01em]"
-            style={{ fontFamily: UI, fontSize: '0.72rem', color: C.indigo, cursor: resetPending ? 'wait' : 'pointer', opacity: resetPending ? 0.6 : 1 }}
+          <Link
+            to={forgotHref}
+            className="tracking-[0.01em] no-underline"
+            style={{ fontFamily: UI, fontSize: '0.72rem', color: C.indigo }}
           >
-            {resetPending ? 'Sending…' : 'Forgot password?'}
-          </button>
+            Forgot password?
+          </Link>
         </div>
         <PasswordInput
           value={password} onChange={e => setPassword(e.target.value)}

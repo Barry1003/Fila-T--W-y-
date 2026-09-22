@@ -17,17 +17,20 @@ import { createNeonAuth } from '@neondatabase/neon-js/auth/next/server';
 const baseUrl = process.env.NEON_AUTH_BASE_URL;
 const secret = process.env.NEON_AUTH_COOKIE_SECRET;
 
-if (!baseUrl || !secret) {
-  throw new Error(
-    'Neon Auth is not configured — set NEON_AUTH_BASE_URL and ' +
-      'NEON_AUTH_COOKIE_SECRET (see .env.example).'
-  );
-}
-
-export const auth = createNeonAuth({
-  baseUrl,
-  cookies: {
-    secret,
-    sessionDataTtl: 300, // cache the session for 5 minutes (the default)
-  },
-});
+/**
+ * The auth instance, or null when the env is not set.
+ *
+ * Missing env (e.g. a build before the vars are added) must read as "signed out"
+ * rather than throw at import — otherwise it takes the whole build down, not
+ * just auth. Auth of course needs the env set to actually work at runtime.
+ */
+export const auth =
+  baseUrl && secret
+    ? createNeonAuth({
+        baseUrl,
+        cookies: {
+          secret,
+          sessionDataTtl: 300, // cache the session for 5 minutes (the default)
+        },
+      })
+    : null;
