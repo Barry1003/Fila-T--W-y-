@@ -11,6 +11,9 @@ import { UserProvider } from '@/lib/user';
  * hiding the link — a signed-out visitor goes to sign in, and a signed-in
  * customer is sent back to the storefront rather than shown a locked door.
  */
+// Owner check reads the session (cookies), so the console is always dynamic.
+export const dynamic = 'force-dynamic';
+
 export default async function ConsoleLayout({ children }: { children: ReactNode }) {
   // If the database cannot be reached the role cannot be checked, so this fails
   // closed and lets the error boundary explain — never opens the console to an
