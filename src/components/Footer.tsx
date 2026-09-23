@@ -34,20 +34,41 @@ export default function Footer() {
         <div className="footer-cols grid grid-cols-4 gap-12 mb-16">
           <div>
             <div className="mb-[1.375rem]" style={{ ...label, color: C.gold, fontSize: '0.595rem', letterSpacing: '0.15em' }}>Shop</div>
-            {['Filà', 'Gele', 'Ipele', 'Kaftan', 'Shoes', 'Pam Slippers', 'Accessories'].map(l => (
-              <a key={l} href="/shop" className="block no-underline mb-2.5" style={{ color: 'rgba(250,246,240,0.65)', fontSize: '0.875rem', lineHeight: 1.5, fontFamily: UI }}>{l}</a>
+            {[
+              { label: 'Filà', href: '/shop?q=fila' },
+              { label: 'Gele', href: '/shop?q=gele' },
+              { label: 'Ipele', href: '/shop?q=ipele' },
+              { label: 'Kaftan', href: '/shop?q=kaftan' },
+              { label: 'Shoes', href: '/shop?q=shoes' },
+              { label: 'Pam Slippers', href: '/shop?q=pam%20slippers' },
+              { label: 'Accessories', href: '/shop?q=accessories' }
+            ].map(l => (
+              <a key={l.label} href={l.href} className="block no-underline mb-2.5" style={{ color: 'rgba(250,246,240,0.65)', fontSize: '0.875rem', lineHeight: 1.5, fontFamily: UI }}>{l.label}</a>
             ))}
           </div>
           <div>
             <div className="mb-[1.375rem]" style={{ ...label, color: C.gold, fontSize: '0.595rem', letterSpacing: '0.15em' }}>Company</div>
-            {['About', 'Custom Order', 'Lookbook', 'Blog', 'Press'].map(l => (
-              <a key={l} href="#" className="block no-underline mb-2.5" style={{ color: 'rgba(250,246,240,0.65)', fontSize: '0.875rem', lineHeight: 1.5, fontFamily: UI }}>{l}</a>
+            {[
+              { label: 'About', href: '/about' },
+              { label: 'Custom Order', href: '/custom-order' },
+              { label: 'Lookbook', href: '/lookbook' },
+              { label: 'Blog', href: '#' },
+              { label: 'Press', href: '#' }
+            ].map(l => (
+              <a key={l.label} href={l.href} className="block no-underline mb-2.5" style={{ color: 'rgba(250,246,240,0.65)', fontSize: '0.875rem', lineHeight: 1.5, fontFamily: UI }}>{l.label}</a>
             ))}
           </div>
           <div>
             <div className="mb-[1.375rem]" style={{ ...label, color: C.gold, fontSize: '0.595rem', letterSpacing: '0.15em' }}>Support</div>
-            {['Help Centre', 'FAQ', 'Returns', 'Contact Us', 'Size Guide', 'Track Order'].map(l => (
-              <a key={l} href="#" className="block no-underline mb-2.5" style={{ color: 'rgba(250,246,240,0.65)', fontSize: '0.875rem', lineHeight: 1.5, fontFamily: UI }}>{l}</a>
+            {[
+              { label: 'Help Centre', href: '/help' },
+              { label: 'FAQ', href: '/help' },
+              { label: 'Returns', href: '/help#returns' },
+              { label: 'Contact Us', href: '/help' },
+              { label: 'Size Guide', href: '#' },
+              { label: 'Track Order', href: '/account/orders' }
+            ].map(l => (
+              <a key={l.label} href={l.href} className="block no-underline mb-2.5" style={{ color: 'rgba(250,246,240,0.65)', fontSize: '0.875rem', lineHeight: 1.5, fontFamily: UI }}>{l.label}</a>
             ))}
           </div>
           <div>
@@ -92,8 +113,12 @@ export default function Footer() {
             © 2026 AdeClassics — Worldwide delivery available.
           </span>
           <div className="flex gap-6">
-            {['Privacy Policy', 'Terms of Use', 'Cookies'].map(l => (
-              <a key={l} href="#" className="no-underline" style={{ fontFamily: UI, fontSize: '0.775rem', color: 'rgba(250,246,240,0.4)' }}>{l}</a>
+            {[
+              { label: 'Privacy Policy', href: '/privacy-policy' },
+              { label: 'Terms of Use', href: '#' },
+              { label: 'Cookies', href: '#' }
+            ].map(l => (
+              <a key={l.label} href={l.href} className="no-underline" style={{ fontFamily: UI, fontSize: '0.775rem', color: 'rgba(250,246,240,0.4)' }}>{l.label}</a>
             ))}
           </div>
         </div>
