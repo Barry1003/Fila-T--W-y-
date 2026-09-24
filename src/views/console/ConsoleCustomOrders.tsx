@@ -1,8 +1,12 @@
 'use client';
 
-import { useState } from "react";
+import { useState, useEffect, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { C, UI } from "../../tokens";
 import type { ConsoleCustomRequest as CustomRequest, ConsoleCustomStatus as RequestStatus } from "@/server/console";
+import { setCustomRequestStatus } from "@/server/custom-requests";
+
+type StatusExtras = { quotedPrice?: number | null; estimatedCompletion?: string | null; declineReason?: string | null; note?: string | null };
 
 // ── Status config ─────────────────────────────────────────────────────────────
 
@@ -232,7 +236,7 @@ function RequestDetailPanel({
 }: {
   req: CustomRequest;
   onClose: () => void;
-  onStatusChange: (id: string, status: RequestStatus) => void;
+  onStatusChange: (id: string, status: RequestStatus, extras?: StatusExtras) => void;
 }) {
   const [quotePrice, setQuotePrice] = useState(req.quotedPrice ? String(req.quotedPrice) : "");
   const [quoteNote, setQuoteNote] = useState("");
@@ -444,7 +448,13 @@ function RequestDetailPanel({
                 />
               </div>
               <button
-                onClick={() => onStatusChange(req.id, "quoted")}
+                onClick={() =>
+                  onStatusChange(req.id, "quoted", {
+                    quotedPrice: quotePrice ? Number(quotePrice) : null,
+                    estimatedCompletion: completionDate || null,
+                    note: quoteNote || null,
+                  })
+                }
                 className="w-full border-none rounded-md p-[0.65rem] font-semibold cursor-pointer tracking-[0.01em]"
                 style={{
                   backgroundColor: C.gold,
@@ -509,7 +519,7 @@ function RequestDetailPanel({
                     }}
                   />
                   <button
-                    onClick={() => { onStatusChange(req.id, "declined"); setShowDecline(false); }}
+                    onClick={() => { onStatusChange(req.id, "declined", { declineReason: declineReason || null }); setShowDecline(false); }}
                     className="mt-2 border-none rounded-md px-5 py-[0.55rem] font-semibold cursor-pointer text-white"
                     style={{
                       backgroundColor: C.maroon,
@@ -624,6 +634,10 @@ export default function ConsoleCustomOrders({ requests: initialRequests = [] }: 
   const [requests, setRequests] = useState<CustomRequest[]>(initialRequests);
   const [activeTab, setActiveTab] = useState<TabKey>("all");
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const router = useRouter();
+  const [, startTransition] = useTransition();
+
+  useEffect(() => setRequests(initialRequests), [initialRequests]);
 
   const selectedReq = requests.find((r) => r.id === selectedId) ?? null;
 
@@ -639,9 +653,16 @@ export default function ConsoleCustomOrders({ requests: initialRequests = [] }: 
 
   const filtered = requests.filter((r) => activeTab === "all" || r.status === activeTab);
 
-  function handleStatusChange(id: string, status: RequestStatus) {
-    setRequests((prev) => prev.map((r) => (r.id === id ? { ...r, status } : r)));
+  async function handleStatusChange(id: string, status: RequestStatus, extras?: StatusExtras) {
+    setRequests((prev) => prev.map((r) => (r.id === id ? { ...r, status } : r))); // optimistic
     setSelectedId(null);
+    const res = await setCustomRequestStatus(id, status, extras);
+    if (!res.ok) {
+      alert(res.message);
+      startTransition(() => router.refresh()); // pull authoritative state back
+      return;
+    }
+    startTransition(() => router.refresh());
   }
 
   return (

@@ -80,3 +80,52 @@ export async function submitCustomRequest(raw: unknown): Promise<SubmitResult> {
     return { ok: false, message: 'We could not save your request just now. Please try again in a moment.' };
   }
 }
+
+/* ─── Owner-side workflow ─────────────────────────────────────── */
+
+export type RequestStatusResult = { ok: true } | { ok: false; message: string };
+
+const REQUEST_STATUS_TO_DB: Record<
+  'new' | 'quoted' | 'approved' | 'in-production' | 'completed' | 'declined',
+  'NEW' | 'QUOTED' | 'APPROVED' | 'IN_PRODUCTION' | 'COMPLETED' | 'DECLINED'
+> = {
+  new: 'NEW',
+  quoted: 'QUOTED',
+  approved: 'APPROVED',
+  'in-production': 'IN_PRODUCTION',
+  completed: 'COMPLETED',
+  declined: 'DECLINED',
+};
+
+/**
+ * Moves a custom request through its workflow. Owner-gated. Addressed by the
+ * human reference (e.g. CR-2026-014), which is what the console holds.
+ */
+export async function setCustomRequestStatus(
+  reference: string,
+  status: 'new' | 'quoted' | 'approved' | 'in-production' | 'completed' | 'declined',
+  extras?: { quotedPrice?: number | null; estimatedCompletion?: string | null; declineReason?: string | null; note?: string | null }
+): Promise<RequestStatusResult> {
+  const user = await getCurrentUser().catch(() => null);
+  if (user?.role !== 'OWNER') return { ok: false, message: 'You do not have permission to do that.' };
+
+  const data: Record<string, unknown> = { status: REQUEST_STATUS_TO_DB[status] };
+  if (extras) {
+    if (extras.quotedPrice !== undefined) data.quotedPrice = extras.quotedPrice;
+    if (extras.estimatedCompletion !== undefined)
+      data.estimatedCompletion = extras.estimatedCompletion ? new Date(extras.estimatedCompletion) : null;
+    if (extras.declineReason !== undefined) data.declineReason = extras.declineReason;
+    if (extras.note !== undefined && extras.note !== null) data.notes = extras.note;
+  }
+
+  try {
+    await withDbRetry('set custom request status', () =>
+      prisma.customRequest.update({ where: { reference }, data })
+    );
+    revalidatePath('/console/custom-orders');
+    return { ok: true };
+  } catch (error) {
+    console.error('[custom-request status] failed', error);
+    return { ok: false, message: 'Could not update the request just now. Please try again.' };
+  }
+}
