@@ -139,6 +139,44 @@ function SelectField({ value, onChange, options }: { value: string; onChange: (v
 
 // ── Main component ────────────────────────────────────────────────────────────
 
+/** Escapes a value for a CSV cell (wraps in quotes, doubles inner quotes). */
+function csvCell(v: string | number): string {
+  const s = String(v ?? "");
+  return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+}
+
+/** Builds a CSV from the given order rows and triggers a download. */
+function exportOrdersCsv(rows: OrderListRow[]) {
+  const headers = ["Order", "Date", "Customer", "Email", "Items", "Products", "Total (CAD)", "Payment", "Status"];
+  const lines = [
+    headers.join(","),
+    ...rows.map(o =>
+      [
+        o.number,
+        o.placedAt,
+        o.customerName,
+        o.customerEmail,
+        o.itemCount,
+        o.itemLabels.join("; "),
+        o.totalCad.toFixed(2),
+        o.payment,
+        o.status,
+      ]
+        .map(csvCell)
+        .join(",")
+    ),
+  ];
+  const blob = new Blob([lines.join("\n")], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `orders-${new Date().toISOString().slice(0, 10)}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
 export default function ConsoleOrders({ orders }: { orders: OrderListRow[] }) {
   const [activeTab, setActiveTab] = useState<"all" | FulfilStatus>("all");
   const [search, setSearch] = useState("");
@@ -185,7 +223,9 @@ export default function ConsoleOrders({ orders }: { orders: OrderListRow[] }) {
           </h1>
         </div>
         <button
-          className="inline-flex items-center gap-[6px] bg-transparent rounded-[7px] px-4 py-2 font-medium cursor-pointer transition-colors duration-150 tracking-[0.01em] border border-solid border-[rgba(43,35,32,0.18)]"
+          onClick={() => exportOrdersCsv(filtered)}
+          disabled={filtered.length === 0}
+          className="inline-flex items-center gap-[6px] bg-transparent rounded-[7px] px-4 py-2 font-medium cursor-pointer transition-colors duration-150 tracking-[0.01em] border border-solid border-[rgba(43,35,32,0.18)] disabled:opacity-50 disabled:cursor-not-allowed"
           style={{
             color: C.charcoal,
             fontSize: "0.78rem",

@@ -526,8 +526,11 @@ function RequestDetailPanel({
 
           {/* ── Message Customer */}
           <section>
-            <button
-              className="inline-flex items-center gap-[6px] bg-transparent rounded-md px-4 py-[0.55rem] font-medium cursor-pointer border border-solid border-[rgba(43,35,32,0.18)]"
+            <a
+              href={`mailto:${req.customer.email}?subject=${encodeURIComponent(
+                `Your custom order request ${req.id} — ${req.garmentType}`
+              )}`}
+              className="inline-flex items-center gap-[6px] bg-transparent rounded-md px-4 py-[0.55rem] font-medium cursor-pointer border border-solid border-[rgba(43,35,32,0.18)] no-underline"
               style={{
                 color: C.charcoal,
                 fontSize: "0.8rem",
@@ -536,7 +539,7 @@ function RequestDetailPanel({
             >
               <ChatIcon />
               Message Customer
-            </button>
+            </a>
             <p className="m-[6px_0_0]" style={{ fontSize: "0.7rem", color: "rgba(43,35,32,0.38)" }}>
               Opens a message thread with {req.customer.name} pre-filled with this request&apos;s context.
             </p>

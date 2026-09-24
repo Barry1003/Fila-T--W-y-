@@ -1,8 +1,10 @@
 'use client';
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { C, UI } from "../../tokens";
 import type { ConsoleConversation as Conversation, ConsoleMessage as Message } from "@/server/console";
+import { sendConsoleMessage, setConversationResolved, markConversationRead } from "@/server/message-actions";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -132,9 +134,15 @@ export default function ConsoleMessages({ conversations = [] }: { conversations?
   const [filter, setFilter] = useState<Filter>("all");
   const [search, setSearch] = useState("");
   const [draft, setDraft] = useState("");
+  const [sending, setSending] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
+  const [, startTransition] = useTransition();
 
   const active = convs.find((c) => c.id === activeId) ?? null;
+
+  // Adopt refreshed server data after an action persists.
+  useEffect(() => setConvs(conversations), [conversations]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -163,33 +171,49 @@ export default function ConsoleMessages({ conversations = [] }: { conversations?
   };
 
   function selectConv(id: string) {
+    const wasUnread = convs.find((c) => c.id === id)?.unread;
     setConvs((prev) => prev.map((c) => (c.id === id ? { ...c, unread: false } : c)));
     setActiveId(id);
     setDraft("");
+    // Persist the read state so the unread badge stays cleared after refresh.
+    if (wasUnread) markConversationRead(id).catch(() => {});
   }
 
-  function sendMessage() {
-    if (!draft.trim() || !activeId) return;
-    const msg: Message = {
-      id: `m${Date.now()}`,
-      sender: "owner",
-      text: draft.trim(),
-      timestamp: "Just now",
-    };
+  async function sendMessage() {
+    const text = draft.trim();
+    if (!text || !activeId || sending) return;
+    // Optimistic append.
+    const msg: Message = { id: `m${Date.now()}`, sender: "owner", text, timestamp: "Just now" };
     setConvs((prev) =>
       prev.map((c) =>
         c.id === activeId
-          ? { ...c, messages: [...c.messages, msg], preview: draft.trim().slice(0, 64) }
+          ? { ...c, messages: [...c.messages, msg], preview: text.slice(0, 64) }
           : c
       )
     );
     setDraft("");
+    setSending(true);
+    const res = await sendConsoleMessage(activeId, text);
+    setSending(false);
+    if (!res.ok) {
+      alert(res.message);
+      setDraft(text); // restore so the reply isn't lost
+    }
+    startTransition(() => router.refresh());
   }
 
-  function markResolved(id: string) {
-    setConvs((prev) =>
-      prev.map((c) => (c.id === id ? { ...c, resolved: !c.resolved } : c))
-    );
+  async function markResolved(id: string) {
+    const target = convs.find((c) => c.id === id);
+    if (!target) return;
+    const next = !target.resolved;
+    setConvs((prev) => prev.map((c) => (c.id === id ? { ...c, resolved: next } : c))); // optimistic
+    const res = await setConversationResolved(id, next);
+    if (!res.ok) {
+      setConvs((prev) => prev.map((c) => (c.id === id ? { ...c, resolved: !next } : c))); // roll back
+      alert(res.message);
+      return;
+    }
+    startTransition(() => router.refresh());
   }
 
   // Approximate panel height: 100vh minus shell top bar (52px) and page header (~130px)

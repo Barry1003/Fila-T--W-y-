@@ -1,8 +1,10 @@
 'use client';
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { Link } from '@/lib/router';
 import type { FulfilStatus, OrderDetail } from '@/server/orders';
+import { updateOrderStatus, saveOrderTracking, saveOrderNote } from '@/server/order-actions';
 import { C, UI } from "../../tokens";
 
 // ── Icons ─────────────────────────────────────────────────────────────────────
@@ -86,11 +88,15 @@ const RATE = 1481;
 // ── Main component ────────────────────────────────────────────────────────────
 
 export default function ConsoleOrderDetail({ order: raw }: { order: OrderDetail }) {
+  const router = useRouter();
+  const [, startTransition] = useTransition();
   const [status, setStatus] = useState<FulfilStatus>(raw.status);
   const [tracking, setTracking] = useState(raw.tracking ?? "");
   const [carrier, setCarrier] = useState(raw.carrier ?? "Royal Mail");
-  const [notes, setNotes] = useState("");
+  const [notes, setNotes] = useState(raw.internalNote ?? "");
   const [saved, setSaved] = useState(false);
+  const [noteState, setNoteState] = useState<"idle" | "saving" | "saved">("idle");
+  const [advancing, setAdvancing] = useState(false);
 
   const order = raw;
   const fulfil = FULFIL_STYLE[status];
@@ -99,13 +105,44 @@ export default function ConsoleOrderDetail({ order: raw }: { order: OrderDetail 
   const subtotal = order.items.reduce((s, i) => s + i.unitCad * i.qty, 0);
   const total = subtotal + order.shippingCad - order.discountCad;
 
-  function advanceStatus() {
-    if (nextStatus) setStatus(nextStatus);
+  async function advanceStatus() {
+    if (!nextStatus || advancing) return;
+    const target = nextStatus;
+    setAdvancing(true);
+    setStatus(target); // optimistic
+    const res = await updateOrderStatus(order.id, target);
+    setAdvancing(false);
+    if (!res.ok) {
+      setStatus(status); // roll back
+      alert(res.message);
+      return;
+    }
+    startTransition(() => router.refresh());
   }
 
-  function saveTracking() {
+  async function saveTracking() {
+    const res = await saveOrderTracking(order.id, carrier, tracking);
+    if (!res.ok) {
+      alert(res.message);
+      return;
+    }
     setSaved(true);
     setTimeout(() => setSaved(false), 2500);
+    startTransition(() => router.refresh());
+  }
+
+  async function handleSaveNote() {
+    if (noteState === "saving") return;
+    setNoteState("saving");
+    const res = await saveOrderNote(order.id, notes);
+    if (!res.ok) {
+      setNoteState("idle");
+      alert(res.message);
+      return;
+    }
+    setNoteState("saved");
+    setTimeout(() => setNoteState("idle"), 2500);
+    startTransition(() => router.refresh());
   }
 
   return (
@@ -253,11 +290,17 @@ export default function ConsoleOrderDetail({ order: raw }: { order: OrderDetail 
               }}
             />
             <div className="flex justify-end mt-[0.625rem]">
-              <button className="border-none rounded-md px-[0.875rem] py-[0.4rem] cursor-pointer font-medium" style={{
-                fontFamily: UI, fontSize: "0.75rem",
-                color: C.charcoal, backgroundColor: "rgba(43,35,32,0.06)",
-              }}>
-                Save Note
+              <button
+                onClick={handleSaveNote}
+                disabled={noteState === "saving"}
+                className="border-none rounded-md px-[0.875rem] py-[0.4rem] cursor-pointer font-medium disabled:cursor-wait"
+                style={{
+                  fontFamily: UI, fontSize: "0.75rem",
+                  color: noteState === "saved" ? "#fff" : C.charcoal,
+                  backgroundColor: noteState === "saved" ? C.teal : "rgba(43,35,32,0.06)",
+                }}
+              >
+                {noteState === "saving" ? "Saving…" : noteState === "saved" ? "Saved ✓" : "Save Note"}
               </button>
             </div>
           </SectionCard>
@@ -328,7 +371,7 @@ export default function ConsoleOrderDetail({ order: raw }: { order: OrderDetail 
               }}
             >
               <TruckIcon size={14} />
-              {saved ? "Saved & Notified ✓" : "Save & Notify Customer"}
+              {saved ? "Tracking Saved ✓" : "Save Tracking"}
             </button>
 
             {order.status === "shipped" && order.tracking && (

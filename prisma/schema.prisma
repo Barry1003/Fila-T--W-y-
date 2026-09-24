@@ -291,6 +291,10 @@ model Order {
   carrier        String?
   trackingNumber String?
 
+  /// Owner-only note about the order (fulfilment reminders, etc.). Never shown
+  /// to the buyer.
+  internalNote String?
+
   subtotal Decimal @db.Decimal(10, 2)
   shipping Decimal @default(0) @db.Decimal(10, 2)
   discount Decimal @default(0) @db.Decimal(10, 2)

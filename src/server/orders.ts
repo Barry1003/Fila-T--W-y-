@@ -39,6 +39,7 @@ export type OrderDetail = OrderListRow & {
   subtotalCad: number;
   shippingCad: number;
   discountCad: number;
+  internalNote: string | null;
 };
 
 const lower = <T extends string>(value: string) => value.toLowerCase() as T;
@@ -144,5 +145,6 @@ function toDetail(o: OrderRow): OrderDetail {
     subtotalCad: Number(o.subtotal),
     shippingCad: Number(o.shipping),
     discountCad: Number(o.discount),
+    internalNote: o.internalNote ?? null,
   };
 }
