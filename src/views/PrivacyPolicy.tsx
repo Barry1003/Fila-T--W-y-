@@ -57,7 +57,7 @@ export default function PrivacyPolicy() {
           5. Contact details
         </h2>
         <p className="mb-8" style={{ color: 'rgba(43,35,32,0.65)' }}>
-          If you have any questions about this privacy policy or our privacy practices, please contact us at: <a href="mailto:support@filato.ca" className="underline" style={{ color: 'inherit' }}>support@filato.ca</a>.
+          If you have any questions about this privacy policy or our privacy practices, please contact us at: <a href="mailto:Help@adeclassics.ca" className="underline" style={{ color: 'inherit' }}>Help@adeclassics.ca</a>.
         </p>
       </div>
     </div>

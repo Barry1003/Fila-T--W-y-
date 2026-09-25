@@ -140,9 +140,9 @@ export default function Help() {
     ...sec,
     items: searchQuery
       ? sec.items.filter(item =>
-          item.q.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          item.a.toLowerCase().includes(searchQuery.toLowerCase())
-        )
+        item.q.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.a.toLowerCase().includes(searchQuery.toLowerCase())
+      )
       : sec.items,
   })).filter(sec => sec.items.length > 0);
 
@@ -351,8 +351,8 @@ export default function Help() {
             <div className="flex flex-col gap-8 pt-2">
               <div>
                 <div className="mb-2" style={{ ...label, fontSize: '0.62rem', color: 'rgba(43,35,32,0.45)', letterSpacing: '0.16em' }}>Email</div>
-                <a href="mailto:support@filato.ca" className="no-underline pb-[1px]" style={{ fontFamily: UI, fontSize: '0.95rem', color: C.indigo, borderBottom: `1px solid rgba(46,74,158,0.25)` }}>
-                  support@filato.ca
+                <a href="mailto:Help@adeclassics.ca" className="no-underline pb-[1px]" style={{ fontFamily: UI, fontSize: '0.95rem', color: C.indigo, borderBottom: `1px solid rgba(46,74,158,0.25)` }}>
+                  Help@adeclassics.ca
                 </a>
               </div>
               <div>
