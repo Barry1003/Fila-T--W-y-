@@ -73,7 +73,17 @@ export default function HeroCarousel({
           aria-hidden={i !== index}
           {...(i === index ? {} : { inert: true })}
         >
-          <img src={slide.imageUrl} alt="" loading={i === 0 ? 'eager' : 'lazy'} />
+          {/* For "contain" slides, a blurred copy fills the frame behind the
+              full image so there are no empty bands. */}
+          {slide.objectFit === 'contain' && (
+            <img src={slide.imageUrl} alt="" aria-hidden className="hero-bg-blur" loading={i === 0 ? 'eager' : 'lazy'} />
+          )}
+          <img
+            src={slide.imageUrl}
+            alt=""
+            loading={i === 0 ? 'eager' : 'lazy'}
+            style={{ objectFit: slide.objectFit, objectPosition: slide.objectPosition }}
+          />
           <div className="hero-scrim" />
 
           <div className="hero-content">

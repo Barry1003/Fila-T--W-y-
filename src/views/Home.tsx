@@ -154,7 +154,7 @@ export default function Home({ content, products, collections }: HomeProps) {
       <section className="section-pad max-w-[1440px] mx-auto py-28 px-10">
         <div className="story-grid grid grid-cols-2 gap-24 items-center">
           <div className="reveal-left relative aspect-[4/5] overflow-hidden" style={{ backgroundColor: '#c8beb5' }}>
-            <img src={content.story.imageUrl} alt="" className="w-full h-full object-cover block" style={{ objectPosition: 'center 12%' }} />
+            <img src={content.story.imageUrl} alt="" className="w-full h-full object-cover block" style={{ objectPosition: 'center 30%' }} />
             <div className="absolute inset-5 pointer-events-none" style={{ border: '1px solid rgba(212,169,78,0.35)' }} />
           </div>
           <div className="reveal-right">

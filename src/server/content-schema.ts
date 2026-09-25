@@ -18,7 +18,22 @@ export const heroSlideSchema = z.object({
   headline: z.string().max(200),
   ctaLabel: z.string().max(40),
   ctaHref: z.string().max(200),
-  imageUrl: z.string().url(),
+  /** An absolute URL (Appwrite/Unsplash) or a root-relative path to a file in
+   *  /public (e.g. "/hero-fila-jump.jpg"). */
+  imageUrl: z
+    .string()
+    .min(1)
+    .max(500)
+    .refine(v => /^https?:\/\//.test(v) || v.startsWith('/'), {
+      message: 'Must be an absolute URL or a root-relative path (starting with /).',
+    }),
+  /** Optional CSS object-position for framing (e.g. "center 40%"); falls back to
+   *  the stylesheet default when omitted. */
+  objectPosition: z.string().max(40).optional(),
+  /** How the image fills the hero. "cover" (default) crops to fill; "contain"
+   *  shows the whole image with a blurred fill behind it so nothing is cropped —
+   *  use it for portrait shots that would otherwise lose their top or bottom. */
+  objectFit: z.enum(['cover', 'contain']).optional(),
 });
 
 export type HeroSlide = z.infer<typeof heroSlideSchema>;
@@ -33,7 +48,14 @@ export const homeContentSchema = z.object({
     heading: z.string().max(200),
     /** Prose: paragraphs are split on blank lines when rendered. */
     body: z.string().max(4000),
-    imageUrl: z.string().url(),
+    /** Absolute URL or a root-relative path to a file in /public. */
+    imageUrl: z
+      .string()
+      .min(1)
+      .max(500)
+      .refine(v => /^https?:\/\//.test(v) || v.startsWith('/'), {
+        message: 'Must be an absolute URL or a root-relative path (starting with /).',
+      }),
   }),
   promo: z.object({
     enabled: z.boolean(),
@@ -48,12 +70,14 @@ export const HOME_DEFAULTS: HomeContent = {
     intervalSeconds: 7,
     slides: [
       {
-        id: 'brand',
-        eyebrow: 'Worldwide delivery available',
-        headline: 'One Brand.\nEndless Style.\nTimeless Elegance.',
-        ctaLabel: 'Shop the collection',
-        ctaHref: '/shop',
-        imageUrl: 'https://images.unsplash.com/photo-1784815840581-ecea314d9e7a?w=1800&h=1100&fit=crop&auto=format',
+        id: 'hero-jump',
+        eyebrow: 'Filà tó Wüyí',
+        headline: 'Crafted with care.\nWorn with pride.',
+        ctaLabel: 'Shop Filà',
+        ctaHref: '/collections/fila-to-wuyi',
+        imageUrl: '/hero-fila-jump.jpg',
+        objectFit: 'contain',
+        objectPosition: 'center',
       },
       {
         id: 'fila',
@@ -78,7 +102,7 @@ export const HOME_DEFAULTS: HomeContent = {
     body:
       'AdeClassics was born from a simple conviction: the artistry woven into every Yoruba filà, gele, and kaftan deserves a stage as global as the culture it carries. We are an international e-commerce store bringing premium Yoruba traditional wear — handcrafted in Nigeria — to customers in Canada, the UK, the US, and beyond.\n\n' +
       'Every piece is handpicked by our team and every purchase is escrow-protected. When you buy here, you are not shopping for a product — you are participating in the preservation of a living tradition.',
-    imageUrl: 'https://images.unsplash.com/photo-1661332306744-70f9ed1a7f40?w=900&h=1100&fit=crop&auto=format',
+    imageUrl: '/story-olumo.jpg',
   },
   promo: {
     enabled: false,

@@ -1344,6 +1344,15 @@ body {
   object-position: center 25%;
 }
 
+/* Blurred, darkened copy behind a "contain" slide so the full image shows with
+   no empty bands. Scaled up so the blur never reveals a hard edge. */
+.hero-bg-blur {
+  object-fit: cover;
+  object-position: center;
+  filter: blur(30px) brightness(0.6);
+  transform: scale(1.15);
+}
+
 .hero-scrim {
   position: absolute;
   inset: 0;
@@ -1383,6 +1392,13 @@ body {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  /* A subtle dark pill keeps the bars and play button legible over any part of
+     the image — light town, bright sky, or blurred fill. */
+  padding: 0.5rem 0.75rem;
+  background: rgba(43, 35, 32, 0.32);
+  border-radius: 999px;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
 }
 
 /* A bar rather than a dot: it doubles as a progress meter for the current
