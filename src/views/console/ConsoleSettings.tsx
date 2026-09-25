@@ -4,6 +4,7 @@ import { useState, useCallback } from "react";
 import { C, UI, DISPLAY, label } from "../../tokens";
 import { updatePageContent } from "@/server/content-actions";
 import type { HomeContent, HeroSlide, AboutContent } from "@/server/content-schema";
+import type { StripePayoutSummary } from "@/server/stripe-payouts";
 
 // ── Shared primitives ────────────────────────────────────────────────────────
 
@@ -1092,226 +1093,172 @@ function ConnectedBadge() {
   );
 }
 
-function TabPayments() {
-  const [editingBank, setEditingBank] = useState(false);
-  const [bankName, setBankName] = useState("First Bank of Nigeria");
-  const [acctNum, setAcctNum] = useState("••••••••7823");
-  const [acctName, setAcctName] = useState("Adunola Okonkwo");
-  const [schedule, setSchedule] = useState("weekly");
-
-  const providers = [
-    {
-      name: "Paystack",
-      logo: "P",
-      logoColor: "#00C3F7",
-      desc: "NGN payments · Cards, bank transfer, USSD",
-    },
-    {
-      name: "Flutterwave",
-      logo: "F",
-      logoColor: "#F5A623",
-      desc: "Multi-currency · Cards, mobile money, bank",
-    },
-  ];
+function TabPayments({ payouts }: { payouts: StripePayoutSummary }) {
+  const money = (n: number) => `CAD $${n.toFixed(2)}`;
 
   return (
     <div className="flex flex-col gap-5">
-      {/* Providers */}
+      {/* Provider status */}
       <SectionCard>
-        <div
-          className="font-semibold mb-5"
-          style={{
-            fontSize: "0.78rem",
-            color: C.charcoal,
-          }}
-        >
-          Payment Providers
-        </div>
-        <div className="flex flex-col gap-3">
-          {providers.map((p) => (
-            <div
-              key={p.name}
-              className="flex items-center gap-4 p-[0.875rem_1rem] rounded-lg"
+        <div className="flex items-center justify-between mb-5">
+          <div className="font-semibold" style={{ fontSize: "0.78rem", color: C.charcoal }}>
+            Payment Provider
+          </div>
+          {payouts.configured && (
+            <span
+              className="px-2 py-[2px] rounded-full font-medium"
               style={{
-                border: "1px solid rgba(43,35,32,0.08)",
-                backgroundColor: "rgba(43,35,32,0.015)",
+                fontSize: "0.65rem",
+                fontFamily: UI,
+                backgroundColor: payouts.testMode ? "rgba(212,169,78,0.15)" : "rgba(59,138,147,0.12)",
+                color: payouts.testMode ? "#8A6818" : C.teal,
               }}
             >
-              <div
-                className="w-9 h-9 rounded-lg flex items-center justify-center font-bold text-white shrink-0"
-                style={{
-                  backgroundColor: p.logoColor,
-                  fontSize: "0.9rem",
-                  fontFamily: UI,
-                }}
-              >
-                {p.logo}
-              </div>
-              <div className="flex-1">
-                <div
-                  className="font-semibold mb-[2px]"
-                  style={{
-                    fontSize: "0.82rem",
-                    color: C.charcoal,
-                    fontFamily: UI,
-                  }}
-                >
-                  {p.name}
-                </div>
-                <div
-                  style={{
-                    fontSize: "0.7rem",
-                    color: "rgba(43,35,32,0.48)",
-                    fontFamily: UI,
-                  }}
-                >
-                  {p.desc}
-                </div>
-              </div>
-              <ConnectedBadge />
-              <button
-                className="bg-none rounded-[5px] px-[0.8rem] py-[0.35rem] cursor-pointer font-medium"
-                style={{
-                  border: "1px solid rgba(43,35,32,0.15)",
-                  fontSize: "0.73rem",
-                  color: C.charcoal,
-                  fontFamily: UI,
-                }}
-              >
-                Manage
-              </button>
-            </div>
-          ))}
+              {payouts.testMode ? "Test mode" : "Live"}
+            </span>
+          )}
         </div>
-      </SectionCard>
 
-      {/* Bank details */}
-      <SectionCard>
         <div
-          className="flex items-center justify-between mb-5"
+          className="flex items-center gap-4 p-[0.875rem_1rem] rounded-lg"
+          style={{ border: "1px solid rgba(43,35,32,0.08)", backgroundColor: "rgba(43,35,32,0.015)" }}
         >
           <div
-            className="font-semibold"
-            style={{
-              fontSize: "0.78rem",
-              color: C.charcoal,
-            }}
+            className="w-9 h-9 rounded-lg flex items-center justify-center font-bold text-white shrink-0"
+            style={{ backgroundColor: "#635BFF", fontSize: "0.9rem", fontFamily: UI }}
           >
-            Payout Bank Account
+            S
           </div>
-          <button
-            onClick={() => setEditingBank(!editingBank)}
-            className="bg-none border-none cursor-pointer p-0 font-medium"
-            style={{
-              fontSize: "0.73rem",
-              color: C.maroon,
-              fontFamily: UI,
-            }}
+          <div className="flex-1">
+            <div className="font-semibold mb-[2px]" style={{ fontSize: "0.82rem", color: C.charcoal, fontFamily: UI }}>
+              Stripe
+            </div>
+            <div style={{ fontSize: "0.7rem", color: "rgba(43,35,32,0.48)", fontFamily: UI }}>
+              Card payments · Apple Pay · Google Pay
+            </div>
+          </div>
+          {payouts.configured ? (
+            <ConnectedBadge />
+          ) : (
+            <span style={{ fontSize: "0.72rem", color: "rgba(43,35,32,0.45)", fontFamily: UI }}>Not connected</span>
+          )}
+          <a
+            href={payouts.dashboardUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="bg-none rounded-[5px] px-[0.8rem] py-[0.35rem] cursor-pointer font-medium no-underline"
+            style={{ border: "1px solid rgba(43,35,32,0.15)", fontSize: "0.73rem", color: C.charcoal, fontFamily: UI }}
           >
-            {editingBank ? "Cancel" : "Edit"}
-          </button>
+            Open Stripe →
+          </a>
         </div>
 
-        {editingBank ? (
-          <div
-            className="flex flex-col gap-[0.875rem]"
-          >
-            <div className="rg-2">
-              <div>
-                <FieldLabel>Bank Name</FieldLabel>
-                <Input value={bankName} onChange={setBankName} />
-              </div>
-              <div>
-                <FieldLabel>Account Number</FieldLabel>
-                <Input value={acctNum} onChange={setAcctNum} />
-              </div>
-            </div>
-            <div>
-              <FieldLabel>Account Name</FieldLabel>
-              <Input value={acctName} onChange={setAcctName} />
-            </div>
-            <div>
-              <button
-                onClick={() => setEditingBank(false)}
-                className="border-none rounded-md px-5 py-2 font-semibold cursor-pointer"
-                style={{
-                  backgroundColor: C.gold,
-                  color: C.charcoal,
-                  fontSize: "0.78rem",
-                  fontFamily: UI,
-                }}
-              >
-                Save Bank Details
-              </button>
-            </div>
+        {!payouts.configured && (
+          <p className="mt-3 mb-0 leading-relaxed" style={{ fontSize: "0.73rem", color: "rgba(43,35,32,0.55)", fontFamily: UI }}>
+            Add <code>STRIPE_SECRET_KEY</code> and <code>STRIPE_WEBHOOK_SECRET</code> to your environment to turn on card
+            payments at checkout. Until then, checkout tells shoppers a payment link will follow.
+          </p>
+        )}
+        {payouts.error && (
+          <p className="mt-3 mb-0" style={{ fontSize: "0.73rem", color: C.maroon, fontFamily: UI }}>
+            Couldn&rsquo;t reach Stripe just now — double-check your keys.
+          </p>
+        )}
+      </SectionCard>
+
+      {/* Balance */}
+      {payouts.configured && !payouts.error && (
+        <SectionCard>
+          <div className="font-semibold mb-5" style={{ fontSize: "0.78rem", color: C.charcoal }}>
+            Balance
           </div>
-        ) : (
-          <div className="rg-3">
+          <div className="rg-2 grid grid-cols-2 gap-4">
             {[
-              ["Bank", bankName],
-              ["Account Number", acctNum],
-              ["Account Name", acctName],
-            ].map(([lbl, val]) => (
-              <div key={lbl}>
-                <div
-                  className="mb-1"
-                  style={{
-                    ...label,
-                    color: "rgba(43,35,32,0.4)",
-                  }}
-                >
-                  {lbl}
+              { label: "Available", value: payouts.availableCad },
+              { label: "Pending", value: payouts.pendingCad },
+            ].map((b) => (
+              <div
+                key={b.label}
+                className="p-[1rem] rounded-lg"
+                style={{ border: "1px solid rgba(43,35,32,0.08)", backgroundColor: "rgba(43,35,32,0.015)" }}
+              >
+                <div className="uppercase mb-[6px] tracking-[0.08em]" style={{ fontSize: "0.62rem", color: "rgba(43,35,32,0.4)", fontFamily: UI }}>
+                  {b.label}
                 </div>
-                <div
-                  className="font-medium"
-                  style={{
-                    fontSize: "0.82rem",
-                    color: C.charcoal,
-                    fontFamily: UI,
-                  }}
-                >
-                  {val}
+                <div className="font-semibold" style={{ fontSize: "1.25rem", color: C.charcoal, fontFamily: UI }}>
+                  {money(b.value)}
                 </div>
               </div>
             ))}
           </div>
-        )}
-      </SectionCard>
+        </SectionCard>
+      )}
 
-      {/* Payout schedule */}
-      <SectionCard>
-        <div
-          className="font-semibold mb-5"
-          style={{
-            fontSize: "0.78rem",
-            color: C.charcoal,
-          }}
-        >
-          Payout Schedule
-        </div>
-        <div className="max-w-[280px]">
-          <FieldLabel>Release Frequency</FieldLabel>
-          <select
-            value={schedule}
-            onChange={(e) => setSchedule(e.target.value)}
-            style={{
-              ...inputStyle,
-              cursor: "pointer",
-              appearance: "none",
-              backgroundImage:
-                "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='rgba(43,35,32,0.4)'/%3E%3C/svg%3E\")",
-              backgroundRepeat: "no-repeat",
-              backgroundPosition: "right 0.75rem center",
-              paddingRight: "2rem",
-            }}
-          >
-            <option value="daily">Daily</option>
-            <option value="weekly">Weekly (every Monday)</option>
-            <option value="biweekly">Bi-weekly</option>
-            <option value="monthly">Monthly (1st of month)</option>
-          </select>
-        </div>
-      </SectionCard>
+      {/* Recent payouts */}
+      {payouts.configured && !payouts.error && (
+        <SectionCard>
+          <div className="flex items-center justify-between mb-4">
+            <div className="font-semibold" style={{ fontSize: "0.78rem", color: C.charcoal }}>
+              Recent Payouts
+            </div>
+            <a
+              href={payouts.dashboardUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="no-underline font-medium"
+              style={{ fontSize: "0.73rem", color: C.maroon, fontFamily: UI }}
+            >
+              View all in Stripe →
+            </a>
+          </div>
+
+          {payouts.payouts.length === 0 ? (
+            <div
+              className="p-[1.5rem] rounded-lg text-center"
+              style={{ border: "1px dashed rgba(43,35,32,0.14)", fontSize: "0.78rem", color: "rgba(43,35,32,0.5)", fontFamily: UI }}
+            >
+              No payouts yet. Once you take payments, Stripe deposits your balance to your bank on your payout schedule.
+            </div>
+          ) : (
+            <div className="flex flex-col gap-2">
+              {payouts.payouts.map((p) => (
+                <div
+                  key={p.id}
+                  className="flex items-center justify-between p-[0.75rem_1rem] rounded-lg"
+                  style={{ border: "1px solid rgba(43,35,32,0.08)" }}
+                >
+                  <div>
+                    <div className="font-semibold" style={{ fontSize: "0.85rem", color: C.charcoal, fontFamily: UI }}>
+                      {money(p.amountCad)}
+                    </div>
+                    <div style={{ fontSize: "0.7rem", color: "rgba(43,35,32,0.45)", fontFamily: UI }}>
+                      Arrives {p.arrivalDate}
+                    </div>
+                  </div>
+                  <span
+                    className="px-2 py-[2px] rounded-full font-medium capitalize"
+                    style={{
+                      fontSize: "0.65rem",
+                      fontFamily: UI,
+                      backgroundColor: p.status === "paid" ? "rgba(59,138,147,0.12)" : "rgba(43,35,32,0.06)",
+                      color: p.status === "paid" ? C.teal : "rgba(43,35,32,0.55)",
+                    }}
+                  >
+                    {p.status}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <p className="mt-4 mb-0 leading-relaxed" style={{ fontSize: "0.72rem", color: "rgba(43,35,32,0.5)", fontFamily: UI }}>
+            Your payout bank account and schedule are managed in the Stripe Dashboard.{" "}
+            <a href={payouts.dashboardUrl} target="_blank" rel="noreferrer" style={{ color: C.maroon }}>
+              Manage payouts →
+            </a>
+          </p>
+        </SectionCard>
+      )}
     </div>
   );
 }
@@ -1324,7 +1271,7 @@ const POLICY_DEFAULTS: Record<string, string> = {
   "Shipping Policy":
     "All orders are dispatched from Lagos, Nigeria within 2 business days. International orders are shipped via DHL or FedEx. Estimated delivery times vary by region — see our Shipping & Delivery table for details. We are not responsible for customs duties or import taxes.",
   "Terms of Service":
-    "By placing an order with AdeClassics you agree to these terms. All prices are displayed in Canadian dollars (CAD). Payment is processed securely via Paystack or Flutterwave. We reserve the right to cancel any order at our discretion with a full refund.",
+    "By placing an order with AdeClassics you agree to these terms. All prices are displayed in Canadian dollars (CAD). Payment is processed securely via Stripe. We reserve the right to cancel any order at our discretion with a full refund.",
   "Privacy Policy":
     "We collect your name, email, shipping address, and payment details solely to fulfil your orders. We do not sell your data to third parties. Your data is stored securely and you may request deletion at any time by emailing privacy@adeclassics.com.",
 };
@@ -1521,7 +1468,7 @@ type Tab = (typeof TABS)[number];
 
 // ── Page root ─────────────────────────────────────────────────────────────────
 
-export default function ConsoleSettings({ homeContent, aboutContent }: { homeContent: HomeContent; aboutContent: AboutContent }) {
+export default function ConsoleSettings({ homeContent, aboutContent, payouts }: { homeContent: HomeContent; aboutContent: AboutContent; payouts: StripePayoutSummary }) {
   const [activeTab, setActiveTab] = useState<Tab>("Store Profile");
 
   return (
@@ -1563,7 +1510,7 @@ export default function ConsoleSettings({ homeContent, aboutContent }: { homeCon
         {activeTab === "Homepage Content" && <TabHomepageContent initial={homeContent} />}
         {activeTab === "About Page" && <TabAboutContent initial={aboutContent} />}
         {activeTab === "Shipping & Delivery" && <TabShipping />}
-        {activeTab === "Payments & Payout" && <TabPayments />}
+        {activeTab === "Payments & Payout" && <TabPayments payouts={payouts} />}
         {activeTab === "Policies" && <TabPolicies />}
         {activeTab === "Notifications" && <TabNotifications />}
       </div>

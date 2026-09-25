@@ -4,6 +4,7 @@ import { Suspense, useEffect, useState, useRef } from 'react';
 import { Link, useNavigate, useSearchParams } from '@/lib/router';
 import { useCart } from '@/lib/cart';
 import { checkPromoCode, placeOrder } from '@/server/place-order';
+import { createStripeCheckoutSession } from '@/server/stripe-actions';
 import { C, DISPLAY, UI, label } from '../tokens';
 import { formatCad, orderTotals, shippingCost, type Discount, type ShippingSpeed, type ShippingZone } from '@/server/pricing';
 
@@ -193,15 +194,15 @@ function PaymentBadge({ children }: { children: React.ReactNode }) {
 }
 
 /* ─── Main component ─────────────────────────────────────────── */
-export default function Checkout() {
+export default function Checkout({ stripeEnabled = false }: { stripeEnabled?: boolean }) {
   return (
     <Suspense fallback={<div className="min-h-screen" style={{ backgroundColor: C.cream }} />}>
-      <CheckoutContent />
+      <CheckoutContent stripeEnabled={stripeEnabled} />
     </Suspense>
   );
 }
 
-function CheckoutContent() {
+function CheckoutContent({ stripeEnabled }: { stripeEnabled: boolean }) {
   const navigate = useNavigate();
   const searchParams = useSearchParams();
   const { lines, clear, hydrated } = useCart();
@@ -321,8 +322,22 @@ function CheckoutContent() {
       return;
     }
 
-    // Empty the cart only once the order is safely written, so a failure
-    // leaves the shopper with everything still in it.
+    // Pay via Stripe when it's configured. The order is already written
+    // (PENDING); the Stripe webhook marks it paid. Don't clear the cart yet —
+    // that happens on the confirmation page — so a cancelled payment keeps it.
+    const session = await createStripeCheckoutSession(result.orderNumber);
+    if (session.ok) {
+      window.location.href = session.url;
+      return;
+    }
+    if (session.reason === 'error') {
+      // Order is placed but payment couldn't start; the confirmation page
+      // explains that a payment link will follow.
+      console.error('[checkout] could not start Stripe payment:', session.message);
+    }
+
+    // Fallback (Stripe not configured, or session failed): the order stands as
+    // PENDING. Empty the cart now that it is safely written.
     clear();
     navigate(`/order-confirmation?order=${encodeURIComponent(result.orderNumber)}`);
   }
@@ -619,12 +634,21 @@ function CheckoutContent() {
                   }}
                 >
                   <div className="mb-2" style={{ fontFamily: UI, fontSize: '0.875rem', fontWeight: 600, color: C.charcoal }}>
-                    We will send you a payment link
+                    {stripeEnabled ? 'Secure payment with Stripe' : 'We will send you a payment link'}
                   </div>
                   <p className="m-0" style={{ fontFamily: UI, fontSize: '0.825rem', color: 'rgba(43,35,32,0.65)', lineHeight: 1.65 }}>
-                    Place your order now and nothing is charged. We confirm the pieces and the
-                    shipping, then email a secure payment link to <strong>{email || 'your email address'}</strong>.
-                    Your order is held while you pay.
+                    {stripeEnabled ? (
+                      <>
+                        When you place your order you&rsquo;ll be taken to Stripe&rsquo;s secure checkout to pay by
+                        card, Apple&nbsp;Pay or Google&nbsp;Pay. You&rsquo;ll return here once payment is confirmed.
+                      </>
+                    ) : (
+                      <>
+                        Place your order now and nothing is charged. We confirm the pieces and the
+                        shipping, then email a secure payment link to <strong>{email || 'your email address'}</strong>.
+                        Your order is held while you pay.
+                      </>
+                    )}
                   </p>
                 </div>
                 <div className="flex items-center gap-2 mt-4 flex-wrap">
@@ -675,7 +699,9 @@ function CheckoutContent() {
                   onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.boxShadow = `0 4px 22px rgba(212,169,78,0.5)`; (e.currentTarget as HTMLButtonElement).style.transform = 'translateY(-1px)'; }}
                   onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.boxShadow = `0 2px 12px rgba(212,169,78,0.35)`; (e.currentTarget as HTMLButtonElement).style.transform = 'none'; }}
                 >
-                  {placing ? 'Placing your order…' : `Place Order — ${formatCad(totals.totalCents)}`}
+                  {placing
+                    ? (stripeEnabled ? 'Redirecting to payment…' : 'Placing your order…')
+                    : `${stripeEnabled ? 'Continue to Payment' : 'Place Order'} — ${formatCad(totals.totalCents)}`}
                 </button>
                 {/* Trust row */}
                 <div className="flex gap-6 justify-center mt-4 flex-wrap">

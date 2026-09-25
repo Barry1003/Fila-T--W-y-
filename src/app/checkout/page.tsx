@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation';
 import Checkout from '@/views/Checkout';
 import { getCurrentUser } from '@/server/auth';
+import { stripeEnabled } from '@/lib/stripe';
 
 /**
  * Checkout requires an account, so every order has an owner who can track it and
@@ -12,5 +13,5 @@ export const dynamic = 'force-dynamic';
 export default async function Page() {
   const user = await getCurrentUser();
   if (!user) redirect('/auth?next=/checkout');
-  return <Checkout />;
+  return <Checkout stripeEnabled={stripeEnabled} />;
 }

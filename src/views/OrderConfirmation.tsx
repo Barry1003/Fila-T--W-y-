@@ -1,6 +1,8 @@
 'use client';
 
+import { useEffect } from 'react';
 import { Link } from '@/lib/router';
+import { useCart } from '@/lib/cart';
 import { C, DISPLAY, UI, label } from '../tokens';
 import { formatCad } from '@/server/pricing';
 import type { OrderDetail } from '@/server/orders';
@@ -60,6 +62,14 @@ const TRUST = [
 
 /* ─── Page ───────────────────────────────────────────────────── */
 export default function OrderConfirmation({ order }: { order: OrderDetail }) {
+  // Reaching this page means the order was placed — empty the cart. (Stripe
+  // redirects here on success without the checkout page having cleared it.)
+  const { clear, hydrated } = useCart();
+  useEffect(() => {
+    if (hydrated) clear();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hydrated]);
+
   return (
     <div className="min-h-screen" style={{ backgroundColor: C.cream, fontFamily: UI, color: C.charcoal }}>
 
