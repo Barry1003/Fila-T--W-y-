@@ -14,6 +14,54 @@ async function requireOwner() {
   return user?.role === 'OWNER';
 }
 
+/**
+ * A signed-in customer submits a review for a product. Owner reply/flag stay
+ * below and are owner-gated; this one only needs a signed-in user.
+ */
+export async function submitReview(
+  productId: string,
+  rating: number,
+  body: string
+): Promise<ReviewActionResult> {
+  const user = await getCurrentUser().catch(() => null);
+  if (!user) return { ok: false, message: 'Please sign in to write a review.' };
+
+  const r = Math.round(rating);
+  if (!(r >= 1 && r <= 5)) return { ok: false, message: 'Choose a rating from 1 to 5 stars.' };
+  const text = body.trim().slice(0, 2000);
+  if (text.length < 3) return { ok: false, message: 'Please write a few words about the product.' };
+
+  try {
+    const product = await withDbRetry('review: check product', () =>
+      prisma.product.findUnique({ where: { id: productId }, select: { id: true } })
+    );
+    if (!product) return { ok: false, message: 'Product not found.' };
+
+    // One review per customer per product — update it if they review again.
+    const existing = await withDbRetry('review: find existing', () =>
+      prisma.review.findFirst({ where: { productId, userId: user.id }, select: { id: true } })
+    );
+
+    if (existing) {
+      await withDbRetry('review: update', () =>
+        prisma.review.update({ where: { id: existing.id }, data: { rating: r, body: text, authorName: user.name } })
+      );
+    } else {
+      await withDbRetry('review: create', () =>
+        prisma.review.create({
+          data: { productId, userId: user.id, authorName: user.name, rating: r, body: text },
+        })
+      );
+    }
+
+    revalidatePath('/console/reviews');
+    return { ok: true };
+  } catch (error) {
+    console.error('[review submit] failed', error);
+    return { ok: false, message: 'Could not save your review just now. Please try again.' };
+  }
+}
+
 export async function replyToReview(id: string, text: string): Promise<ReviewActionResult> {
   if (!(await requireOwner())) return { ok: false, message: 'You do not have permission to reply.' };
   const body = text.trim();

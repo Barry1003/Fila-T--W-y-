@@ -1,8 +1,10 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useTransition } from 'react';
+import { useRouter } from 'next/navigation';
 import { Link } from '@/lib/router';
 import AccountShell from '../components/AccountShell';
+import { createSupportConversation, replyToSupport } from '@/server/support-actions';
 import { C, DISPLAY, UI, label } from '../tokens';
 
 type Message = {
@@ -36,9 +38,15 @@ export default function Support({
   const [modalSubject, setModalSubject] = useState('');
   const [modalOrder, setModalOrder] = useState('');
   const [modalBody, setModalBody] = useState('');
+  const [sending, setSending] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
+  const [, startTransition] = useTransition();
 
   const active = conversations.find(c => c.id === activeId) ?? null;
+
+  // Adopt refreshed server data after an action persists.
+  useEffect(() => { setConversations(initialConversations); }, [initialConversations]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -49,32 +57,44 @@ export default function Support({
     setActiveId(id);
   };
 
-  const sendMessage = () => {
-    if (!draft.trim() || !activeId) return;
-    const msg: Message = { id: `m${Date.now()}`, sender: 'buyer', text: draft.trim(), timestamp: 'Just now' };
+  const sendMessage = async () => {
+    const text = draft.trim();
+    if (!text || !activeId || sending) return;
+    // Optimistic append.
+    const msg: Message = { id: `m${Date.now()}`, sender: 'buyer', text, timestamp: 'Just now' };
     setConversations(prev => prev.map(c =>
-      c.id === activeId ? { ...c, messages: [...c.messages, msg], preview: draft.trim().slice(0, 64) } : c
+      c.id === activeId ? { ...c, messages: [...c.messages, msg], preview: text.slice(0, 64) } : c
     ));
     setDraft('');
+    setSending(true);
+    const res = await replyToSupport(activeId, text);
+    setSending(false);
+    if (!res.ok) {
+      alert(res.message);
+      setDraft(text);
+      return;
+    }
+    startTransition(() => router.refresh());
   };
 
-  const sendNewMessage = () => {
-    if (!modalSubject.trim() || !modalBody.trim()) return;
-    const newConv: Conversation = {
-      id: `c${Date.now()}`,
+  const sendNewMessage = async () => {
+    if (!modalSubject.trim() || !modalBody.trim() || sending) return;
+    setSending(true);
+    const res = await createSupportConversation({
       subject: modalSubject.trim(),
-      order: modalOrder || null,
-      preview: modalBody.trim().slice(0, 64),
-      date: 'Just now',
-      unread: false,
-      messages: [{ id: 'm1', sender: 'buyer', text: modalBody.trim(), timestamp: 'Just now' }],
-    };
-    setConversations(prev => [newConv, ...prev]);
-    setActiveId(newConv.id);
+      orderNumber: modalOrder || null,
+      body: modalBody.trim(),
+    });
+    setSending(false);
+    if (!res.ok) {
+      alert(res.message);
+      return;
+    }
     setShowModal(false);
     setModalSubject('');
     setModalOrder('');
     setModalBody('');
+    startTransition(() => router.refresh());
   };
 
   return (

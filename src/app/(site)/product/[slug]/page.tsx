@@ -4,6 +4,7 @@ import Product from '@/views/Product';
 import { getProductBySlug, listProducts } from '@/server/catalogue';
 import { getCurrentUser } from '@/server/auth';
 import { isInWishlist } from '@/server/account';
+import { listProductReviews } from '@/server/reviews';
 import { siteUrl } from '@/lib/site';
 import { ogImageUrl } from '@/server/storage';
 
@@ -72,6 +73,7 @@ export default async function Page({ params }: Params) {
 
   const user = await getCurrentUser().catch(() => null);
   const inWishlist = user ? await isInWishlist(user.id, product.id) : false;
+  const reviews = await listProductReviews(product.id);
 
   return (
     <Product
@@ -79,6 +81,7 @@ export default async function Page({ params }: Params) {
       related={related}
       inWishlist={inWishlist}
       signedIn={Boolean(user)}
+      reviews={reviews}
       shareBaseUrl={siteUrl()}
     />
   );

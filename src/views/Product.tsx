@@ -1,15 +1,15 @@
 'use client';
 
 import { useState, useMemo, useTransition } from 'react';
+import { useRouter } from 'next/navigation';
 import { Link, useNavigate } from '@/lib/router';
 import { useOverlay } from '@/lib/useOverlay';
 import { useCart } from '@/lib/cart';
 import { toggleWishlist } from '@/server/wishlist-actions';
+import { submitReview } from '@/server/review-actions';
 import { C, DISPLAY, UI, label } from '../tokens';
 import type { CatalogueProduct } from '@/server/catalogue';
-
-// Reviews are not wired to real data yet, so the product page shows none rather
-// than placeholder ratings — no invented "4.7 / 24 reviews" as social proof.
+import type { ProductReviews } from '@/server/reviews';
 
 // ── Share Modal ──────────────────────────────────────────────────────────────
 
@@ -253,12 +253,13 @@ export type ProductProps = {
   related: CatalogueProduct[];
   inWishlist?: boolean;
   signedIn?: boolean;
+  reviews?: ProductReviews;
   /** Canonical origin (from siteUrl()) so shared links survive redeploys and
    *  never point at a preview/localhost host. */
   shareBaseUrl?: string;
 };
 
-export default function Product({ product, related, inWishlist = false, signedIn = false, shareBaseUrl }: ProductProps) {
+export default function Product({ product, related, inWishlist = false, signedIn = false, reviews, shareBaseUrl }: ProductProps) {
 
   const [mainIdx, setMainIdx] = useState(0);
   const uniqueSizes = useMemo(() => [...new Set(product.variants.map(v => v.size))], [product.variants]);
@@ -752,7 +753,9 @@ export default function Product({ product, related, inWishlist = false, signedIn
         </div>
       </div>
 
-      {/* Reviews section intentionally omitted until real reviews are wired. */}
+      {/* ── REVIEWS ── */}
+      <ReviewsSection productId={product.id} signedIn={signedIn} data={reviews} />
+
 
       {/* ── RELATED PRODUCTS ── */}
       <section style={{ borderTop: '1px solid rgba(43,35,32,0.09)' }}>
@@ -815,5 +818,145 @@ export default function Product({ product, related, inWishlist = false, signedIn
         />
       )}
     </div>
+  );
+}
+
+/* ─── Reviews ─────────────────────────────────────────────────── */
+
+function Stars({ value, size = 15 }: { value: number; size?: number }) {
+  return (
+    <span aria-label={`${value} out of 5`} style={{ display: 'inline-flex', gap: 1, color: C.gold }}>
+      {[1, 2, 3, 4, 5].map(n => (
+        <svg key={n} width={size} height={size} viewBox="0 0 24 24" aria-hidden="true"
+          fill={n <= Math.round(value) ? C.gold : 'none'} stroke={C.gold} strokeWidth="1.5">
+          <path d="M12 2l2.9 6.3 6.9.7-5.1 4.6 1.4 6.8L12 17.8 5.9 20.4l1.4-6.8L2.2 9l6.9-.7z" />
+        </svg>
+      ))}
+    </span>
+  );
+}
+
+function ReviewsSection({ productId, signedIn, data }: { productId: string; signedIn: boolean; data?: ProductReviews }) {
+  const router = useRouter();
+  const [, startTransition] = useTransition();
+  const reviews = data?.reviews ?? [];
+  const average = data?.average ?? 0;
+  const count = data?.count ?? 0;
+
+  const [rating, setRating] = useState(0);
+  const [hover, setHover] = useState(0);
+  const [body, setBody] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [done, setDone] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function submit(e: React.FormEvent) {
+    e.preventDefault();
+    setError(null);
+    if (rating < 1) { setError('Please choose a star rating.'); return; }
+    if (body.trim().length < 3) { setError('Please write a few words.'); return; }
+    setBusy(true);
+    const res = await submitReview(productId, rating, body.trim());
+    setBusy(false);
+    if (!res.ok) { setError(res.message); return; }
+    setDone(true);
+    setBody('');
+    setRating(0);
+    startTransition(() => router.refresh());
+  }
+
+  return (
+    <section style={{ borderTop: '1px solid rgba(43,35,32,0.09)' }}>
+      <div className="max-w-[1440px] mx-auto py-20 px-10">
+        <div className="rg-split grid grid-cols-[minmax(0,1fr)_minmax(0,380px)] gap-16">
+          {/* Left: summary + list */}
+          <div>
+            <div className="flex items-baseline gap-4 mb-8 flex-wrap">
+              <h2 className="m-0" style={{ fontFamily: DISPLAY, fontSize: 'clamp(1.75rem, 2.6vw, 2.5rem)', fontWeight: 400, letterSpacing: '-0.022em', color: C.charcoal }}>
+                Reviews
+              </h2>
+              {count > 0 && (
+                <span className="flex items-center gap-2" style={{ fontFamily: UI, fontSize: '0.85rem', color: 'rgba(43,35,32,0.6)' }}>
+                  <Stars value={average} /> {average.toFixed(1)} · {count} review{count !== 1 ? 's' : ''}
+                </span>
+              )}
+            </div>
+
+            {reviews.length === 0 ? (
+              <p style={{ fontFamily: UI, fontSize: '0.9rem', color: 'rgba(43,35,32,0.5)' }}>
+                No reviews yet — be the first to review this piece.
+              </p>
+            ) : (
+              <div className="flex flex-col gap-7">
+                {reviews.map(r => (
+                  <div key={r.id} style={{ borderBottom: '1px solid rgba(43,35,32,0.08)', paddingBottom: '1.5rem' }}>
+                    <div className="flex items-center justify-between gap-3 mb-2">
+                      <span className="font-semibold" style={{ fontFamily: UI, fontSize: '0.88rem', color: C.charcoal }}>{r.authorName}</span>
+                      <span style={{ fontFamily: UI, fontSize: '0.72rem', color: 'rgba(43,35,32,0.4)' }}>{r.date}</span>
+                    </div>
+                    <div className="mb-2"><Stars value={r.rating} size={13} /></div>
+                    <p className="m-0" style={{ fontFamily: UI, fontSize: '0.9rem', color: 'rgba(43,35,32,0.78)', lineHeight: 1.6 }}>{r.body}</p>
+                    {r.reply && (
+                      <div className="mt-3 p-[0.75rem_1rem] rounded-md" style={{ backgroundColor: 'rgba(43,35,32,0.04)' }}>
+                        <div style={{ ...label, fontSize: '0.58rem', color: C.gold, marginBottom: 4 }}>Response from AdeClassics</div>
+                        <p className="m-0" style={{ fontFamily: UI, fontSize: '0.85rem', color: 'rgba(43,35,32,0.72)', lineHeight: 1.55 }}>{r.reply}</p>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Right: write a review */}
+          <div>
+            <div className="p-6 rounded-lg" style={{ backgroundColor: '#fff', border: '1px solid rgba(43,35,32,0.1)' }}>
+              <h3 className="mt-0 mb-4" style={{ fontFamily: DISPLAY, fontSize: '1.15rem', fontWeight: 400, color: C.charcoal }}>Write a review</h3>
+
+              {!signedIn ? (
+                <p style={{ fontFamily: UI, fontSize: '0.85rem', color: 'rgba(43,35,32,0.6)', lineHeight: 1.6 }}>
+                  Please <Link to={`/auth?next=/product/${productId}`} style={{ color: C.maroon }}>sign in</Link> to write a review.
+                </p>
+              ) : done ? (
+                <p style={{ fontFamily: UI, fontSize: '0.88rem', color: C.teal, lineHeight: 1.6 }}>
+                  Thanks! Your review has been posted.
+                </p>
+              ) : (
+                <form onSubmit={submit} className="flex flex-col gap-4">
+                  {error && (
+                    <div role="alert" className="p-[0.6rem_0.8rem] rounded" style={{ fontFamily: UI, fontSize: '0.78rem', color: C.maroon, backgroundColor: 'rgba(122,46,56,0.07)', border: '1px solid rgba(122,46,56,0.25)' }}>{error}</div>
+                  )}
+                  <div>
+                    <div className="mb-2" style={{ ...label, fontSize: '0.62rem', color: C.charcoal }}>Your rating</div>
+                    <div className="flex gap-1" onMouseLeave={() => setHover(0)}>
+                      {[1, 2, 3, 4, 5].map(n => (
+                        <button key={n} type="button" onClick={() => setRating(n)} onMouseEnter={() => setHover(n)}
+                          aria-label={`${n} star${n > 1 ? 's' : ''}`} className="bg-transparent border-none cursor-pointer p-0" style={{ lineHeight: 0 }}>
+                          <svg width="26" height="26" viewBox="0 0 24 24" fill={n <= (hover || rating) ? C.gold : 'none'} stroke={C.gold} strokeWidth="1.4">
+                            <path d="M12 2l2.9 6.3 6.9.7-5.1 4.6 1.4 6.8L12 17.8 5.9 20.4l1.4-6.8L2.2 9l6.9-.7z" />
+                          </svg>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <label htmlFor="review-body" className="block mb-2" style={{ ...label, fontSize: '0.62rem', color: C.charcoal }}>Your review</label>
+                    <textarea id="review-body" value={body} onChange={e => setBody(e.target.value)} rows={4}
+                      placeholder="How is the fit, the fabric, the craftsmanship?"
+                      className="w-full p-[0.7rem_0.85rem] rounded-[5px] outline-none box-border resize-y"
+                      style={{ fontFamily: UI, fontSize: '0.875rem', color: C.charcoal, border: '1.5px solid rgba(43,35,32,0.2)' }} />
+                  </div>
+                  <button type="submit" disabled={busy}
+                    className="w-full py-[0.8rem] px-6 rounded-[5px] border-none uppercase font-bold tracking-[0.14em]"
+                    style={{ backgroundColor: C.gold, color: C.charcoal, fontFamily: UI, fontSize: '0.78rem', cursor: busy ? 'wait' : 'pointer', opacity: busy ? 0.7 : 1 }}>
+                    {busy ? 'Posting…' : 'Post review'}
+                  </button>
+                </form>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
   );
 }
