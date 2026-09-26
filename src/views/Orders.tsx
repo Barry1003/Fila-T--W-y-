@@ -282,7 +282,7 @@ function OrderCard({ order }: { order: Order }) {
               )}
 
               {/* Support link */}
-              <a href="#" className="no-underline pb-[1px]" style={{ fontFamily: UI, fontSize: '0.78rem', color: C.indigo, letterSpacing: '0.01em', borderBottom: `1px solid rgba(46,74,158,0.25)` }}>
+              <a href="/account/support" className="no-underline pb-[1px]" style={{ fontFamily: UI, fontSize: '0.78rem', color: C.indigo, letterSpacing: '0.01em', borderBottom: `1px solid rgba(46,74,158,0.25)` }}>
                 Need help with this order?
               </a>
             </div>

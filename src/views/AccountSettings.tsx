@@ -1,8 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import AccountShell from '../components/AccountShell';
 import { useUser, getInitials } from '@/lib/user';
+import { updateProfile } from '@/server/account-actions';
+import { authClient } from '@/lib/auth/client';
 import { C, DISPLAY, UI, label } from '../tokens';
 
 /* ─── Shared primitives ──────────────────────────────────────── */
@@ -331,6 +334,9 @@ export default function AccountSettings() {
   const [phone, setPhone] = useState('');
   const [profileSaved, setProfileSaved] = useState(false);
 
+  const router = useRouter();
+  const [busy, setBusy] = useState(false);
+
   useEffect(() => {
     if (user?.name) setFullName(user.name);
     if (user?.email) setEmail(user.email);
@@ -359,6 +365,57 @@ export default function AccountSettings() {
   function flash(set: (v: boolean) => void) {
     set(true);
     setTimeout(() => set(false), 2200);
+  }
+
+  // Notification and region choices have no backend behaviour yet (no email
+  // campaigns; the store prices in CAD only), so they are remembered per browser
+  // rather than pretending to persist server-side.
+  useEffect(() => {
+    try {
+      const n = localStorage.getItem('ac_notif_prefs');
+      if (n) setNotif(prev => ({ ...prev, ...JSON.parse(n) }));
+      const r = localStorage.getItem('ac_region');
+      if (r) { const p = JSON.parse(r); if (p.language) setLanguage(p.language); if (p.currency) setCurrency(p.currency); }
+    } catch { /* private mode / disabled storage */ }
+  }, []);
+
+  async function saveProfile() {
+    if (busy) return;
+    setBusy(true);
+    const fullPhone = phone.trim() ? `${phoneCode} ${phone.trim()}` : '';
+    const res = await updateProfile({ name: fullName, phone: fullPhone });
+    setBusy(false);
+    if (!res.ok) { alert(res.message); return; }
+    flash(setProfileSaved);
+    router.refresh();
+  }
+
+  async function savePassword() {
+    if (busy) return;
+    if (!currentPw || !newPw) { alert('Enter your current and new password.'); return; }
+    if (newPw.length < 8) { alert('New password must be at least 8 characters.'); return; }
+    if (newPw !== confirmPw) { alert('New passwords do not match.'); return; }
+    setBusy(true);
+    try {
+      await authClient.changePassword({ currentPassword: currentPw, newPassword: newPw, revokeOtherSessions: true });
+      setCurrentPw(''); setNewPw(''); setConfirmPw('');
+      flash(setPwSaved);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Could not update your password. Check your current password and try again.';
+      alert(msg);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  function saveNotif() {
+    try { localStorage.setItem('ac_notif_prefs', JSON.stringify(notif)); } catch { /* ignore */ }
+    flash(setNotifSaved);
+  }
+
+  function saveRegion() {
+    try { localStorage.setItem('ac_region', JSON.stringify({ language, currency })); } catch { /* ignore */ }
+    flash(setRegionSaved);
   }
 
   return (
@@ -422,7 +479,7 @@ export default function AccountSettings() {
 
           <div className="flex justify-end items-center gap-4 mt-2">
             <SaveFeedback visible={profileSaved} />
-            <GoldButton onClick={() => flash(setProfileSaved)}>Save Changes</GoldButton>
+            <GoldButton onClick={saveProfile}>Save Changes</GoldButton>
           </div>
         </SectionCard>
 
@@ -441,7 +498,7 @@ export default function AccountSettings() {
           </div>
           <div className="flex justify-end items-center gap-4">
             <SaveFeedback visible={pwSaved} />
-            <GoldButton onClick={() => flash(setPwSaved)}>Update Password</GoldButton>
+            <GoldButton onClick={savePassword}>Update Password</GoldButton>
           </div>
         </SectionCard>
 
@@ -476,7 +533,7 @@ export default function AccountSettings() {
           </div>
           <div className="flex justify-end items-center gap-4 mt-5">
             <SaveFeedback visible={notifSaved} />
-            <GoldButton onClick={() => flash(setNotifSaved)}>Save Preferences</GoldButton>
+            <GoldButton onClick={saveNotif}>Save Preferences</GoldButton>
           </div>
         </SectionCard>
 
@@ -512,7 +569,7 @@ export default function AccountSettings() {
           </div>
           <div className="flex justify-end items-center gap-4">
             <SaveFeedback visible={regionSaved} />
-            <GoldButton onClick={() => flash(setRegionSaved)}>Save Preferences</GoldButton>
+            <GoldButton onClick={saveRegion}>Save Preferences</GoldButton>
           </div>
         </SectionCard>
 

@@ -167,9 +167,9 @@ export default function Home({ content, products, collections }: HomeProps) {
                 {para}
               </p>
             ))}
-            <a href="#" className="shimmer-cta inline-block no-underline py-3.5 px-8" style={{ backgroundColor: C.maroon, color: C.cream, ...label, fontSize: '0.65rem', letterSpacing: '0.14em' }}>
+            <Link to="/about" className="shimmer-cta inline-block no-underline py-3.5 px-8" style={{ backgroundColor: C.maroon, color: C.cream, ...label, fontSize: '0.65rem', letterSpacing: '0.14em' }}>
               Our Story
-            </a>
+            </Link>
           </div>
         </div>
       </section>

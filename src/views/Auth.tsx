@@ -515,7 +515,7 @@ function RegisterForm({ switchTab }: { switchTab: () => void }) {
             I agree to the{' '}
             <a href="#" className="no-underline border-b border-solid border-[rgba(46,74,158,0.3)]" style={{ color: C.indigo }}>Terms of Service</a>
             {' '}and{' '}
-            <a href="#" className="no-underline border-b border-solid border-[rgba(46,74,158,0.3)]" style={{ color: C.indigo }}>Privacy Policy</a>
+            <a href="/privacy-policy" className="no-underline border-b border-solid border-[rgba(46,74,158,0.3)]" style={{ color: C.indigo }}>Privacy Policy</a>
           </span>
         </label>
         {submitted && errors.agreed && <FieldError msg={errors.agreed} />}
