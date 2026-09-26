@@ -383,9 +383,10 @@ export default function ConsoleOrderDetail({ order: raw }: { order: OrderDetail 
             )}
           </SectionCard>
 
-          {/* Message customer */}
-          <Link
-            to="/console/messages"
+          {/* Message customer — opens the owner's email client addressed to the
+              buyer, with this order referenced in the subject. */}
+          <a
+            href={`mailto:${order.customerEmail}?subject=${encodeURIComponent(`Regarding your AdeClassics order ${order.number}`)}&body=${encodeURIComponent(`Hi ${order.customerName.split(" ")[0] || "there"},\n\n`)}`}
             className="flex items-center justify-center gap-[7px] px-4 py-[0.6rem] rounded-[7px] bg-transparent font-medium no-underline transition-colors duration-150 tracking-[0.01em] border border-solid border-[rgba(43,35,32,0.16)]"
             style={{
               color: C.charcoal,
@@ -395,7 +396,7 @@ export default function ConsoleOrderDetail({ order: raw }: { order: OrderDetail 
             onMouseLeave={e => (e.currentTarget as HTMLElement).style.backgroundColor = "transparent"}
           >
             <MessageSquare size={14} /> Message Customer
-          </Link>
+          </a>
 
           {/* Back */}
           <Link
