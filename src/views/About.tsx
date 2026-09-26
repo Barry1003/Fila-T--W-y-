@@ -182,7 +182,7 @@ export default function About() {
     <div style={{ backgroundColor: C.cream }}>
 
       {/* ── Hero ─────────────────────────────────────────────────────── */}
-      <div style={{
+      <div className="about-hero" style={{
         position: 'relative',
         minHeight: 'clamp(520px, 82vh, 780px)',
         backgroundColor: C.charcoal,
@@ -238,7 +238,7 @@ export default function About() {
         </div>
 
         {/* Stats strip — anchored to bottom, now counts up on scroll into view */}
-        <div style={{
+        <div className="about-stats" style={{
           position: 'absolute', bottom: 0, left: 0, right: 0,
           borderTop: '1px solid rgba(212,169,78,0.18)',
           backgroundColor: 'rgba(212,169,78,0.07)',
@@ -738,6 +738,22 @@ export default function About() {
         }
         @media (max-width: 600px) {
           .about-two-col > *:first-child { min-height: 260px; }
+        }
+
+        /* On phones the centred hero content (down to the founding seal) grew
+           tall enough to sit under the bottom-anchored stats strip, so the seal
+           label and the stat numbers overlapped. Let the hero size to its
+           content and drop the strip into normal flow beneath it. */
+        @media (max-width: 760px) {
+          .about-hero {
+            min-height: auto !important;
+            justify-content: flex-start !important;
+            padding-bottom: 0 !important;
+          }
+          .about-stats {
+            position: static !important;
+            margin: 3rem -2rem 0 !important;
+          }
         }
 
         /* Marquee — pauses on hover, disabled under reduced motion */

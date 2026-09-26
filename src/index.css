@@ -110,6 +110,24 @@ body {
   transform: rotateY(180deg);
 }
 
+/* Touch devices can't hover, so the flip never fires and the product photo on
+   the back is never seen — visitors just get a small bordered letter box. On
+   touch, drop the flip and rest on the image face (letter + name overlaid),
+   which fills the tile edge to edge with no border. */
+@media (hover: none) and (pointer: coarse) {
+  .flip-card-inner {
+    transform: none !important;
+  }
+  .flip-card-front {
+    display: none;
+  }
+  .flip-card-back {
+    transform: none !important;
+    backface-visibility: visible;
+    -webkit-backface-visibility: visible;
+  }
+}
+
 /* Maker card hover */
 .maker-card {
   transition: box-shadow 0.25s ease;
@@ -206,7 +224,7 @@ body {
   }
 
   .footer-cols {
-    grid-template-columns: repeat(2, 1fr) !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
   }
 
   /* Shop page */
@@ -234,11 +252,18 @@ body {
   }
 
   .cat-grid {
-    grid-template-columns: repeat(3, 1fr) !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
   }
 
   .footer-cols {
     grid-template-columns: 1fr !important;
+  }
+
+  /* Let the single column shrink to the container: a plain 1fr track keeps its
+     min-content floor, which the newsletter input row pushed past the viewport
+     and got clipped. */
+  .footer-cols > * {
+    min-width: 0;
   }
 }
 
