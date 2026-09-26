@@ -110,24 +110,6 @@ body {
   transform: rotateY(180deg);
 }
 
-/* Touch devices can't hover, so the flip never fires and the product photo on
-   the back is never seen — visitors just get a small bordered letter box. On
-   touch, drop the flip and rest on the image face (letter + name overlaid),
-   which fills the tile edge to edge with no border. */
-@media (hover: none) and (pointer: coarse) {
-  .flip-card-inner {
-    transform: none !important;
-  }
-  .flip-card-front {
-    display: none;
-  }
-  .flip-card-back {
-    transform: none !important;
-    backface-visibility: visible;
-    -webkit-backface-visibility: visible;
-  }
-}
-
 /* Maker card hover */
 .maker-card {
   transition: box-shadow 0.25s ease;
