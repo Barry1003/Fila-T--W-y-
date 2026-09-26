@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import AccountShell from '../components/AccountShell';
 import { useUser, getInitials } from '@/lib/user';
-import { updateProfile } from '@/server/account-actions';
+import { updateProfile, deleteMyAccount } from '@/server/account-actions';
 import { authClient } from '@/lib/auth/client';
 import { C, DISPLAY, UI, label } from '../tokens';
 
@@ -418,6 +418,24 @@ export default function AccountSettings() {
     flash(setRegionSaved);
   }
 
+  async function deactivate() {
+    if (busy) return;
+    if (!window.confirm('Sign out and deactivate your account? You can reactivate any time by signing back in.')) return;
+    setBusy(true);
+    try { await authClient.signOut(); } catch { /* session may already be gone */ }
+    window.location.href = '/';
+  }
+
+  async function deleteAccount() {
+    if (busy) return;
+    if (!window.confirm('This permanently deletes your account and all personal data (addresses, saved cards, wishlist). This cannot be undone. Continue?')) return;
+    setBusy(true);
+    const res = await deleteMyAccount();
+    if (!res.ok) { setBusy(false); alert(res.message); return; }
+    try { await authClient.signOut(); } catch { /* session already deleted server-side */ }
+    window.location.href = '/';
+  }
+
   return (
     <AccountShell>
       {/* Page title */}
@@ -540,7 +558,7 @@ export default function AccountSettings() {
         {/* ── 4. Language & Region ─────────────────────────────────── */}
         <SectionCard>
           <SectionLabel>Language &amp; Region</SectionLabel>
-          <div className="rg-2 grid grid-cols-2 gap-x-4 max-w-[560px]">
+          <div className="max-w-[280px]">
             <FSelect
               label="Language"
               value={language}
@@ -553,19 +571,9 @@ export default function AccountSettings() {
                 { value: 'ha', label: 'Hausa' },
               ]}
             />
-            <FSelect
-              label="Primary Currency"
-              value={currency}
-              onChange={setCurrency}
-              options={[
-                { value: 'cad', label: 'CAD — Canadian Dollar' },
-                { value: 'ngn', label: 'NGN — Nigerian Naira' },
-                { value: 'usd', label: 'USD — US Dollar' },
-              ]}
-            />
           </div>
-          <div className="mb-5" style={{ fontFamily: UI, fontSize: '0.74rem', color: 'rgba(43,35,32,0.42)', lineHeight: 1.6 }}>
-            NGN equivalent is always shown as secondary pricing. Your primary currency setting controls the displayed checkout total.
+          <div className="mb-5 mt-1" style={{ fontFamily: UI, fontSize: '0.74rem', color: 'rgba(43,35,32,0.42)', lineHeight: 1.6 }}>
+            Prices are shown in CAD, with the Naira equivalent as secondary pricing.
           </div>
           <div className="flex justify-end items-center gap-4">
             <SaveFeedback visible={regionSaved} />
@@ -599,7 +607,7 @@ export default function AccountSettings() {
                   </div>
                 </div>
                 <div className="shrink-0">
-                  <OutlineBtn>Deactivate</OutlineBtn>
+                  <OutlineBtn onClick={deactivate}>Deactivate</OutlineBtn>
                 </div>
               </div>
 
@@ -626,7 +634,7 @@ export default function AccountSettings() {
                   </div>
                 </div>
                 <div className="shrink-0">
-                  <OutlineBtn red>Delete Account</OutlineBtn>
+                  <OutlineBtn red onClick={deleteAccount}>Delete Account</OutlineBtn>
                 </div>
               </div>
 

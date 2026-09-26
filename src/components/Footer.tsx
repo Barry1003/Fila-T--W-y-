@@ -52,8 +52,8 @@ export default function Footer() {
               { label: 'About', href: '/about' },
               { label: 'Custom Order', href: '/custom-order' },
               { label: 'Lookbook', href: '/lookbook' },
-              { label: 'Blog', href: '#' },
-              { label: 'Press', href: '#' }
+              { label: 'Blog', href: '/lookbook' },
+              { label: 'Press', href: '/about' }
             ].map(l => (
               <a key={l.label} href={l.href} className="block no-underline mb-2.5" style={{ color: 'rgba(250,246,240,0.65)', fontSize: '0.875rem', lineHeight: 1.5, fontFamily: UI }}>{l.label}</a>
             ))}
@@ -65,7 +65,7 @@ export default function Footer() {
               { label: 'FAQ', href: '/help' },
               { label: 'Returns', href: '/help#returns' },
               { label: 'Contact Us', href: '/help' },
-              { label: 'Size Guide', href: '#' },
+              { label: 'Size Guide', href: '/help' },
               { label: 'Track Order', href: '/account/orders' }
             ].map(l => (
               <a key={l.label} href={l.href} className="block no-underline mb-2.5" style={{ color: 'rgba(250,246,240,0.65)', fontSize: '0.875rem', lineHeight: 1.5, fontFamily: UI }}>{l.label}</a>
@@ -115,8 +115,8 @@ export default function Footer() {
           <div className="flex gap-6">
             {[
               { label: 'Privacy Policy', href: '/privacy-policy' },
-              { label: 'Terms of Use', href: '#' },
-              { label: 'Cookies', href: '#' }
+              { label: 'Terms of Use', href: '/privacy-policy' },
+              { label: 'Cookies', href: '/privacy-policy' }
             ].map(l => (
               <a key={l.label} href={l.href} className="no-underline" style={{ fontFamily: UI, fontSize: '0.775rem', color: 'rgba(250,246,240,0.4)' }}>{l.label}</a>
             ))}
