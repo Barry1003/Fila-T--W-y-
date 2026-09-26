@@ -315,33 +315,43 @@ export default function Lookbook() {
         <h1 className="mb-3" style={{ fontFamily: DISPLAY, fontSize: 'clamp(2rem, 4vw, 3rem)', fontWeight: 500, color: C.charcoal, letterSpacing: '-0.02em', lineHeight: 1.1 }}>
           Lookbook & Stories
         </h1>
-        <p className="max-w-[520px] mb-12" style={{ fontFamily: UI, fontSize: '1rem', color: 'rgba(43,35,32,0.55)', lineHeight: 1.6 }}>
+        <p className="max-w-[520px] mb-10" style={{ fontFamily: UI, fontSize: '1rem', color: 'rgba(43,35,32,0.55)', lineHeight: 1.6 }}>
           Cultural styling guides, care rituals, event inspiration, and a closer look at the craft behind every piece.
         </p>
+      </div>
 
-        {/* Featured article */}
-        <div
-          className="relative h-[520px] rounded-[12px] overflow-hidden mb-12 cursor-pointer"
-          style={{ backgroundColor: '#2B2320' }}
-          onClick={() => setSelectedArticle(featured)}
-        >
-          <img
-            src={featured.image}
-            alt={featured.title}
-            className="w-full h-full object-cover"
-            style={{ transition: 'transform 0.5s ease' }}
-            onMouseEnter={e => (e.currentTarget.style.transform = 'scale(1.03)')}
-            onMouseLeave={e => (e.currentTarget.style.transform = 'scale(1)')}
-          />
-          <div
-            className="absolute inset-0 flex flex-col justify-end py-10 px-12"
-            style={{ background: 'linear-gradient(to top, rgba(43,35,32,0.88) 0%, rgba(43,35,32,0.25) 55%, transparent 100%)' }}
-          >
+      {/* Featured article — full-bleed, immersive hero. Breaks out of the padded
+          column so the image runs edge to edge; the text is re-constrained to the
+          same 1440 content width by an inner container. */}
+      <div
+        className="lookbook-featured relative overflow-hidden mb-14 cursor-pointer"
+        style={{ backgroundColor: '#1D1714', height: 'clamp(460px, 66vh, 640px)' }}
+        onClick={() => setSelectedArticle(featured)}
+      >
+        <img
+          src={featured.image.replace('w=1400&h=700', 'w=1800&h=1100')}
+          alt={featured.title}
+          className="w-full h-full object-cover"
+          style={{ transition: 'transform 0.6s ease', filter: 'grayscale(0.25) contrast(1.04)' }}
+          onMouseEnter={e => (e.currentTarget.style.transform = 'scale(1.04)')}
+          onMouseLeave={e => (e.currentTarget.style.transform = 'scale(1)')}
+        />
+        {/* Deep gradient scrim — carries the moody editorial look and keeps the
+            cream text legible from the bottom up. */}
+        <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, rgba(29,23,20,0.94) 0%, rgba(29,23,20,0.55) 42%, rgba(29,23,20,0.12) 72%, transparent 100%)' }} />
+        <div className="lb-inner absolute inset-0 max-w-[1440px] mx-auto w-full px-10 flex flex-col justify-between py-12">
+          {/* Date + read time pill */}
+          <div className="self-end">
+            <span className="rounded-[20px] py-[0.3rem] px-3" style={{ fontFamily: UI, fontSize: '0.7rem', color: 'rgba(250,246,240,0.7)', backgroundColor: 'rgba(43,35,32,0.4)', backdropFilter: 'blur(4px)' }}>
+              {featured.date} · {featured.readTime}
+            </span>
+          </div>
+          <div>
             <CatTag cat={featured.category} />
-            <h2 className="max-w-[600px] my-3" style={{ fontFamily: DISPLAY, fontSize: 'clamp(1.5rem, 2.8vw, 2.25rem)', fontWeight: 500, color: C.cream, lineHeight: 1.2, letterSpacing: '-0.02em' }}>
+            <h2 className="max-w-[640px] my-3" style={{ fontFamily: DISPLAY, fontSize: 'clamp(1.75rem, 3.4vw, 2.85rem)', fontWeight: 500, color: C.cream, lineHeight: 1.14, letterSpacing: '-0.02em' }}>
               {featured.title}
             </h2>
-            <p className="max-w-[500px] mb-5" style={{ fontFamily: UI, fontSize: '0.9rem', color: 'rgba(250,246,240,0.72)', lineHeight: 1.55 }}>
+            <p className="max-w-[520px] mb-5" style={{ fontFamily: UI, fontSize: '0.95rem', color: 'rgba(250,246,240,0.78)', lineHeight: 1.55 }}>
               {featured.excerpt}
             </p>
             <button
@@ -361,14 +371,11 @@ export default function Lookbook() {
               </svg>
             </button>
           </div>
-          {/* Date + read time pill */}
-          <div className="absolute top-6 right-6">
-            <span className="rounded-[20px] py-[0.3rem] px-3" style={{ fontFamily: UI, fontSize: '0.7rem', color: 'rgba(250,246,240,0.65)', backgroundColor: 'rgba(43,35,32,0.4)', backdropFilter: 'blur(4px)' }}>
-              {featured.date} · {featured.readTime}
-            </span>
-          </div>
         </div>
+      </div>
 
+      {/* Rest of the page — back inside the padded column */}
+      <div className="max-w-[1440px] mx-auto px-10">
         {/* Category pills */}
         <div className="flex gap-2 mb-10 flex-wrap">
           {CATEGORIES.map(cat => {
@@ -435,6 +442,7 @@ export default function Lookbook() {
         }
         @media (max-width: 600px) {
           .article-grid { grid-template-columns: 1fr !important; gap: 2rem !important; }
+          .lookbook-featured .lb-inner { padding: 1.75rem 1.5rem !important; }
         }
       `}</style>
     </div>
