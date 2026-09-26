@@ -1402,27 +1402,44 @@ body {
 }
 
 /* A bar rather than a dot: it doubles as a progress meter for the current
-   slide, so the timing is visible instead of a surprise. */
+   slide, so the timing is visible instead of a surprise.
+
+   The button itself is a transparent hit area — the global touch rule gives it
+   a 40px min-height for tapping, which would turn a solid bar into a box. So the
+   visible 3px track is drawn by ::before, centred in that tall hit area, and the
+   gold fill is centred the same way. The bar stays a thin line at any size while
+   the tap target stays comfortable on touch. */
 .hero-bar {
   position: relative;
+  display: flex;
+  align-items: center;
   width: 44px;
   height: 3px;
   padding: 0;
   border: none;
-  border-radius: 2px;
-  background: rgba(250, 246, 240, 0.32);
+  background: transparent;
   cursor: pointer;
-  overflow: hidden;
 }
 
-.hero-bar.active {
+.hero-bar::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 3px;
+  border-radius: 2px;
   background: rgba(250, 246, 240, 0.32);
 }
 
 .hero-bar-fill {
   position: absolute;
-  inset: 0;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
   width: 0;
+  height: 3px;
   background: #D4A94E;
   border-radius: 2px;
 }
@@ -1457,6 +1474,15 @@ body {
 .hero-play:hover {
   background: rgba(250, 246, 240, 0.26);
   color: #FAF6F0;
+}
+
+/* On touch the global 40px min-height would stretch the play button into an
+   oval; match its width so it stays a round 40px tap target. */
+@media (hover: none) and (pointer: coarse) {
+  .hero-play {
+    width: 40px;
+    height: 40px;
+  }
 }
 
 /* Without motion the bars are position markers, not timers. */

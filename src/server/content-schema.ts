@@ -68,9 +68,6 @@ export type HomeContent = z.infer<typeof homeContentSchema>;
 export const HOME_DEFAULTS: HomeContent = {
   hero: {
     intervalSeconds: 7,
-    // A single branded hero. With one slide the carousel shows no pagination
-    // controls; the owner can add more slides from Store Settings, and the
-    // bars reappear automatically once there is more than one.
     slides: [
       {
         id: 'hero-jump',
@@ -81,6 +78,22 @@ export const HOME_DEFAULTS: HomeContent = {
         imageUrl: '/hero-fila-jump.jpg',
         objectFit: 'contain',
         objectPosition: 'center',
+      },
+      {
+        id: 'fila',
+        eyebrow: 'The cap line',
+        headline: 'Filà tó Wüyí.\nShaped by hand.',
+        ctaLabel: 'Shop Filà',
+        ctaHref: '/collections/fila-to-wuyi',
+        imageUrl: 'https://images.unsplash.com/photo-1763823133159-c6f8ec380e33?w=1800&h=1100&fit=crop&auto=format',
+      },
+      {
+        id: 'gele',
+        eyebrow: 'Gele & Ipele',
+        headline: 'Aso-oke that holds\nits shape all day.',
+        ctaLabel: 'Shop Gele & Ipele',
+        ctaHref: '/collections/gele-ipele',
+        imageUrl: 'https://images.unsplash.com/photo-1714124731489-7eb16af0ac91?w=1800&h=1100&fit=crop&auto=format',
       },
     ],
   },
