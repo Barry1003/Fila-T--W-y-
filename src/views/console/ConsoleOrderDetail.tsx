@@ -246,11 +246,15 @@ export default function ConsoleOrderDetail({ order: raw }: { order: OrderDetail 
                       <tr key={i} className="border-t border-solid border-[rgba(43,35,32,0.06)]">
                         <td className="py-3">
                           <div className="flex items-center gap-[0.625rem]">
-                            <div className="w-9 h-9 rounded-[5px] shrink-0 flex items-center justify-center opacity-75" style={{
-                              backgroundColor: C.maroon,
-                            }}>
-                              <span className="font-bold text-white" style={{ fontSize: "0.55rem" }}>IMG</span>
-                            </div>
+                            {item.imageUrl ? (
+                              <img src={item.imageUrl} alt="" className="w-9 h-9 rounded-[5px] shrink-0 object-cover" />
+                            ) : (
+                              <div className="w-9 h-9 rounded-[5px] shrink-0 flex items-center justify-center opacity-75" style={{
+                                backgroundColor: C.maroon,
+                              }}>
+                                <span className="font-bold text-white" style={{ fontSize: "0.55rem" }}>IMG</span>
+                              </div>
+                            )}
                             <span className="font-semibold" style={{ fontSize: "0.8rem", color: C.charcoal }}>{item.name}</span>
                           </div>
                         </td>

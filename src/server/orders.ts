@@ -35,7 +35,7 @@ export type OrderDetail = OrderListRow & {
   paymentMethod: string | null;
   carrier: string | null;
   tracking: string | null;
-  items: { name: string; variant: string | null; qty: number; unitCad: number }[];
+  items: { name: string; variant: string | null; qty: number; unitCad: number; imageUrl: string | null }[];
   subtotalCad: number;
   shippingCad: number;
   discountCad: number;
@@ -89,7 +89,13 @@ export async function getOrder(id: string): Promise<OrderDetail | null> {
   const o = await withDbRetry('get order', () =>
     prisma.order.findUnique({
       where: { id },
-      include: { items: true },
+      include: {
+        items: {
+          include: {
+            product: { include: { images: { orderBy: { position: 'asc' }, take: 1 } } },
+          },
+        },
+      },
     })
   );
 
@@ -108,7 +114,13 @@ export async function getOrderByNumber(number: string): Promise<OrderDetail | nu
   const o = await withDbRetry('get order by number', () =>
     prisma.order.findUnique({
       where: { number },
-      include: { items: true },
+      include: {
+        items: {
+          include: {
+            product: { include: { images: { orderBy: { position: 'asc' }, take: 1 } } },
+          },
+        },
+      },
     })
   );
 
@@ -116,7 +128,13 @@ export async function getOrderByNumber(number: string): Promise<OrderDetail | nu
 }
 
 type OrderRow = NonNullable<Awaited<ReturnType<typeof prisma.order.findUnique>>> & {
-  items: { name: string; variant: string | null; quantity: number; unitPrice: unknown }[];
+  items: {
+    name: string;
+    variant: string | null;
+    quantity: number;
+    unitPrice: unknown;
+    product?: { images: { url: string }[] } | null;
+  }[];
 };
 
 function toDetail(o: OrderRow): OrderDetail {
@@ -141,6 +159,7 @@ function toDetail(o: OrderRow): OrderDetail {
       variant: i.variant,
       qty: i.quantity,
       unitCad: Number(i.unitPrice),
+      imageUrl: i.product?.images?.[0]?.url ?? null,
     })),
     subtotalCad: Number(o.subtotal),
     shippingCad: Number(o.shipping),
