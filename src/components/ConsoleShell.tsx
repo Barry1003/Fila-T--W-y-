@@ -19,6 +19,7 @@ import {
   StarIcon,
   SettingsIcon,
   BellIcon,
+  TeamIcon,
 } from "../icons";
 
 const NAV_ITEMS = [
@@ -30,6 +31,7 @@ const NAV_ITEMS = [
   { label: "Analytics", to: "/console/analytics", icon: <BarChartIcon size={15} /> },
   { label: "Messages", to: "/console/messages", icon: <MessageIcon size={15} /> },
   { label: "Reviews", to: "/console/reviews", icon: <StarIcon size={15} /> },
+  { label: "Team", to: "/console/team", icon: <TeamIcon size={15} /> },
   { label: "Store Settings", to: "/console/settings", icon: <SettingsIcon size={15} /> },
 ];
 

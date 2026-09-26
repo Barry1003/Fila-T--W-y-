@@ -18,14 +18,24 @@ import { auth } from '@/lib/auth/server';
  */
 
 /**
- * Whether an address owns the store.
+ * The bootstrap owner addresses, from OWNER_EMAIL.
  *
- * Set OWNER_EMAIL in .env and that account gets console access on sign-in.
- * Without it there would be no way to reach the console at all.
+ * Accepts more than one, separated by commas/semicolons/whitespace, so a
+ * two-person business can seed both owners from the environment. Any of these
+ * gets console access on sign-in; additional admins are added at runtime from
+ * the console (see `src/server/team-actions.ts`), which sets `role: OWNER` on
+ * their row directly.
  */
+export function ownerEmails(): string[] {
+  return (process.env.OWNER_EMAIL ?? '')
+    .split(/[,;\s]+/)
+    .map(e => e.trim().toLowerCase())
+    .filter(Boolean);
+}
+
+/** Whether an address is one of the environment-configured store owners. */
 function isOwnerEmail(email: string): boolean {
-  const owner = process.env.OWNER_EMAIL?.trim().toLowerCase();
-  return !!owner && owner === email.trim().toLowerCase();
+  return ownerEmails().includes(email.trim().toLowerCase());
 }
 
 export type CurrentUser = {
