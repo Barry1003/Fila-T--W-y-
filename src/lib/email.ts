@@ -77,24 +77,23 @@ export function renderBrandedEmail(subject: string, text: string): string {
 </div>`;
 }
 
-/** Emails the store owner. Returns `{ ok:false, skipped:true }` when email is off. */
-export async function sendOwnerEmail(opts: {
+/** Sends one branded email to any address. No-op when email is unconfigured. */
+export async function sendEmail(opts: {
+  to: string;
   subject: string;
   /** Plain-text body; also wrapped in the branded HTML shell. */
   text: string;
-  /** Optional Reply-To so the owner can reply straight to the customer. */
   replyTo?: string;
 }): Promise<SendResult> {
   if (!resend) return { ok: false, skipped: true };
-  const to = ownerAddress();
-  if (!to) return { ok: false, message: 'OWNER_EMAIL is not set.' };
+  if (!opts.to.trim()) return { ok: false, message: 'No recipient address.' };
 
   try {
     const html = renderBrandedEmail(opts.subject, opts.text);
 
     const { data, error } = await resend.emails.send({
       from: FROM,
-      to,
+      to: opts.to,
       subject: opts.subject,
       text: opts.text,
       html,
@@ -106,6 +105,18 @@ export async function sendOwnerEmail(opts: {
     console.error('[email] send failed', error);
     return { ok: false, message: 'Email send failed.' };
   }
+}
+
+/** Emails the store owner (OWNER_EMAIL). Returns `{ ok:false, skipped:true }` when email is off. */
+export async function sendOwnerEmail(opts: {
+  subject: string;
+  text: string;
+  /** Optional Reply-To so the owner can reply straight to the customer. */
+  replyTo?: string;
+}): Promise<SendResult> {
+  const to = ownerAddress();
+  if (!to) return { ok: false, message: 'OWNER_EMAIL is not set.' };
+  return sendEmail({ to, ...opts });
 }
 
 function escapeHtml(s: string): string {

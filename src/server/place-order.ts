@@ -9,6 +9,7 @@ import { withDbRetry } from './db';
 import { getCurrentUser } from './auth';
 import { formatCad, orderTotals, type Discount } from './pricing';
 import { placeOrderSchema } from './order-schema';
+import { sendEmail, sendOwnerEmail } from '@/lib/email';
 
 /**
  * Placing an order.
@@ -136,7 +137,7 @@ export async function placeOrder(raw: unknown): Promise<PlaceOrderResult> {
   const user = await getCurrentUser().catch(() => null);
 
   try {
-    const orderNumber = await withDbRetry('place order', async () => {
+    const placed = await withDbRetry('place order', async () => {
       // Look up what these actually cost. Deliberately outside the transaction:
       // it is a read, and keeping the transaction short matters more.
       const products = await prisma.product.findMany({
@@ -199,7 +200,7 @@ export async function placeOrder(raw: unknown): Promise<PlaceOrderResult> {
       // unique constraint rejects the loser, and because the whole thing is one
       // transaction its stock decrements roll back with it — so simply trying
       // again is safe, and cheaper than serialising every checkout.
-      return runWithNumberRetry(async tx => {
+      const orderNumber = await runWithNumberRetry(async tx => {
         // Decrement with the quantity as a guard rather than reading then
         // writing. Two shoppers taking the last cap at the same moment both
         // pass the check above; only one can pass this.
@@ -263,10 +264,69 @@ export async function placeOrder(raw: unknown): Promise<PlaceOrderResult> {
 
         return order.number;
       });
+
+      return {
+        orderNumber,
+        items: resolved.map(line => ({
+          name: line.name,
+          variant: line.variant,
+          quantity: line.quantity,
+          lineCents: line.unitPriceCents * line.quantity,
+        })),
+        totals,
+      };
     });
+
+    const { orderNumber } = placed;
 
     // Stock moved, so anything showing availability is now stale.
     revalidateTag(CATALOGUE_TAG);
+
+    // Order confirmations — the customer's receipt and the owner's alert. Sent
+    // best-effort and only if email is configured (Resend); a mail hiccup must
+    // never fail an order that is already written.
+    try {
+      const itemLines = placed.items
+        .map(i => `• ${i.name} (${i.variant}) ×${i.quantity} — ${formatCad(i.lineCents)}`)
+        .join('\n');
+      const shipTo = [
+        input.line1,
+        input.line2,
+        `${input.city}${input.state ? ', ' + input.state : ''} ${input.postal}`.trim(),
+        input.country,
+      ].filter(Boolean).join('\n');
+      const firstName = input.fullName.trim().split(/\s+/)[0] || 'there';
+      const { subtotalCents, shippingCents, discountCents, totalCents } = placed.totals;
+
+      await sendEmail({
+        to: input.email,
+        subject: `Your AdeClassics order ${orderNumber}`,
+        text:
+          `Hi ${firstName},\n\n` +
+          `Thank you for your order — we've received it and will be in touch shortly.\n\n` +
+          `Order ${orderNumber}\n${itemLines}\n\n` +
+          `Subtotal: ${formatCad(subtotalCents)}\n` +
+          `Shipping: ${formatCad(shippingCents)}\n` +
+          (discountCents > 0 ? `Discount: -${formatCad(discountCents)}\n` : '') +
+          `Total: ${formatCad(totalCents)}\n\n` +
+          `Shipping to:\n${shipTo}\n\n` +
+          `Have a question? Just reply to this email.\n\n— AdeClassics`,
+      });
+
+      await sendOwnerEmail({
+        subject: `New order ${orderNumber} — ${formatCad(totalCents)}`,
+        text:
+          `${input.fullName} placed order ${orderNumber}.\n\n` +
+          `${itemLines}\n\n` +
+          `Total: ${formatCad(totalCents)}\n\n` +
+          `Contact: ${input.email}${input.phone ? ' · ' + input.phone : ''}\n` +
+          `Ship to:\n${shipTo}\n\n` +
+          `Open it in the console: /console/orders`,
+        replyTo: input.email,
+      });
+    } catch (mailError) {
+      console.error('[place order] confirmation email failed', mailError);
+    }
 
     return { ok: true, orderNumber };
   } catch (error) {
