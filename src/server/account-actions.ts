@@ -82,3 +82,34 @@ export async function updateProfile(input: { name: string; phone?: string }): Pr
     return { ok: false, message: 'Could not save your profile just now. Please try again.' };
   }
 }
+
+export async function cancelMyOrder(orderId: string): Promise<ProfileResult> {
+  const user = await getCurrentUser().catch(() => null);
+  if (!user) return { ok: false, message: 'Please sign in to cancel your order.' };
+
+  const number = `#${orderId}`;
+
+  try {
+    const order = await withDbRetry('account: get order', () =>
+      prisma.order.findUnique({ where: { number }, select: { userId: true, status: true, id: true } })
+    );
+
+    if (!order) return { ok: false, message: 'Order not found.' };
+    if (order.userId !== user.id) return { ok: false, message: 'You do not have permission.' };
+    
+    // Only allow if not yet shipped
+    if (order.status !== 'NEW' && order.status !== 'PROCESSING') {
+      return { ok: false, message: 'This order cannot be cancelled anymore.' };
+    }
+
+    await withDbRetry('account: cancel order', () =>
+      prisma.order.update({ where: { id: order.id }, data: { status: 'CANCELLED' } })
+    );
+    
+    revalidatePath('/account');
+    return { ok: true };
+  } catch (error) {
+    console.error('[account] cancel order failed', error);
+    return { ok: false, message: 'Could not cancel your order just now. Please try again.' };
+  }
+}

@@ -3,6 +3,7 @@
 import { useState, useCallback } from "react";
 import { C, UI, DISPLAY, label } from "../../tokens";
 import { updatePageContent } from "@/server/content-actions";
+import { uploadProductImage } from "@/server/product-image-actions";
 import type { HomeContent, HeroSlide, AboutContent } from "@/server/content-schema";
 import type { StripePayoutSummary } from "@/server/stripe-payouts";
 
@@ -131,25 +132,53 @@ function Dropzone({
   label: lbl,
   hint,
   wide,
+  value,
+  onChange,
 }: {
   label: string;
   hint: string;
   wide?: boolean;
+  value?: string;
+  onChange?: (v: string) => void;
 }) {
   const [dragging, setDragging] = useState(false);
-  const [file, setFile] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleDrop = useCallback((e: React.DragEvent) => {
+  const doUpload = async (f: File) => {
+    setUploading(true);
+    setError(null);
+    const fd = new FormData();
+    fd.append("file", f);
+    const res = await uploadProductImage(fd);
+    setUploading(false);
+    if (res.ok) {
+      onChange?.(res.url);
+    } else {
+      setError(res.message);
+    }
+  };
+
+  const handleDrop = async (e: React.DragEvent) => {
     e.preventDefault();
     setDragging(false);
     const f = e.dataTransfer.files[0];
-    if (f) setFile(f.name);
-  }, []);
+    if (f) {
+      await doUpload(f);
+    }
+  };
+
+  const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const f = e.target.files?.[0];
+    if (f) {
+      await doUpload(f);
+    }
+  };
 
   return (
-    <div>
+    <div className="flex flex-col gap-2 relative">
       <FieldLabel>{lbl}</FieldLabel>
-      <div
+      <label
         onDragOver={(e) => {
           e.preventDefault();
           setDragging(true);
@@ -163,18 +192,20 @@ function Dropzone({
             ? "rgba(212,169,78,0.05)"
             : "rgba(43,35,32,0.02)",
           height: wide ? 100 : 80,
+          opacity: uploading ? 0.6 : 1,
         }}
       >
-        {file ? (
+        <input type="file" style={{ display: "none" }} onChange={handleChange} accept="image/*" disabled={uploading} />
+        {uploading ? (
           <span
             style={{
               fontSize: "0.75rem",
-              color: C.teal,
+              color: C.charcoal,
               fontFamily: UI,
               fontWeight: 500,
             }}
           >
-            {file}
+            Uploading...
           </span>
         ) : (
           <>
@@ -202,6 +233,14 @@ function Dropzone({
             </span>
           </>
         )}
+      </label>
+      {error && <div style={{ color: C.maroon, fontSize: "0.7rem", fontFamily: UI }}>{error}</div>}
+      <div className="mt-1">
+        <Input 
+          value={value || ""} 
+          onChange={(val) => { onChange?.(val); }} 
+          placeholder="Or paste an image URL..." 
+        />
       </div>
     </div>
   );
@@ -221,15 +260,23 @@ function Toggle({
       role="switch"
       aria-checked={checked}
       onClick={() => onChange(!checked)}
-      className="w-9 h-5 rounded-full border-none cursor-pointer relative shrink-0 transition-colors duration-150 p-0"
+      className="border-none cursor-pointer relative shrink-0 transition-colors duration-150 p-0"
       style={{
+        width: 36,
+        height: 20,
+        borderRadius: 20,
         backgroundColor: checked ? C.teal : "rgba(43,35,32,0.18)",
       }}
     >
       <span
-        className="absolute top-[2px] w-4 h-4 rounded-full bg-white transition-all duration-150 shadow-[0_1px_3px_rgba(0,0,0,0.2)]"
+        className="absolute bg-white transition-all duration-150"
         style={{
+          width: 16,
+          height: 16,
+          borderRadius: "50%",
+          top: 2,
           left: checked ? 18 : 2,
+          boxShadow: "0 1px 3px rgba(0,0,0,0.2)",
         }}
       />
     </button>
@@ -422,10 +469,7 @@ function TabAboutContent({ initial }: { initial: AboutContent }) {
             Leave a blank line between paragraphs.
           </p>
         </div>
-        <div>
-          <FieldLabel>Image URL</FieldLabel>
-          <Input value={section.imageUrl} onChange={v => set({ ...section, imageUrl: v })} placeholder="https://…" />
-        </div>
+        <Dropzone label="Image" hint="JPG / PNG · 900×1100px recommended" value={section.imageUrl} onChange={v => set({ ...section, imageUrl: v })} />
       </div>
     </SectionCard>
   );
@@ -443,10 +487,7 @@ function TabAboutContent({ initial }: { initial: AboutContent }) {
             <FieldLabel>Heading</FieldLabel>
             <Textarea value={heroHeading} onChange={setHeroHeading} rows={2} placeholder="Page heading" />
           </div>
-          <div>
-            <FieldLabel>Header Image URL</FieldLabel>
-            <Input value={heroImage} onChange={setHeroImage} placeholder="https://…" />
-          </div>
+          <Dropzone label="Header Image" hint="JPG / PNG · 1440×800px recommended" wide value={heroImage} onChange={setHeroImage} />
         </div>
       </SectionCard>
 
@@ -672,10 +713,7 @@ function TabHomepageContent({ initial }: { initial: HomeContent }) {
                       <Input value={slide.ctaHref} onChange={v => patchSlide(slide.id, { ctaHref: v })} placeholder="/shop" />
                     </div>
                   </div>
-                  <div>
-                    <FieldLabel>Slide Image URL</FieldLabel>
-                    <Input value={slide.imageUrl} onChange={v => patchSlide(slide.id, { imageUrl: v })} placeholder="https://…" />
-                  </div>
+                    <Dropzone label="Slide Image" hint="JPG / PNG · 1440×800px recommended" wide value={slide.imageUrl} onChange={v => patchSlide(slide.id, { imageUrl: v })} />
                 </div>
               </div>
             ))}
@@ -752,10 +790,7 @@ function TabHomepageContent({ initial }: { initial: HomeContent }) {
                 Leave a blank line between paragraphs.
               </p>
             </div>
-            <div>
-              <FieldLabel>Story Image URL</FieldLabel>
-              <Input value={storyImage} onChange={setStoryImage} placeholder="https://…" />
-            </div>
+            <Dropzone label="Story Image" hint="JPG / PNG · 900×1100px recommended" value={storyImage} onChange={setStoryImage} />
           </div>
         </SectionCard>
 
@@ -1472,13 +1507,33 @@ export default function ConsoleSettings({ homeContent, aboutContent, payouts }: 
   const [activeTab, setActiveTab] = useState<Tab>("Store Profile");
 
   return (
-    <div className="flex h-full" style={{ fontFamily: UI }}>
+    <div className="flex h-full settings-layout" style={{ fontFamily: UI }}>
+      <style>{`
+        .settings-layout { flex-direction: row; }
+        .settings-nav { width: 192px; flex-direction: column; border-right: 1px solid rgba(43,35,32,0.08); border-bottom: none; }
+        .settings-nav-btn { border-bottom: 2px solid transparent; }
+        .settings-content { padding: 1.75rem; }
+        
+        @media (max-width: 860px) {
+          .settings-layout { flex-direction: column; }
+          .settings-nav { 
+            width: 100%; 
+            flex-direction: row; 
+            overflow-x: auto; 
+            border-right: none;
+            border-bottom: 1px solid rgba(43,35,32,0.08); 
+            padding-top: 0; padding-bottom: 0;
+          }
+          .settings-nav::-webkit-scrollbar { display: none; }
+          .settings-nav-btn { padding: 1rem 1.25rem !important; white-space: nowrap; }
+          .settings-content { padding: 1.25rem !important; }
+        }
+      `}</style>
       {/* Left sub-nav */}
       <nav
         aria-label="Settings sections"
-        className="w-[192px] shrink-0 py-5 flex flex-col"
+        className="shrink-0 py-5 flex settings-nav"
         style={{
-          borderRight: "1px solid rgba(43,35,32,0.08)",
           backgroundColor: "rgba(43,35,32,0.025)",
         }}
       >
@@ -1488,9 +1543,9 @@ export default function ConsoleSettings({ homeContent, aboutContent, payouts }: 
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className="bg-none border-none text-left px-5 py-[0.6rem] uppercase cursor-pointer leading-snug transition-colors duration-120"
+              className="bg-none border-none text-left px-5 py-[0.6rem] uppercase cursor-pointer leading-snug transition-colors duration-120 settings-nav-btn"
               style={{
-                borderBottom: `2px solid ${active ? C.gold : "transparent"}`,
+                borderBottomColor: active ? C.gold : "transparent",
                 fontFamily: UI,
                 fontSize: "0.72rem",
                 letterSpacing: "0.06em",
@@ -1505,7 +1560,7 @@ export default function ConsoleSettings({ homeContent, aboutContent, payouts }: 
       </nav>
 
       {/* Content pane */}
-      <div className="flex-1 overflow-y-auto p-7 min-w-0">
+      <div className="flex-1 overflow-y-auto min-w-0 settings-content">
         {activeTab === "Store Profile" && <TabStoreProfile />}
         {activeTab === "Homepage Content" && <TabHomepageContent initial={homeContent} />}
         {activeTab === "About Page" && <TabAboutContent initial={aboutContent} />}

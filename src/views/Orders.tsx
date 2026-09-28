@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import AccountShell from '../components/AccountShell';
 import type { AccountOrder as Order, AccountOrderStatus as OrderStatus, AccountTimelineStep as TimelineStep } from '@/server/account';
+import { cancelMyOrder } from '@/server/account-actions';
+import { useOverlay } from '@/lib/useOverlay';
 import { C, DISPLAY, UI, label } from '../tokens';
 
 type FilterTab = 'all' | OrderStatus;
@@ -87,10 +89,63 @@ function OrderTimeline({ steps, cancelled }: { steps: TimelineStep[]; cancelled:
   );
 }
 
+/* ─── Cancel Modal ────────────────────────────────────────── */
+function CancelOrderModal({ orderId, onClose, onConfirm, cancelling }: { orderId: string, onClose: () => void, onConfirm: () => void, cancelling: boolean }) {
+  useOverlay(true, onClose);
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ backgroundColor: 'rgba(43,35,32,0.4)', backdropFilter: 'blur(2px)' }}>
+      <div 
+        className="rounded-[10px] p-6 max-w-[300px] w-full"
+        style={{
+          backgroundColor: '#fff',
+          boxShadow: '0 10px 40px rgba(43,35,32,0.15)',
+        }}
+        role="dialog"
+        aria-modal="true"
+      >
+        <h2 className="mb-2" style={{ fontFamily: DISPLAY, fontSize: '1.25rem', fontWeight: 500, color: C.charcoal, lineHeight: 1.2 }}>
+          Cancel Order
+        </h2>
+        <p className="mb-6" style={{ fontFamily: UI, fontSize: '0.85rem', color: 'rgba(43,35,32,0.6)', lineHeight: 1.5 }}>
+          Are you sure you want to cancel order <strong>#{orderId}</strong>? This action cannot be undone.
+        </p>
+        <div className="flex flex-col gap-2.5">
+          <button 
+            onClick={onConfirm}
+            disabled={cancelling}
+            className="rounded-[5px] py-2 px-4 cursor-pointer text-center"
+            style={{
+              fontFamily: UI, fontSize: '0.78rem', fontWeight: 600, color: '#fff',
+              backgroundColor: '#b94a48', border: 'none',
+              opacity: cancelling ? 0.7 : 1,
+            }}
+          >
+            {cancelling ? 'Cancelling...' : 'Yes, Cancel Order'}
+          </button>
+          <button 
+            onClick={onClose}
+            disabled={cancelling}
+            className="rounded-[5px] py-2 px-4 cursor-pointer text-center"
+            style={{
+              fontFamily: UI, fontSize: '0.78rem', fontWeight: 600, color: C.charcoal,
+              backgroundColor: 'transparent', border: `1px solid rgba(43,35,32,0.15)`,
+            }}
+          >
+            Keep Order
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* ─── Order card ──────────────────────────────────────────── */
 function OrderCard({ order }: { order: Order }) {
   const [expanded, setExpanded] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [cancelling, setCancelling] = useState(false);
+  const [showCancelModal, setShowCancelModal] = useState(false);
   const THUMB_SHOW = 3;
   const extra = order.items.length - THUMB_SHOW;
 
@@ -99,6 +154,17 @@ function OrderCard({ order }: { order: Order }) {
       navigator.clipboard.writeText(order.tracking).catch(() => {});
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
+    }
+  }
+
+  async function handleConfirmCancel() {
+    setCancelling(true);
+    const res = await cancelMyOrder(order.id);
+    setCancelling(false);
+    if (!res.ok) {
+      alert(res.message);
+    } else {
+      setShowCancelModal(false);
     }
   }
 
@@ -203,6 +269,24 @@ function OrderCard({ order }: { order: Order }) {
               Track Package
             </button>
           )}
+          {(order.status === 'placed' || order.status === 'processing') && (
+            <button
+              onClick={() => setShowCancelModal(true)}
+              disabled={cancelling}
+              className="rounded-[5px] py-2 px-3.5 cursor-pointer whitespace-nowrap"
+              style={{
+                fontFamily: UI, fontSize: '0.72rem', fontWeight: 600,
+                letterSpacing: '0.05em', color: C.charcoal,
+                backgroundColor: 'rgba(43,35,32,0.06)',
+                border: 'none',
+                transition: 'background 0.15s',
+              }}
+              onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'rgba(43,35,32,0.1)'; }}
+              onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'rgba(43,35,32,0.06)'; }}
+            >
+              Cancel Order
+            </button>
+          )}
         </div>
       </div>
 
@@ -288,6 +372,15 @@ function OrderCard({ order }: { order: Order }) {
             </div>
           </div>
         </div>
+      )}
+
+      {showCancelModal && (
+        <CancelOrderModal 
+          orderId={order.id} 
+          onClose={() => setShowCancelModal(false)} 
+          onConfirm={handleConfirmCancel} 
+          cancelling={cancelling} 
+        />
       )}
     </div>
   );
