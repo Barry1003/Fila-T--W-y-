@@ -82,19 +82,30 @@ export default function Home({ content, products, collections }: HomeProps) {
             Shop by Category
           </h2>
         </div>
-        <div className="cat-grid reveal grid grid-cols-[repeat(auto-fill,minmax(156px,1fr))] gap-4">
+        <div className="cat-grid reveal grid grid-cols-[repeat(auto-fill,minmax(172px,1fr))] gap-4">
           {tiles.map(({ letter, name, imageUrl, href }, i) => (
-            <Link key={name} to={href} className="cat-tile no-underline" style={{ backgroundColor: catBgs[i] }}>
-              {/* Product photo, revealed behind the monogram on hover */}
-              <img src={imageUrl} alt="" aria-hidden className="cat-tile-img" loading="lazy" />
-              <span className="cat-tile-scrim" aria-hidden />
-              <span className="cat-tile-index">{String(i + 1).padStart(2, "0")}</span>
-              <span className="cat-tile-letter">{letter}</span>
-              <span className="cat-tile-foot">
-                <span className="cat-tile-name">{name}</span>
-                <span className="cat-tile-go" aria-hidden>&rarr;</span>
-              </span>
-            </Link>
+            <div key={name} className="flip-card cursor-pointer" style={{ aspectRatio: "3 / 4" }}>
+              <div className="flip-card-inner">
+                {/* Front — the gradient monogram */}
+                <Link to={href} className="flip-card-front" style={{ backgroundColor: catBgs[i] }}>
+                  <span className="cat-index">{String(i + 1).padStart(2, "0")}</span>
+                  <span className="cat-letter">{letter}</span>
+                  <span className="cat-foot">
+                    <span className="cat-rule" aria-hidden />
+                    <span className="cat-name">{name}</span>
+                  </span>
+                </Link>
+                {/* Back — the product photo, revealed on flip */}
+                <Link to={href} className="flip-card-back">
+                  <img src={imageUrl} alt="" aria-hidden className="cat-back-img" loading="lazy" />
+                  <span className="cat-back-scrim" aria-hidden />
+                  <span className="cat-back-foot">
+                    <span className="cat-back-name">{name}</span>
+                    <span className="cat-back-go">Shop &rarr;</span>
+                  </span>
+                </Link>
+              </div>
+            </div>
           ))}
         </div>
       </section>

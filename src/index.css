@@ -110,82 +110,50 @@ body {
   transform: rotateY(180deg);
 }
 
-/* ── Category tiles (Shop by Category) ──────────────────────────────────────── */
-/* An editorial monogram card: an oversized gold→maroon letter at rest, with the
-   product photo and a cream monogram revealing on hover. Keeps the letters as
-   the hero while adding depth, a catalogue index, and a gold frame. */
-.cat-tile {
-  position: relative;
-  display: block;
-  aspect-ratio: 1 / 1;
+/* ── Category tiles (Shop by Category) — flipping monogram cards ─────────────── */
+/* Front: an oversized gold→maroon monogram, an index, and the category name over
+   a gold rule. On hover the card flips (base .flip-card rules above) to reveal
+   the category's product photo. Portrait rectangles rather than squares. */
+.flip-card {
+  transition: transform 0.4s ease;
+}
+
+.flip-card:hover {
+  transform: translateY(-4px);
+}
+
+.flip-card-front,
+.flip-card-back {
+  border-radius: 6px;
   overflow: hidden;
-  border-radius: 5px;
+}
+
+.flip-card-front {
+  display: block;
+  text-decoration: none;
   border: 1px solid rgba(43, 35, 32, 0.08);
-  isolation: isolate;
-  transition: transform 0.45s cubic-bezier(0.22, 0.61, 0.36, 1), box-shadow 0.45s ease, border-color 0.45s ease;
 }
 
-.cat-tile:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 20px 44px -20px rgba(43, 35, 32, 0.5);
-  border-color: rgba(212, 169, 78, 0.6);
-}
-
-.cat-tile-img {
+.cat-index {
   position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  opacity: 0;
-  transform: scale(1.12);
-  transition: opacity 0.55s ease, transform 0.9s cubic-bezier(0.22, 0.61, 0.36, 1);
-  z-index: 0;
-}
-
-.cat-tile:hover .cat-tile-img {
-  opacity: 1;
-  transform: scale(1);
-}
-
-.cat-tile-scrim {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(160deg, rgba(43, 35, 32, 0.82) 0%, rgba(43, 35, 32, 0.46) 50%, rgba(43, 35, 32, 0.74) 100%);
-  opacity: 0;
-  transition: opacity 0.55s ease;
-  z-index: 1;
-}
-
-.cat-tile:hover .cat-tile-scrim {
-  opacity: 1;
-}
-
-.cat-tile-index {
-  position: absolute;
-  top: 0.85rem;
+  top: 0.9rem;
   left: 1rem;
   z-index: 2;
   font-family: 'Inter', system-ui, sans-serif;
-  font-size: 0.58rem;
+  font-size: 0.6rem;
   font-weight: 600;
   letter-spacing: 0.16em;
   color: rgba(212, 169, 78, 0.9);
-  transition: color 0.4s ease;
 }
 
-.cat-tile:hover .cat-tile-index {
-  color: rgba(250, 246, 240, 0.82);
-}
-
-.cat-tile-letter {
+.cat-letter {
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -58%);
+  transform: translate(-50%, -56%);
   z-index: 2;
   font-family: 'Fraunces', Georgia, serif;
-  font-size: clamp(3.75rem, 6.5vw, 5.5rem);
+  font-size: clamp(4rem, 7vw, 6rem);
   font-style: italic;
   font-weight: 400;
   line-height: 1;
@@ -194,70 +162,81 @@ body {
   background-clip: text;
   -webkit-text-fill-color: transparent;
   color: transparent;
-  transition: transform 0.45s cubic-bezier(0.22, 0.61, 0.36, 1);
   pointer-events: none;
 }
 
-.cat-tile:hover .cat-tile-letter {
-  transform: translate(-50%, -62%);
-  background: none;
-  -webkit-text-fill-color: #FAF6F0;
-  color: #FAF6F0;
-}
-
-.cat-tile-foot {
+.cat-foot {
   position: absolute;
   left: 0;
   right: 0;
   bottom: 0;
   z-index: 2;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
-  padding: 0.95rem 1rem;
+  gap: 0.6rem;
+  padding: 0 1rem 1.3rem;
 }
 
-.cat-tile-name {
+.cat-rule {
+  width: 1.6rem;
+  height: 1px;
+  background: rgba(212, 169, 78, 0.8);
+}
+
+.cat-name {
   font-family: 'Inter', system-ui, sans-serif;
-  font-size: 0.6rem;
-  font-weight: 500;
-  letter-spacing: 0.14em;
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: rgba(43, 35, 32, 0.72);
-  transition: color 0.4s ease;
+  color: #2B2320;
+  text-align: center;
 }
 
-.cat-tile:hover .cat-tile-name {
+.cat-back-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cat-back-scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(43, 35, 32, 0.9) 0%, rgba(43, 35, 32, 0.12) 56%, rgba(43, 35, 32, 0.32) 100%);
+}
+
+.cat-back-foot {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.35rem;
+  padding: 0 1.1rem 1.3rem;
+}
+
+.cat-back-name {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 0.76rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
   color: #FAF6F0;
 }
 
-.cat-tile-go {
-  font-size: 0.85rem;
-  line-height: 1;
-  color: rgba(212, 169, 78, 0);
-  transform: translateX(-5px);
-  transition: color 0.4s ease, transform 0.4s ease;
-}
-
-.cat-tile:hover .cat-tile-go {
+.cat-back-go {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 0.62rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
   color: #D4A94E;
-  transform: translateX(0);
-}
-
-/* A thin gold inset frame that draws in on hover. */
-.cat-tile::after {
-  content: "";
-  position: absolute;
-  inset: 0.5rem;
-  z-index: 2;
-  border: 1px solid rgba(212, 169, 78, 0);
-  pointer-events: none;
-  transition: border-color 0.45s ease;
-}
-
-.cat-tile:hover::after {
-  border-color: rgba(212, 169, 78, 0.55);
 }
 
 /* Maker card hover */
