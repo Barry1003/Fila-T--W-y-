@@ -155,14 +155,36 @@ body {
   font-family: 'Fraunces', Georgia, serif;
   font-size: clamp(4rem, 7vw, 6rem);
   font-style: italic;
-  font-weight: 400;
+  font-weight: 500;
   line-height: 1;
-  background: linear-gradient(135deg, #D4A94E 0%, #7A2E38 72%);
+  /* The lit face: a bright gold highlight holding most of the glyph before it
+     rolls into the maroon, so the gradient reads clearly over the 3D depth. */
+  background: linear-gradient(140deg, #F6DD98 0%, #E3B65C 40%, #CE913F 64%, #97403F 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
   color: transparent;
+  /* Lifts the whole monogram off the tile. */
+  filter: drop-shadow(0 0.06em 0.09em rgba(43, 35, 32, 0.3));
   pointer-events: none;
+}
+
+/* The carved maroon depth behind the face — a duplicate glyph stepped down and
+   to the right so the letter reads as a raised, extruded monogram. */
+.cat-letter::before {
+  content: attr(data-letter);
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: -1;
+  -webkit-text-fill-color: #5a2029;
+  color: #5a2029;
+  text-shadow:
+    0.016em 0.016em 0 #561e26,
+    0.032em 0.032em 0 #4f1b23,
+    0.048em 0.048em 0 #481820,
+    0.064em 0.064em 0 #41151d,
+    0.08em 0.085em 0.03em rgba(43, 35, 32, 0.4);
 }
 
 .cat-foot {
@@ -187,11 +209,14 @@ body {
 .cat-name {
   font-family: 'Inter', system-ui, sans-serif;
   font-size: 0.74rem;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: #2B2320;
   text-align: center;
+  /* Letterpress: a light edge below and a soft dark edge above read as pressed
+     into the tile — dimensional without shouting. */
+  text-shadow: 0 1px 0 rgba(250, 246, 240, 0.85), 0 -1px 1px rgba(43, 35, 32, 0.18);
 }
 
 .cat-back-img {
@@ -224,10 +249,11 @@ body {
 .cat-back-name {
   font-family: 'Inter', system-ui, sans-serif;
   font-size: 0.76rem;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: #FAF6F0;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.55);
 }
 
 .cat-back-go {

@@ -89,7 +89,7 @@ export default function Home({ content, products, collections }: HomeProps) {
                 {/* Front — the gradient monogram */}
                 <Link to={href} className="flip-card-front" style={{ backgroundColor: catBgs[i] }}>
                   <span className="cat-index">{String(i + 1).padStart(2, "0")}</span>
-                  <span className="cat-letter">{letter}</span>
+                  <span className="cat-letter" data-letter={letter}>{letter}</span>
                   <span className="cat-foot">
                     <span className="cat-rule" aria-hidden />
                     <span className="cat-name">{name}</span>
