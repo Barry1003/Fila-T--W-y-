@@ -87,7 +87,7 @@ export default function HeroCarousel({
           <div className="hero-scrim" />
 
           <div className="hero-content">
-            <div className="mb-7" style={{ ...label, color: C.gold, fontSize: '0.62rem', letterSpacing: '0.17em' }}>
+            <div className="mb-7" style={{ fontFamily: DISPLAY, color: C.gold, fontSize: '1.5rem', letterSpacing: '0.08em', fontWeight: 600 }}>
               {slide.eyebrow}
             </div>
             <h1 className="mb-10" style={{ fontFamily: DISPLAY, fontSize: 'clamp(2.6rem, 5.2vw, 4.75rem)', color: C.cream, fontWeight: 400, lineHeight: 1.08, letterSpacing: '-0.025em' }}>
@@ -97,8 +97,8 @@ export default function HeroCarousel({
             </h1>
             <Link
               to={slide.ctaHref}
-              className="shimmer-cta inline-block no-underline w-fit py-[0.9rem] px-10"
-              style={{ border: '1.5px solid rgba(250,246,240,0.7)', color: C.cream, ...label, letterSpacing: '0.15em', fontSize: '0.68rem', backgroundColor: 'transparent' }}
+              className="shimmer-cta inline-block no-underline w-fit py-[1rem] px-12"
+              style={{ border: '1.5px solid rgba(250,246,240,0.7)', color: C.cream, ...label, letterSpacing: '0.15em', fontSize: '0.95rem', fontWeight: 600, backgroundColor: 'transparent' }}
             >
               {slide.ctaLabel}
             </Link>
