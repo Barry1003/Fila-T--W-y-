@@ -75,7 +75,7 @@ function SidebarContent({ onNavClick, user: userProp }: { onNavClick?: () => voi
           FTW Console
         </div>
         <Link
-          to="/"
+          to="/shop"
           className="inline-flex items-center gap-[4px] no-underline"
           style={{ color: "rgba(212,169,78,0.85)", fontSize: "0.7rem", letterSpacing: "0.01em" }}
         >
