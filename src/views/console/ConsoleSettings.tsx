@@ -1513,32 +1513,66 @@ export default function ConsoleSettings({ homeContent, aboutContent, payouts }: 
         .settings-nav { width: 192px; flex-direction: column; border-right: 1px solid rgba(43,35,32,0.08); border-bottom: none; }
         .settings-nav-btn { border-bottom: 2px solid transparent; }
         .settings-content { padding: 1.75rem; }
-        
+        /* The mobile dropdown replaces the sidebar on narrow screens. */
+        .settings-select-wrap { display: none; }
+
         @media (max-width: 860px) {
           .settings-layout { flex-direction: column; }
-          .settings-nav {
-            width: 100%;
-            flex-direction: row;
-            overflow-x: auto;
-            border-right: none;
+          /* A scrolling tab strip chopped labels on a 380px screen; swap it for a
+             dropdown so every section is reachable and nothing is cut. */
+          .settings-nav { display: none; }
+          .settings-select-wrap {
+            display: block;
+            padding: 0.85rem 1.25rem;
             border-bottom: 1px solid rgba(43,35,32,0.08);
-            padding: 0 0.75rem;
-            scroll-snap-type: x proximity;
-            /* Fade the edges so a partly-scrolled tab reads as "scroll for more"
-               instead of a broken, chopped label. */
-            -webkit-mask-image: linear-gradient(to right, transparent 0, #000 1.5rem, #000 calc(100% - 1.75rem), transparent 100%);
-            mask-image: linear-gradient(to right, transparent 0, #000 1.5rem, #000 calc(100% - 1.75rem), transparent 100%);
+            background-color: rgba(43,35,32,0.025);
           }
-          .settings-nav::-webkit-scrollbar { display: none; }
-          .settings-nav-btn {
-            padding: 1rem 1.1rem !important;
-            white-space: nowrap;
-            flex-shrink: 0;
-            scroll-snap-align: center;
+          .settings-select-box { position: relative; }
+          .settings-select {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            padding: 0.7rem 2.3rem 0.7rem 0.95rem;
+            font-family: 'Inter', system-ui, sans-serif;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #2B2320;
+            background-color: #fff;
+            border: 1.5px solid rgba(43,35,32,0.16);
+            border-radius: 8px;
+            cursor: pointer;
+            outline: none;
+          }
+          .settings-select-chev {
+            position: absolute;
+            right: 0.95rem;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none;
+            color: rgba(43,35,32,0.5);
+            font-size: 0.65rem;
           }
           .settings-content { padding: 1.25rem !important; }
         }
       `}</style>
+
+      {/* Mobile section switcher (replaces the sidebar on narrow screens) */}
+      <div className="settings-select-wrap">
+        <div className="settings-select-box">
+          <select
+            className="settings-select"
+            value={activeTab}
+            onChange={(e) => setActiveTab(e.target.value as Tab)}
+            aria-label="Settings section"
+          >
+            {TABS.map((tab) => (
+              <option key={tab} value={tab}>{tab}</option>
+            ))}
+          </select>
+          <span className="settings-select-chev" aria-hidden>▾</span>
+        </div>
+      </div>
+
       {/* Left sub-nav */}
       <nav
         aria-label="Settings sections"
