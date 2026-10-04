@@ -1516,16 +1516,26 @@ export default function ConsoleSettings({ homeContent, aboutContent, payouts }: 
         
         @media (max-width: 860px) {
           .settings-layout { flex-direction: column; }
-          .settings-nav { 
-            width: 100%; 
-            flex-direction: row; 
-            overflow-x: auto; 
+          .settings-nav {
+            width: 100%;
+            flex-direction: row;
+            overflow-x: auto;
             border-right: none;
-            border-bottom: 1px solid rgba(43,35,32,0.08); 
-            padding-top: 0; padding-bottom: 0;
+            border-bottom: 1px solid rgba(43,35,32,0.08);
+            padding: 0 0.75rem;
+            scroll-snap-type: x proximity;
+            /* Fade the edges so a partly-scrolled tab reads as "scroll for more"
+               instead of a broken, chopped label. */
+            -webkit-mask-image: linear-gradient(to right, transparent 0, #000 1.5rem, #000 calc(100% - 1.75rem), transparent 100%);
+            mask-image: linear-gradient(to right, transparent 0, #000 1.5rem, #000 calc(100% - 1.75rem), transparent 100%);
           }
           .settings-nav::-webkit-scrollbar { display: none; }
-          .settings-nav-btn { padding: 1rem 1.25rem !important; white-space: nowrap; }
+          .settings-nav-btn {
+            padding: 1rem 1.1rem !important;
+            white-space: nowrap;
+            flex-shrink: 0;
+            scroll-snap-align: center;
+          }
           .settings-content { padding: 1.25rem !important; }
         }
       `}</style>
