@@ -255,30 +255,39 @@ function Toggle({
   checked: boolean;
   onChange: (v: boolean) => void;
 }) {
+  // The button is a transparent tap target; the visible pill is an inner span.
+  // On touch devices a global rule forces every button to min-height 40px, which
+  // would stretch a bare 20px pill into a near-circle and make the knob read as a
+  // crescent — keeping the pill on the span leaves its shape fixed at any size.
   return (
     <button
       role="switch"
       aria-checked={checked}
       onClick={() => onChange(!checked)}
-      className="border-none cursor-pointer relative shrink-0 transition-colors duration-150 p-0"
-      style={{
-        width: 36,
-        height: 20,
-        borderRadius: 20,
-        backgroundColor: checked ? C.teal : "rgba(43,35,32,0.18)",
-      }}
+      className="border-none cursor-pointer shrink-0 p-0 bg-transparent inline-flex items-center justify-center"
+      style={{ width: 44, height: 24 }}
     >
       <span
-        className="absolute bg-white transition-all duration-150"
+        className="relative block transition-colors duration-150"
         style={{
-          width: 16,
-          height: 16,
-          borderRadius: "50%",
-          top: 2,
-          left: checked ? 18 : 2,
-          boxShadow: "0 1px 3px rgba(0,0,0,0.2)",
+          width: 36,
+          height: 20,
+          borderRadius: 20,
+          backgroundColor: checked ? C.teal : "rgba(43,35,32,0.18)",
         }}
-      />
+      >
+        <span
+          className="absolute bg-white transition-all duration-150"
+          style={{
+            width: 16,
+            height: 16,
+            borderRadius: "50%",
+            top: 2,
+            left: checked ? 18 : 2,
+            boxShadow: "0 1px 3px rgba(0,0,0,0.2)",
+          }}
+        />
+      </span>
     </button>
   );
 }
