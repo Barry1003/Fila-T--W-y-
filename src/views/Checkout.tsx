@@ -608,8 +608,8 @@ function CheckoutContent({ stripeEnabled }: { stripeEnabled: boolean }) {
                             <span style={{ fontFamily: UI, fontWeight: 600, fontSize: '0.875rem', color: C.charcoal }}>
                               {m.label}
                             </span>
-                            <span className="shrink-0" style={{ fontFamily: UI, fontWeight: 600, fontSize: '0.875rem', color: shippingCost(ZONE_OF[group], m.speed) === 0 ? C.teal : C.charcoal }}>
-                              {shippingCost(ZONE_OF[group], m.speed) === 0 ? 'Free' : formatCad(shippingCost(ZONE_OF[group], m.speed))}
+                            <span className="shrink-0" style={{ fontFamily: UI, fontWeight: 600, fontSize: '0.875rem', color: shippingCost(ZONE_OF[group], m.speed, totals.subtotalCents) === 0 ? C.teal : C.charcoal }}>
+                              {shippingCost(ZONE_OF[group], m.speed, totals.subtotalCents) === 0 ? 'Free' : formatCad(shippingCost(ZONE_OF[group], m.speed, totals.subtotalCents))}
                             </span>
                           </div>
                           <div className="mt-[2px]" style={{ fontFamily: UI, fontSize: '0.775rem', color: 'rgba(43,35,32,0.55)' }}>
@@ -786,6 +786,15 @@ function CheckoutContent({ stripeEnabled }: { stripeEnabled: boolean }) {
                           <div style={{ fontFamily: DISPLAY, fontSize: '1.2rem', color: C.charcoal, fontWeight: 600 }}>{formatCad(totals.totalCents)}</div>
                         </div>
                       </div>
+                      {totals.discountCents > 0 && (
+                        <div className="flex justify-end mt-1.5 items-center gap-1.5" style={{ fontFamily: UI, fontSize: '0.8rem', color: '#16a34a', fontWeight: 500 }}>
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+                            <line x1="7" y1="7" x2="7.01" y2="7"></line>
+                          </svg>
+                          Total savings {formatCad(totals.discountCents).replace('CAD ', '')}
+                        </div>
+                      )}
                     </div>
                   </div>
 

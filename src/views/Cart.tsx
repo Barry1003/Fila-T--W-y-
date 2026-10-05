@@ -5,7 +5,8 @@ import { Link } from '@/lib/router';
 import { useCart } from '@/lib/cart';
 import { checkPromoCode } from '@/server/place-order';
 import { C, DISPLAY, UI, label } from '../tokens';
-import { formatCad, orderTotals, shippingCost, type Discount, type ShippingZone } from '@/server/pricing';
+import { formatCad, orderTotals, shippingCost, type Discount, type ShippingZone, FREE_SHIPPING_THRESHOLD_CENTS } from '@/server/pricing';
+import type { CatalogueProduct } from '@/server/catalogue';
 
 /* ─── Shipping options ──────────────────────────────────── */
 const SHIPPING_OPTS: { id: string; zone: ShippingZone; label: string; est: string }[] = [
@@ -16,8 +17,8 @@ const SHIPPING_OPTS: { id: string; zone: ShippingZone; label: string; est: strin
 ];
 
 /** What a zone costs, written the way the option list shows it. */
-function shippingLabel(zone: ShippingZone): string {
-  const cents = shippingCost(zone, 'standard');
+function shippingLabel(zone: ShippingZone, subtotalCents: number): string {
+  const cents = shippingCost(zone, 'standard', subtotalCents);
   return cents === 0 ? 'Free' : formatCad(cents);
 }
 
@@ -58,7 +59,7 @@ const TRUST = [
 ];
 
 /* ─── Component ─────────────────────────────────────────── */
-export default function Cart() {
+export default function Cart({ recommendations = [] }: { recommendations?: CatalogueProduct[] }) {
   const { lines, count: itemCount, setQuantity, remove, hydrated } = useCart();
 
   const [shipping, setShipping] = useState('ca-us');
@@ -141,6 +142,9 @@ export default function Cart() {
   }
 
   /* ── Full cart ──────────────────────────────────────── */
+  const awayFromFree = Math.max(0, FREE_SHIPPING_THRESHOLD_CENTS - totals.subtotalCents);
+  const percentToFree = Math.min(100, Math.round((totals.subtotalCents / FREE_SHIPPING_THRESHOLD_CENTS) * 100));
+
   return (
     <div className="min-h-screen" style={{ backgroundColor: C.cream }}>
       <div className="max-w-[1440px] mx-auto pt-14 px-10 pb-24">
@@ -153,6 +157,26 @@ export default function Cart() {
           <span style={{ ...label, fontSize: '0.7rem', color: 'rgba(43,35,32,0.45)', letterSpacing: '0.14em' }}>
             ({itemCount} {itemCount === 1 ? 'item' : 'items'})
           </span>
+        </div>
+
+        {/* Free Shipping Progress */}
+        <div className="mb-10 max-w-[600px] mx-auto text-center">
+          <div className="flex items-center justify-center gap-2 mb-3">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={C.charcoal} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="1" y="3" width="15" height="13" />
+              <polygon points="16 8 20 8 23 11 23 16 16 16 16 8" />
+              <circle cx="5.5" cy="18.5" r="2.5" />
+              <circle cx="18.5" cy="18.5" r="2.5" />
+            </svg>
+            <span style={{ fontFamily: UI, fontSize: '0.95rem', fontWeight: 500, color: C.charcoal }}>
+              {awayFromFree > 0
+                ? `You're ${formatCad(awayFromFree)} away from free shipping!`
+                : 'You have unlocked free shipping!'}
+            </span>
+          </div>
+          <div className="h-2 w-full bg-gray-200 rounded-full overflow-hidden" style={{ backgroundColor: 'rgba(43,35,32,0.1)' }}>
+            <div className="h-full rounded-full transition-all duration-500 ease-out" style={{ width: `${percentToFree}%`, backgroundColor: C.gold }} />
+          </div>
         </div>
 
         {/* Two-column grid */}
@@ -277,6 +301,56 @@ export default function Cart() {
                 </button>
               </Link>
             </div>
+
+            {/* You may also like */}
+            {recommendations.length > 0 && (
+              <div className="mt-14 pt-8 border-t border-solid" style={{ borderColor: 'rgba(43,35,32,0.1)' }}>
+                <h3 className="m-0 mb-6" style={{ fontFamily: DISPLAY, fontSize: '1.25rem', fontWeight: 500, color: C.charcoal }}>
+                  You may also like
+                </h3>
+                <div className="flex flex-col gap-6">
+                  {recommendations.map(prod => (
+                    <div key={prod.id} className="flex gap-4 p-4 rounded-lg items-center" style={{ border: `1px solid rgba(43,35,32,0.08)`, backgroundColor: '#fff' }}>
+                      <div className="w-[80px] h-[100px] shrink-0 bg-gray-100 overflow-hidden rounded-[4px]" style={{ backgroundColor: '#e8e2da' }}>
+                        <img src={prod.imageUrl} alt={prod.title} className="w-full h-full object-cover" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <Link to={`/product/${prod.slug}`} className="no-underline">
+                          <div className="truncate mb-1" style={{ fontFamily: DISPLAY, fontSize: '1.05rem', fontWeight: 500, color: C.charcoal }}>
+                            {prod.title}
+                          </div>
+                        </Link>
+                        <div className="mb-3" style={{ fontFamily: UI, fontSize: '0.9rem', fontWeight: 500, color: C.charcoal }}>
+                          {formatCad(prod.priceCad * 100)}
+                        </div>
+                        <div className="flex gap-2">
+                          <select className="flex-1 p-2 rounded-[4px] cursor-pointer" style={{ border: '1px solid rgba(43,35,32,0.15)', fontFamily: UI, fontSize: '0.75rem', backgroundColor: '#fff' }}>
+                            {prod.variants.filter(v => v.inStock).map(v => (
+                              <option key={`${v.color}-${v.size}`} value={`${v.color}|${v.size}`}>
+                                {v.color} / {v.size}
+                              </option>
+                            ))}
+                          </select>
+                          <button 
+                            className="px-5 rounded-[4px] font-bold cursor-pointer transition-transform active:scale-95 hover:brightness-105"
+                            style={{ backgroundColor: C.gold, color: C.charcoal, border: 'none', fontFamily: UI, fontSize: '0.8rem' }}
+                            onClick={(e) => {
+                              const select = e.currentTarget.previousElementSibling as HTMLSelectElement;
+                              const [color, size] = select.value.split('|');
+                              if (color && size) {
+                                setQuantity(prod.id, size, color, 1);
+                              }
+                            }}
+                          >
+                            Add
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* ─── Right: Order Summary ─────────────────── */}
@@ -314,7 +388,7 @@ export default function Cart() {
                   <span style={{ fontFamily: UI, fontSize: '0.875rem', color: 'rgba(43,35,32,0.65)' }}>Shipping</span>
                   <div className="text-right">
                     <div style={{ fontFamily: UI, fontSize: '0.9rem', fontWeight: 500, color: totals.shippingCents === 0 ? C.teal : C.charcoal }}>
-                      {shippingLabel(selectedShip.zone)}
+                      {shippingLabel(selectedShip.zone, totals.subtotalCents)}
                     </div>
                     <div style={{ fontFamily: UI, fontSize: '0.7rem', color: 'rgba(43,35,32,0.4)' }}>{selectedShip.est}</div>
                   </div>

@@ -36,6 +36,8 @@ export type OrderTotals = {
   totalCents: number;
 };
 
+export const FREE_SHIPPING_THRESHOLD_CENTS = 25000;
+
 // ── 1. Subtotal ──────────────────────────────────────────────────────────────
 
 /**
@@ -77,12 +79,16 @@ export function discountAmount(subtotalCents: number, discount: Discount | null)
 /**
  * Shipping cost in cents for a zone and speed.
  */
-export function shippingCost(zone: ShippingZone, speed: ShippingSpeed): number {
+export function shippingCost(zone: ShippingZone, speed: ShippingSpeed, subtotalCents: number = 0): number {
+  if (speed === 'standard' && subtotalCents >= FREE_SHIPPING_THRESHOLD_CENTS) {
+    return 0;
+  }
+
   const rates: Record<ShippingZone, Record<ShippingSpeed, number>> = {
-    'canada-us':     { standard: 0,    express: 2500 },
-    'uk':            { standard: 500,  express: 1800 },
+    'canada-us':     { standard: 1500, express: 2500 }, // Assuming standard isn't free anymore below threshold
+    'uk':            { standard: 2000, express: 3500 },
     'nigeria':       { standard: 700,  express: 2000 },
-    'rest-of-world': { standard: 1000, express: 2500 }
+    'rest-of-world': { standard: 3000, express: 5000 }
   };
 
   return rates[zone][speed];
@@ -101,7 +107,7 @@ export function orderTotals(
 ): OrderTotals {
   const subtotalCents = subtotal(lines);
   const discountCents = discountAmount(subtotalCents, discount);
-  const shippingCents = shippingCost(zone, speed);
+  const shippingCents = shippingCost(zone, speed, subtotalCents);
   
   // Total is subtotal minus discount, plus shipping
   const totalCents = (subtotalCents - discountCents) + shippingCents;
