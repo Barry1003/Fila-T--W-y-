@@ -134,6 +134,17 @@ body {
   border: 1px solid rgba(43, 35, 32, 0.08);
 }
 
+/* The gradient/filter monogram and the back's content get promoted to their own
+   compositing layers, which some GPUs then fail to cull with the face's
+   backface-visibility — so the front letter/text bleeds through the flip. Hide
+   each face's content explicitly (including the extrusion pseudo). */
+.flip-card-front > *,
+.flip-card-back > *,
+.cat-letter::before {
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
 .cat-index {
   position: absolute;
   top: 0.9rem;
