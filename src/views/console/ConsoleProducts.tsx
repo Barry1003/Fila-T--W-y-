@@ -370,6 +370,13 @@ export default function ConsoleProducts({ products, categories }: { products: Co
                               width={38}
                               height={38}
                               className="w-[38px] h-[38px] object-cover rounded-[5px] shrink-0"
+                              onError={(e) => {
+                                const target = e.currentTarget;
+                                const fallback = "https://images.unsplash.com/photo-1763823133159-c6f8ec380e33?w=900&h=1200&fit=crop&auto=format";
+                                if (target.src !== fallback) {
+                                  target.src = fallback;
+                                }
+                              }}
                             />
                             <div>
                               <div className="font-semibold leading-snug" style={{ fontSize: "0.8rem", color: C.charcoal }}>
