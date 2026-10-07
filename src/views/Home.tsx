@@ -134,9 +134,11 @@ export default function Home({ content, products, collections }: HomeProps) {
             <Link key={p.id} to={`/product/${slugify(p.title)}`} className="product-card no-underline block" style={{ color: C.charcoal }}>
               <div className="relative mb-4 overflow-hidden aspect-[3/4]" style={{ backgroundColor: '#ddd5c8' }}>
                 <img className="product-img w-full h-full object-cover block" src={p.imageUrl} alt={p.title} />
-                <span className="absolute top-3 left-3 py-[3px] px-[8px]" style={{ backgroundColor: p.tag === 'NEW' ? C.maroon : C.charcoal, color: C.cream, ...label, fontSize: '0.56rem', letterSpacing: '0.12em' }}>
-                  {p.tag}
-                </span>
+                {p.tag && (
+                  <span className="absolute top-3 left-3 py-[3px] px-[8px]" style={{ backgroundColor: p.tag === 'NEW' ? C.maroon : p.tag === 'TRENDING' ? C.teal : C.charcoal, color: C.cream, ...label, fontSize: '0.56rem', letterSpacing: '0.12em' }}>
+                    {p.tag}
+                  </span>
+                )}
                 <div className="product-overlay">
                   <div className="product-overlay-btns">
                     <button onClick={e => e.preventDefault()} className="flex-1 cursor-pointer py-[0.55rem]" style={{ border: '1px solid rgba(250,246,240,0.55)', color: C.cream, background: 'transparent', ...label, fontSize: '0.585rem', letterSpacing: '0.12em', backdropFilter: 'blur(4px)' }}>

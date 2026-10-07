@@ -18,7 +18,7 @@ export type CatalogueProduct = {
   category: string;
   collectionSlug: string | null;
   collectionName: string | null;
-  tag: 'NEW' | 'SOLD OUT' | 'MADE TO ORDER';
+  tag: 'NEW' | 'SOLD OUT' | 'MADE TO ORDER' | 'TRENDING' | null;
   priceCad: number;
   /** The first image — the card thumbnail and cart snapshot. */
   imageUrl: string;
@@ -66,6 +66,7 @@ const productSelect = {
   category: {
     select: { name: true, parent: { select: { slug: true, name: true } } },
   },
+  _count: { select: { orderItems: true } },
 } as const;
 
 type ProductRow = {
@@ -79,9 +80,10 @@ type ProductRow = {
   images: { url: string; color: string | null }[];
   variants: { size: string; color: string; stock: number }[];
   category: { name: string; parent: { slug: string; name: string } | null };
+  _count?: { orderItems: number };
 };
 
-function toCatalogueProduct(row: ProductRow): CatalogueProduct {
+function toCatalogueProduct(row: ProductRow, computedTag?: CatalogueProduct['tag']): CatalogueProduct {
   return {
     id: row.id,
     slug: row.slug,
@@ -89,7 +91,7 @@ function toCatalogueProduct(row: ProductRow): CatalogueProduct {
     category: row.category.name,
     collectionSlug: row.category.parent?.slug ?? null,
     collectionName: row.category.parent?.name ?? null,
-    tag: TAG_LABELS[row.tag],
+    tag: computedTag !== undefined ? computedTag : (row.tag ? TAG_LABELS[row.tag as keyof typeof TAG_LABELS] : null),
     // Prisma returns Decimal; the views want a plain number.
     priceCad: Number(row.priceCad),
     imageUrl: row.images[0]?.url ?? PLACEHOLDER_IMAGE,
@@ -117,14 +119,45 @@ const CACHE = { tags: [CATALOGUE_TAG], revalidate: 60 };
 /** Published products only — drafts are the owner's business, not a shopper's. */
 export const listProducts = unstable_cache(
   async (): Promise<CatalogueProduct[]> => {
-    const rows = await withDbRetry('list products', () =>
+    const rows = (await withDbRetry('list products', () =>
       prisma.product.findMany({
         where: { status: 'PUBLISHED' },
         select: productSelect,
         orderBy: { createdAt: 'desc' },
       })
-    );
-    return (rows as unknown as ProductRow[]).map(toCatalogueProduct);
+    )) as unknown as ProductRow[];
+
+    let maxOrders = 0;
+    let trendingId: string | null = null;
+    for (const row of rows) {
+      if (row.inStock && row.tag !== 'MADE_TO_ORDER' && row.tag !== 'SOLD_OUT') {
+        const orders = row._count?.orderItems ?? 0;
+        if (orders > maxOrders) {
+          maxOrders = orders;
+          trendingId = row.id;
+        }
+      }
+    }
+
+    let newCount = 0;
+    return rows.map((row) => {
+      let dynamicTag: CatalogueProduct['tag'] = row.tag ? TAG_LABELS[row.tag as keyof typeof TAG_LABELS] : null;
+      
+      if (!row.inStock) {
+        dynamicTag = 'SOLD OUT';
+      } else if (!row.tag || row.tag === 'NEW') {
+        if (row.id === trendingId && maxOrders > 0) {
+          dynamicTag = 'TRENDING';
+        } else if (newCount < 4) {
+          dynamicTag = 'NEW';
+          newCount++;
+        } else {
+          dynamicTag = null;
+        }
+      }
+
+      return toCatalogueProduct(row, dynamicTag);
+    });
   },
   ['catalogue:products'],
   CACHE
@@ -147,16 +180,10 @@ export async function listProductsForConsole(): Promise<ConsoleProduct[]> {
   }));
 }
 
-export const getProductBySlug = unstable_cache(
-  async (slug: string): Promise<CatalogueProduct | null> => {
-    const row = await withDbRetry('get product', () =>
-      prisma.product.findUnique({ where: { slug }, select: productSelect })
-    );
-    return row ? toCatalogueProduct(row as unknown as ProductRow) : null;
-  },
-  ['catalogue:product'],
-  CACHE
-);
+export const getProductBySlug = async (slug: string): Promise<CatalogueProduct | null> => {
+  const all = await listProducts();
+  return all.find(p => p.slug === slug) ?? null;
+};
 
 /** Collections with their categories, in display order. */
 export const listCollections = unstable_cache(

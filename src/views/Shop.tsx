@@ -182,7 +182,9 @@ function ProductCard({ p, view }: { p: CatalogueProduct; view: 'grid' | 'list' }
         onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}>
         <div className="w-[120px] shrink-0 aspect-[3/4] overflow-hidden relative" style={{ backgroundColor: '#ddd5c8' }}>
           <img src={p.imageUrl} alt={p.title} className="w-full h-full object-cover block" style={{ transform: hovered ? 'scale(1.05)' : 'scale(1)', transition: 'transform 0.4s ease' }} />
-          <span className="absolute top-2 left-2 py-[2px] px-[6px]" style={{ backgroundColor: p.tag === 'NEW' ? C.maroon : C.charcoal, color: C.cream, ...label, fontSize: '0.52rem' }}>{p.tag}</span>
+        {p.tag && (
+          <span className="absolute top-2 left-2 py-[2px] px-[6px]" style={{ backgroundColor: p.tag === 'NEW' ? C.maroon : p.tag === 'TRENDING' ? C.teal : C.charcoal, color: C.cream, ...label, fontSize: '0.52rem' }}>{p.tag}</span>
+        )}
         </div>
         <div className="flex-1 flex flex-col justify-center">
           <div className="mb-[0.4rem]" style={{ fontFamily: UI, fontSize: '0.9375rem', color: C.charcoal }}>{p.title}</div>
@@ -196,9 +198,11 @@ function ProductCard({ p, view }: { p: CatalogueProduct; view: 'grid' | 'list' }
     <Link to={`/product/${p.slug}`} className="product-card no-underline block" style={{ color: C.charcoal }}>
       <div className="relative mb-4 overflow-hidden aspect-[3/4]" style={{ backgroundColor: '#ddd5c8' }}>
         <img className="product-img w-full h-full object-cover block" src={p.imageUrl} alt={p.title} />
-        <span className="absolute top-3 left-3 py-[3px] px-[8px]" style={{ backgroundColor: p.tag === 'NEW' ? C.maroon : C.charcoal, color: C.cream, ...label, fontSize: '0.56rem', letterSpacing: '0.12em' }}>
+      {p.tag && (
+        <span className="absolute top-3 left-3 py-[3px] px-[8px]" style={{ backgroundColor: p.tag === 'NEW' ? C.maroon : p.tag === 'TRENDING' ? C.teal : C.charcoal, color: C.cream, ...label, fontSize: '0.56rem', letterSpacing: '0.12em' }}>
           {p.tag}
         </span>
+      )}
         <div className="product-overlay">
           <div className="product-overlay-btns">
             <button onClick={e => e.preventDefault()} className="flex-1 cursor-pointer py-[0.55rem]" style={{ border: '1px solid rgba(250,246,240,0.55)', color: C.cream, background: 'transparent', ...label, fontSize: '0.585rem', letterSpacing: '0.12em', backdropFilter: 'blur(4px)' }}>
