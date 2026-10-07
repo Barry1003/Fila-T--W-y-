@@ -86,21 +86,22 @@ export default function HeroCarousel({
           />
           <div className="hero-scrim" />
 
-          <div className="hero-content">
-            <div className="mb-7" style={{ fontFamily: DISPLAY, color: C.gold, fontSize: '1.5rem', letterSpacing: '0.08em', fontWeight: 600 }}>
+          <div className="hero-content flex flex-col items-start">
+            <div className="mb-5 uppercase" style={{ fontFamily: 'Inter, system-ui, sans-serif', color: 'rgba(250,246,240,0.85)', fontSize: '0.75rem', letterSpacing: '0.3em', fontWeight: 500 }}>
               {slide.eyebrow}
             </div>
-            <h1 className="mb-10" style={{ fontFamily: DISPLAY, fontSize: 'clamp(2.6rem, 5.2vw, 4.75rem)', color: C.cream, fontWeight: 400, lineHeight: 1.08, letterSpacing: '-0.025em' }}>
+            <h1 className="mb-10" style={{ fontFamily: '"Fraunces", Georgia, serif', fontSize: 'clamp(3rem, 7vw, 6.5rem)', color: '#FAF6F0', fontWeight: 300, lineHeight: 1.1, letterSpacing: '0.02em', textTransform: 'uppercase' }}>
               {slide.headline.split('\n').map((line, n) => (
                 <span key={n} className="block">{line}</span>
               ))}
             </h1>
             <Link
               to={slide.ctaHref}
-              className="shimmer-cta inline-block no-underline w-fit py-[1rem] px-12"
-              style={{ border: '1.5px solid rgba(250,246,240,0.7)', color: C.cream, ...label, letterSpacing: '0.15em', fontSize: '0.95rem', fontWeight: 600, backgroundColor: 'transparent' }}
+              className="inline-flex items-center gap-4 no-underline transition-opacity hover:opacity-85"
+              style={{ backgroundColor: '#FAF6F0', color: '#111', padding: '1.1rem 2.5rem', ...label, letterSpacing: '0.15em', fontSize: '0.75rem', fontWeight: 500 }}
             >
-              {slide.ctaLabel}
+              <span className="uppercase">{slide.ctaLabel}</span>
+              <span aria-hidden="true" className="text-[1.1rem] font-light leading-none">→</span>
             </Link>
           </div>
         </div>

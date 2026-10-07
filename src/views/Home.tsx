@@ -61,15 +61,26 @@ export default function Home({ content, products, collections }: HomeProps) {
       <div className="reveal" style={{ borderTop: '1px solid rgba(43,35,32,0.09)', borderBottom: '1px solid rgba(43,35,32,0.09)', backgroundColor: C.cream }}>
         <div className="trust-row max-w-[960px] mx-auto py-11 px-10 grid grid-cols-3 gap-8">
           {[
-            { icon: <ShieldIcon />, lbl: 'Escrow-Protected Payments' },
+            { icon: <ShieldIcon />, lbl: 'Escrow-Protected Payments', href: '/escrow-protection' },
             { icon: <BadgeIcon />,  lbl: 'Quality Guaranteed' },
             { icon: <GlobeIcon />,  lbl: 'Worldwide Delivery' },
-          ].map(({ icon, lbl }) => (
-            <div key={lbl} className="flex flex-col items-center gap-3">
-              <div style={{ color: C.teal, lineHeight: 0 }}>{icon}</div>
-              <span className="text-center" style={{ ...label, fontSize: '0.63rem', color: C.charcoal }}>{lbl}</span>
-            </div>
-          ))}
+          ].map(({ icon, lbl, href }) => {
+            const content = (
+              <>
+                <div style={{ color: C.teal, lineHeight: 0 }}>{icon}</div>
+                <span className="text-center" style={{ ...label, fontSize: '0.63rem', color: C.charcoal }}>{lbl}</span>
+              </>
+            );
+            return href ? (
+              <Link key={lbl} to={href} className="flex flex-col items-center gap-3 no-underline cursor-pointer transition-opacity hover:opacity-75">
+                {content}
+              </Link>
+            ) : (
+              <div key={lbl} className="flex flex-col items-center gap-3">
+                {content}
+              </div>
+            );
+          })}
         </div>
       </div>
 
