@@ -85,7 +85,7 @@ export const HOME_DEFAULTS: HomeContent = {
         headline: 'Filà tó Wüyí.\nShaped by hand.',
         ctaLabel: 'Shop Filà',
         ctaHref: '/collections/fila-to-wuyi',
-        imageUrl: 'https://images.unsplash.com/photo-1763823133159-c6f8ec380e33?w=1800&h=1100&fit=crop&auto=format',
+        imageUrl: '/hero-fila-artisan.jpg',
       },
       {
         id: 'gele',
