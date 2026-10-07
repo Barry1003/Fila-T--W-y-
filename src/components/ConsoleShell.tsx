@@ -9,6 +9,7 @@ import { useUser, getInitials, type CurrentUser } from '@/lib/user';
 import CardTableLabels from './CardTableLabels';
 import { C, DISPLAY, UI } from "../tokens";
 import {
+  ShieldIcon,
   GridIcon,
   TagIcon,
   PackageIcon,
@@ -204,6 +205,17 @@ export default function ConsoleShell({ children, user: userProp }: { children: R
           </div>
 
           <div className="flex items-center gap-4 shrink-0">
+            {/* Escrow Protection */}
+            <Link
+              to="/escrow-protection"
+              className="relative flex items-center cursor-pointer p-[4px]"
+              style={{ background: "none", border: "none", color: C.charcoal, opacity: 0.65 }}
+              aria-label="Escrow Protection"
+              title="Escrow Protection"
+            >
+              <ShieldIcon size={18} />
+            </Link>
+
             {/* Notifications */}
             <button
               className="relative flex items-center cursor-pointer p-[4px]"
