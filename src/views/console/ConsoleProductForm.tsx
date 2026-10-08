@@ -155,13 +155,14 @@ type ImageEntry = { id: string; url: string; color: string };
 // Mirrors the images .max(8) in product-schema.ts — keep the two in step.
 const MAX_IMAGES = 8;
 
-function ImageSlot({ img, isMain, colors, onColorChange, onRemove }: {
+function ImageSlot({ img, isMain, colors, onColorChange, onRemove, onMakeMain }: {
   img: ImageEntry;
   isMain: boolean;
   /** The product's variant colours, for tying this photo to one. */
   colors: string[];
   onColorChange: (color: string) => void;
   onRemove: () => void;
+  onMakeMain: () => void;
 }) {
   // A colour set on the image but no longer among the variants still needs an
   // option, or the select would fall blank and silently lose the tie.
@@ -172,8 +173,10 @@ function ImageSlot({ img, isMain, colors, onColorChange, onRemove }: {
       <img
         src={img.url}
         alt=""
+        onClick={!isMain ? onMakeMain : undefined}
+        title={!isMain ? "Click to set as main photo" : undefined}
         className="block w-full aspect-square rounded-[7px] object-cover"
-        style={{ backgroundColor: "rgba(43,35,32,0.08)" }}
+        style={{ backgroundColor: "rgba(43,35,32,0.08)", cursor: isMain ? "default" : "pointer" }}
       />
       {isMain && (
         <span
@@ -291,6 +294,15 @@ export default function ConsoleProductForm({ product, categories, knownColors }:
   }
   function removeImage(iid: string) {
     setImages(imgs => imgs.filter(i => i.id !== iid));
+  }
+  function setMainImage(index: number) {
+    if (index === 0) return;
+    setImages(imgs => {
+      const copy = [...imgs];
+      const [item] = copy.splice(index, 1);
+      copy.unshift(item);
+      return copy;
+    });
   }
 
   async function uploadFiles(fileList: FileList | File[] | null) {
@@ -692,6 +704,7 @@ export default function ConsoleProductForm({ product, categories, knownColors }:
                   colors={variantColors}
                   onColorChange={color => setImageColor(img.id, color)}
                   onRemove={() => removeImage(img.id)}
+                  onMakeMain={() => setMainImage(i)}
                 />
               ))}
             </div>
@@ -771,8 +784,7 @@ export default function ConsoleProductForm({ product, categories, knownColors }:
               <p className="mb-[0.4rem]" style={{ fontSize: "0.68rem", color: C.maroon }}>{firstError('images')}</p>
             )}
             <p style={{ fontSize: "0.63rem", color: "rgba(43,35,32,0.38)", lineHeight: 1.5 }}>
-              The first image is the main photo. Drag to reorder is not available
-              yet — remove and re-add to change the main photo.
+              The first image is the main photo. Click on any image to set it as the main photo.
             </p>
           </FormCard>
 
