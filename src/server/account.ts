@@ -125,7 +125,7 @@ export type AccountWishItem = {
   id: string;
   productId: string;
   img: string;
-  tag: string;
+  tag: string | null;
   title: string;
   slug: string;
   cadNum: number;
