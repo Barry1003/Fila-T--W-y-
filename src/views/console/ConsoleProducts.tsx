@@ -133,6 +133,7 @@ export default function ConsoleProducts({ products, categories }: { products: Co
   const router = useRouter();
   const navigate = useNavigate();
   const PER_PAGE = 8;
+  const [deleteConfirm, setDeleteConfirm] = useState<{ id?: string, title?: string, isBulk?: boolean } | null>(null);
 
   function handleDuplicate(id: string) {
     setBusyId(id);
@@ -146,28 +147,49 @@ export default function ConsoleProducts({ products, categories }: { products: Co
   }
 
   function handleDelete(id: string, title: string) {
-    if (!window.confirm(`Delete “${title}”? This can’t be undone.`)) return;
-    setBusyId(id);
-    startAction(async () => {
-      const res = await deleteProduct(id);
-      setBusyId(null);
-      if (!res.ok) { alert(res.message); return; }
-      router.refresh();
-    });
+    setDeleteConfirm({ id, title });
   }
 
   function handleBulk(action: "Publish" | "Unpublish" | "Delete") {
     const ids = [...selected];
     if (ids.length === 0) return;
-    if (action === "Delete" && !window.confirm(`Delete ${ids.length} product${ids.length !== 1 ? "s" : ""}? This can’t be undone.`)) return;
+    if (action === "Delete") {
+      setDeleteConfirm({ isBulk: true, title: `${ids.length} product${ids.length !== 1 ? "s" : ""}` });
+      return;
+    }
     startAction(async () => {
-      const res = action === "Delete"
-        ? await deleteProducts(ids)
-        : await setProductsStatus(ids, action === "Publish" ? "PUBLISHED" : "DRAFT");
+      const res = await setProductsStatus(ids, action === "Publish" ? "PUBLISHED" : "DRAFT");
       if (!res.ok) { alert(res.message); return; }
       setSelected(new Set());
       router.refresh();
     });
+  }
+
+  function executeDelete() {
+    if (!deleteConfirm) return;
+    
+    if (deleteConfirm.isBulk) {
+      const ids = [...selected];
+      setBusyId("bulk-delete");
+      startAction(async () => {
+        const res = await deleteProducts(ids);
+        setBusyId(null);
+        setDeleteConfirm(null);
+        if (!res.ok) { alert(res.message); return; }
+        setSelected(new Set());
+        router.refresh();
+      });
+    } else if (deleteConfirm.id) {
+      const id = deleteConfirm.id;
+      setBusyId(id);
+      startAction(async () => {
+        const res = await deleteProduct(id);
+        setBusyId(null);
+        setDeleteConfirm(null);
+        if (!res.ok) { alert(res.message); return; }
+        router.refresh();
+      });
+    }
   }
 
   const CATEGORIES = ["All Categories", ...categories];
@@ -513,6 +535,36 @@ export default function ConsoleProducts({ products, categories }: { products: Co
           </>
         )}
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {deleteConfirm && (
+        <div className="fixed inset-0 flex items-center justify-center z-50 p-4" style={{ backgroundColor: "rgba(43,35,32,0.4)" }}>
+          <div className="bg-white rounded-lg p-6 max-w-sm w-full shadow-lg" style={{ fontFamily: UI, border: "1px solid rgba(43,35,32,0.1)" }}>
+            <h3 className="font-semibold mb-2 m-0" style={{ fontSize: "1.1rem", color: C.charcoal }}>Delete {deleteConfirm.isBulk ? "Products" : "Product"}?</h3>
+            <p className="mb-5 m-0" style={{ fontSize: "0.82rem", color: "rgba(43,35,32,0.6)" }}>
+              Delete “{deleteConfirm.title}”? This can’t be undone.
+            </p>
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={() => setDeleteConfirm(null)}
+                disabled={busyId !== null}
+                className="px-4 py-2 rounded-[5px] bg-transparent border border-solid border-[rgba(43,35,32,0.18)] cursor-pointer"
+                style={{ fontSize: "0.78rem", color: C.charcoal, fontWeight: 500 }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={executeDelete}
+                disabled={busyId !== null}
+                className="px-4 py-2 rounded-[5px] border-none cursor-pointer"
+                style={{ backgroundColor: C.maroon, color: "white", fontSize: "0.78rem", fontWeight: 600 }}
+              >
+                {busyId !== null ? "Deleting..." : "Delete"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
