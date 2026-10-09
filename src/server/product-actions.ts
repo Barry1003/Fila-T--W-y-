@@ -297,3 +297,70 @@ export async function duplicateProduct(id: string): Promise<SaveProductResult> {
     return { ok: false, message: 'Could not duplicate this product just now. Please try again.' };
   }
 }
+
+export async function createCategory(name: string, collectionName: string): Promise<{ ok: true; id: string; name: string; collectionName: string } | { ok: false; message: string }> {
+  const user = await getCurrentUser().catch(() => null);
+  if (user?.role !== 'OWNER') {
+    return { ok: false, message: 'You do not have permission to create categories.' };
+  }
+
+  const cleanName = name.trim();
+  const cleanCollection = collectionName.trim();
+
+  if (!cleanName || !cleanCollection) {
+    return { ok: false, message: 'Category name and collection are required.' };
+  }
+
+  try {
+    const created = await withDbRetry('create category', async () => {
+      // Find or create parent collection
+      let parent = await prisma.category.findFirst({
+        where: { name: cleanCollection, parentId: null }
+      });
+      
+      if (!parent) {
+        let baseSlug = slugify(cleanCollection) || 'collection';
+        let attempt = 0;
+        let slug = baseSlug;
+        while (await prisma.category.findUnique({ where: { slug } })) {
+          attempt++;
+          slug = `${baseSlug}-${attempt}`;
+        }
+        parent = await prisma.category.create({
+          data: { name: cleanCollection, slug }
+        });
+      }
+
+      // Check if child category already exists
+      const existing = await prisma.category.findUnique({
+        where: { name: cleanName }
+      });
+      
+      if (existing) {
+        return existing; // just return it if it exists
+      }
+
+      let baseSlug = slugify(cleanName) || 'category';
+      let attempt = 0;
+      let slug = baseSlug;
+      while (await prisma.category.findUnique({ where: { slug } })) {
+        attempt++;
+        slug = `${baseSlug}-${attempt}`;
+      }
+
+      return prisma.category.create({
+        data: {
+          name: cleanName,
+          slug,
+          parentId: parent.id
+        }
+      });
+    });
+
+    revalidateTag(CATALOGUE_TAG);
+    return { ok: true, id: created.id, name: created.name, collectionName: cleanCollection };
+  } catch (error) {
+    console.error('[create category] failed', error);
+    return { ok: false, message: 'Could not create category just now.' };
+  }
+}

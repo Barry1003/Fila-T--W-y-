@@ -1511,7 +1511,8 @@ body {
    jolt at this size, and a fade keeps the eye on the garment. */
 .hero-slide {
   position: absolute;
-  inset: 0;
+  /* Leave a real row for the controls so they cannot cover the slide CTA. */
+  inset: 0 0 4.5rem;
   opacity: 0;
   visibility: hidden;
   transition: opacity 1.15s ease-in-out, visibility 0s linear 1.15s;
@@ -1588,18 +1589,12 @@ body {
 .hero-controls {
   position: absolute;
   z-index: 4;
-  bottom: 1.5rem;
+  bottom: 0;
   left: max(2.5rem, calc((100vw - 1440px) / 2 + 2.5rem));
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  /* A subtle dark pill keeps the bars and play button legible over any part of
-     the image — light town, bright sky, or blurred fill. */
-  padding: 0.5rem 0.75rem;
-  background: rgba(43, 35, 32, 0.32);
-  border-radius: 999px;
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
+  height: 4.5rem;
 }
 
 /* A bar rather than a dot: it doubles as a progress meter for the current
@@ -1695,7 +1690,7 @@ body {
 }
 
 @media (max-width: 900px) {
-  .hero-controls { bottom: 1rem; left: 1.75rem; }
+  .hero-controls { left: 1.75rem; }
   .hero-content { padding: 0 1.75rem; }
 }
 
@@ -1703,7 +1698,7 @@ body {
   .hero-carousel { height: 82vh; min-height: 580px; max-height: 760px; }
   .hero-slide img { top: 0; right: 0; width: 100%; height: 68%; }
   .hero-scrim { background: linear-gradient(to bottom, rgba(43,35,32,0.02) 0%, rgba(43,35,32,0.45) 40%, #2B2320 66%, #2B2320 100%); }
-  .hero-content { padding: 0 1.25rem 5rem !important; justify-content: flex-end; }
+  .hero-content { padding: 0 1.25rem 1.25rem !important; justify-content: flex-end; }
   .hero-content > * { max-width: 100%; }
   .hero-content h1 { font-size: clamp(2.1rem, 9vw, 3.25rem) !important; margin-bottom: 1.5rem; }
   .hero-content .mb-7 { margin-bottom: 0.75rem; }

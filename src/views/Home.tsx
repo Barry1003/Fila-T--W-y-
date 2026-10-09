@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import { Link } from '@/lib/router';
 import { C, DISPLAY, UI, label } from '../tokens';
 import { slugify } from '@/lib/slug';
@@ -42,7 +41,6 @@ export default function Home({ content, products, collections }: HomeProps) {
       return first ? [{ name, letter: name[0], imageUrl: first.imageUrl, href: `/collections/${collection.slug}` }] : [];
     })
   );
-  const [promoDismissed, setPromoDismissed] = useState(false);
 
   return (
     <>
@@ -50,12 +48,11 @@ export default function Home({ content, products, collections }: HomeProps) {
       <HeroCarousel slides={content.hero.slides} intervalSeconds={content.hero.intervalSeconds} />
 
       {/* ── PROMO STRIP ── */}
-      {content.promo.enabled && !promoDismissed && (
+      {content.promo.enabled && (
         <div className="flex items-center justify-center relative py-[0.8rem] px-10" style={{ backgroundColor: C.charcoal, color: C.cream }}>
           <p className="m-0 text-center" style={{ ...label, fontSize: '0.64rem', letterSpacing: '0.12em' }}>
             {content.promo.text}
           </p>
-          <button onClick={() => setPromoDismissed(true)} aria-label="Dismiss" className="absolute right-6 cursor-pointer py-[2px] px-[6px]" style={{ background: 'none', border: 'none', color: C.cream, fontSize: '1.1rem', opacity: 0.55, lineHeight: 1 }}>×</button>
         </div>
       )}
 

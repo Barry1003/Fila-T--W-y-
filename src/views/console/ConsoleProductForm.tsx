@@ -2,7 +2,7 @@
 
 import { useState, useRef } from "react";
 import { Link, useNavigate } from '@/lib/router';
-import { saveProduct } from '@/server/product-actions';
+import { saveProduct, createCategory } from '@/server/product-actions';
 import { uploadProductImage } from '@/server/product-image-actions';
 import { PRODUCT_TAGS, TAG_LABELS } from '@/server/product-schema';
 import type { CategoryOption, ProductForEdit } from '@/server/catalogue';
@@ -250,7 +250,14 @@ export default function ConsoleProductForm({ product, categories, knownColors }:
 
   const [name, setName] = useState(product?.title ?? "");
   const [description, setDescription] = useState(product?.description ?? "");
+  
+  const [localCategories, setLocalCategories] = useState(categories);
   const [categoryId, setCategoryId] = useState(product?.categoryId ?? "");
+  const [isAddingCategory, setIsAddingCategory] = useState(false);
+  const [newCategoryName, setNewCategoryName] = useState("");
+  const [newCategoryCollection, setNewCategoryCollection] = useState("");
+  const [creatingCategory, setCreatingCategory] = useState(false);
+  
   const [priceCad, setPriceCad] = useState(product ? (product.priceCadCents / 100).toFixed(2) : "");
   const [productionDays, setProductionDays] = useState(product?.productionDays ?? "");
   const [tag, setTag] = useState<string>(product?.tag ?? "");
@@ -421,6 +428,21 @@ export default function ConsoleProductForm({ product, categories, knownColors }:
     navigate('/console/products');
   }
 
+  async function handleCreateCategory() {
+    if (!newCategoryName.trim() || !newCategoryCollection.trim()) return;
+    setCreatingCategory(true);
+    const res = await createCategory(newCategoryName, newCategoryCollection);
+    setCreatingCategory(false);
+    if (res.ok) {
+      setLocalCategories(prev => [...prev, { id: res.id, name: res.name, collectionName: res.collectionName }]);
+      setCategoryId(res.id);
+      setIsAddingCategory(false);
+      setNewCategoryName("");
+    } else {
+      alert(res.message);
+    }
+  }
+
   const firstError = (field: string) => fieldErrors[field]?.[0];
   const FieldError = ({ name }: { name: string }) => firstError(name) ? <p role="alert" className="mt-1 mb-3 text-xs" style={{ color: C.maroon }}>{firstError(name)}</p> : null;
 
@@ -477,28 +499,68 @@ export default function ConsoleProductForm({ product, categories, knownColors }:
             <FieldError name="description" />
 
             <FieldLabel>Category</FieldLabel>
-            <div className="relative w-full mb-4">
-              <select
-                value={categoryId}
-                onChange={e => setCategoryId(e.target.value)}
-                className="block box-border w-full rounded-[6px] py-2 pl-3 pr-8 appearance-none cursor-pointer"
-                style={inputBase}
-              >
-                <option value="">Select a category…</option>
-                {/* Grouped by collection, and leaves only — a product is never
-                    filed directly under "Pre-Order". */}
-                {[...new Set(categories.map(c => c.collectionName))].map(collection => (
-                  <optgroup key={collection} label={collection}>
-                    {categories.filter(c => c.collectionName === collection).map(c => (
-                      <option key={c.id} value={c.id}>{c.name}</option>
-                    ))}
-                  </optgroup>
-                ))}
-              </select>
-              <span className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: "rgba(43,35,32,0.4)", lineHeight: 0 }}>
-                <ChevronDownIcon />
-              </span>
-            </div>
+            {isAddingCategory ? (
+              <div className="mb-4 p-3 rounded-[6px]" style={{ backgroundColor: "rgba(43,35,32,0.03)", border: "1px dashed rgba(43,35,32,0.15)" }}>
+                <input
+                  type="text"
+                  placeholder="New category name (e.g. Fila Gobi)"
+                  value={newCategoryName}
+                  onChange={e => setNewCategoryName(e.target.value)}
+                  className={`${INPUT_CLS} w-full mb-2`}
+                  style={inputBase}
+                />
+                <input
+                  type="text"
+                  placeholder="Collection (e.g. Filà tó Wüyí)"
+                  value={newCategoryCollection}
+                  onChange={e => setNewCategoryCollection(e.target.value)}
+                  className={`${INPUT_CLS} w-full mb-3`}
+                  style={inputBase}
+                  list="collection-options"
+                />
+                <datalist id="collection-options">
+                  {[...new Set(localCategories.map(c => c.collectionName))].map(col => (
+                    <option key={col} value={col} />
+                  ))}
+                </datalist>
+                <div className="flex gap-2">
+                  <button type="button" onClick={handleCreateCategory} disabled={creatingCategory} className="rounded-[4px] py-1.5 px-3 cursor-pointer" style={{ backgroundColor: C.charcoal, color: C.cream, border: "none", fontSize: "0.75rem", fontFamily: UI }}>
+                    {creatingCategory ? "Creating..." : "Create"}
+                  </button>
+                  <button type="button" onClick={() => setIsAddingCategory(false)} className="rounded-[4px] py-1.5 px-3 cursor-pointer" style={{ backgroundColor: "transparent", color: C.charcoal, border: "1px solid rgba(43,35,32,0.2)", fontSize: "0.75rem", fontFamily: UI }}>
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="relative w-full mb-4">
+                <select
+                  value={categoryId}
+                  onChange={e => {
+                    if (e.target.value === "__NEW__") {
+                      setIsAddingCategory(true);
+                    } else {
+                      setCategoryId(e.target.value);
+                    }
+                  }}
+                  className="block box-border w-full rounded-[6px] py-2 pl-3 pr-8 appearance-none cursor-pointer"
+                  style={inputBase}
+                >
+                  <option value="">Select a category…</option>
+                  {[...new Set(localCategories.map(c => c.collectionName))].map(collection => (
+                    <optgroup key={collection} label={collection}>
+                      {localCategories.filter(c => c.collectionName === collection).map(c => (
+                        <option key={c.id} value={c.id}>{c.name}</option>
+                      ))}
+                    </optgroup>
+                  ))}
+                  <option value="__NEW__">+ Add new category</option>
+                </select>
+                <span className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: "rgba(43,35,32,0.4)", lineHeight: 0 }}>
+                  <ChevronDownIcon />
+                </span>
+              </div>
+            )}
             <FieldError name="categoryId" />
 
             <FieldLabel>Production Time (working days)</FieldLabel>
