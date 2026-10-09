@@ -15,6 +15,7 @@ export type CatalogueProduct = {
   id: string;
   slug: string;
   title: string;
+  description: string | null;
   category: string;
   collectionSlug: string | null;
   collectionName: string | null;
@@ -60,6 +61,7 @@ const productSelect = {
   id: true,
   slug: true,
   title: true,
+  description: true,
   tag: true,
   inStock: true,
   priceCad: true,
@@ -78,6 +80,7 @@ type ProductRow = {
   id: string;
   slug: string;
   title: string;
+  description: string | null;
   tag: keyof typeof TAG_LABELS;
   inStock: boolean;
   priceCad: unknown;
@@ -95,6 +98,7 @@ function toCatalogueProduct(row: ProductRow, computedTag?: CatalogueProduct['tag
     id: row.id,
     slug: row.slug,
     title: row.title,
+    description: row.description,
     category: row.category.name,
     collectionSlug: row.category.parent?.slug ?? null,
     collectionName: row.category.parent?.name ?? null,
