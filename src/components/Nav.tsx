@@ -8,16 +8,10 @@ import SignOutForm from './SignOutForm';
 import type { CurrentUser } from '@/server/auth';
 import { C, DISPLAY, label, UI } from '../tokens';
 import { SearchIcon, HeartIcon, UserIcon, CartIcon, GridIcon } from '../icons';
-import { COLLECTIONS } from '../data/products';
+import type { CatalogueCollection } from '@/server/catalogue';
 
 /** The collections sit under Shop rather than beside it — they are ways into
  *  the catalogue, not siblings of Lookbook and About. */
-const COLLECTION_LINKS = [
-  { label: 'Shop All', to: '/shop' },
-  { label: 'Filà tó Wüyí', to: '/collections/fila-to-wuyi' },
-  { label: 'Gele & Ipele', to: '/collections/gele-ipele' },
-  { label: 'Pre-Order', to: '/collections/pre-order' },
-];
 
 const NAV_LINKS = [
   { label: 'Custom Order', to: '/custom-order' },
@@ -74,11 +68,16 @@ function categoryAnchor(name: string): string {
   return name.replace(/\s+/g, '-').toLowerCase();
 }
 
-export default function Nav({ user }: { user: CurrentUser | null }) {
+export default function Nav({ user, collections }: { user: CurrentUser | null; collections: CatalogueCollection[] }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const close = useCallback(() => setMenuOpen(false), []);
   const isOwner = user?.role === 'OWNER';
+
+  const collectionLinks = [
+    { label: 'Shop All', to: '/shop' },
+    ...collections.map(c => ({ label: c.name, to: `/collections/${c.slug}` }))
+  ];
 
   // Signed in → straight to the account; signed out → sign in and come back to
   // the page they were on, not a fixed landing. /auth itself is never a return
@@ -131,7 +130,7 @@ export default function Nav({ user }: { user: CurrentUser | null }) {
 
               <div className="nav-dropdown-menu nav-mega">
                 <div className="nav-mega-grid">
-                  {COLLECTIONS.map(col => (
+                  {collections.map(col => (
                     <div key={col.slug} className="nav-mega-col">
                       <Link to={`/collections/${col.slug}`} className="nav-mega-heading">{col.name}</Link>
                       {col.categories.map(cat => (
@@ -260,7 +259,7 @@ export default function Nav({ user }: { user: CurrentUser | null }) {
 
           <div className="nav-drawer-body">
             <nav aria-label="Shop">
-              {COLLECTION_LINKS.map(({ label: lbl, to }) => (
+              {collectionLinks.map(({ label: lbl, to }) => (
                 <NavLink key={lbl} to={to} onClick={close} className={({ isActive }) => `nav-drawer-link${isActive ? ' active' : ''}`}>
                   {lbl}
                 </NavLink>

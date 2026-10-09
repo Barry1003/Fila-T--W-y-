@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import type { ReactNode } from 'react';
 import type { CurrentUser } from '@/server/auth';
+import type { CatalogueCollection } from '@/server/catalogue';
 import { useLocation } from '@/lib/router';
 import { C, UI } from '../tokens';
 import { UserProvider } from '@/lib/user';
@@ -47,13 +48,13 @@ function useScrollReveal() {
   }, [pathname]);
 }
 
-export default function Root({ children, user }: { children: ReactNode; user: CurrentUser | null }) {
+export default function Root({ children, user, collections }: { children: ReactNode; user: CurrentUser | null; collections: CatalogueCollection[] }) {
   useScrollReveal();
 
   return (
     <UserProvider user={user}>
       <div className="overflow-x-hidden min-h-screen" style={{ backgroundColor: C.cream, color: C.charcoal, fontFamily: UI }}>
-        <Nav user={user} />
+        <Nav user={user} collections={collections} />
         <main>
           {children}
         </main>
