@@ -25,6 +25,7 @@ export default function HeroCarousel({
   const [hovered, setHovered] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
   const touchStartX = useRef<number | null>(null);
+  const preloaded = useRef(new Map<string, HTMLImageElement>());
 
   const count = slides.length;
   const go = useCallback((next: number) => setIndex(((next % count) + count) % count), [count]);
@@ -36,6 +37,21 @@ export default function HeroCarousel({
     mq.addEventListener('change', sync);
     return () => mq.removeEventListener('change', sync);
   }, []);
+
+  // The next frame is ready before autoplay crossfades to it. Limit the preload
+  // to one image so an owner with eight slides does not download all eight at once.
+  useEffect(() => {
+    if (count < 2) return;
+    const id = window.setTimeout(() => {
+      const url = slides[(index + 1) % count].imageUrl;
+      if (!preloaded.current.has(url)) {
+        const next = new Image();
+        next.src = url;
+        preloaded.current.set(url, next);
+      }
+    }, 500);
+    return () => window.clearTimeout(id);
+  }, [count, index, slides]);
 
   const advancing = playing && !hovered && !reducedMotion && count > 1;
 
@@ -79,7 +95,7 @@ export default function HeroCarousel({
             loading={i === 0 ? 'eager' : 'lazy'}
             fetchPriority={i === 0 ? 'high' : 'auto'}
             decoding="async"
-            style={{ objectFit: slide.objectFit, objectPosition: slide.objectPosition }}
+            style={{ objectFit: slide.objectFit, objectPosition: slide.objectPosition, animationDuration: `${intervalSeconds}s`, animationPlayState: i === index && advancing ? 'running' : 'paused' }}
           />
           <div className="hero-scrim" />
 

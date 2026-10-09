@@ -1514,13 +1514,13 @@ body {
   inset: 0;
   opacity: 0;
   visibility: hidden;
-  transition: opacity 0.9s ease, visibility 0s linear 0.9s;
+  transition: opacity 1.15s ease-in-out, visibility 0s linear 1.15s;
 }
 
 .hero-slide.active {
   opacity: 1;
   visibility: visible;
-  transition: opacity 0.9s ease;
+  transition: opacity 1.15s ease-in-out;
 }
 
 .hero-slide img {
@@ -1531,6 +1531,17 @@ body {
   height: 100%;
   object-fit: cover;
   object-position: center;
+}
+
+.hero-slide.active > img {
+  animation-name: hero-image-drift;
+  animation-timing-function: ease-out;
+  animation-fill-mode: both;
+}
+
+@keyframes hero-image-drift {
+  from { transform: scale(1.04); }
+  to { transform: scale(1); }
 }
 
 /* Older saved slides may still request contain; the solid panel remains behind. */
@@ -1559,6 +1570,15 @@ body {
 
 .hero-content > * {
   max-width: 45%;
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 0.65s ease, transform 0.65s ease;
+}
+
+.hero-slide.active .hero-content > * {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: 0.18s;
 }
 
 .hero-fade {
@@ -1669,6 +1689,8 @@ body {
 /* Without motion the bars are position markers, not timers. */
 @media (prefers-reduced-motion: reduce) {
   .hero-slide { transition: none; }
+  .hero-slide.active > img { animation: none; }
+  .hero-content > * { transition: none; transform: none; }
   .hero-bar.active .hero-bar-fill { animation: none; width: 100%; }
 }
 
@@ -1681,7 +1703,7 @@ body {
   .hero-carousel { height: 82vh; min-height: 580px; max-height: 760px; }
   .hero-slide img { top: 0; right: 0; width: 100%; height: 68%; }
   .hero-scrim { background: linear-gradient(to bottom, rgba(43,35,32,0.02) 0%, rgba(43,35,32,0.45) 40%, #2B2320 66%, #2B2320 100%); }
-  .hero-content { padding: 0 1.25rem 5rem; justify-content: flex-end; }
+  .hero-content { padding: 0 1.25rem 5rem !important; justify-content: flex-end; }
   .hero-content > * { max-width: 100%; }
   .hero-content h1 { font-size: clamp(2.1rem, 9vw, 3.25rem) !important; margin-bottom: 1.5rem; }
   .hero-content .mb-7 { margin-bottom: 0.75rem; }
