@@ -182,7 +182,7 @@ export default function CustomOrderRequest() {
                       id={`m-${name}`}
                       value={measurements[name] ?? ''}
                       onChange={e => setMeasurements(m => ({ ...m, [name]: e.target.value }))}
-                      placeholder={name === 'Preferred yards' ? '5' : name === 'Width' ? '23' : '44"'}
+                      placeholder={name === 'Preferred yards' ? '5' : (name === 'Width' || name === 'Head circumference') ? '23' : '44"'}
                       className={FIELD_CLS}
                       style={field}
                     />
@@ -207,7 +207,7 @@ export default function CustomOrderRequest() {
               </div>
               <div className="rg-2 grid grid-cols-2 gap-4">
                 <Field htmlFor="phone" hint="Phone (optional)">
-                  <input id="phone" name="phone" type="tel" autoComplete="tel" placeholder="+234 801 234 5678" className={FIELD_CLS} style={field} />
+                  <input id="phone" name="phone" type="tel" autoComplete="tel" placeholder="+1 416 123 4567" className={FIELD_CLS} style={field} />
                 </Field>
                 <Field htmlFor="location" hint="Where you are (optional)">
                   <input id="location" name="location" placeholder="Ontario, Canada or USA." className={FIELD_CLS} style={field} />

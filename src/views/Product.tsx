@@ -8,6 +8,7 @@ import { useCart } from '@/lib/cart';
 import { toggleWishlist } from '@/server/wishlist-actions';
 import { submitReview } from '@/server/review-actions';
 import { C, DISPLAY, UI, label } from '../tokens';
+import ReactMarkdown from 'react-markdown';
 import type { CatalogueProduct } from '@/server/catalogue';
 import type { ProductReviews } from '@/server/reviews';
 
@@ -671,13 +672,28 @@ export default function Product({ product, related, inWishlist = false, signedIn
           <div className="max-w-[700px]">
             {/* Description */}
             {activeTab === 'description' && (
-              <div>
-                <p className="mb-5" style={{ fontFamily: UI, fontSize: '0.9375rem', lineHeight: 1.85, color: 'rgba(43,35,32,0.72)' }}>
-                  The {product.title} is a handcrafted piece made with premium materials sourced and finished in Nigeria. Each one is individually sewn and inspected before shipping — reflecting the standard of quality AdeClassics has maintained since its founding.
-                </p>
-                <p className="mb-5" style={{ fontFamily: UI, fontSize: '0.9375rem', lineHeight: 1.85, color: 'rgba(43,35,32,0.72)' }}>
-                  This {product.category.toLowerCase()} is constructed using traditional techniques passed down through generations of Yoruba craftspeople. The rich tones and textures are a direct result of careful material selection and hand-finishing — no shortcuts, no compromises.
-                </p>
+              <div style={{ fontFamily: UI, fontSize: '0.9375rem', lineHeight: 1.85, color: 'rgba(43,35,32,0.72)' }}>
+                {product.description ? (
+                  <ReactMarkdown
+                    components={{
+                      p: ({ node, ...props }) => <p className="mb-5" {...props} />,
+                      ul: ({ node, ...props }) => <ul className="m-0 pl-5 mb-5" style={{ lineHeight: 2.1 }} {...props} />,
+                      li: ({ node, ...props }) => <li {...props} />,
+                      strong: ({ node, ...props }) => <strong style={{ color: C.charcoal }} {...props} />,
+                    }}
+                  >
+                    {product.description}
+                  </ReactMarkdown>
+                ) : (
+                  <>
+                    <p className="mb-5">
+                      The {product.title} is a handcrafted piece made with premium materials sourced and finished in Nigeria. Each one is individually sewn and inspected before shipping — reflecting the standard of quality AdeClassics has maintained since its founding.
+                    </p>
+                    <p className="mb-5">
+                      This {product.category.toLowerCase()} is constructed using traditional techniques passed down through generations of Yoruba craftspeople. The rich tones and textures are a direct result of careful material selection and hand-finishing — no shortcuts, no compromises.
+                    </p>
+                  </>
+                )}
                 <div className="mt-9">
                   <div className="mb-4" style={{ ...label, color: C.charcoal, fontSize: '0.58rem', letterSpacing: '0.14em' }}>Materials & Care</div>
                   <ul className="m-0 pl-5" style={{ fontFamily: UI, fontSize: '0.875rem', lineHeight: 2.1, color: 'rgba(43,35,32,0.7)' }}>
