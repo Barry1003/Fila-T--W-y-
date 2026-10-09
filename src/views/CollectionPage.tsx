@@ -16,6 +16,7 @@ function ProductCard({ p }: { p: CatalogueProduct }) {
           alt={p.title}
           loading="lazy"
           className="product-img w-full h-full object-cover block"
+          style={{ objectPosition: p.imagePosition }}
         />
         {p.tag && (
           <span
@@ -30,26 +31,26 @@ function ProductCard({ p }: { p: CatalogueProduct }) {
           </span>
         )}
 
-        {/* Reveals on hover — same Quick View / Add to Cart as the shop grid. */}
+        {/* Reveals product details and a direct cart action for a single variant. */}
         <div className="product-overlay">
           <div className="product-overlay-btns">
-            <button
-              onClick={e => e.preventDefault()}
-              className="flex-1 cursor-pointer py-[0.55rem]"
+            <span
+              className="flex-1 text-center py-[0.55rem]"
               style={{ border: '1px solid rgba(250,246,240,0.55)', color: C.cream, background: 'transparent', ...label, fontSize: '0.585rem', letterSpacing: '0.12em', backdropFilter: 'blur(4px)' }}
             >
-              Quick View
-            </button>
-            <button
+              View Details
+            </span>
+            {p.variants.length === 1 && p.variants[0].inStock && p.tag !== 'SOLD OUT' ? <button
               onClick={e => {
                 // The whole card is a link to the product; adding must not navigate.
                 e.preventDefault();
+                e.stopPropagation();
                 add({
                   productId: p.id,
                   slug: p.slug,
                   title: p.title,
-                  size: p.variants[0]?.size ?? 'One Size',
-                  color: p.colors[0] ?? '',
+                  size: p.variants[0].size,
+                  color: p.variants[0].color,
                   unitPriceCents: Math.round(p.priceCad * 100),
                   imageUrl: p.imageUrl,
                 });
@@ -58,7 +59,7 @@ function ProductCard({ p }: { p: CatalogueProduct }) {
               style={{ border: 'none', color: C.charcoal, background: C.gold, ...label, fontSize: '0.585rem', letterSpacing: '0.12em' }}
             >
               Add to Cart
-            </button>
+            </button> : <span className="flex-1 text-center py-[0.55rem]" style={{ border: 'none', color: C.charcoal, background: C.gold, ...label, fontSize: '0.585rem', letterSpacing: '0.12em' }}>{p.tag === 'SOLD OUT' ? 'Sold Out' : 'Choose Options'}</span>}
           </div>
         </div>
       </div>

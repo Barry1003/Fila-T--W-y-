@@ -4,13 +4,12 @@ import { useState, useEffect, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLocation, useNavigate } from '@/lib/router';
 import AccountShell from '../components/AccountShell';
-import type { AccountAddress as Address, AccountPayment as Payment } from '@/server/account';
+import type { AccountAddress as Address } from '@/server/account';
 import { saveAddress as saveAddressAction, deleteAddress, setDefaultAddress } from '@/server/address-actions';
 import { C, DISPLAY, UI, label } from '../tokens';
 
 /* ─── Form shapes ───────────────────────────────────────────── */
 type AddrForm = Omit<Address, 'id'>;
-type PayForm = { cardNumber: string; expiry: string; cvc: string; nameOnCard: string; sameAsShipping: boolean };
 
 const COUNTRIES = [
   'Nigeria', 'Canada', 'United Kingdom', 'United States',
@@ -21,32 +20,6 @@ const BLANK_ADDR: AddrForm = {
   isDefault: false, name: '', line1: '', line2: '',
   city: '', state: '', postal: '', country: 'Nigeria', phone: '',
 };
-
-const BLANK_PAY: PayForm = {
-  cardNumber: '', expiry: '', cvc: '', nameOnCard: '', sameAsShipping: true,
-};
-
-/* ─── Card brand icons ───────────────────────────────────────── */
-function VisaIcon() {
-  return (
-    <svg className="block shrink-0" width="42" height="28" viewBox="0 0 42 28">
-      <rect width="42" height="28" rx="4" fill="#1A1F71" />
-      <text x="50%" y="19" textAnchor="middle" fill="#fff" fontSize="13" fontWeight="800"
-        fontFamily="Arial,Helvetica,sans-serif" letterSpacing="1.5">VISA</text>
-    </svg>
-  );
-}
-
-function MastercardIcon() {
-  return (
-    <svg className="block shrink-0" width="42" height="28" viewBox="0 0 42 28">
-      <rect width="42" height="28" rx="4" fill="#1D1D1B" />
-      <circle cx="16" cy="14" r="8" fill="#EB001B" />
-      <circle cx="26" cy="14" r="8" fill="#F79E1B" />
-      <path d="M21 7.2a8 8 0 0 1 0 13.6A8 8 0 0 1 21 7.2z" fill="#FF5F00" />
-    </svg>
-  );
-}
 
 /* ─── Form field primitives ──────────────────────────────────── */
 function FInput({ label: lbl, placeholder, type = 'text', value, onChange, required }: {
@@ -235,48 +208,6 @@ function AddressSlideOver({ initial, isEdit, onSave, onClose }: {
   );
 }
 
-/* ─── Payment slide-over form ────────────────────────────────── */
-function PaymentSlideOver({ onSave, onClose }: { onSave: () => void; onClose: () => void }) {
-  const [form, setForm] = useState<PayForm>(BLANK_PAY);
-  const set = <K extends keyof PayForm>(k: K) => (v: PayForm[K]) => setForm(f => ({ ...f, [k]: v }));
-
-  return (
-    <SlideOver
-      title="Add Payment Method"
-      onClose={onClose}
-      onSave={onSave}
-      saveLabel="Save Card"
-    >
-      <FInput label="Card Number" placeholder="1234 5678 9012 3456" value={form.cardNumber} onChange={set('cardNumber')} required />
-      <div className="rg-2 grid grid-cols-2 gap-x-3">
-        <FInput label="Expiry (MM / YY)" placeholder="09/27" value={form.expiry} onChange={set('expiry')} required />
-        <FInput label="CVC" type="password" placeholder="•••" value={form.cvc} onChange={set('cvc')} required />
-      </div>
-      <FInput label="Name on Card" placeholder="As it appears on card" value={form.nameOnCard} onChange={set('nameOnCard')} required />
-
-      <div className="pt-4 mt-2 border-t border-solid border-[rgba(43,35,32,0.08)]">
-        <div className="mb-[0.875rem]" style={{ ...label, fontSize: '0.65rem', color: 'rgba(43,35,32,0.52)' }}>
-          Billing Address
-        </div>
-        <FCheckbox checked={form.sameAsShipping} onChange={v => set('sameAsShipping')(v)}>
-          Same as default shipping address
-        </FCheckbox>
-      </div>
-
-      {/* Trust note */}
-      <div className="flex items-start gap-[0.6rem] mt-6 py-[0.875rem] px-4 rounded-[6px] border border-solid border-[rgba(59,138,147,0.18)] bg-[rgba(59,138,147,0.06)]">
-        <svg className="shrink-0 mt-[1px]" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={C.teal} strokeWidth="2.2" strokeLinecap="round">
-          <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-          <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-        </svg>
-        <span className="leading-[1.6]" style={{ fontFamily: UI, fontSize: '0.72rem', color: 'rgba(43,35,32,0.5)' }}>
-          Payments processed securely via Paystack / Flutterwave — we never store your full card details.
-        </span>
-      </div>
-    </SlideOver>
-  );
-}
-
 /* ─── Address card ───────────────────────────────────────────── */
 function AddressCard({ addr, onEdit, onDelete, onSetDefault }: {
   addr: Address; onEdit: () => void; onDelete: () => void; onSetDefault: () => void;
@@ -319,47 +250,6 @@ function AddressCard({ addr, onEdit, onDelete, onSetDefault }: {
             </TextBtn>
           </>
         )}
-      </div>
-    </div>
-  );
-}
-
-/* ─── Payment card ───────────────────────────────────────────── */
-function PaymentCard({ pay, onEdit, onRemove, onSetDefault }: {
-  pay: Payment; onEdit: () => void; onRemove: () => void; onSetDefault: () => void;
-}) {
-  return (
-    <div className="rounded-lg py-5 px-6 flex items-center gap-4 bg-white border border-solid border-[rgba(43,35,32,0.11)] shadow-[0_1px_8px_rgba(43,35,32,0.05)]">
-      {pay.brand === 'visa' ? <VisaIcon /> : <MastercardIcon />}
-
-      <div className="flex-1 min-w-0">
-        <div className="font-semibold tracking-[0.04em]" style={{ fontFamily: UI, fontSize: '0.875rem', color: C.charcoal }}>
-          •••• •••• •••• {pay.last4}
-        </div>
-        <div className="mt-[3px]" style={{ fontFamily: UI, fontSize: '0.75rem', color: 'rgba(43,35,32,0.48)' }}>
-          Expires {pay.expiry}
-        </div>
-      </div>
-
-      {pay.isDefault && (
-        <span className="shrink-0 py-[2px] px-2 rounded-[3px] tracking-[0.12em] bg-[rgba(212,169,78,0.12)] border border-solid border-[rgba(212,169,78,0.45)]" style={{
-          ...label, fontSize: '0.58rem',
-          color: 'rgba(43,35,32,0.7)',
-        }}>
-          Default
-        </span>
-      )}
-
-      <div className="flex gap-[0.875rem] shrink-0">
-        <TextBtn color={C.indigo} onClick={onEdit}>Edit</TextBtn>
-        {!pay.isDefault && (
-          <TextBtn color="rgba(43,35,32,0.42)" hoverColor={C.charcoal} onClick={onSetDefault}>
-            Set Default
-          </TextBtn>
-        )}
-        <TextBtn color="rgba(185,45,45,0.65)" hoverColor="#b92d2d" onClick={onRemove}>
-          Remove
-        </TextBtn>
       </div>
     </div>
   );
@@ -413,28 +303,11 @@ function TextBtn({ color, hoverColor, onClick, right, children }: {
   );
 }
 
-/* ─── Trust note (payment tab) ───────────────────────────────── */
-function TrustNote() {
-  return (
-    <div className="flex items-start gap-[0.625rem] py-[0.875rem] px-[1.125rem] mt-2 rounded-[6px] bg-[rgba(59,138,147,0.055)] border border-solid border-[rgba(59,138,147,0.16)]">
-      <svg className="shrink-0 mt-[2px]" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={C.teal} strokeWidth="2.2" strokeLinecap="round">
-        <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-        <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-      </svg>
-      <span className="leading-[1.65]" style={{ fontFamily: UI, fontSize: '0.74rem', color: 'rgba(43,35,32,0.52)' }}>
-        Payments processed securely via Paystack / Flutterwave — we never store your full card details.
-      </span>
-    </div>
-  );
-}
-
 /* ─── Main page ──────────────────────────────────────────────── */
 export default function AddressesPayment({
   initialAddresses = [],
-  initialPayments = [],
 }: {
   initialAddresses?: Address[];
-  initialPayments?: Payment[];
 }) {
   const { pathname } = useLocation();
   const navigate = useNavigate();
@@ -443,17 +316,14 @@ export default function AddressesPayment({
   const router = useRouter();
   const [, startTransition] = useTransition();
   const [addresses, setAddresses] = useState<Address[]>(initialAddresses);
-  const [payments, setPayments] = useState<Payment[]>(initialPayments);
 
   // Reconcile with the server after each save: the route re-runs, the fresh
   // rows arrive as props (with their real database ids), and local state adopts
   // them — replacing the optimistic placeholders shown a moment earlier.
   useEffect(() => { setAddresses(initialAddresses); }, [initialAddresses]);
-  useEffect(() => { setPayments(initialPayments); }, [initialPayments]);
 
   // Modal state: null=closed, 'add'=new, an id string=editing that address
   const [addrModal, setAddrModal] = useState<'add' | string | null>(null);
-  const [payModal, setPayModal] = useState<'add' | string | null>(null);
   const isEditingAddr = addrModal !== null && addrModal !== 'add';
 
   /* Address actions — optimistic locally, then persisted and reconciled */
@@ -500,15 +370,6 @@ export default function AddressesPayment({
       if (!res.ok) alert(res.message);
       router.refresh();
     });
-  }
-
-  /* Payment actions — display only; card storage needs a payment provider */
-  function removePayment(id: string) {
-    setPayments(prev => prev.filter(p => p.id !== id));
-  }
-
-  function setDefaultPayment(id: string) {
-    setPayments(prev => prev.map(p => ({ ...p, isDefault: p.id === id })));
   }
 
   const editingAddr = isEditingAddr
@@ -585,18 +446,11 @@ export default function AddressesPayment({
 
       {/* ── Payment Methods tab ─────────────────────────────────── */}
       {activeTab === 'payment' && (
-        <div className="flex flex-col gap-[0.875rem]">
-          {payments.map(pay => (
-            <PaymentCard
-              key={pay.id}
-              pay={pay}
-              onEdit={() => setPayModal(pay.id)}
-              onRemove={() => removePayment(pay.id)}
-              onSetDefault={() => setDefaultPayment(pay.id)}
-            />
-          ))}
-          <AddNewCard text="Add New Payment Method" onClick={() => setPayModal('add')} />
-          <TrustNote />
+        <div className="rounded-lg bg-white border border-solid border-[rgba(43,35,32,0.11)] p-7">
+          <h2 className="mb-2" style={{ fontFamily: DISPLAY, fontSize: '1.35rem', color: C.charcoal }}>Secure payment at checkout</h2>
+          <p className="m-0" style={{ fontFamily: UI, fontSize: '0.875rem', lineHeight: 1.7, color: C.charcoal }}>
+            Payment instructions appear when you place an order. If online card checkout is available, you enter your details on the payment provider’s secure page. We do not collect card numbers or CVCs in your account.
+          </p>
         </div>
       )}
 
@@ -610,12 +464,6 @@ export default function AddressesPayment({
         />
       )}
 
-      {payModal !== null && (
-        <PaymentSlideOver
-          onSave={() => setPayModal(null)}
-          onClose={() => setPayModal(null)}
-        />
-      )}
     </AccountShell>
   );
 }

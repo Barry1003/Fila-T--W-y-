@@ -840,21 +840,13 @@ function TabHomepageContent({ initial }: { initial: HomeContent }) {
           style={CARD}
         >
           <div
-            className="p-[1.75rem_1.25rem_1.5rem] relative overflow-hidden"
-            style={{
-              background: `linear-gradient(135deg, ${C.maroon} 0%, #4A1820 100%)`,
-            }}
+            className="p-[1.75rem_1.25rem_1.5rem] relative overflow-hidden min-h-[190px] flex flex-col justify-center"
+            style={{ backgroundColor: C.charcoal }}
           >
-            {/* Decorative texture */}
+            {slides[0]?.imageUrl && <img src={slides[0].imageUrl} alt="" className="absolute top-0 right-0 w-[60%] h-full object-cover" style={{ objectFit: slides[0].objectFit ?? 'cover', objectPosition: slides[0].objectPosition ?? 'center' }} />}
+            <div className="absolute inset-0 pointer-events-none" style={{ background: `linear-gradient(90deg, ${C.charcoal} 0%, ${C.charcoal} 39%, rgba(43,35,32,0.87) 47%, rgba(43,35,32,0.04) 72%)` }} />
             <div
-              className="absolute inset-0 pointer-events-none"
-              style={{
-                backgroundImage:
-                  "radial-gradient(circle at 80% 20%, rgba(212,169,78,0.15) 0%, transparent 60%)",
-              }}
-            />
-            <div
-              className="uppercase mb-2"
+              className="uppercase mb-2 relative z-[1] max-w-[53%]"
               style={{
                 fontFamily: UI,
                 fontSize: "0.6rem",
@@ -866,7 +858,7 @@ function TabHomepageContent({ initial }: { initial: HomeContent }) {
               {slides[0]?.eyebrow || "Eyebrow text…"}
             </div>
             <div
-              className="font-medium whitespace-pre-line mb-[0.875rem] leading-tight"
+              className="font-medium whitespace-pre-line mb-[0.875rem] leading-tight relative z-[1] max-w-[53%]"
               style={{
                 fontFamily: DISPLAY,
                 fontSize: "1.3rem",
@@ -877,16 +869,16 @@ function TabHomepageContent({ initial }: { initial: HomeContent }) {
               {slides[0]?.headline || "Hero headline…"}
             </div>
             <div
-              className="inline-block rounded px-[0.9rem] py-[0.35rem] font-semibold"
+              className="inline-block w-fit px-[0.9rem] py-[0.35rem] font-semibold relative z-[1]"
               style={{
-                backgroundColor: C.gold,
-                color: C.charcoal,
+                border: `1px solid ${C.cream}`,
+                color: C.cream,
                 fontSize: "0.65rem",
                 fontFamily: UI,
                 letterSpacing: "0.04em",
               }}
             >
-              Shop Now
+              {slides[0]?.ctaLabel || 'Shop Now'}
             </div>
           </div>
 

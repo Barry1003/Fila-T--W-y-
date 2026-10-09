@@ -54,6 +54,8 @@ export const productSchema = z.object({
     .array(
       z.object({
         url: z.string().trim().url('That is not a valid image URL.'),
+        focalX: z.number().int().min(0).max(100).default(50),
+        focalY: z.number().int().min(0).max(100).default(50),
         // "" is a general image, shown for every colour; a colour name ties it
         // to that variant colour. Not checked against the variant list — a
         // colour can be photographed before its stock is entered.
@@ -70,6 +72,10 @@ export const productSchema = z.object({
       list => new Set(list.map(v => `${v.size.toLowerCase()}|${v.color.toLowerCase()}`)).size === list.length,
       'Two variants have the same size and colour combination.',
     ),
+}).superRefine((product, ctx) => {
+  if (product.status === 'PUBLISHED' && product.images.length === 0) {
+    ctx.addIssue({ code: 'custom', path: ['images'], message: 'Add a product image before publishing.' });
+  }
 });
 
 export type ProductInput = z.infer<typeof productSchema>;

@@ -1,5 +1,11 @@
 import Shop from '@/views/Shop';
 import { colorsOf, listCollections, listProducts } from '@/server/catalogue';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Shop Yoruba Headwear & Clothing',
+  description: 'Shop handcrafted filà caps, gele and traditional clothing from AdeClassics.',
+};
 
 /**
  * Two round trips, run in sequence.

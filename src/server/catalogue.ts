@@ -20,10 +20,13 @@ export type CatalogueProduct = {
   collectionName: string | null;
   tag: 'NEW' | 'SOLD OUT' | 'MADE TO ORDER' | 'TRENDING' | null;
   priceCad: number;
+  metaTitle: string | null;
+  metaDescription: string | null;
   /** The first image — the card thumbnail and cart snapshot. */
   imageUrl: string;
+  imagePosition: string;
   /** Every image, with the colour it belongs to (null = shown for all colours). */
-  images: { url: string; color: string | null }[];
+  images: { url: string; color: string | null; objectPosition: string }[];
   colors: string[];
   variants: { size: string; color: string; inStock: boolean }[];
   inStock: boolean;
@@ -60,8 +63,10 @@ const productSelect = {
   tag: true,
   inStock: true,
   priceCad: true,
+  metaTitle: true,
+  metaDescription: true,
   status: true,
-  images: { select: { url: true, color: true }, orderBy: { position: 'asc' } },
+  images: { select: { url: true, color: true, focalX: true, focalY: true }, orderBy: { position: 'asc' } },
   variants: { select: { size: true, color: true, stock: true }, orderBy: { id: 'asc' } },
   category: {
     select: { name: true, parent: { select: { slug: true, name: true } } },
@@ -76,8 +81,10 @@ type ProductRow = {
   tag: keyof typeof TAG_LABELS;
   inStock: boolean;
   priceCad: unknown;
+  metaTitle: string | null;
+  metaDescription: string | null;
   status: 'DRAFT' | 'PUBLISHED';
-  images: { url: string; color: string | null }[];
+  images: { url: string; color: string | null; focalX: number; focalY: number }[];
   variants: { size: string; color: string; stock: number }[];
   category: { name: string; parent: { slug: string; name: string } | null };
   _count?: { orderItems: number };
@@ -94,8 +101,11 @@ function toCatalogueProduct(row: ProductRow, computedTag?: CatalogueProduct['tag
     tag: computedTag !== undefined ? computedTag : (row.tag ? TAG_LABELS[row.tag as keyof typeof TAG_LABELS] : null),
     // Prisma returns Decimal; the views want a plain number.
     priceCad: Number(row.priceCad),
+    metaTitle: row.metaTitle,
+    metaDescription: row.metaDescription,
     imageUrl: row.images[0]?.url ?? PLACEHOLDER_IMAGE,
-    images: row.images.map(image => ({ url: image.url, color: image.color })),
+    imagePosition: row.images[0] ? `${row.images[0].focalX}% ${row.images[0].focalY}%` : '50% 50%',
+    images: row.images.map(image => ({ url: image.url, color: image.color, objectPosition: `${image.focalX}% ${image.focalY}%` })),
     colors: [...new Set(row.variants.map(v => v.color))].sort(),
     variants: row.variants.map(v => ({ size: v.size, color: v.color, inStock: v.stock > 0 })),
     inStock: row.inStock,
@@ -238,7 +248,7 @@ export type ProductForEdit = {
   metaTitle: string;
   metaDescription: string;
   /** Each image and the colour it is tied to; "" means shown for all colours. */
-  images: { url: string; color: string }[];
+  images: { url: string; color: string; focalX: number; focalY: number }[];
   variants: { size: string; color: string; stock: number }[];
 };
 
@@ -257,7 +267,7 @@ export async function getProductForEdit(id: string): Promise<ProductForEdit | nu
         id: true, title: true, description: true, categoryId: true,
         priceCad: true, productionDays: true, tag: true, status: true,
         metaTitle: true, metaDescription: true,
-        images: { select: { url: true, color: true }, orderBy: { position: 'asc' } },
+        images: { select: { url: true, color: true, focalX: true, focalY: true }, orderBy: { position: 'asc' } },
         variants: { select: { size: true, color: true, stock: true }, orderBy: { size: 'asc' } },
       },
     })
@@ -276,7 +286,7 @@ export async function getProductForEdit(id: string): Promise<ProductForEdit | nu
     status: row.status,
     metaTitle: row.metaTitle ?? '',
     metaDescription: row.metaDescription ?? '',
-    images: row.images.map(image => ({ url: image.url, color: image.color ?? '' })),
+    images: row.images.map(image => ({ url: image.url, color: image.color ?? '', focalX: image.focalX, focalY: image.focalY })),
     variants: row.variants.map(variant => ({ size: variant.size, color: variant.color, stock: variant.stock })),
   };
 }

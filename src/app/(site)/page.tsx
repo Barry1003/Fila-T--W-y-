@@ -2,6 +2,12 @@ import Home from '@/views/Home';
 import { getPageContent } from '@/server/content';
 import { listCollections, listProducts } from '@/server/catalogue';
 import type { CatalogueCollection, CatalogueProduct } from '@/server/catalogue';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Handcrafted Yoruba Headwear',
+  description: 'Explore handcrafted filà caps and gele from AdeClassics, made with care in Nigeria.',
+};
 
 /**
  * The homepage is mostly editorial — hero, story, craftsmanship — with the

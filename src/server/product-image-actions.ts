@@ -2,6 +2,7 @@
 
 import { ID, Permission, Role } from 'node-appwrite';
 import { InputFile } from 'node-appwrite/file';
+import sharp from 'sharp';
 import { getCurrentUser } from './auth';
 import { getStorage, publicFileUrl, PRODUCT_BUCKET_ID } from './storage';
 
@@ -37,12 +38,21 @@ export async function uploadProductImage(formData: FormData): Promise<UploadResu
   }
 
   try {
-    const buffer = Buffer.from(await file.arrayBuffer());
+    const original = Buffer.from(await file.arrayBuffer());
+    // Store a display-sized image, rather than sending an entire camera file to
+    // every storefront visitor. Animated GIFs keep their original frames.
+    const optimized = file.type === 'image/gif' ? null : await sharp(original)
+      .rotate()
+      .resize({ width: 1800, height: 1800, fit: 'inside', withoutEnlargement: true })
+      .webp({ quality: 82 })
+      .toBuffer();
+    const buffer = optimized && optimized.length < original.length ? optimized : original;
     const safeName = file.name?.replace(/[^\w.\-]+/g, '_') || 'upload';
+    const uploadName = buffer === optimized ? safeName.replace(/\.[^.]+$/, '') + '.webp' : safeName;
     const created = await getStorage().createFile(
       PRODUCT_BUCKET_ID,
       ID.unique(),
-      InputFile.fromBuffer(buffer, safeName),
+      InputFile.fromBuffer(buffer, uploadName),
       // Public read on the file itself, so it loads on the storefront when the
       // bucket has File Security on. (With File Security off, the bucket's own
       // read permission governs instead — set that to "Any" in Appwrite.)

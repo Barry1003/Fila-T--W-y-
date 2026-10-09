@@ -181,7 +181,7 @@ function ProductCard({ p, view }: { p: CatalogueProduct; view: 'grid' | 'list' }
       <Link to={`/product/${p.slug}`} className="flex gap-6 no-underline py-5" style={{ color: C.charcoal, borderBottom: '1px solid rgba(43,35,32,0.07)' }}
         onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}>
         <div className="w-[120px] shrink-0 aspect-[3/4] overflow-hidden relative" style={{ backgroundColor: '#ddd5c8' }}>
-          <img src={p.imageUrl} alt={p.title} className="w-full h-full object-cover block" style={{ transform: hovered ? 'scale(1.05)' : 'scale(1)', transition: 'transform 0.4s ease' }} />
+          <img src={p.imageUrl} alt={p.title} className="w-full h-full object-cover block" style={{ objectPosition: p.imagePosition, transform: hovered ? 'scale(1.05)' : 'scale(1)', transition: 'transform 0.4s ease' }} />
         {p.tag && (
           <span className="absolute top-2 left-2 py-[2px] px-[6px]" style={{ backgroundColor: p.tag === 'NEW' ? C.maroon : p.tag === 'TRENDING' ? C.teal : C.charcoal, color: C.cream, ...label, fontSize: '0.52rem' }}>{p.tag}</span>
         )}
@@ -197,7 +197,7 @@ function ProductCard({ p, view }: { p: CatalogueProduct; view: 'grid' | 'list' }
   return (
     <Link to={`/product/${p.slug}`} className="product-card no-underline block" style={{ color: C.charcoal }}>
       <div className="relative mb-4 overflow-hidden aspect-[3/4]" style={{ backgroundColor: '#ddd5c8' }}>
-        <img className="product-img w-full h-full object-cover block" src={p.imageUrl} alt={p.title} />
+        <img className="product-img w-full h-full object-cover block" src={p.imageUrl} alt={p.title} style={{ objectPosition: p.imagePosition }} />
       {p.tag && (
         <span className="absolute top-3 left-3 py-[3px] px-[8px]" style={{ backgroundColor: p.tag === 'NEW' ? C.maroon : p.tag === 'TRENDING' ? C.teal : C.charcoal, color: C.cream, ...label, fontSize: '0.56rem', letterSpacing: '0.12em' }}>
           {p.tag}
@@ -205,19 +205,20 @@ function ProductCard({ p, view }: { p: CatalogueProduct; view: 'grid' | 'list' }
       )}
         <div className="product-overlay">
           <div className="product-overlay-btns">
-            <button onClick={e => e.preventDefault()} className="flex-1 cursor-pointer py-[0.55rem]" style={{ border: '1px solid rgba(250,246,240,0.55)', color: C.cream, background: 'transparent', ...label, fontSize: '0.585rem', letterSpacing: '0.12em', backdropFilter: 'blur(4px)' }}>
-              Quick View
-            </button>
-            <button
+            <span className="flex-1 text-center py-[0.55rem]" style={{ border: '1px solid rgba(250,246,240,0.55)', color: C.cream, background: 'transparent', ...label, fontSize: '0.585rem', letterSpacing: '0.12em', backdropFilter: 'blur(4px)' }}>
+              View Details
+            </span>
+            {p.variants.length === 1 && p.variants[0].inStock && p.tag !== 'SOLD OUT' ? <button
               onClick={e => {
                 // The whole card is a link to the product; adding shouldn't navigate.
                 e.preventDefault();
+                e.stopPropagation();
                 add({
                   productId: p.id,
                   slug: p.slug,
                   title: p.title,
-                  size: p.variants[0]?.size ?? 'One Size',
-                  color: p.colors[0] ?? '',
+                  size: p.variants[0].size,
+                  color: p.variants[0].color,
                   unitPriceCents: Math.round(p.priceCad * 100),
                   imageUrl: p.imageUrl,
                 });
@@ -226,7 +227,7 @@ function ProductCard({ p, view }: { p: CatalogueProduct; view: 'grid' | 'list' }
               style={{ border: 'none', color: C.charcoal, background: C.gold, ...label, fontSize: '0.585rem', letterSpacing: '0.12em' }}
             >
               Add to Cart
-            </button>
+            </button> : <span className="flex-1 text-center py-[0.55rem]" style={{ border: 'none', color: C.charcoal, background: C.gold, ...label, fontSize: '0.585rem', letterSpacing: '0.12em' }}>{p.tag === 'SOLD OUT' ? 'Sold Out' : 'Choose Options'}</span>}
           </div>
         </div>
       </div>

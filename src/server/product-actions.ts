@@ -86,6 +86,8 @@ export async function saveProduct(raw: unknown): Promise<SaveProductResult> {
       const images = input.images.map((image, position) => ({
         url: image.url,
         position,
+        focalX: image.focalX,
+        focalY: image.focalY,
         alt: input.title,
         // Empty means the photo is general; store null so a query can tell the
         // two apart.
@@ -179,6 +181,14 @@ export async function setProductsStatus(ids: string[], status: 'PUBLISHED' | 'DR
   if (ids.length === 0) return { ok: true };
 
   try {
+    if (status === 'PUBLISHED') {
+      const missingImageCount = await withDbRetry('check product images before publishing', () =>
+        prisma.product.count({ where: { id: { in: ids }, images: { none: {} } } })
+      );
+      if (missingImageCount > 0) {
+        return { ok: false, message: 'Add a product image to each selected product before publishing.' };
+      }
+    }
     await withDbRetry('bulk set status', () =>
       prisma.product.updateMany({ where: { id: { in: ids } }, data: { status } })
     );
@@ -271,7 +281,7 @@ export async function duplicateProduct(id: string): Promise<SaveProductResult> {
           inStock: src.inStock,
           metaTitle: src.metaTitle,
           metaDescription: src.metaDescription,
-          images: { create: src.images.map(im => ({ url: im.url, position: im.position, alt: im.alt, color: im.color })) },
+          images: { create: src.images.map(im => ({ url: im.url, position: im.position, focalX: im.focalX, focalY: im.focalY, alt: im.alt, color: im.color })) },
           // sku is unique, so a copy can't reuse it.
           variants: { create: src.variants.map(v => ({ size: v.size, color: v.color, stock: v.stock })) },
         },

@@ -32,8 +32,8 @@ const TRUST = [
         <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
       </svg>
     ),
-    title: 'Escrow-Protected Payments',
-    body: 'Funds held until delivery confirmed',
+    title: 'Clear & Secure Checkout',
+    body: 'Payment instructions shown before you pay',
   },
   {
     icon: (

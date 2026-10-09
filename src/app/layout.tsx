@@ -5,7 +5,7 @@ import { CartProvider } from '@/lib/cart';
 import { PageTransitionProvider } from '@/lib/PageTransition';
 
 export const metadata: Metadata = {
-  title: 'AdeClassics — Timeless Elegance',
+  title: { default: 'AdeClassics — Yoruba Headwear & Clothing', template: '%s | AdeClassics' },
   description: 'Handcrafted Nigerian caps, headwear and tailoring, made to order.',
 };
 

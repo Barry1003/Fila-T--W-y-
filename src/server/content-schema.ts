@@ -30,9 +30,7 @@ export const heroSlideSchema = z.object({
   /** Optional CSS object-position for framing (e.g. "center 40%"); falls back to
    *  the stylesheet default when omitted. */
   objectPosition: z.string().max(40).optional(),
-  /** How the image fills the hero. "cover" (default) crops to fill; "contain"
-   *  shows the whole image with a blurred fill behind it so nothing is cropped —
-   *  use it for portrait shots that would otherwise lose their top or bottom. */
+  /** How the image fills its hero image area. "contain" shows the full image. */
   objectFit: z.enum(['cover', 'contain']).optional(),
 });
 
@@ -70,30 +68,13 @@ export const HOME_DEFAULTS: HomeContent = {
     intervalSeconds: 7,
     slides: [
       {
-        id: 'hero-jump',
+        id: 'hero-craft',
         eyebrow: 'Filà tó Wüyí',
-        headline: 'Crafted with care.\nWorn with pride.',
-        ctaLabel: 'Shop Filà',
-        ctaHref: '/collections/fila-to-wuyi',
-        imageUrl: '/hero-fila-jump.jpg',
-        objectFit: 'contain',
-        objectPosition: 'center',
-      },
-      {
-        id: 'fila',
-        eyebrow: 'The cap line',
-        headline: 'Filà tó Wüyí.\nShaped by hand.',
-        ctaLabel: 'Shop Filà',
+        headline: 'Yoruba headwear,\nshaped by hand.',
+        ctaLabel: 'Explore the collection',
         ctaHref: '/collections/fila-to-wuyi',
         imageUrl: '/hero-fila-artisan.jpg',
-      },
-      {
-        id: 'gele',
-        eyebrow: 'Gele & Ipele',
-        headline: 'Aso-oke that holds\nits shape all day.',
-        ctaLabel: 'Shop Gele & Ipele',
-        ctaHref: '/collections/gele-ipele',
-        imageUrl: 'https://images.unsplash.com/photo-1714124731489-7eb16af0ac91?w=1800&h=1100&fit=crop&auto=format',
+        objectPosition: '52% center',
       },
     ],
   },
@@ -101,7 +82,7 @@ export const HOME_DEFAULTS: HomeContent = {
     heading: 'Yoruba craft, made for the world.',
     body:
       'AdeClassics was born from a simple conviction: the artistry woven into every Yoruba filà, gele, and kaftan deserves a stage as global as the culture it carries. We are an international e-commerce store bringing premium Yoruba traditional wear — handcrafted in Nigeria — to customers in Canada, the UK, the US, and beyond.\n\n' +
-      'Every piece is handpicked by our team and every purchase is escrow-protected. When you buy here, you are not shopping for a product — you are participating in the preservation of a living tradition.',
+      'Every piece is handpicked by our team. When you buy here, you are participating in the preservation of a living tradition.',
     imageUrl: '/story-olumo.jpg',
   },
   promo: {

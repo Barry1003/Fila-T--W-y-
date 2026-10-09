@@ -150,7 +150,7 @@ function VariantRow({ v, onChange, onRemove }: {
 
 // ── Image slot ────────────────────────────────────────────────────────────────
 
-type ImageEntry = { id: string; url: string; color: string };
+type ImageEntry = { id: string; url: string; color: string; focalX: number; focalY: number };
 
 // Mirrors the images .max(8) in product-schema.ts — keep the two in step.
 const MAX_IMAGES = 8;
@@ -173,10 +173,8 @@ function ImageSlot({ img, isMain, colors, onColorChange, onRemove, onMakeMain }:
       <img
         src={img.url}
         alt=""
-        onClick={!isMain ? onMakeMain : undefined}
-        title={!isMain ? "Click to set as main photo" : undefined}
         className="block w-full aspect-square rounded-[7px] object-cover"
-        style={{ backgroundColor: "rgba(43,35,32,0.08)", cursor: isMain ? "default" : "pointer" }}
+        style={{ backgroundColor: "rgba(43,35,32,0.08)", objectPosition: `${img.focalX}% ${img.focalY}%` }}
       />
       {isMain && (
         <span
@@ -201,6 +199,11 @@ function ImageSlot({ img, isMain, colors, onColorChange, onRemove, onMakeMain }:
       >
         <XIcon size={9} />
       </button>
+      {!isMain && (
+        <button type="button" onClick={onMakeMain} className="w-full mt-1 rounded-[5px] py-1 cursor-pointer" style={{ background: C.cream, border: '1px solid rgba(43,35,32,0.18)', color: C.charcoal, fontSize: '0.62rem' }}>
+          Set as main
+        </button>
+      )}
       {/* Which colour this photo shows. "All colours" is a general image. */}
       <select
         value={img.color}
@@ -263,7 +266,7 @@ export default function ConsoleProductForm({ product, categories, knownColors }:
   );
 
   const [images, setImages] = useState<ImageEntry[]>(
-    (product?.images ?? []).map((img, i) => ({ id: `i${i}`, url: img.url, color: img.color }))
+    (product?.images ?? []).map((img, i) => ({ id: `i${i}`, url: img.url, color: img.color, focalX: img.focalX, focalY: img.focalY }))
   );
   const [imageDraft, setImageDraft] = useState("");
   const [uploading, setUploading] = useState(false);
@@ -288,8 +291,12 @@ export default function ConsoleProductForm({ product, categories, knownColors }:
   function addImage() {
     const url = imageDraft.trim();
     if (!url) return;
+    if (images.length >= MAX_IMAGES) {
+      setUploadError(`You can add up to ${MAX_IMAGES} images. Remove one to add more.`);
+      return;
+    }
     // New photos are general until the owner ties them to a colour.
-    setImages(imgs => [...imgs, { id: `i${Date.now()}`, url, color: "" }]);
+    setImages(imgs => [...imgs, { id: `i${Date.now()}`, url, color: "", focalX: 50, focalY: 50 }]);
     setImageDraft("");
   }
   function removeImage(iid: string) {
@@ -348,6 +355,8 @@ export default function ConsoleProductForm({ product, categories, knownColors }:
             id: `i${Date.now()}-${i}-${Math.random().toString(36).slice(2, 6)}`,
             url: r.url,
             color: "",
+            focalX: 50,
+            focalY: 50,
           })),
         ]);
       }
@@ -369,11 +378,15 @@ export default function ConsoleProductForm({ product, categories, knownColors }:
   function setImageColor(iid: string, color: string) {
     setImages(imgs => imgs.map(i => (i.id === iid ? { ...i, color } : i)));
   }
+  function setImageFocal(iid: string, axis: 'focalX' | 'focalY', value: number) {
+    setImages(imgs => imgs.map(i => i.id === iid ? { ...i, [axis]: value } : i));
+  }
 
   // The colours the images can be tied to — whatever the variants currently name.
   const variantColors = [...new Set(variants.map(v => v.color.trim()).filter(Boolean))];
 
   async function save(status: "PUBLISHED" | "DRAFT") {
+    if (uploading) return;
     setSaving(true);
     setError("");
     setFieldErrors({});
@@ -390,7 +403,7 @@ export default function ConsoleProductForm({ product, categories, knownColors }:
       status,
       metaTitle,
       metaDescription: metaDesc,
-      images: images.map(i => ({ url: i.url, color: i.color })),
+      images: images.map(i => ({ url: i.url, color: i.color, focalX: i.focalX, focalY: i.focalY })),
       variants: variants
         // A blank trailing row is how people leave a form, not an error.
         .filter(v => v.size.trim() !== "" || v.color.trim() !== "")
@@ -409,6 +422,7 @@ export default function ConsoleProductForm({ product, categories, knownColors }:
   }
 
   const firstError = (field: string) => fieldErrors[field]?.[0];
+  const FieldError = ({ name }: { name: string }) => firstError(name) ? <p role="alert" className="mt-1 mb-3 text-xs" style={{ color: C.maroon }}>{firstError(name)}</p> : null;
 
   return (
     <div className="console-page p-7 min-h-full" style={{ fontFamily: UI }}>
@@ -449,6 +463,7 @@ export default function ConsoleProductForm({ product, categories, knownColors }:
               className={`${INPUT_CLS} w-full mb-4`}
               style={inputBase}
             />
+            <FieldError name="title" />
 
             <FieldLabel>Description</FieldLabel>
             <textarea
@@ -459,6 +474,7 @@ export default function ConsoleProductForm({ product, categories, knownColors }:
               className={`${INPUT_CLS} w-full mb-4 resize-y`}
               style={{ ...inputBase, lineHeight: 1.6 }}
             />
+            <FieldError name="description" />
 
             <FieldLabel>Category</FieldLabel>
             <div className="relative w-full mb-4">
@@ -483,6 +499,7 @@ export default function ConsoleProductForm({ product, categories, knownColors }:
                 <ChevronDownIcon />
               </span>
             </div>
+            <FieldError name="categoryId" />
 
             <FieldLabel>Production Time (working days)</FieldLabel>
             <div className="flex items-center gap-3">
@@ -498,6 +515,7 @@ export default function ConsoleProductForm({ product, categories, knownColors }:
                 Shown to buyers before checkout
               </span>
             </div>
+            <FieldError name="productionDays" />
           </FormCard>
 
           {/* Pricing */}
@@ -518,6 +536,7 @@ export default function ConsoleProductForm({ product, categories, knownColors }:
                     style={inputBase}
                   />
                 </div>
+                <FieldError name="priceCadCents" />
               </div>
             </div>
           </FormCard>
@@ -542,6 +561,7 @@ export default function ConsoleProductForm({ product, categories, knownColors }:
                 onRemove={() => removeVariant(v.id)}
               />
             ))}
+            <FieldError name="variants" />
             <button
               onClick={addVariant}
               className="inline-flex items-center gap-[5px] mt-1.5 rounded-[6px] py-[0.4rem] px-3.5 cursor-pointer"
@@ -584,6 +604,7 @@ export default function ConsoleProductForm({ product, categories, knownColors }:
                   className={`${INPUT_CLS} w-full mb-4`}
                   style={inputBase}
                 />
+                <FieldError name="metaTitle" />
                 <FieldLabel>Meta Description</FieldLabel>
                 <textarea
                   placeholder="Short description for search engines (155 chars max)"
@@ -594,6 +615,7 @@ export default function ConsoleProductForm({ product, categories, knownColors }:
                   className={`${INPUT_CLS} w-full resize-y`}
                   style={{ ...inputBase, lineHeight: 1.6 }}
                 />
+                <FieldError name="metaDescription" />
                 {metaDesc && (
                   <p className="mt-1 text-right" style={{ fontSize: "0.63rem", color: "rgba(43,35,32,0.38)" }}>
                     {metaDesc.length}/155
@@ -627,7 +649,7 @@ export default function ConsoleProductForm({ product, categories, knownColors }:
             <button
               type="button"
               onClick={() => save(publishStatus)}
-              disabled={saving}
+              disabled={saving || uploading}
               className="w-full rounded-[7px] py-2.5 px-4 mb-2"
               style={{
                 backgroundColor: saving ? "rgba(43,35,32,0.15)" : C.gold,
@@ -640,14 +662,14 @@ export default function ConsoleProductForm({ product, categories, knownColors }:
                 letterSpacing: "0.01em",
               }}
             >
-              {saving ? "Saving…" : isEdit ? "Save Changes" : "Save Product"}
+              {saving ? "Saving…" : uploading ? "Uploading images…" : isEdit ? "Save Changes" : "Save Product"}
             </button>
             {/* Saving as a draft is the same save with a different status, so
                 the two buttons cannot drift apart. */}
             <button
               type="button"
               onClick={() => save("DRAFT")}
-              disabled={saving}
+              disabled={saving || uploading}
               className="w-full rounded-[7px] py-[0.575rem] px-4"
               style={{
                 backgroundColor: "transparent",
@@ -708,6 +730,29 @@ export default function ConsoleProductForm({ product, categories, knownColors }:
                 />
               ))}
             </div>
+            {images[0] && (
+              <div className="mb-4 p-3 rounded-[7px]" style={{ background: C.cream, border: '1px solid rgba(43,35,32,0.1)' }}>
+                <div className="mb-2 text-xs font-semibold" style={{ color: C.charcoal }}>Storefront crop preview</div>
+                <div className="rg-2 grid grid-cols-2 gap-2">
+                  {([['Shop card · 3:4', '3 / 4'], ['Product page · 4:5', '4 / 5']] as const).map(([title, ratio]) => (
+                    <div key={title}>
+                      <div className="overflow-hidden rounded-[5px]" style={{ aspectRatio: ratio, background: '#ddd5c8' }}>
+                        <img src={images[0].url} alt={title} className="w-full h-full object-cover" style={{ objectPosition: `${images[0].focalX}% ${images[0].focalY}%` }} />
+                      </div>
+                      <span className="block mt-1 text-[0.6rem]" style={{ color: C.charcoal }}>{title}</span>
+                    </div>
+                  ))}
+                </div>
+                <p className="my-3 text-[0.63rem]" style={{ color: C.charcoal }}>Move the focal point to keep the cap or garment in frame.</p>
+                {([['Horizontal', 'focalX'], ['Vertical', 'focalY']] as const).map(([title, axis]) => (
+                  <label key={axis} className="flex items-center gap-2 mb-2 text-[0.63rem]" style={{ color: C.charcoal }}>
+                    <span className="w-[58px]">{title}</span>
+                    <input type="range" min="0" max="100" value={images[0][axis]} onChange={e => setImageFocal(images[0].id, axis, Number(e.target.value))} className="flex-1 min-w-0" style={{ accentColor: C.maroon }} />
+                    <span className="w-[25px] text-right">{images[0][axis]}%</span>
+                  </label>
+                ))}
+              </div>
+            )}
             {/* Upload from device */}
             <input
               ref={fileInputRef}

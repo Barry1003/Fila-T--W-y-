@@ -16,11 +16,11 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const base = siteUrl();
 
   if (!product) {
-    return { metadataBase: new URL(base), title: 'Product not found — AdeClassics' };
+    return { metadataBase: new URL(base), title: { absolute: 'Product not found | AdeClassics' } };
   }
 
-  const title = `${product.title} — AdeClassics`;
-  const description = `${product.title}${product.colors.length ? ` in ${product.colors.join(', ')}` : ''}. Handcrafted in Nigeria — CAD $${product.priceCad.toLocaleString()}.`;
+  const title = product.metaTitle?.trim() || `${product.title} — AdeClassics`;
+  const description = product.metaDescription?.trim() || `${product.title}${product.colors.length ? ` in ${product.colors.join(', ')}` : ''}. Handcrafted in Nigeria — CAD $${product.priceCad.toLocaleString()}.`;
   const path = `/product/${product.slug}`;
 
   // A static, pre-baked file on Appwrite's CDN — no render on the scraper's
@@ -38,7 +38,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 
   return {
     metadataBase: new URL(base),
-    title,
+    title: { absolute: title },
     description,
     alternates: { canonical: path },
     openGraph: {

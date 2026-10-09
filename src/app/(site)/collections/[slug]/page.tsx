@@ -1,8 +1,15 @@
 import { notFound } from 'next/navigation';
 import CollectionPage from '@/views/CollectionPage';
 import { listCollections, listProducts } from '@/server/catalogue';
+import type { Metadata } from 'next';
 
 type Params = { params: Promise<{ slug: string }> };
+
+export async function generateMetadata({ params }: Params): Promise<Metadata> {
+  const { slug } = await params;
+  const collection = (await listCollections()).find(c => c.slug === slug);
+  return collection ? { title: collection.name, description: collection.blurb || `Explore ${collection.name} at AdeClassics.` } : {};
+}
 
 /**
  * A collection, straight from the catalogue the console edits — so a product

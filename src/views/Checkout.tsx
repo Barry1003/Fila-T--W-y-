@@ -639,8 +639,8 @@ function CheckoutContent({ stripeEnabled }: { stripeEnabled: boolean }) {
                   <p className="m-0" style={{ fontFamily: UI, fontSize: '0.825rem', color: 'rgba(43,35,32,0.65)', lineHeight: 1.65 }}>
                     {stripeEnabled ? (
                       <>
-                        When you place your order you&rsquo;ll be taken to Stripe&rsquo;s secure checkout to pay by
-                        card, Apple&nbsp;Pay or Google&nbsp;Pay. You&rsquo;ll return here once payment is confirmed.
+                        When you place your order you&rsquo;ll be taken to Stripe&rsquo;s secure checkout.
+                        Available payment methods will be shown there. You&rsquo;ll return here once payment is confirmed.
                       </>
                     ) : (
                       <>
@@ -651,14 +651,12 @@ function CheckoutContent({ stripeEnabled }: { stripeEnabled: boolean }) {
                     )}
                   </p>
                 </div>
-                <div className="flex items-center gap-2 mt-4 flex-wrap">
+                {stripeEnabled && <div className="flex items-center gap-2 mt-4 flex-wrap">
                   <span className="mr-1" style={{ fontFamily: UI, fontSize: '0.7rem', color: 'rgba(43,35,32,0.5)' }}>Payment accepted by:</span>
                   <PaymentBadge>VISA</PaymentBadge>
                   <PaymentBadge>Mastercard</PaymentBadge>
                   <PaymentBadge>Amex</PaymentBadge>
-                  <PaymentBadge>Paystack</PaymentBadge>
-                  <PaymentBadge>Flutterwave</PaymentBadge>
-                </div>
+                </div>}
               </section>
 
               {/* 5. Order notes */}
@@ -706,7 +704,7 @@ function CheckoutContent({ stripeEnabled }: { stripeEnabled: boolean }) {
                 {/* Trust row */}
                 <div className="flex gap-6 justify-center mt-4 flex-wrap">
                   {[
-                    { icon: 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z', label: 'Escrow-Protected Payments' },
+                    { icon: 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z', label: 'Clear Payment Process' },
                     { icon: 'M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2zm0 0a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10A15.3 15.3 0 0 1 12 2zM2 12h20', label: 'Worldwide Delivery' },
                   ].map(t => (
                     <div key={t.label} className="flex items-center gap-[0.4rem]">

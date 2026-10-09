@@ -205,13 +205,13 @@ export default function ConsoleShell({ children, user: userProp }: { children: R
           </div>
 
           <div className="flex items-center gap-4 shrink-0">
-            {/* Escrow Protection */}
+            {/* Payment information */}
             <Link
               to="/escrow-protection"
               className="relative flex items-center cursor-pointer p-[4px]"
               style={{ background: "none", border: "none", color: C.charcoal, opacity: 0.65 }}
-              aria-label="Escrow Protection"
-              title="Escrow Protection"
+              aria-label="Payment information"
+              title="Payment information"
             >
               <ShieldIcon size={18} />
             </Link>

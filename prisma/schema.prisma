@@ -227,6 +227,8 @@ model ProductImage {
   url       String
   alt       String?
   position  Int    @default(0)
+  focalX    Int    @default(50)
+  focalY    Int    @default(50)
 
   /// Which colour this photo shows. Null means it is a general image, shown for
   /// every colour; a colour name ties it to that variant colour so the product

@@ -25,14 +25,14 @@ const STATUS_MESSAGES = [
 
 /** The branded intro plays for at least this long so the logo and progress are
  *  actually seen, even when the next route commits instantly. */
-const MIN_VISIBLE_MS = 1300;
+const MIN_VISIBLE_MS = 250;
 
 /** A hard cap so the loader can never trap the user — if a page never becomes
  *  ready (a hung request, or a same-route click), it still dismisses. */
-const MAX_VISIBLE_MS = 5000;
+const MAX_VISIBLE_MS = 2500;
 
 /** How long to wait for the new page's images before revealing it anyway. */
-const IMAGE_WAIT_MS = 3000;
+const IMAGE_WAIT_MS = 800;
 
 /**
  * Resolves once every image currently in the document has loaded (or errored),
@@ -104,7 +104,7 @@ function NavigationTracker({
       hideTimer = setTimeout(() => {
         setIsNavigating(false);
         setIsFadingOut(false);
-      }, 500); // 500ms fade-out duration
+      }, 250);
     };
 
     // Give the new content a couple of frames to mount, then hold the loader
@@ -185,7 +185,7 @@ export function PageTransitionProvider({ children }: { children: ReactNode }) {
       hideTimer = setTimeout(() => {
         setIsNavigating(false);
         setIsFadingOut(false);
-      }, 500);
+      }, 250);
     }, MAX_VISIBLE_MS);
 
     return () => {

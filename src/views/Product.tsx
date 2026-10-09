@@ -264,7 +264,7 @@ export default function Product({ product, related, inWishlist = false, signedIn
   const [mainIdx, setMainIdx] = useState(0);
   const uniqueSizes = useMemo(() => [...new Set(product.variants.map(v => v.size))], [product.variants]);
   const [selectedSize, setSelectedSize] = useState(uniqueSizes[0] ?? '');
-  const [selectedColor, setSelectedColor] = useState(product.colors[0] ?? '');
+  const [selectedColor, setSelectedColor] = useState(product.images[0]?.color && product.colors.includes(product.images[0].color) ? product.images[0].color : product.colors[0] || '');
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState<'description' | 'sizing' | 'shipping'>('description');
   const [shareOpen, setShareOpen] = useState(false);
@@ -314,9 +314,7 @@ export default function Product({ product, related, inWishlist = false, signedIn
   // the general ones that apply to every colour.
   const shownImages = useMemo(() => {
     const all = product.images ?? [];
-    const forColor = all.filter(img => img.color === selectedColor);
-    const general = all.filter(img => !img.color);
-    return [...forColor, ...general];
+    return all.filter(img => !img.color || img.color === selectedColor);
   }, [product.images, selectedColor]);
 
   // A product with a real gallery shows its photos as stored. One with a single
@@ -324,7 +322,7 @@ export default function Product({ product, related, inWishlist = false, signedIn
   // lone thumbnail — Unsplash URLs accept crop hints; anything else repeats.
   const gallery = useMemo(() => {
     if (shownImages.length > 1) {
-      return shownImages.map(img => ({ main: img.url, thumb: img.url }));
+      return shownImages.map(img => ({ main: img.url, thumb: img.url, objectPosition: img.objectPosition }));
     }
     const url = shownImages[0]?.url ?? product.imageUrl;
     const base = url.split('?')[0];
@@ -332,8 +330,9 @@ export default function Product({ product, related, inWishlist = false, signedIn
       ? ['entropy', 'top', 'bottom', 'left', 'right'].map(crop => ({
           main: `${base}?w=900&h=1125&fit=crop&crop=${crop}&auto=format`,
           thumb: `${base}?w=200&h=200&fit=crop&crop=${crop}&auto=format`,
+          objectPosition: shownImages[0]?.objectPosition ?? product.imagePosition,
         }))
-      : [{ main: url, thumb: url }];
+      : [{ main: url, thumb: url, objectPosition: shownImages[0]?.objectPosition ?? product.imagePosition }];
   }, [shownImages, product.imageUrl]);
 
   // Switching colour can shrink the gallery below the current index. Clamp here,
@@ -420,6 +419,7 @@ export default function Product({ product, related, inWishlist = false, signedIn
                 className="pdp-main-img w-full h-full object-cover block"
                 src={gallery[safeIdx].main}
                 alt={product.title}
+                style={{ objectPosition: gallery[safeIdx].objectPosition }}
               />
               <span className="absolute top-4 left-4 py-[4px] px-[10px]" style={{ backgroundColor: isSoldOut ? C.charcoal : isMTO ? C.charcoal : C.maroon, color: C.cream, ...label, fontSize: '0.575rem', letterSpacing: '0.12em' }}>
                 {product.tag}
@@ -441,7 +441,7 @@ export default function Product({ product, related, inWishlist = false, signedIn
                     transition: 'outline 0.15s',
                   }}
                 >
-                  <img src={g.thumb} alt="" className="w-full h-full object-cover block" />
+                  <img src={g.thumb} alt="" className="w-full h-full object-cover block" style={{ objectPosition: g.objectPosition }} />
                 </button>
               ))}
             </div>
@@ -633,7 +633,7 @@ export default function Product({ product, related, inWishlist = false, signedIn
             {/* Trust row */}
             <div className="pt-6 flex gap-6 flex-wrap" style={{ borderTop: '1px solid rgba(43,35,32,0.08)' }}>
               {[
-                { mark: '🔒', text: 'Escrow-protected payment' },
+                { mark: '🔒', text: 'Clear payment process' },
                 { mark: '✦', text: 'Authentic Yoruba craft' },
                 { mark: '↩', text: 'Easy 14-day returns' },
               ].map(({ mark, text }) => (
@@ -770,25 +770,26 @@ export default function Product({ product, related, inWishlist = false, signedIn
             {related.map(p => (
               <Link key={p.id} to={`/product/${p.slug}`} className="product-card no-underline block" style={{ color: C.charcoal }}>
                 <div className="relative mb-4 overflow-hidden aspect-[3/4]" style={{ backgroundColor: '#ddd5c8' }}>
-                  <img className="product-img w-full h-full object-cover block" src={p.imageUrl} alt={p.title} />
+                  <img className="product-img w-full h-full object-cover block" src={p.imageUrl} alt={p.title} style={{ objectPosition: p.imagePosition }} />
                   <span className="absolute top-3 left-3 py-[3px] px-[8px]" style={{ backgroundColor: p.tag === 'NEW' ? C.maroon : C.charcoal, color: C.cream, ...label, fontSize: '0.56rem', letterSpacing: '0.12em' }}>
                     {p.tag}
                   </span>
                   <div className="product-overlay">
                     <div className="product-overlay-btns">
-                      <button onClick={e => e.preventDefault()} className="flex-1 cursor-pointer py-[0.55rem]" style={{ border: '1px solid rgba(250,246,240,0.55)', color: C.cream, background: 'transparent', ...label, fontSize: '0.585rem', letterSpacing: '0.12em', backdropFilter: 'blur(4px)' }}>
-                        Quick View
-                      </button>
-                      <button
+                      <span className="flex-1 text-center py-[0.55rem]" style={{ border: '1px solid rgba(250,246,240,0.55)', color: C.cream, background: 'transparent', ...label, fontSize: '0.585rem', letterSpacing: '0.12em', backdropFilter: 'blur(4px)' }}>
+                        View Details
+                      </span>
+                      {p.variants.length === 1 && p.variants[0].inStock && p.tag !== 'SOLD OUT' ? <button
                         onClick={e => {
                           // The card is a link; adding should not also navigate.
                           e.preventDefault();
+                          e.stopPropagation();
                           add({
                             productId: p.id,
                             slug: p.slug,
                             title: p.title,
-                            size: p.variants[0]?.size ?? 'One Size',
-                            color: p.colors[0] ?? '',
+                            size: p.variants[0].size,
+                            color: p.variants[0].color,
                             unitPriceCents: Math.round(p.priceCad * 100),
                             imageUrl: p.imageUrl,
                           });
@@ -797,7 +798,7 @@ export default function Product({ product, related, inWishlist = false, signedIn
                         style={{ border: 'none', color: C.charcoal, background: C.gold, ...label, fontSize: '0.585rem', letterSpacing: '0.12em' }}
                       >
                         Add to Cart
-                      </button>
+                      </button> : <span className="flex-1 text-center py-[0.55rem]" style={{ border: 'none', color: C.charcoal, background: C.gold, ...label, fontSize: '0.585rem', letterSpacing: '0.12em' }}>{p.tag === 'SOLD OUT' ? 'Sold Out' : 'Choose Options'}</span>}
                     </div>
                   </div>
                 </div>
