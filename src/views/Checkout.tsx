@@ -107,12 +107,19 @@ function FieldError({ msg }: { msg?: string }) {
 }
 
 function FocusInput(props: React.InputHTMLAttributes<HTMLInputElement> & { error?: boolean }) {
-  const { error, style, ...rest } = props;
+  const { error, style, className = '', ...rest } = props;
   const [focused, setFocused] = useState(false);
+  const hasCustomWidth = className.includes('w-') || className.includes('flex-1') || style?.width !== undefined;
   return (
     <input
       {...rest}
-      style={{ ...(error ? fieldError : fieldBase), ...(focused ? { borderColor: C.gold, boxShadow: `0 0 0 2.5px rgba(212,169,78,0.22)` } : {}), ...style }}
+      className={className}
+      style={{
+        ...(error ? fieldError : fieldBase),
+        ...(hasCustomWidth && !style?.width ? { width: undefined } : {}),
+        ...(focused ? { borderColor: C.gold, boxShadow: `0 0 0 2.5px rgba(212,169,78,0.22)` } : {}),
+        ...style,
+      }}
       onFocus={e => { setFocused(true); props.onFocus?.(e); }}
       onBlur={e => { setFocused(false); props.onBlur?.(e); }}
     />
@@ -120,12 +127,25 @@ function FocusInput(props: React.InputHTMLAttributes<HTMLInputElement> & { error
 }
 
 function FocusSelect(props: React.SelectHTMLAttributes<HTMLSelectElement> & { error?: boolean }) {
-  const { error, style, ...rest } = props;
+  const { error, style, className = '', ...rest } = props;
   const [focused, setFocused] = useState(false);
+  const hasCustomWidth = className.includes('w-') || className.includes('flex-1') || style?.width !== undefined;
   return (
     <select
       {...rest}
-      style={{ ...(error ? fieldError : fieldBase), ...(focused ? { borderColor: C.gold, boxShadow: `0 0 0 2.5px rgba(212,169,78,0.22)` } : {}), appearance: 'none', backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%232B2320' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.875rem center', paddingRight: '2.25rem', cursor: 'pointer', ...style }}
+      className={className}
+      style={{
+        ...(error ? fieldError : fieldBase),
+        ...(hasCustomWidth && !style?.width ? { width: undefined } : {}),
+        appearance: 'none',
+        backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%232B2320' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E")`,
+        backgroundRepeat: 'no-repeat',
+        backgroundPosition: 'right 0.875rem center',
+        paddingRight: '2.25rem',
+        cursor: 'pointer',
+        ...(focused ? { borderColor: C.gold, boxShadow: `0 0 0 2.5px rgba(212,169,78,0.22)` } : {}),
+        ...style,
+      }}
       onFocus={e => { setFocused(true); props.onFocus?.(e); }}
       onBlur={e => { setFocused(false); props.onBlur?.(e); }}
     />
@@ -149,31 +169,31 @@ function FocusTextarea(props: React.TextareaHTMLAttributes<HTMLTextAreaElement> 
 const STEPS = ['Cart', 'Shipping', 'Payment', 'Confirmation'];
 function ProgressBar({ current }: { current: number }) {
   return (
-    <div className="checkout-steps flex items-center justify-center">
+    <div className="checkout-steps flex items-center justify-center max-w-full overflow-hidden">
       {STEPS.map((s, i) => {
         const done = i < current;
         const active = i === current;
         return (
-          <div key={s} className="flex items-center">
+          <div key={s} className="flex items-center shrink-0">
             {i > 0 && (
-              <div className="checkout-step-line w-10 h-px" style={{ backgroundColor: done ? C.maroon : 'rgba(43,35,32,0.2)' }} />
+              <div className="checkout-step-line w-4 sm:w-8 md:w-10 h-px shrink" style={{ backgroundColor: done ? C.maroon : 'rgba(43,35,32,0.2)' }} />
             )}
-            <div className="flex flex-col items-center gap-[4px]">
+            <div className="flex flex-col items-center gap-[4px] px-1 sm:px-2">
               <div
-                className="w-6 h-6 rounded-full flex items-center justify-center shrink-0"
+                className="w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center shrink-0"
                 style={{ backgroundColor: done ? C.maroon : active ? C.gold : 'rgba(43,35,32,0.1)' }}
               >
                 {done ? (
-                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                  <svg width="10" height="10" viewBox="0 0 12 12" fill="none" className="sm:w-3 sm:h-3">
                     <polyline points="2,6 5,9 10,3" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
                 ) : (
-                  <span style={{ fontFamily: UI, fontSize: '0.6rem', fontWeight: 700, color: active ? C.charcoal : 'rgba(43,35,32,0.4)' }}>
+                  <span style={{ fontFamily: UI, fontSize: '0.55rem', fontWeight: 700, color: active ? C.charcoal : 'rgba(43,35,32,0.4)' }}>
                     {i + 1}
                   </span>
                 )}
               </div>
-              <span className="checkout-step-label" style={{ ...label, fontSize: '0.575rem', color: active ? C.gold : done ? C.maroon : 'rgba(43,35,32,0.4)', letterSpacing: '0.1em' }}>
+              <span className="checkout-step-label" style={{ ...label, fontSize: '0.55rem', color: active ? C.gold : done ? C.maroon : 'rgba(43,35,32,0.4)', letterSpacing: '0.08em' }}>
                 {s}
               </span>
             </div>
@@ -229,6 +249,8 @@ function CheckoutContent({ stripeEnabled }: { stripeEnabled: boolean }) {
   const [email, setEmail] = useState('');
   const [phoneCode, setPhoneCode] = useState('+1');
   const [phone, setPhone] = useState('');
+  const [summaryOpen, setSummaryOpen] = useState(false);
+  const totalQuantity = lines.reduce((total, l) => total + l.quantity, 0);
 
   // Address
   const [country, setCountry] = useState('CA');
@@ -350,15 +372,15 @@ function CheckoutContent({ stripeEnabled }: { stripeEnabled: boolean }) {
   // arriving with a full cart would see this for a frame.
   if (hydrated && lines.length === 0) {
     return (
-      <div className="min-h-[70vh] flex flex-col items-center justify-center py-20 px-8 text-center" style={{ backgroundColor: C.cream }}>
-        <div className="mb-3" style={{ fontFamily: DISPLAY, fontSize: '2rem', color: C.charcoal, fontWeight: 500 }}>
+      <div className="min-h-[70vh] flex flex-col items-center justify-center py-16 sm:py-20 px-4 sm:px-8 text-center" style={{ backgroundColor: C.cream }}>
+        <div className="mb-3 text-2xl sm:text-3xl" style={{ fontFamily: DISPLAY, color: C.charcoal, fontWeight: 500 }}>
           There is nothing to check out
         </div>
-        <p className="max-w-[340px] mb-8" style={{ fontFamily: UI, fontSize: '0.9rem', color: 'rgba(43,35,32,0.55)' }}>
+        <p className="max-w-[340px] mb-8 text-sm sm:text-base px-2" style={{ fontFamily: UI, color: 'rgba(43,35,32,0.55)' }}>
           Your cart is empty. Once you have added a piece, you can complete your order here.
         </p>
         <Link to="/shop" className="no-underline">
-          <span className="shimmer-cta inline-block py-[0.9rem] px-9 cursor-pointer" style={{ backgroundColor: C.gold, color: C.charcoal, ...label, fontSize: '0.68rem', letterSpacing: '0.14em' }}>
+          <span className="shimmer-cta inline-block py-[0.85rem] sm:py-[0.9rem] px-8 sm:px-9 cursor-pointer" style={{ backgroundColor: C.gold, color: C.charcoal, ...label, fontSize: '0.68rem', letterSpacing: '0.14em' }}>
             Browse the Shop
           </span>
         </Link>
@@ -380,15 +402,25 @@ function CheckoutContent({ stripeEnabled }: { stripeEnabled: boolean }) {
         }
         .shimmer-place-order:hover::after { transform: translateX(100%); transition: transform 0.6s ease; }
         @media (max-width: 1060px) {
-          .checkout-grid { grid-template-columns: 1fr; }
+          .checkout-grid { grid-template-columns: 1fr; gap: 1.75rem; }
           .checkout-sticky { position: static; }
           .checkout-summary-top { order: -1; }
+          .checkout-summary-desktop-header { display: none !important; }
+          .checkout-summary-mobile-toggle { display: flex !important; }
+        }
+        @media (min-width: 1061px) {
+          .checkout-summary-desktop-header { display: block !important; }
+          .checkout-summary-mobile-toggle { display: none !important; }
+          .checkout-summary-content { display: block !important; }
+          .checkout-mobile-return { display: none !important; }
         }
         @media (max-width: 640px) {
           .checkout-head { padding: 0 1rem !important; }
-          .checkout-progress { padding: 0.7rem 1rem !important; }
-          .checkout-body { padding: 2rem 1rem 3.5rem !important; }
-          .checkout-grid { gap: 2rem; }
+          .checkout-progress { padding: 0.5rem 0.75rem !important; }
+          .checkout-body { padding: 1.5rem 1rem 3rem !important; }
+          .checkout-grid { gap: 1.5rem; }
+          .checkout-step-line { width: 1rem !important; }
+          .checkout-step-label { font-size: 0.5rem !important; letter-spacing: 0.04em !important; }
         }
         input[type="radio"] { accent-color: ${C.gold}; }
         input[type="checkbox"] { accent-color: ${C.gold}; }
@@ -397,27 +429,27 @@ function CheckoutContent({ stripeEnabled }: { stripeEnabled: boolean }) {
 
       {/* ── Checkout Header ─────────────────────────────────── */}
       <header style={{ backgroundColor: C.maroon, borderBottom: `1px solid rgba(212,169,78,0.22)` }}>
-        <div className="checkout-head max-w-[1240px] mx-auto px-8 h-16 flex items-center justify-between">
+        <div className="checkout-head max-w-[1240px] mx-auto px-4 sm:px-8 h-14 sm:h-16 flex items-center justify-between">
           <Link to="/" className="no-underline">
-            <div style={{ fontFamily: DISPLAY, fontSize: '1.25rem', color: C.cream, fontWeight: 500, letterSpacing: '-0.01em', lineHeight: 1.05 }}>
+            <div style={{ fontFamily: DISPLAY, fontSize: '1.15rem', color: C.cream, fontWeight: 500, letterSpacing: '-0.01em', lineHeight: 1.05 }}>
               AdeClassics
             </div>
-            <div className="mt-[2px] uppercase" style={{ fontFamily: UI, fontSize: '0.525rem', color: C.gold, letterSpacing: '0.16em' }}>
+            <div className="mt-[2px] uppercase" style={{ fontFamily: UI, fontSize: '0.5rem', color: C.gold, letterSpacing: '0.16em' }}>
               Timeless Elegance
             </div>
           </Link>
-          <div className="flex items-center gap-2">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={C.gold} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={C.gold} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
               <path d="M7 11V7a5 5 0 0 1 10 0v4" />
             </svg>
-            <span className="uppercase" style={{ fontFamily: UI, fontSize: '0.7rem', color: C.cream, letterSpacing: '0.08em', opacity: 0.85 }}>
+            <span className="uppercase text-[0.65rem] sm:text-[0.7rem]" style={{ fontFamily: UI, color: C.cream, letterSpacing: '0.08em', opacity: 0.85 }}>
               Secure Checkout
             </span>
           </div>
         </div>
         {/* Progress bar */}
-        <div className="checkout-progress py-[0.7rem] px-8" style={{ backgroundColor: 'rgba(0,0,0,0.12)' }}>
+        <div className="checkout-progress py-[0.6rem] sm:py-[0.7rem] px-4 sm:px-8" style={{ backgroundColor: 'rgba(0,0,0,0.12)' }}>
           <ProgressBar current={1} />
         </div>
       </header>
@@ -453,11 +485,12 @@ function CheckoutContent({ stripeEnabled }: { stripeEnabled: boolean }) {
                     <label className="block mb-[0.4rem]" style={{ ...label, fontSize: '0.65rem', color: C.charcoal }}>
                       Phone <span style={{ opacity: 0.5 }}>(optional)</span>
                     </label>
-                    <div className="flex gap-2">
+                    <div className="grid grid-cols-[120px_1fr] sm:grid-cols-[130px_1fr] gap-2">
                       <FocusSelect
                         value={phoneCode}
                         onChange={e => setPhoneCode(e.target.value)}
-                        className="w-[130px] shrink-0"
+                        aria-label="Country calling code"
+                        style={{ minWidth: 0 }}
                       >
                         {PHONE_CODES.map(p => (
                           <option key={p.code} value={p.code}>{p.label}</option>
@@ -469,7 +502,8 @@ function CheckoutContent({ stripeEnabled }: { stripeEnabled: boolean }) {
                         value={phone}
                         onChange={e => setPhone(e.target.value)}
                         autoComplete="tel-national"
-                        className="flex-1"
+                        aria-label="Phone number"
+                        style={{ minWidth: 0 }}
                       />
                     </div>
                   </div>
@@ -531,8 +565,8 @@ function CheckoutContent({ stripeEnabled }: { stripeEnabled: boolean }) {
                     onChange={e => setAddress2(e.target.value)}
                     autoComplete="address-line2"
                   />
-                  <div className="rg-3 grid grid-cols-3 gap-3">
-                    <div className="col-[1/2]">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div>
                       <label className="block mb-[0.4rem]" style={{ ...label, fontSize: '0.65rem', color: C.charcoal }}>
                         City <span style={{ color: '#b94a48' }}>*</span>
                       </label>
@@ -587,7 +621,7 @@ function CheckoutContent({ stripeEnabled }: { stripeEnabled: boolean }) {
                     return (
                       <label
                         key={m.id}
-                        className="flex items-center gap-4 py-4 px-[1.125rem] rounded-[6px] cursor-pointer"
+                        className="flex items-center gap-3 sm:gap-4 py-3.5 px-3.5 sm:py-4 sm:px-[1.125rem] rounded-[6px] cursor-pointer"
                         style={{
                           border: `1.5px solid ${active ? C.gold : 'rgba(43,35,32,0.2)'}`,
                           backgroundColor: active ? 'rgba(212,169,78,0.07)' : '#fff',
@@ -603,9 +637,9 @@ function CheckoutContent({ stripeEnabled }: { stripeEnabled: boolean }) {
                           className="w-4 h-4 shrink-0"
                           style={{ accentColor: C.gold }}
                         />
-                        <div className="flex-1">
-                          <div className="flex justify-between items-baseline gap-4">
-                            <span style={{ fontFamily: UI, fontWeight: 600, fontSize: '0.875rem', color: C.charcoal }}>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex justify-between items-baseline gap-2 sm:gap-4">
+                            <span className="truncate" style={{ fontFamily: UI, fontWeight: 600, fontSize: '0.875rem', color: C.charcoal }}>
                               {m.label}
                             </span>
                             <span className="shrink-0" style={{ fontFamily: UI, fontWeight: 600, fontSize: '0.875rem', color: shippingCost(ZONE_OF[group], m.speed, totals.subtotalCents) === 0 ? C.teal : C.charcoal }}>
@@ -685,11 +719,11 @@ function CheckoutContent({ stripeEnabled }: { stripeEnabled: boolean }) {
                 <button
                   type="submit"
                   disabled={placing}
-                  className={`w-full py-[1.05rem] px-8 rounded-[5px] uppercase ${placing ? '' : 'shimmer-place-order'}`}
+                  className={`w-full py-3.5 sm:py-[1.05rem] px-4 sm:px-8 rounded-[5px] uppercase ${placing ? '' : 'shimmer-place-order'}`}
                   style={{
                     backgroundColor: placing ? 'rgba(43,35,32,0.25)' : C.gold, color: C.charcoal,
-                    fontFamily: UI, fontWeight: 700, fontSize: '0.875rem',
-                    letterSpacing: '0.12em',
+                    fontFamily: UI, fontWeight: 700, fontSize: '0.85rem',
+                    letterSpacing: '0.08em',
                     border: 'none', cursor: placing ? 'wait' : 'pointer',
                     boxShadow: `0 2px 12px rgba(212,169,78,0.35)`,
                     transition: 'box-shadow 0.2s, transform 0.15s',
@@ -702,18 +736,27 @@ function CheckoutContent({ stripeEnabled }: { stripeEnabled: boolean }) {
                     : `${stripeEnabled ? 'Continue to Payment' : 'Place Order'} — ${formatCad(totals.totalCents)}`}
                 </button>
                 {/* Trust row */}
-                <div className="flex gap-6 justify-center mt-4 flex-wrap">
+                <div className="flex gap-4 sm:gap-6 justify-center mt-4 flex-wrap">
                   {[
                     { icon: 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z', label: 'Clear Payment Process' },
                     { icon: 'M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2zm0 0a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10A15.3 15.3 0 0 1 12 2zM2 12h20', label: 'Worldwide Delivery' },
                   ].map(t => (
                     <div key={t.label} className="flex items-center gap-[0.4rem]">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={C.maroon} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={C.maroon} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="shrink-0">
                         <path d={t.icon} />
                       </svg>
                       <span style={{ fontFamily: UI, fontSize: '0.68rem', color: 'rgba(43,35,32,0.55)', letterSpacing: '0.02em' }}>{t.label}</span>
                     </div>
                   ))}
+                </div>
+                {/* Back to cart (Mobile) */}
+                <div className="checkout-mobile-return text-center mt-5">
+                  <Link to="/cart" className="no-underline" style={{ fontFamily: UI, fontSize: '0.75rem', color: C.indigo, letterSpacing: '0.04em' }}
+                    onMouseEnter={e => (e.currentTarget.style.textDecoration = 'underline')}
+                    onMouseLeave={e => (e.currentTarget.style.textDecoration = 'none')}
+                  >
+                    ← Return to cart
+                  </Link>
                 </div>
               </div>
             </div>
@@ -725,90 +768,131 @@ function CheckoutContent({ stripeEnabled }: { stripeEnabled: boolean }) {
                   backgroundColor: '#fff', border: `1px solid rgba(43,35,32,0.12)`,
                   boxShadow: '0 2px 16px rgba(43,35,32,0.06)',
                 }}>
-                  {/* Header */}
-                  <div className="py-[1.125rem] px-6" style={{ borderBottom: `1px solid rgba(43,35,32,0.1)`, backgroundColor: C.cream }}>
+                  {/* Desktop Header */}
+                  <div className="checkout-summary-desktop-header py-[1.125rem] px-6" style={{ borderBottom: `1px solid rgba(43,35,32,0.1)`, backgroundColor: C.cream }}>
                     <div style={{ ...label, color: C.charcoal, fontSize: '0.65rem' }}>Order Summary</div>
                   </div>
 
-                  {/* Items */}
-                  <div className="py-4 px-6 flex flex-col gap-4 max-h-[260px] overflow-y-auto">
-                    {lines.map(it => (
-                      <div key={`${it.productId}:${it.size}`} className="flex gap-3.5 items-start">
-                        <div className="relative shrink-0">
-                          <img
-                            src={it.imageUrl}
-                            alt={it.title}
-                            width={52} height={52}
-                            className="rounded-[4px] object-cover block"
-                            style={{ backgroundColor: 'rgba(43,35,32,0.08)' }}
-                          />
-                          <span className="absolute -top-[6px] -right-[6px] rounded-full w-[18px] h-[18px] flex items-center justify-center" style={{
-                            backgroundColor: C.charcoal, color: '#fff',
-                            fontFamily: UI, fontSize: '0.55rem', fontWeight: 700,
-                          }}>{it.quantity}</span>
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="truncate" style={{ fontFamily: UI, fontSize: '0.8rem', fontWeight: 600, color: C.charcoal }}>
-                            {it.title}
-                          </div>
-                          <div className="mt-[2px]" style={{ fontFamily: UI, fontSize: '0.7rem', color: 'rgba(43,35,32,0.5)' }}>{it.color} · {it.size}</div>
-                        </div>
-                        <div className="shrink-0 text-right">
-                          <div style={{ fontFamily: UI, fontSize: '0.825rem', fontWeight: 600, color: C.charcoal }}>
-                            {formatCad(it.unitPriceCents * it.quantity)}
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Totals */}
-                  <div className="py-4 px-6 flex flex-col gap-2.5" style={{ borderTop: `1px solid rgba(43,35,32,0.1)` }}>
-                    {[
-                      { label: 'Subtotal', cents: totals.subtotalCents },
-                      ...(discount ? [{ label: `Promo (${discount.code})`, cents: -totals.discountCents }] : []),
-                      { label: `Shipping (${selectedMethod.label})`, cents: totals.shippingCents, isFree: totals.shippingCents === 0 },
-                    ].map(row => (
-                      <div key={row.label} className="flex justify-between items-baseline">
-                        <span style={{ fontFamily: UI, fontSize: '0.8rem', color: 'rgba(43,35,32,0.6)' }}>{row.label}</span>
-                        <span style={{ fontFamily: UI, fontSize: '0.8rem', color: row.isFree ? C.teal : C.charcoal, fontWeight: row.isFree ? 600 : 400 }}>
-                          {row.isFree ? 'Free' : row.cents < 0 ? `−${formatCad(Math.abs(row.cents))}` : formatCad(row.cents)}
-                        </span>
-                      </div>
-                    ))}
-                    {/* Divider */}
-                    <div className="pt-2.5 mt-1" style={{ borderTop: `1px solid rgba(43,35,32,0.12)` }}>
-                      <div className="flex justify-between items-baseline">
-                        <span style={{ fontFamily: UI, fontWeight: 700, fontSize: '0.95rem', color: C.charcoal }}>Total</span>
-                        <div className="text-right">
-                          <div style={{ fontFamily: DISPLAY, fontSize: '1.2rem', color: C.charcoal, fontWeight: 600 }}>{formatCad(totals.totalCents)}</div>
-                        </div>
-                      </div>
-                      {totals.discountCents > 0 && (
-                        <div className="flex justify-end mt-1.5 items-center gap-1.5" style={{ fontFamily: UI, fontSize: '0.8rem', color: '#16a34a', fontWeight: 500 }}>
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
-                            <line x1="7" y1="7" x2="7.01" y2="7"></line>
-                          </svg>
-                          Total savings {formatCad(totals.discountCents).replace('CAD ', '')}
-                        </div>
-                      )}
+                  {/* Mobile Toggle Bar */}
+                  <button
+                    type="button"
+                    onClick={() => setSummaryOpen(!summaryOpen)}
+                    className="checkout-summary-mobile-toggle w-full py-3.5 px-4 items-center justify-between cursor-pointer border-none text-left"
+                    style={{
+                      backgroundColor: C.cream,
+                      borderBottom: summaryOpen ? `1px solid rgba(43,35,32,0.1)` : 'none',
+                    }}
+                    aria-expanded={summaryOpen}
+                  >
+                    <div className="flex items-center gap-2">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={C.maroon} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+                        <line x1="3" y1="6" x2="21" y2="6" />
+                        <path d="M16 10a4 4 0 0 1-8 0" />
+                      </svg>
+                      <span style={{ ...label, color: C.charcoal, fontSize: '0.65rem' }}>
+                        {summaryOpen ? 'Hide order summary' : 'Show order summary'}
+                      </span>
+                      <span style={{ fontFamily: UI, fontSize: '0.75rem', color: 'rgba(43,35,32,0.5)' }}>
+                        ({totalQuantity})
+                      </span>
+                      <svg
+                        width="10" height="6" viewBox="0 0 12 8" fill="none"
+                        style={{
+                          transform: summaryOpen ? 'rotate(180deg)' : 'none',
+                          transition: 'transform 0.2s ease',
+                        }}
+                      >
+                        <path d="M1 1l5 5 5-5" stroke={C.charcoal} strokeWidth="1.5" strokeLinecap="round" />
+                      </svg>
                     </div>
-                  </div>
-
-                  {/* Delivery estimate */}
-                  <div className="py-3.5 px-6 flex items-center gap-2" style={{ backgroundColor: `rgba(59,138,147,0.07)`, borderTop: `1px solid rgba(59,138,147,0.15)` }}>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={C.teal} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />
-                    </svg>
-                    <span style={{ fontFamily: UI, fontSize: '0.72rem', color: C.teal }}>
-                      Est. delivery: <strong>{selectedMethod.days}</strong>
+                    <span style={{ fontFamily: DISPLAY, fontSize: '1rem', fontWeight: 600, color: C.charcoal }}>
+                      {formatCad(totals.totalCents)}
                     </span>
+                  </button>
+
+                  {/* Summary Content (Collapsible on Mobile, Always visible on Desktop) */}
+                  <div className={`checkout-summary-content ${summaryOpen ? 'block' : 'hidden'}`}>
+                    {/* Items */}
+                    <div className="py-4 px-4 sm:px-6 flex flex-col gap-4 max-h-[260px] overflow-y-auto">
+                      {lines.map(it => (
+                        <div key={`${it.productId}:${it.size}`} className="flex gap-3.5 items-start">
+                          <div className="relative shrink-0">
+                            <img
+                              src={it.imageUrl}
+                              alt={it.title}
+                              width={52} height={52}
+                              className="rounded-[4px] object-cover block"
+                              style={{ backgroundColor: 'rgba(43,35,32,0.08)' }}
+                            />
+                            <span className="absolute -top-[6px] -right-[6px] rounded-full w-[18px] h-[18px] flex items-center justify-center" style={{
+                              backgroundColor: C.charcoal, color: '#fff',
+                              fontFamily: UI, fontSize: '0.55rem', fontWeight: 700,
+                            }}>{it.quantity}</span>
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="truncate" style={{ fontFamily: UI, fontSize: '0.8rem', fontWeight: 600, color: C.charcoal }}>
+                              {it.title}
+                            </div>
+                            <div className="mt-[2px]" style={{ fontFamily: UI, fontSize: '0.7rem', color: 'rgba(43,35,32,0.5)' }}>{it.color} · {it.size}</div>
+                          </div>
+                          <div className="shrink-0 text-right">
+                            <div style={{ fontFamily: UI, fontSize: '0.825rem', fontWeight: 600, color: C.charcoal }}>
+                              {formatCad(it.unitPriceCents * it.quantity)}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Totals */}
+                    <div className="py-4 px-4 sm:px-6 flex flex-col gap-2.5" style={{ borderTop: `1px solid rgba(43,35,32,0.1)` }}>
+                      {[
+                        { label: 'Subtotal', cents: totals.subtotalCents },
+                        ...(discount ? [{ label: `Promo (${discount.code})`, cents: -totals.discountCents }] : []),
+                        { label: `Shipping (${selectedMethod.label})`, cents: totals.shippingCents, isFree: totals.shippingCents === 0 },
+                      ].map(row => (
+                        <div key={row.label} className="flex justify-between items-baseline">
+                          <span style={{ fontFamily: UI, fontSize: '0.8rem', color: 'rgba(43,35,32,0.6)' }}>{row.label}</span>
+                          <span style={{ fontFamily: UI, fontSize: '0.8rem', color: row.isFree ? C.teal : C.charcoal, fontWeight: row.isFree ? 600 : 400 }}>
+                            {row.isFree ? 'Free' : row.cents < 0 ? `−${formatCad(Math.abs(row.cents))}` : formatCad(row.cents)}
+                          </span>
+                        </div>
+                      ))}
+                      {/* Divider */}
+                      <div className="pt-2.5 mt-1" style={{ borderTop: `1px solid rgba(43,35,32,0.12)` }}>
+                        <div className="flex justify-between items-baseline">
+                          <span style={{ fontFamily: UI, fontWeight: 700, fontSize: '0.95rem', color: C.charcoal }}>Total</span>
+                          <div className="text-right">
+                            <div style={{ fontFamily: DISPLAY, fontSize: '1.2rem', color: C.charcoal, fontWeight: 600 }}>{formatCad(totals.totalCents)}</div>
+                          </div>
+                        </div>
+                        {totals.discountCents > 0 && (
+                          <div className="flex justify-end mt-1.5 items-center gap-1.5" style={{ fontFamily: UI, fontSize: '0.8rem', color: '#16a34a', fontWeight: 500 }}>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+                              <line x1="7" y1="7" x2="7.01" y2="7"></line>
+                            </svg>
+                            Total savings {formatCad(totals.discountCents).replace('CAD ', '')}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Delivery estimate */}
+                    <div className="py-3.5 px-4 sm:px-6 flex items-center gap-2" style={{ backgroundColor: `rgba(59,138,147,0.07)`, borderTop: `1px solid rgba(59,138,147,0.15)` }}>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={C.teal} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />
+                      </svg>
+                      <span style={{ fontFamily: UI, fontSize: '0.72rem', color: C.teal }}>
+                        Est. delivery: <strong>{selectedMethod.days}</strong>
+                      </span>
+                    </div>
                   </div>
                 </div>
 
-                {/* Back to cart */}
-                <div className="text-center mt-5">
+                {/* Back to cart (Desktop) */}
+                <div className="hidden lg:block text-center mt-5">
                   <Link to="/cart" className="no-underline" style={{ fontFamily: UI, fontSize: '0.75rem', color: C.indigo, letterSpacing: '0.04em' }}
                     onMouseEnter={e => (e.currentTarget.style.textDecoration = 'underline')}
                     onMouseLeave={e => (e.currentTarget.style.textDecoration = 'none')}
@@ -825,11 +909,11 @@ function CheckoutContent({ stripeEnabled }: { stripeEnabled: boolean }) {
 
       {/* ── Minimal Footer ──────────────────────────────────── */}
       <footer style={{ backgroundColor: C.maroon, borderTop: `1px solid rgba(212,169,78,0.15)` }}>
-        <div className="max-w-[1240px] mx-auto py-5 px-8 flex items-center justify-between flex-wrap gap-3">
+        <div className="max-w-[1240px] mx-auto py-5 px-4 sm:px-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
           <span style={{ fontFamily: UI, fontSize: '0.65rem', color: 'rgba(250,246,240,0.45)', letterSpacing: '0.04em' }}>
             © {new Date().getFullYear()} AdeClassics. All rights reserved.
           </span>
-          <div className="flex gap-6">
+          <div className="flex gap-4 sm:gap-6 justify-center">
             {['Privacy Policy', 'Terms of Service', 'Returns'].map(lnk => (
               <a key={lnk} href="#" className="no-underline" style={{ fontFamily: UI, fontSize: '0.65rem', color: 'rgba(250,246,240,0.5)', letterSpacing: '0.04em' }}
                 onMouseEnter={e => (e.currentTarget.style.color = C.gold)}
