@@ -485,12 +485,12 @@ function CheckoutContent({ stripeEnabled }: { stripeEnabled: boolean }) {
                     <label className="block mb-[0.4rem]" style={{ ...label, fontSize: '0.65rem', color: C.charcoal }}>
                       Phone <span style={{ opacity: 0.5 }}>(optional)</span>
                     </label>
-                    <div className="grid grid-cols-[120px_1fr] sm:grid-cols-[130px_1fr] gap-2">
+                    <div className="grid gap-2" style={{ gridTemplateColumns: '125px 1fr' }}>
                       <FocusSelect
                         value={phoneCode}
                         onChange={e => setPhoneCode(e.target.value)}
                         aria-label="Country calling code"
-                        style={{ minWidth: 0 }}
+                        style={{ minWidth: 0, width: '100%' }}
                       >
                         {PHONE_CODES.map(p => (
                           <option key={p.code} value={p.code}>{p.label}</option>
@@ -503,7 +503,7 @@ function CheckoutContent({ stripeEnabled }: { stripeEnabled: boolean }) {
                         onChange={e => setPhone(e.target.value)}
                         autoComplete="tel-national"
                         aria-label="Phone number"
-                        style={{ minWidth: 0 }}
+                        style={{ minWidth: 0, width: '100%' }}
                       />
                     </div>
                   </div>
