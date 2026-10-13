@@ -236,10 +236,10 @@ function Dropzone({
       </label>
       {error && <div style={{ color: C.maroon, fontSize: "0.7rem", fontFamily: UI }}>{error}</div>}
       <div className="mt-1">
-        <Input 
-          value={value || ""} 
-          onChange={(val) => { onChange?.(val); }} 
-          placeholder="Or paste an image URL..." 
+        <Input
+          value={value || ""}
+          onChange={(val) => { onChange?.(val); }}
+          placeholder="Or paste an image URL..."
         />
       </div>
     </div>
@@ -516,7 +516,7 @@ function TabAboutContent({ initial }: { initial: AboutContent }) {
               color: "rgba(43,35,32,0.6)",
             }}
           >
-          + Add
+            + Add
           </button>
         </div>
         <div className="flex flex-col gap-4">
@@ -722,7 +722,7 @@ function TabHomepageContent({ initial }: { initial: HomeContent }) {
                       <Input value={slide.ctaHref} onChange={v => patchSlide(slide.id, { ctaHref: v })} placeholder="/shop" />
                     </div>
                   </div>
-                    <Dropzone label="Slide Image" hint="JPG / PNG · 1440×800px recommended" wide value={slide.imageUrl} onChange={v => patchSlide(slide.id, { imageUrl: v })} />
+                  <Dropzone label="Slide Image" hint="JPG / PNG · 1440×800px recommended" wide value={slide.imageUrl} onChange={v => patchSlide(slide.id, { imageUrl: v })} />
                 </div>
               </div>
             ))}
@@ -950,19 +950,19 @@ type Region = {
   standard: string;
   express: string;
   costCad: string;
+  costNgn: string;
 };
 
 const DEFAULT_REGIONS: Region[] = [
-  { id: 1, name: "United Kingdom", standard: "3–5 business days", express: "Next day", costCad: "CAD $12.02" },
-  { id: 2, name: "Canada", standard: "7–10 business days", express: "3–5 days", costCad: "CAD $20.64" },
-  { id: 3, name: "United States", standard: "7–10 business days", express: "3–5 days", costCad: "CAD $17.20" },
-  { id: 4, name: "Nigeria", standard: "2–4 business days", express: "Same day (Lagos)", costCad: "CAD $0.00" },
-  { id: 5, name: "Other / Rest of World", standard: "10–21 business days", express: "", costCad: "CAD $30.96" },
+  { id: 1, name: "United Kingdom", standard: "3–5 business days", express: "Next day", costCad: "CAD $12.02", costNgn: "" },
+  { id: 2, name: "Canada", standard: "7–10 business days", express: "3–5 days", costCad: "CAD $20.64", costNgn: "" },
+  { id: 3, name: "United States", standard: "7–10 business days", express: "3–5 days", costCad: "CAD $17.20", costNgn: "" },
+  { id: 4, name: "Nigeria", standard: "2–4 business days", express: "Same day (Lagos)", costCad: "CAD $0.00", costNgn: "" },
+  { id: 5, name: "Other / Rest of World", standard: "10–21 business days", express: "", costCad: "CAD $30.96", costNgn: "" },
 ];
 
 function TabShipping() {
   const [regions, setRegions] = useState<Region[]>(DEFAULT_REGIONS);
-  const [nextId, setNextId] = useState(6);
 
   const update = (id: number, field: keyof Region, val: string) => {
     setRegions((prev) =>
@@ -971,11 +971,13 @@ function TabShipping() {
   };
 
   const addRegion = () => {
-    setRegions((prev) => [
-      ...prev,
-      { id: nextId, name: "", standard: "", express: "", costCad: "" },
-    ]);
-    setNextId((n) => n + 1);
+    setRegions((prev) => {
+      const id = prev.reduce((maxId, r) => Math.max(maxId, r.id), 0) + 1;
+      return [
+        ...prev,
+        { id, name: "", standard: "", express: "", costCad: "", costNgn: "" },
+      ];
+    });
   };
 
   const remove = (id: number) =>
@@ -1048,6 +1050,7 @@ function TabShipping() {
                         ["standard", r.standard, "e.g. 3–5 days"],
                         ["express", r.express, "Optional"],
                         ["costCad", r.costCad, "CAD $0.00"],
+                        ["costNgn", r.costNgn, "₦ 0.00"],
                       ] as [keyof Region, string, string][]
                     ).map(([field, val, ph]) => (
                       <td key={field} style={{ padding: "0.5rem 0.75rem" }}>
