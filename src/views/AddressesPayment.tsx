@@ -12,13 +12,13 @@ import { C, DISPLAY, UI, label } from '../tokens';
 type AddrForm = Omit<Address, 'id'>;
 
 const COUNTRIES = [
-  'Nigeria', 'Canada', 'United Kingdom', 'United States',
+  'Canada', 'Nigeria', 'United Kingdom', 'United States',
   'Ghana', 'Kenya', 'South Africa', 'France', 'Germany', 'Australia',
 ];
 
 const BLANK_ADDR: AddrForm = {
   isDefault: false, name: '', line1: '', line2: '',
-  city: '', state: '', postal: '', country: 'Nigeria', phone: '',
+  city: '', state: '', postal: '', country: 'Canada', phone: '',
 };
 
 /* ─── Form field primitives ──────────────────────────────────── */

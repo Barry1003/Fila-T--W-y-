@@ -166,8 +166,8 @@ export default function Cart({ recommendations = [], shippingContent }: { recomm
             </svg>
             <span style={{ fontFamily: UI, fontSize: '0.95rem', fontWeight: 500, color: C.charcoal }}>
               {awayFromFree > 0
-                ? `You're ${formatCad(awayFromFree)} away from free shipping!`
-                : 'You have unlocked free shipping!'}
+                ? `You're ${formatCad(awayFromFree)} away from completing your curated look!`
+                : 'Your curated look is complete!'}
             </span>
           </div>
           <div className="h-2 w-full bg-gray-200 rounded-full overflow-hidden" style={{ backgroundColor: 'rgba(43,35,32,0.1)' }}>
@@ -334,13 +334,13 @@ export default function Cart({ recommendations = [], shippingContent }: { recomm
 
             {/* You may also like */}
             {recommendations.length > 0 && (
-              <div className="mt-14 pt-8 border-t border-solid" style={{ borderColor: 'rgba(43,35,32,0.1)' }}>
+              <div className="mt-8 pt-6 border-t border-solid" style={{ borderColor: 'rgba(43,35,32,0.1)' }}>
                 <h3 className="m-0 mb-6" style={{ fontFamily: DISPLAY, fontSize: '1.25rem', fontWeight: 500, color: C.charcoal }}>
                   You may also like
                 </h3>
                 <div className="flex flex-col gap-6">
                   {recommendations.map(prod => (
-                    <div key={prod.id} className="flex gap-4 p-4 rounded-lg items-center" style={{ border: `1px solid rgba(43,35,32,0.08)`, backgroundColor: '#fff' }}>
+                    <div key={prod.id} className="flex gap-4 p-4 rounded-lg items-center min-w-0" style={{ border: `1px solid rgba(43,35,32,0.08)`, backgroundColor: '#fff' }}>
                       <div className="w-[80px] h-[100px] shrink-0 bg-gray-100 overflow-hidden rounded-[4px]" style={{ backgroundColor: '#e8e2da' }}>
                         <img src={prod.imageUrl} alt={prod.title} className="w-full h-full object-cover" />
                       </div>
@@ -353,8 +353,8 @@ export default function Cart({ recommendations = [], shippingContent }: { recomm
                         <div className="mb-3" style={{ fontFamily: UI, fontSize: '0.9rem', fontWeight: 500, color: C.charcoal }}>
                           {formatCad(prod.priceCad * 100)}
                         </div>
-                        <div className="flex gap-2">
-                          <select className="flex-1 p-2 rounded-[4px] cursor-pointer" style={{ border: '1px solid rgba(43,35,32,0.15)', fontFamily: UI, fontSize: '0.75rem', backgroundColor: '#fff' }}>
+                        <div className="flex gap-2 min-w-0">
+                          <select className="flex-1 min-w-0 p-2 rounded-[4px] cursor-pointer" style={{ border: '1px solid rgba(43,35,32,0.15)', fontFamily: UI, fontSize: '0.75rem', backgroundColor: '#fff' }}>
                             {prod.variants.filter(v => v.inStock).map(v => (
                               <option key={`${v.color}-${v.size}`} value={`${v.color}|${v.size}`}>
                                 {v.color} / {v.size}
@@ -362,7 +362,7 @@ export default function Cart({ recommendations = [], shippingContent }: { recomm
                             ))}
                           </select>
                           <button 
-                            className="px-5 rounded-[4px] font-bold cursor-pointer transition-transform active:scale-95 hover:brightness-105"
+                            className="shrink-0 px-4 rounded-[4px] font-bold cursor-pointer transition-transform active:scale-95 hover:brightness-105"
                             style={{ backgroundColor: C.gold, color: C.charcoal, border: 'none', fontFamily: UI, fontSize: '0.8rem' }}
                             onClick={(e) => {
                               const select = e.currentTarget.previousElementSibling as HTMLSelectElement;
@@ -571,12 +571,15 @@ export default function Cart({ recommendations = [], shippingContent }: { recomm
           }
         }
         @media (max-width: 640px) {
-          .cart-grid { padding-left: 1rem; padding-right: 1rem; }
+          .cart-grid { padding-left: 0; padding-right: 0; min-width: 0; }
+          .cart-grid > * { min-width: 0; }
+          .cart-item-grid { min-width: 0; }
+          .cart-item-grid > :nth-child(2) { overflow: hidden; }
           .cart-swipe-row { position: relative; overflow: hidden; background: ${C.maroon}; }
           .cart-swipe-action { position: absolute; inset: 0 auto 0 0; width: 88px; display: flex; align-items: center; justify-content: center; }
           .cart-swipe-action button { border: 0; background: none; color: ${C.cream}; font: 600 0.62rem ${UI}; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; }
           .cart-swipe-content { position: relative; z-index: 1; background: ${C.cream}; transition: transform 180ms ease; }
-          .cart-item-grid { grid-template-columns: 72px minmax(0, 1fr) auto !important; gap: 0.75rem !important; }
+          .cart-item-grid { grid-template-columns: 72px minmax(0, 1fr) minmax(0, auto) !important; gap: 0.75rem !important; }
           .cart-item-grid > :nth-child(2) { min-width: 0; }
           .cart-item-grid > :nth-child(3) { grid-column: 2; grid-row: 2; justify-self: start; margin-top: 0.5rem; }
           .cart-item-grid > :nth-child(4) { grid-column: 3; grid-row: 2; align-self: end; }

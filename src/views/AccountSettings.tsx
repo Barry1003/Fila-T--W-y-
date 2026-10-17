@@ -120,7 +120,7 @@ function PhoneInput({ value, onChange, code, onCodeChange }: {
   code: string; onCodeChange: (v: string) => void;
 }) {
   const [focused, setFocused] = useState(false);
-  const CODES = ['+234', '+1', '+44', '+33', '+49', '+61', '+254', '+233', '+27', '+32'];
+  const CODES = ['+1', '+44', '+33', '+49', '+61', '+254', '+233', '+27', '+32', '+234'];
   return (
     <div className="mb-[1.1rem]">
       <label className="block mb-[0.4rem] uppercase" style={{
@@ -148,7 +148,7 @@ function PhoneInput({ value, onChange, code, onCodeChange }: {
           type="tel"
           value={value}
           onChange={e => onChange(e.target.value)}
-          placeholder="806 123 4567"
+          placeholder="(416) 555-0123"
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
           className="flex-1 py-2.5 px-3.5 rounded-[5px] box-border"

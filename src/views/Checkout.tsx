@@ -486,7 +486,7 @@ function CheckoutContent({ stripeEnabled, shippingContent }: { stripeEnabled: bo
                       </FocusSelect>
                       <FocusInput
                         type="tel"
-                        placeholder="8012345678"
+                        placeholder="(416) 555-0123"
                         value={phone}
                         onChange={e => setPhone(e.target.value)}
                         autoComplete="tel-national"
@@ -522,7 +522,7 @@ function CheckoutContent({ stripeEnabled, shippingContent }: { stripeEnabled: bo
                     </label>
                     <FocusInput
                       type="text"
-                      placeholder="Adewale Okonkwo"
+                      placeholder="Avery Morgan"
                       value={fullName}
                       onChange={e => setFullName(e.target.value)}
                       onBlur={() => touch('fullName')}
@@ -560,7 +560,7 @@ function CheckoutContent({ stripeEnabled, shippingContent }: { stripeEnabled: bo
                       </label>
                       <FocusInput
                         type="text"
-                        placeholder="Lagos"
+                        placeholder="Toronto"
                         value={city}
                         onChange={e => setCity(e.target.value)}
                         onBlur={() => touch('city')}
@@ -575,7 +575,7 @@ function CheckoutContent({ stripeEnabled, shippingContent }: { stripeEnabled: bo
                       </label>
                       <FocusInput
                         type="text"
-                        placeholder="Lagos"
+                        placeholder="Ontario"
                         value={stateProvince}
                         onChange={e => setStateProvince(e.target.value)}
                         autoComplete="address-level1"
@@ -587,7 +587,7 @@ function CheckoutContent({ stripeEnabled, shippingContent }: { stripeEnabled: bo
                       </label>
                       <FocusInput
                         type="text"
-                        placeholder="100001"
+                        placeholder="M5V 2T6"
                         value={postal}
                         onChange={e => setPostal(e.target.value)}
                         onBlur={() => touch('postal')}
