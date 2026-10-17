@@ -8,8 +8,10 @@ import { useCart } from '@/lib/cart';
 import { toggleWishlist } from '@/server/wishlist-actions';
 import { submitReview } from '@/server/review-actions';
 import { C, DISPLAY, UI, label } from '../tokens';
+import { formatCad } from '@/server/pricing';
 import ReactMarkdown from 'react-markdown';
 import type { CatalogueProduct } from '@/server/catalogue';
+import type { ShippingContent } from '@/server/content-schema';
 import type { ProductReviews } from '@/server/reviews';
 
 // ── Share Modal ──────────────────────────────────────────────────────────────
@@ -258,9 +260,11 @@ export type ProductProps = {
   /** Canonical origin (from siteUrl()) so shared links survive redeploys and
    *  never point at a preview/localhost host. */
   shareBaseUrl?: string;
+  shippingContent: ShippingContent;
 };
 
-export default function Product({ product, related, inWishlist = false, signedIn = false, reviews, shareBaseUrl }: ProductProps) {
+export default function Product({ product, related, inWishlist = false, signedIn = false, reviews, shareBaseUrl, shippingContent }: ProductProps) {
+  const shippingById = Object.fromEntries(shippingContent.regions.map(region => [region.id, region]));
 
   const [mainIdx, setMainIdx] = useState(0);
   const uniqueSizes = useMemo(() => [...new Set(product.variants.map(v => v.size))], [product.variants]);
@@ -551,8 +555,9 @@ export default function Product({ product, related, inWishlist = false, signedIn
             <div className="mb-8 py-3.5 px-[1.125rem]" style={{ backgroundColor: 'rgba(59,138,147,0.055)', borderLeft: `2.5px solid ${C.teal}` }}>
               <div className="mb-2" style={{ ...label, color: C.charcoal, fontSize: '0.57rem', letterSpacing: '0.13em' }}>Estimated Delivery</div>
               <div style={{ fontFamily: UI, fontSize: '0.8rem', color: 'rgba(43,35,32,0.7)', lineHeight: 1.75 }}>
-                Canada / US / UK: 7–10 business days<br />
-                Nigeria: 2–4 business days
+                Canada / United States: {shippingById['canada-us']?.standard ?? 'See checkout'}<br />
+                United Kingdom: {shippingById.uk?.standard ?? 'See checkout'}<br />
+                Nigeria: {shippingById.nigeria?.standard ?? 'See checkout'}
               </div>
             </div>
 
@@ -746,10 +751,10 @@ export default function Product({ product, related, inWishlist = false, signedIn
                 <div className="mb-9">
                   <div className="mb-4" style={{ ...label, color: C.charcoal, fontSize: '0.58rem', letterSpacing: '0.14em' }}>Shipping</div>
                   <ul className="m-0 pl-5" style={{ fontFamily: UI, fontSize: '0.875rem', lineHeight: 2.1, color: 'rgba(43,35,32,0.7)' }}>
-                    <li>Canada / US / UK: standard 7–10 business days; express 3–5 days</li>
-                    <li>Nigeria: 2–4 business days via our Lagos fulfilment partner</li>
-                    <li>All other countries: 10–18 business days</li>
-                    <li>Free standard shipping on all orders over CAD $200</li>
+                    {shippingContent.regions.map(region => (
+                      <li key={region.id}>{region.name}: standard {region.standard}{region.express ? `; express ${region.express}` : ''}</li>
+                    ))}
+                    <li>Free standard shipping on all orders over {formatCad(shippingContent.freeShippingThresholdCents)}</li>
                     <li>All parcels are fully tracked and insured at no extra cost</li>
                   </ul>
                 </div>

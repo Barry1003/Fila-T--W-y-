@@ -8,6 +8,7 @@ import type { PageSlug } from './content-schema';
 const AFFECTED_PATHS: Record<PageSlug, string[]> = {
   home: ['/'],
   about: ['/about'],
+  shipping: ['/cart', '/checkout', '/shop'],
 };
 
 /**

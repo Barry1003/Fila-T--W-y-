@@ -1,24 +1,17 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Link } from '@/lib/router';
 import { useCart } from '@/lib/cart';
 import { checkPromoCode } from '@/server/place-order';
 import { C, DISPLAY, UI, label } from '../tokens';
-import { formatCad, orderTotals, shippingCost, type Discount, type ShippingZone, FREE_SHIPPING_THRESHOLD_CENTS } from '@/server/pricing';
+import { formatCad, orderTotals, shippingCost, type Discount, type ShippingZone } from '@/server/pricing';
+import type { ShippingContent } from '@/server/content-schema';
 import type { CatalogueProduct } from '@/server/catalogue';
 
 /* ─── Shipping options ──────────────────────────────────── */
-const SHIPPING_OPTS: { id: string; zone: ShippingZone; label: string; est: string }[] = [
-  { id: 'ca-us', zone: 'canada-us',     label: 'Canada / United States', est: '5–8 business days' },
-  { id: 'uk',    zone: 'uk',            label: 'United Kingdom',         est: '8–12 business days' },
-  { id: 'ng',    zone: 'nigeria',       label: 'Nigeria',                est: '7–14 business days' },
-  { id: 'intl',  zone: 'rest-of-world', label: 'Rest of World',          est: '10–18 business days' },
-];
-
-/** What a zone costs, written the way the option list shows it. */
-function shippingLabel(zone: ShippingZone, subtotalCents: number): string {
-  const cents = shippingCost(zone, 'standard', subtotalCents);
+function shippingLabel(zone: ShippingZone, subtotalCents: number, shippingContent: ShippingContent): string {
+  const cents = shippingCost(zone, 'standard', subtotalCents, shippingContent);
   return cents === 0 ? 'Free' : formatCad(cents);
 }
 
@@ -59,22 +52,25 @@ const TRUST = [
 ];
 
 /* ─── Component ─────────────────────────────────────────── */
-export default function Cart({ recommendations = [] }: { recommendations?: CatalogueProduct[] }) {
+export default function Cart({ recommendations = [], shippingContent }: { recommendations?: CatalogueProduct[]; shippingContent: ShippingContent }) {
   const { lines, count: itemCount, setQuantity, remove, hydrated } = useCart();
 
-  const [shipping, setShipping] = useState('ca-us');
+  const [shipping, setShipping] = useState<ShippingZone>('canada-us');
   const [promo, setPromo] = useState('');
   const [applied, setApplied] = useState<{ code: string; discount: Discount; description: string } | null>(null);
   const [promoError, setPromoError] = useState('');
   const [checking, setChecking] = useState(false);
+  const [swipedKey, setSwipedKey] = useState<string | null>(null);
+  const touchStart = useRef<{ x: number; y: number } | null>(null);
 
-  const selectedShip = SHIPPING_OPTS.find(o => o.id === shipping)!;
+  const selectedShip = shippingContent.regions.find(o => o.id === shipping) ?? shippingContent.regions[0];
 
   const totals = orderTotals(
     lines.map(line => ({ unitPriceCents: line.unitPriceCents, quantity: line.quantity })),
     applied?.discount ?? null,
-    selectedShip.zone,
-    'standard'
+    selectedShip.id,
+    'standard',
+    shippingContent,
   );
 
   // The code is checked against the database rather than a string in this file,
@@ -142,8 +138,8 @@ export default function Cart({ recommendations = [] }: { recommendations?: Catal
   }
 
   /* ── Full cart ──────────────────────────────────────── */
-  const awayFromFree = Math.max(0, FREE_SHIPPING_THRESHOLD_CENTS - totals.subtotalCents);
-  const percentToFree = Math.min(100, Math.round((totals.subtotalCents / FREE_SHIPPING_THRESHOLD_CENTS) * 100));
+  const awayFromFree = Math.max(0, shippingContent.freeShippingThresholdCents - totals.subtotalCents);
+  const percentToFree = shippingContent.freeShippingThresholdCents === 0 ? 100 : Math.min(100, Math.round((totals.subtotalCents / shippingContent.freeShippingThresholdCents) * 100));
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: C.cream }}>
@@ -186,7 +182,7 @@ export default function Cart({ recommendations = [] }: { recommendations?: Catal
           <div>
             {/* Column headers */}
             <div
-              className="grid gap-4 items-center pb-3.5"
+              className="cart-header cart-item-grid grid gap-4 items-center pb-3.5"
               style={{
                 gridTemplateColumns: '88px 1fr auto auto',
                 ...label, fontSize: '0.6rem', color: 'rgba(43,35,32,0.45)',
@@ -202,12 +198,45 @@ export default function Cart({ recommendations = [] }: { recommendations?: Catal
             {/* Line items */}
             {lines.map((item, idx) => {
               const lineTotalCents = item.unitPriceCents * item.quantity;
+              const itemKey = `${item.productId}:${item.size}:${item.color}`;
+              const isSwiped = swipedKey === itemKey;
               return (
-                <div key={`${item.productId}:${item.size}:${item.color}`}>
+                <div key={itemKey}>
                   <div
-                    className="grid gap-4 items-start py-[1.875rem] relative"
-                    style={{ gridTemplateColumns: '88px 1fr auto auto' }}
+                    className="cart-swipe-row"
+                    onTouchStart={e => {
+                      const touch = e.touches[0];
+                      touchStart.current = { x: touch.clientX, y: touch.clientY };
+                    }}
+                    onTouchEnd={e => {
+                      const start = touchStart.current;
+                      touchStart.current = null;
+                      if (!start) return;
+                      const touch = e.changedTouches[0];
+                      const dx = touch.clientX - start.x;
+                      const dy = Math.abs(touch.clientY - start.y);
+                      if (dy > 48) return;
+                      if (dx > 60) setSwipedKey(itemKey);
+                      if (dx < -40) setSwipedKey(null);
+                    }}
                   >
+                    <div className="cart-swipe-action" aria-hidden={!isSwiped}>
+                      <button
+                        type="button"
+                        onClick={() => { remove(item.productId, item.size, item.color); setSwipedKey(null); }}
+                        tabIndex={isSwiped ? 0 : -1}
+                        aria-label={`Cancel and remove ${item.title}`}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                    <div
+                      className="cart-item-grid grid gap-4 items-start py-[1.875rem] relative cart-swipe-content"
+                      style={{
+                        gridTemplateColumns: '88px 1fr auto auto',
+                        transform: isSwiped ? 'translateX(88px)' : 'translateX(0)',
+                      }}
+                    >
                     {/* Thumbnail */}
                     <div className="w-[88px] h-[88px] shrink-0 overflow-hidden" style={{ backgroundColor: '#e8e2da' }}>
                       <img
@@ -273,6 +302,7 @@ export default function Cart({ recommendations = [] }: { recommendations?: Catal
                       <div style={{ fontFamily: UI, fontSize: '0.9rem', fontWeight: 600, color: C.charcoal }}>
                         {formatCad(lineTotalCents)}
                       </div>
+                    </div>
                     </div>
                   </div>
 
@@ -388,14 +418,14 @@ export default function Cart({ recommendations = [] }: { recommendations?: Catal
                   <span style={{ fontFamily: UI, fontSize: '0.875rem', color: 'rgba(43,35,32,0.65)' }}>Shipping</span>
                   <div className="text-right">
                     <div style={{ fontFamily: UI, fontSize: '0.9rem', fontWeight: 500, color: totals.shippingCents === 0 ? C.teal : C.charcoal }}>
-                      {shippingLabel(selectedShip.zone, totals.subtotalCents)}
+                      {shippingLabel(selectedShip.id, totals.subtotalCents, shippingContent)}
                     </div>
-                    <div style={{ fontFamily: UI, fontSize: '0.7rem', color: 'rgba(43,35,32,0.4)' }}>{selectedShip.est}</div>
+                    <div style={{ fontFamily: UI, fontSize: '0.7rem', color: 'rgba(43,35,32,0.4)' }}>{selectedShip.standard}</div>
                   </div>
                 </div>
                 <select
                   value={shipping}
-                  onChange={e => setShipping(e.target.value)}
+                  onChange={e => setShipping(e.target.value as ShippingZone)}
                   className="w-full py-[0.6rem] pl-3 pr-8 cursor-pointer appearance-none"
                   style={{
                     border: `1px solid rgba(43,35,32,0.2)`,
@@ -409,8 +439,8 @@ export default function Cart({ recommendations = [] }: { recommendations?: Catal
                     backgroundPosition: 'right 0.75rem center',
                   }}
                 >
-                  {SHIPPING_OPTS.map(opt => (
-                    <option key={opt.id} value={opt.id}>{opt.label}</option>
+                  {shippingContent.regions.map(opt => (
+                    <option key={opt.id} value={opt.id}>{opt.name}</option>
                   ))}
                 </select>
               </div>
@@ -541,9 +571,20 @@ export default function Cart({ recommendations = [] }: { recommendations?: Catal
           }
         }
         @media (max-width: 640px) {
-          .cart-grid > div:first-child > div[style*="88px 1fr auto auto"] {
-            grid-template-columns: 72px 1fr !important;
-          }
+          .cart-grid { padding-left: 1rem; padding-right: 1rem; }
+          .cart-swipe-row { position: relative; overflow: hidden; background: ${C.maroon}; }
+          .cart-swipe-action { position: absolute; inset: 0 auto 0 0; width: 88px; display: flex; align-items: center; justify-content: center; }
+          .cart-swipe-action button { border: 0; background: none; color: ${C.cream}; font: 600 0.62rem ${UI}; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; }
+          .cart-swipe-content { position: relative; z-index: 1; background: ${C.cream}; transition: transform 180ms ease; }
+          .cart-item-grid { grid-template-columns: 72px minmax(0, 1fr) auto !important; gap: 0.75rem !important; }
+          .cart-item-grid > :nth-child(2) { min-width: 0; }
+          .cart-item-grid > :nth-child(3) { grid-column: 2; grid-row: 2; justify-self: start; margin-top: 0.5rem; }
+          .cart-item-grid > :nth-child(4) { grid-column: 3; grid-row: 2; align-self: end; }
+          .cart-item-grid > :first-child { width: 72px !important; height: 72px !important; }
+          .cart-header { display: none !important; }
+        }
+        @media (min-width: 641px) {
+          .cart-swipe-action { display: none; }
         }
       `}</style>
     </div>

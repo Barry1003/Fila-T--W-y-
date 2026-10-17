@@ -7,10 +7,9 @@ import { getStripePayoutSummary } from '@/server/stripe-payouts';
 export const dynamic = 'force-dynamic';
 
 export default async function Page() {
-  const [homeContent, aboutContent] = await Promise.all([
-    getPageContent('home'),
-    getPageContent('about'),
-  ]);
+  const homeContent = await getPageContent('home');
+  const aboutContent = await getPageContent('about');
+  const shippingContent = await getPageContent('shipping');
   const payouts = await getStripePayoutSummary();
-  return <ConsoleSettings homeContent={homeContent} aboutContent={aboutContent} payouts={payouts} />;
+  return <ConsoleSettings homeContent={homeContent} aboutContent={aboutContent} shippingContent={shippingContent} payouts={payouts} />;
 }

@@ -7,6 +7,7 @@ import { checkPromoCode, placeOrder } from '@/server/place-order';
 import { createStripeCheckoutSession } from '@/server/stripe-actions';
 import { C, DISPLAY, UI, label } from '../tokens';
 import { formatCad, orderTotals, shippingCost, type Discount, type ShippingSpeed, type ShippingZone } from '@/server/pricing';
+import type { ShippingContent } from '@/server/content-schema';
 
 /* ─── Country + shipping matrix ──────────────────────────── */
 type CountryGroup = 'ca-us' | 'uk' | 'ng' | 'intl';
@@ -32,25 +33,6 @@ const ZONE_OF: Record<CountryGroup, ShippingZone> = {
   uk: 'uk',
   ng: 'nigeria',
   intl: 'rest-of-world',
-};
-
-const SHIPPING_MATRIX: Record<CountryGroup, { id: string; label: string; days: string; speed: ShippingSpeed }[]> = {
-  'ca-us': [
-    { id: 'ca-us-std', label: 'Standard', days: '5–8 business days', speed: 'standard' },
-    { id: 'ca-us-exp', label: 'Express', days: '2–3 business days', speed: 'express' },
-  ],
-  'uk': [
-    { id: 'uk-std', label: 'Standard', days: '8–12 business days', speed: 'standard' },
-    { id: 'uk-exp', label: 'Express', days: '4–6 business days', speed: 'express' },
-  ],
-  'ng': [
-    { id: 'ng-std', label: 'Standard', days: '7–14 business days', speed: 'standard' },
-    { id: 'ng-exp', label: 'Express', days: '4–7 business days', speed: 'express' },
-  ],
-  'intl': [
-    { id: 'intl-std', label: 'Standard', days: '10–18 business days', speed: 'standard' },
-    { id: 'intl-exp', label: 'Express', days: '6–10 business days', speed: 'express' },
-  ],
 };
 
 const PHONE_CODES = [
@@ -214,15 +196,15 @@ function PaymentBadge({ children }: { children: React.ReactNode }) {
 }
 
 /* ─── Main component ─────────────────────────────────────────── */
-export default function Checkout({ stripeEnabled = false }: { stripeEnabled?: boolean }) {
+export default function Checkout({ stripeEnabled = false, shippingContent }: { stripeEnabled?: boolean; shippingContent: ShippingContent }) {
   return (
     <Suspense fallback={<div className="min-h-screen" style={{ backgroundColor: C.cream }} />}>
-      <CheckoutContent stripeEnabled={stripeEnabled} />
+      <CheckoutContent stripeEnabled={stripeEnabled} shippingContent={shippingContent} />
     </Suspense>
   );
 }
 
-function CheckoutContent({ stripeEnabled }: { stripeEnabled: boolean }) {
+function CheckoutContent({ stripeEnabled, shippingContent }: { stripeEnabled: boolean; shippingContent: ShippingContent }) {
   const navigate = useNavigate();
   const searchParams = useSearchParams();
   const { lines, clear, hydrated } = useCart();
@@ -263,7 +245,11 @@ function CheckoutContent({ stripeEnabled }: { stripeEnabled: boolean }) {
 
   // Shipping
   const group = getGroup(country);
-  const methods = SHIPPING_MATRIX[group];
+  const region = shippingContent.regions.find(r => r.id === ZONE_OF[group]) ?? shippingContent.regions[0];
+  const methods = [
+    { id: `${region.id}-std`, label: 'Standard', days: region.standard, speed: 'standard' as const },
+    ...(region.express ? [{ id: `${region.id}-exp`, label: 'Express', days: region.express, speed: 'express' as const }] : []),
+  ];
   const [methodId, setMethodId] = useState(methods[0].id);
   const selectedMethod = methods.find(m => m.id === methodId) ?? methods[0];
 
@@ -271,7 +257,8 @@ function CheckoutContent({ stripeEnabled }: { stripeEnabled: boolean }) {
   function handleCountryChange(val: string) {
     setCountry(val);
     const g = getGroup(val);
-    setMethodId(SHIPPING_MATRIX[g][0].id);
+    const nextRegion = shippingContent.regions.find(r => r.id === ZONE_OF[g]) ?? shippingContent.regions[0];
+    setMethodId(`${nextRegion.id}-std`);
   }
 
   const [orderNotes, setOrderNotes] = useState('');
@@ -299,7 +286,8 @@ function CheckoutContent({ stripeEnabled }: { stripeEnabled: boolean }) {
     lines.map(line => ({ unitPriceCents: line.unitPriceCents, quantity: line.quantity })),
     discount?.discount ?? null,
     ZONE_OF[group],
-    selectedMethod.speed
+    selectedMethod.speed,
+    shippingContent
   );
 
   async function handleSubmit(e: React.FormEvent) {
@@ -616,7 +604,7 @@ function CheckoutContent({ stripeEnabled }: { stripeEnabled: boolean }) {
               <section>
                 <SectionLabel>Shipping Method</SectionLabel>
                 <div className="flex flex-col gap-[0.65rem]">
-                  {SHIPPING_MATRIX[group].map(m => {
+                  {methods.map(m => {
                     const active = methodId === m.id;
                     return (
                       <label
@@ -642,8 +630,8 @@ function CheckoutContent({ stripeEnabled }: { stripeEnabled: boolean }) {
                             <span className="truncate" style={{ fontFamily: UI, fontWeight: 600, fontSize: '0.875rem', color: C.charcoal }}>
                               {m.label}
                             </span>
-                            <span className="shrink-0" style={{ fontFamily: UI, fontWeight: 600, fontSize: '0.875rem', color: shippingCost(ZONE_OF[group], m.speed, totals.subtotalCents) === 0 ? C.teal : C.charcoal }}>
-                              {shippingCost(ZONE_OF[group], m.speed, totals.subtotalCents) === 0 ? 'Free' : formatCad(shippingCost(ZONE_OF[group], m.speed, totals.subtotalCents))}
+                            <span className="shrink-0" style={{ fontFamily: UI, fontWeight: 600, fontSize: '0.875rem', color: shippingCost(ZONE_OF[group], m.speed, totals.subtotalCents, shippingContent) === 0 ? C.teal : C.charcoal }}>
+                              {shippingCost(ZONE_OF[group], m.speed, totals.subtotalCents, shippingContent) === 0 ? 'Free' : formatCad(shippingCost(ZONE_OF[group], m.speed, totals.subtotalCents, shippingContent))}
                             </span>
                           </div>
                           <div className="mt-[2px]" style={{ fontFamily: UI, fontSize: '0.775rem', color: 'rgba(43,35,32,0.55)' }}>

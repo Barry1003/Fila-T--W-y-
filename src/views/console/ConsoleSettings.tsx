@@ -4,7 +4,7 @@ import { useState, useCallback } from "react";
 import { C, UI, DISPLAY, label } from "../../tokens";
 import { updatePageContent } from "@/server/content-actions";
 import { uploadProductImage } from "@/server/product-image-actions";
-import type { HomeContent, HeroSlide, AboutContent } from "@/server/content-schema";
+import type { HomeContent, HeroSlide, AboutContent, ShippingContent } from "@/server/content-schema";
 import type { StripePayoutSummary } from "@/server/stripe-payouts";
 
 // ── Shared primitives ────────────────────────────────────────────────────────
@@ -953,16 +953,16 @@ type Region = {
   costNgn: string;
 };
 
-const DEFAULT_REGIONS: Region[] = [
-  { id: 1, name: "United Kingdom", standard: "3–5 business days", express: "Next day", costCad: "CAD $12.02", costNgn: "" },
-  { id: 2, name: "Canada", standard: "7–10 business days", express: "3–5 days", costCad: "CAD $20.64", costNgn: "" },
-  { id: 3, name: "United States", standard: "7–10 business days", express: "3–5 days", costCad: "CAD $17.20", costNgn: "" },
-  { id: 4, name: "Nigeria", standard: "2–4 business days", express: "Same day (Lagos)", costCad: "CAD $0.00", costNgn: "" },
-  { id: 5, name: "Other / Rest of World", standard: "10–21 business days", express: "", costCad: "CAD $30.96", costNgn: "" },
-];
-
-function TabShipping() {
-  const [regions, setRegions] = useState<Region[]>(DEFAULT_REGIONS);
+function TabShipping({ initial }: { initial: ShippingContent }) {
+  const [regions, setRegions] = useState<Region[]>(() => initial.regions.map(r => ({
+    id: Number(r.id === 'uk' ? 1 : r.id === 'canada-us' ? 2 : r.id === 'nigeria' ? 3 : 4),
+    name: r.name,
+    standard: r.standard,
+    express: r.express,
+    costCad: `CAD $${(r.costCadCents / 100).toFixed(2)}`,
+    costNgn: r.costNgn,
+  })));
+  const [saved, setSaved] = useState(false);
 
   const update = (id: number, field: keyof Region, val: string) => {
     setRegions((prev) =>
@@ -982,6 +982,26 @@ function TabShipping() {
 
   const remove = (id: number) =>
     setRegions((prev) => prev.filter((r) => r.id !== id));
+
+  async function save() {
+    const result = await updatePageContent('shipping', {
+      freeShippingThresholdCents: initial.freeShippingThresholdCents,
+      regions: regions.map(r => ({
+        id: r.name.toLowerCase().includes('united kingdom') ? 'uk' :
+          r.name.toLowerCase().includes('canada') || r.name.toLowerCase().includes('united states') ? 'canada-us' :
+          r.name.toLowerCase().includes('nigeria') ? 'nigeria' : 'rest-of-world',
+        name: r.name.trim(),
+        standard: r.standard.trim(),
+        express: r.express.trim(),
+        costCadCents: Math.round(Number(r.costCad.replace(/[^0-9.]/g, '')) * 100) || 0,
+        costNgn: r.costNgn.trim(),
+      })),
+    });
+    if (result.ok) {
+      setSaved(true);
+      setTimeout(() => setSaved(false), 1800);
+    }
+  }
 
   const colHead = (t: string) => (
     <th
@@ -1108,7 +1128,13 @@ function TabShipping() {
       </div>
 
       <div>
-        <SaveButton />
+        <button
+          onClick={save}
+          className="border-none rounded-md px-6 py-[0.55rem] font-semibold cursor-pointer"
+          style={{ backgroundColor: saved ? C.teal : C.gold, color: saved ? "#fff" : C.charcoal, fontFamily: UI, fontSize: "0.8rem" }}
+        >
+          {saved ? "Saved" : "Save Changes"}
+        </button>
       </div>
     </div>
   );
@@ -1507,7 +1533,7 @@ type Tab = (typeof TABS)[number];
 
 // ── Page root ─────────────────────────────────────────────────────────────────
 
-export default function ConsoleSettings({ homeContent, aboutContent, payouts }: { homeContent: HomeContent; aboutContent: AboutContent; payouts: StripePayoutSummary }) {
+export default function ConsoleSettings({ homeContent, aboutContent, shippingContent, payouts }: { homeContent: HomeContent; aboutContent: AboutContent; shippingContent: ShippingContent; payouts: StripePayoutSummary }) {
   const [activeTab, setActiveTab] = useState<Tab>("Store Profile");
 
   return (
@@ -1575,7 +1601,7 @@ export default function ConsoleSettings({ homeContent, aboutContent, payouts }: 
         {activeTab === "Store Profile" && <TabStoreProfile />}
         {activeTab === "Homepage Content" && <TabHomepageContent initial={homeContent} />}
         {activeTab === "About Page" && <TabAboutContent initial={aboutContent} />}
-        {activeTab === "Shipping & Delivery" && <TabShipping />}
+        {activeTab === "Shipping & Delivery" && <TabShipping initial={shippingContent} />}
         {activeTab === "Payments & Payout" && <TabPayments payouts={payouts} />}
         {activeTab === "Policies" && <TabPolicies />}
         {activeTab === "Notifications" && <TabNotifications />}

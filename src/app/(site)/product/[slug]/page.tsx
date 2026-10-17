@@ -7,6 +7,7 @@ import { isInWishlist } from '@/server/account';
 import { listProductReviews } from '@/server/reviews';
 import { siteUrl } from '@/lib/site';
 import { ogImageUrl } from '@/server/storage';
+import { getPageContent } from '@/server/content';
 
 type Params = { params: Promise<{ slug: string }> };
 
@@ -74,6 +75,7 @@ export default async function Page({ params }: Params) {
   const user = await getCurrentUser().catch(() => null);
   const inWishlist = user ? await isInWishlist(user.id, product.id) : false;
   const reviews = await listProductReviews(product.id);
+  const shippingContent = await getPageContent('shipping');
 
   return (
     <Product
@@ -83,6 +85,7 @@ export default async function Page({ params }: Params) {
       signedIn={Boolean(user)}
       reviews={reviews}
       shareBaseUrl={siteUrl()}
+      shippingContent={shippingContent}
     />
   );
 }

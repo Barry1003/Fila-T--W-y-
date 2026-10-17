@@ -5,16 +5,17 @@
  * they always return the same result, which makes them the easiest part of the
  * backend to reason about and to test.
  *
- * Right now this logic is inlined in Cart.tsx and duplicated in Checkout.tsx,
- * where it has already drifted — see the note on shippingCost below. Pulling it
- * here means the cart, the checkout and the order confirmation cannot disagree
- * about what someone owes.
+ * Cart and checkout both receive owner-controlled shipping configuration from
+ * PageContent. The server action reads that same record before writing an
+ * order, so browser values cannot change the amount charged.
  *
  * ── Working notes ────────────────────────────────────────────────────────────
  * Everything is in Canadian dollars. Money is held as whole cents (an integer),
  * never as a float: 0.1 + 0.2 !== 0.3 in JavaScript, and that error compounds
  * across a cart. Convert to dollars only when displaying.
  */
+
+import { SHIPPING_DEFAULTS, type ShippingContent } from './content-schema';
 
 export type CartLine = {
   /** Price of one unit, in cents. 8900 means CAD $89.00. */
@@ -36,7 +37,7 @@ export type OrderTotals = {
   totalCents: number;
 };
 
-export const FREE_SHIPPING_THRESHOLD_CENTS = 25000;
+export const FREE_SHIPPING_THRESHOLD_CENTS = SHIPPING_DEFAULTS.freeShippingThresholdCents;
 
 // ── 1. Subtotal ──────────────────────────────────────────────────────────────
 
@@ -79,19 +80,19 @@ export function discountAmount(subtotalCents: number, discount: Discount | null)
 /**
  * Shipping cost in cents for a zone and speed.
  */
-export function shippingCost(zone: ShippingZone, speed: ShippingSpeed, subtotalCents: number = 0): number {
-  if (speed === 'standard' && subtotalCents >= FREE_SHIPPING_THRESHOLD_CENTS) {
+export function shippingCost(zone: ShippingZone, speed: ShippingSpeed, subtotalCents = 0, config?: ShippingContent): number {
+  const source = config ?? SHIPPING_DEFAULTS;
+  const threshold = source.freeShippingThresholdCents;
+  if (speed === 'standard' && subtotalCents >= threshold) {
     return 0;
   }
-
-  const rates: Record<ShippingZone, Record<ShippingSpeed, number>> = {
-    'canada-us':     { standard: 1500, express: 2500 }, // Assuming standard isn't free anymore below threshold
-    'uk':            { standard: 2000, express: 3500 },
-    'nigeria':       { standard: 700,  express: 2000 },
-    'rest-of-world': { standard: 3000, express: 5000 }
-  };
-
-  return rates[zone][speed];
+  const region = source.regions.find(r => r.id === zone);
+  if (!region) return 0;
+  if (speed === 'standard') return region.costCadCents;
+  // The console stores delivery wording, while the CAD amount is the base
+  // standard rate. Express pricing has no separate field in the settings UI;
+  // keep it explicitly derived until the owner adds an express-cost field.
+  return region.costCadCents === 0 ? 0 : Math.round(region.costCadCents * 1.65);
 }
 
 // ── 4. Putting it together ───────────────────────────────────────────────────
@@ -103,11 +104,12 @@ export function orderTotals(
   lines: CartLine[],
   discount: Discount | null,
   zone: ShippingZone,
-  speed: ShippingSpeed
+  speed: ShippingSpeed,
+  config?: ShippingContent,
 ): OrderTotals {
   const subtotalCents = subtotal(lines);
   const discountCents = discountAmount(subtotalCents, discount);
-  const shippingCents = shippingCost(zone, speed, subtotalCents);
+  const shippingCents = shippingCost(zone, speed, subtotalCents, config);
   
   // Total is subtotal minus discount, plus shipping
   const totalCents = (subtotalCents - discountCents) + shippingCents;

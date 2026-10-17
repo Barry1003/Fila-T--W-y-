@@ -137,6 +137,35 @@ export const aboutContentSchema = z.object({
 
 export type AboutContent = z.infer<typeof aboutContentSchema>;
 
+// Shipping is configuration, not presentation copy.  Store it in the same
+// validated content record so the console, storefront and order action all
+// read one owner-controlled source.
+const shippingRegionSchema = z.object({
+  id: z.enum(['canada-us', 'uk', 'nigeria', 'rest-of-world']),
+  name: z.string().min(1).max(100),
+  standard: z.string().max(100),
+  express: z.string().max(100),
+  costCadCents: z.number().int().min(0).max(100000),
+  costNgn: z.string().max(40),
+});
+
+export const shippingContentSchema = z.object({
+  freeShippingThresholdCents: z.number().int().min(0).max(1000000),
+  regions: z.array(shippingRegionSchema).min(1).max(20),
+});
+
+export type ShippingContent = z.infer<typeof shippingContentSchema>;
+
+export const SHIPPING_DEFAULTS: ShippingContent = {
+  freeShippingThresholdCents: 25000,
+  regions: [
+    { id: 'uk', name: 'United Kingdom', standard: '3–5 business days', express: 'Next day', costCadCents: 1202, costNgn: '' },
+    { id: 'canada-us', name: 'Canada / United States', standard: '7–10 business days', express: '3–5 days', costCadCents: 2064, costNgn: '' },
+    { id: 'nigeria', name: 'Nigeria', standard: '2–4 business days', express: 'Same day (Lagos)', costCadCents: 0, costNgn: '' },
+    { id: 'rest-of-world', name: 'Other / Rest of World', standard: '10–21 business days', express: '', costCadCents: 3096, costNgn: '' },
+  ],
+};
+
 export const ABOUT_DEFAULTS: AboutContent = {
   hero: {
     eyebrow: 'Our Story',
@@ -176,6 +205,7 @@ export const ABOUT_DEFAULTS: AboutContent = {
 export const PAGE_SCHEMAS = {
   home: { schema: homeContentSchema, defaults: HOME_DEFAULTS },
   about: { schema: aboutContentSchema, defaults: ABOUT_DEFAULTS },
+  shipping: { schema: shippingContentSchema, defaults: SHIPPING_DEFAULTS },
 } as const;
 
 export type PageSlug = keyof typeof PAGE_SCHEMAS;

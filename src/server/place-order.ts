@@ -10,6 +10,7 @@ import { getCurrentUser } from './auth';
 import { formatCad, orderTotals, type Discount } from './pricing';
 import { placeOrderSchema } from './order-schema';
 import { sendEmail, sendOwnerEmail } from '@/lib/email';
+import { getPageContent } from './content';
 
 /**
  * Placing an order.
@@ -131,6 +132,7 @@ export async function placeOrder(raw: unknown): Promise<PlaceOrderResult> {
   }
 
   const input = parsed.data;
+  const shippingConfig = await getPageContent('shipping');
 
   // Signed in or not — guests can buy. The order keeps its own copy of the
   // contact details either way, so it stays a faithful record.
@@ -194,6 +196,7 @@ export async function placeOrder(raw: unknown): Promise<PlaceOrderResult> {
         discount,
         input.shippingZone,
         input.shippingSpeed,
+        shippingConfig,
       );
 
       // Two orders placed in the same instant can pick the same number. The

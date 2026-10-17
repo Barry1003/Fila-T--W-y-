@@ -17,7 +17,7 @@ const FAQ_SECTIONS: FaqSection[] = [
       </svg>
     ),
     items: [
-      { id: 'o1', q: "How long does shipping take?", a: "Standard international shipping takes 7–14 business days. Express options (3–5 business days) are available at checkout. All orders are dispatched from Lagos within 2–3 business days of payment confirmation." },
+      { id: 'o1', q: "How long does shipping take?", a: "Delivery estimates and available shipping methods are shown at checkout for your destination. All orders are dispatched after payment confirmation." },
       { id: 'o2', q: "Do you ship worldwide?", a: "Yes. We ship to over 40 countries across North America, Europe, and Africa. Shipping costs and estimated delivery times are calculated at checkout based on your destination." },
       { id: 'o3', q: "How do I track my order?", a: "Once your order ships, you'll receive a tracking number by email. You can also view your tracking status in your account under Orders & Tracking." },
       { id: 'o4', q: "Can I change or cancel my order?", a: "Orders can be amended or cancelled within 12 hours of placement, before they enter fulfilment. Contact us via your Support Inbox as soon as possible with your order number." },
